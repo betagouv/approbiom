@@ -1,0 +1,1 @@
+import{i as e,n as t,r as n,t as r}from"./_plugin-vue_export-helper-CKae3373.js";var i={};function a(t,r){return e(),n(`h1`,null,`Hello World 1`)}t(r(i,[[`render`,a]])).mount(`#app`);
