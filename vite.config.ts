@@ -5,13 +5,13 @@ import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
 import vueDevTools from 'vite-plugin-vue-devtools'
 
-const widgetsDir = fileURLToPath(new URL('./grist-widgets', import.meta.url))
+const widgetsDir = fileURLToPath(new URL('./grist-widget', import.meta.url))
 const widgetEntries = Object.fromEntries(
   readdirSync(widgetsDir, { withFileTypes: true })
     .filter((d) => d.isDirectory())
     .map((d) => [
       d.name,
-      fileURLToPath(new URL(`./grist-widgets/${d.name}/index.html`, import.meta.url)),
+      fileURLToPath(new URL(`./grist-widget/${d.name}/index.html`, import.meta.url)),
     ]),
 )
 
@@ -26,7 +26,7 @@ export default defineConfig({
       transformIndexHtml: {
         order: 'pre',
         handler(html, ctx) {
-          if (!ctx.filename.includes('grist-widgets')) return html
+          if (!ctx.filename.includes('grist-widget')) return html
           return {
             html,
             tags: [
