@@ -24,7 +24,7 @@ jobs:
           node-version: 24
           cache: pnpm
       - run: pnpm install --config.minimumReleaseAge=0
-      - run: pnpm build
+      - run: pnpm build --config.minimumReleaseAge=0
       - uses: actions/upload-pages-artifact@v3
         with:
           path: dist
