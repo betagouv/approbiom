@@ -1,5 +1,5 @@
 import { fileURLToPath, URL } from 'node:url'
-import { readdirSync } from 'node:fs'
+import { readdirSync, writeFileSync } from 'node:fs'
 
 import { defineConfig } from 'vite'
 import vue from '@vitejs/plugin-vue'
@@ -21,6 +21,15 @@ export default defineConfig({
   plugins: [
     vue(),
     vueDevTools(),
+    // GitHub Pages uses Jekyll which silently blocks files starting with '_'.
+    // Vite generates _plugin-vue_export-helper.js which would be 404.
+    // An empty .nojekyll file disables Jekyll so all files are served as-is.
+    {
+      name: 'github-pages-nojekyll',
+      closeBundle() {
+        writeFileSync('docs/.nojekyll', '')
+      },
+    },
     // Injects the Grist plugin API script into every widget's <head> automatically,
     {
       name: 'inject-grist-api',
