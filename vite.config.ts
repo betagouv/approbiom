@@ -30,6 +30,15 @@ export default defineConfig({
         writeFileSync('docs/.nojekyll', '')
       },
     },
+    // Vite handles .json natively but not .geojson — this plugin bridges the gap.
+    {
+      name: 'geojson',
+      transform(src, id) {
+        if (id.endsWith('.geojson')) {
+          return { code: `export default ${src}` }
+        }
+      },
+    },
     // Injects the Grist plugin API script into every widget's <head> automatically,
     {
       name: 'inject-grist-api',
@@ -43,6 +52,11 @@ export default defineConfig({
               {
                 tag: 'script',
                 attrs: { src: 'https://docs.getgrist.com/grist-plugin-api.js' },
+                injectTo: 'head',
+              },
+              {
+                tag: 'style',
+                children: 'body { margin: 0; }',
                 injectTo: 'head',
               },
             ],
