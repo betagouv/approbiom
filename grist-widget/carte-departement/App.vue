@@ -2,30 +2,38 @@
 import CarteDepartement from "./CarteDepartement.vue";
 
 grist.ready({
-  requiredAccess: "full",
-  allowSelectBy: true,
-  columns: [{ name: "Département", type: "Text" }],
+  requiredAccess: "read table", // Possible values are: none, read table and full. https://support.getgrist.com/widget-custom/#access-level
+  columns: [{ name: "DDEP_C_COD", type: "Text", title: "Département", allowMultiple: true }],
 });
 
 grist.onRecord((row, mappings) => {
-  const preElement = document.getElementById("out");
-  const mappingsElement = document.getElementById("mappings");
-  if (preElement) {
-    preElement.textContent = JSON.stringify(row, null, 2);
+  if (!mappings) {
+    throw new Error("mappings variable is undefined");
   }
-  if (mappingsElement) {
-    mappingsElement.textContent = JSON.stringify(mappings) + " " + `${mappings}`;
+
+  if (typeof mappings["DDEP_C_COD"] !== "string") {
+    throw new Error("No mapping for DDEP_C_COD");
   }
-  try {
-    if (row === null) {
-      throw new Error("(No data - not on row - please add or select a row)");
+
+  if (row && row[mappings["DDEP_C_COD"]]) {
+    const preElement = document.getElementById("out");
+
+    if (preElement) {
+      //test display
+      preElement.textContent = JSON.stringify(row[mappings["DDEP_C_COD"]]);
     }
-  } catch (err) {
-    throw new Error(`error : ${err}`);
   }
 });
 
 grist.onOptions((_options, settings) => {
+  if (settings.accessLevel === "read table") {
+    const readoutElement = document.getElementById("readout");
+    if (readoutElement) {
+      readoutElement.remove();
+    }
+  }
+
+  //test display
   const preElement = document.getElementById("option");
   if (preElement) {
     preElement.textContent = JSON.stringify(settings, null, 2);
@@ -37,6 +45,7 @@ grist.onOptions((_options, settings) => {
   <pre id="mappings">mappings...</pre>
   <pre id="option">Options...</pre>
   <pre id="out">Chargement...</pre>
+  <pre id="readout">Waiting for data...</pre>
   <CarteDepartement />
 </template>
 

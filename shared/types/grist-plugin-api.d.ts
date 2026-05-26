@@ -91,7 +91,7 @@ interface GristPlugin {
   onOptions(callback: (options: unknown, settings: InteractionOptions) => unknown): void;
   /** Add a handler called whenever the row with the cursor changes. By default, options.keepEncoded is false. */
   onRecord(
-    callback: (data: RowRecord[] | null, mappings: WidgetColumnMap | null) => unknown,
+    callback: (data: RowRecord | null, mappings: WidgetColumnMap | null) => unknown,
     options?: FetchSelectedOptions,
   ): void;
 }
