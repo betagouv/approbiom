@@ -21,10 +21,10 @@ grist.onRecord((row) => {
   }
 });
 
-grist.onOptions((options, settings) => {
+grist.onOptions((_options, settings) => {
   const preElement = document.getElementById("option");
   if (preElement) {
-    preElement.textContent = JSON.stringify(`${options} ${settings}`, null, 2);
+    preElement.textContent = JSON.stringify(settings, null, 2);
   }
 });
 </script>
