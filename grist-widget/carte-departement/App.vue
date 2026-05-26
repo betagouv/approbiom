@@ -7,7 +7,7 @@ grist.ready({
   allowSelectBy: true,
 });
 
-grist.onRecord((data) => console.log("data", data));
+grist.onRecord((data) => console.log("data test", data));
 </script>
 
 <template>
