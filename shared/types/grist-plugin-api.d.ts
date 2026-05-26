@@ -31,19 +31,19 @@ interface ReadyPayload {
 }
 
 const enum GristObjCode {
-  List        = "L",
-  LookUp      = "l",
-  Dict        = "O",
-  DateTime    = "D",
-  Date        = "d",
-  Censored    = "C",
-  Reference   = "R",
+  List = "L",
+  LookUp = "l",
+  Dict = "O",
+  DateTime = "D",
+  Date = "d",
+  Censored = "C",
+  Reference = "R",
   ReferenceList = "r",
-  Exception   = "E",
-  Pending     = "P",
-  Skip        = "S",
+  Exception = "E",
+  Pending = "P",
+  Skip = "S",
   Unmarshallable = "U",
-  Versions    = "V",
+  Versions = "V",
 }
 
 /** Possible types of cell content. Primitives or a tuple [GristObjCode, ...args]. */
@@ -83,7 +83,7 @@ interface GristPlugin {
   ready(settings?: ReadyPayload): void;
   /** Add a handler called whenever the row with the cursor changes. By default, options.keepEncoded is false. */
   onRecord(
-    callback: (data: RowRecord | null, mappings: WidgetColumnMap | null) => unknown,
+    callback: (data: RowRecord[] | null, mappings: WidgetColumnMap | null) => unknown,
     options?: FetchSelectedOptions,
   ): void;
 }
