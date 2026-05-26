@@ -79,8 +79,16 @@ interface FetchSelectedOptions {
   expandRefs?: boolean;
 }
 
+/** Widget configuration set and approved by Grist, sent as part of ready message. */
+interface InteractionOptions {
+  /** Granted access level. */
+  accessLevel: string;
+}
+
 interface GristPlugin {
   ready(settings?: ReadyPayload): void;
+  /** Add a handler called whenever widget options change (and on initial ready message). Called with saved json options or null, and the widget's relationship with the document. */
+  onOptions(callback: (options: unknown, settings: InteractionOptions) => unknown): void;
   /** Add a handler called whenever the row with the cursor changes. By default, options.keepEncoded is false. */
   onRecord(
     callback: (data: RowRecord[] | null, mappings: WidgetColumnMap | null) => unknown,

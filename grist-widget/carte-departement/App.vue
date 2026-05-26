@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import CarteDepartement from "./CarteDepartement.vue";
 
-/* READY */
 grist.ready({
   requiredAccess: "full",
   allowSelectBy: true,
+  columns: [{ name: "Département", type: "Text" }],
 });
 
 grist.onRecord((row) => {
@@ -18,6 +18,13 @@ grist.onRecord((row) => {
     }
   } catch (err) {
     throw new Error(`error : ${err}`);
+  }
+});
+
+grist.onOptions((options, settings) => {
+  const preElement = document.getElementById("out");
+  if (preElement) {
+    preElement.textContent = JSON.stringify(`${options} ${settings}`, null, 2);
   }
 });
 </script>
