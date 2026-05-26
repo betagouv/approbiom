@@ -31,18 +31,11 @@ grist.onOptions((_options, settings) => {
     if (readoutElement) {
       readoutElement.remove();
     }
-  } else {
-    //test display
-    const preElement = document.getElementById("option");
-    if (preElement) {
-      preElement.textContent = JSON.stringify(settings, null, 2);
-    }
   }
 });
 </script>
 
 <template>
-  <pre id="option">Options...</pre>
   <pre id="out">Row ici</pre>
   <pre id="readout">Waiting for data...</pre>
   <CarteDepartement />
