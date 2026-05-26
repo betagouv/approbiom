@@ -3,7 +3,7 @@ import CarteDepartement from "./CarteDepartement.vue";
 
 grist.ready({
   requiredAccess: "read table", // Possible values are: none, read table and full. https://support.getgrist.com/widget-custom/#access-level
-  columns: [{ name: "DDEP_C_COD", type: "Text", title: "Département", allowMultiple: true }],
+  columns: [{ name: "DDEP_C_COD", type: "Text", title: "Département" }],
 });
 
 grist.onRecord((row, mappings) => {
@@ -26,25 +26,24 @@ grist.onRecord((row, mappings) => {
 });
 
 grist.onOptions((_options, settings) => {
-  if (settings.accessLevel === "read table") {
+  if (settings.accessLevel !== "none") {
     const readoutElement = document.getElementById("readout");
     if (readoutElement) {
       readoutElement.remove();
     }
-  }
-
-  //test display
-  const preElement = document.getElementById("option");
-  if (preElement) {
-    preElement.textContent = JSON.stringify(settings, null, 2);
+  } else {
+    //test display
+    const preElement = document.getElementById("option");
+    if (preElement) {
+      preElement.textContent = JSON.stringify(settings, null, 2);
+    }
   }
 });
 </script>
 
 <template>
-  <pre id="mappings">mappings...</pre>
   <pre id="option">Options...</pre>
-  <pre id="out">Chargement...</pre>
+  <pre id="out">Row ici</pre>
   <pre id="readout">Waiting for data...</pre>
   <CarteDepartement />
 </template>
