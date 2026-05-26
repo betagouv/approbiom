@@ -7,10 +7,14 @@ grist.ready({
   columns: [{ name: "Département", type: "Text" }],
 });
 
-grist.onRecord((row) => {
+grist.onRecord((row, mappings) => {
   const preElement = document.getElementById("out");
+  const mappingsElement = document.getElementById("mappings");
   if (preElement) {
     preElement.textContent = JSON.stringify(row, null, 2);
+  }
+  if (mappingsElement) {
+    mappingsElement.textContent = JSON.stringify(mappings) + " " + `${mappings}`;
   }
   try {
     if (row === null) {
@@ -30,6 +34,7 @@ grist.onOptions((_options, settings) => {
 </script>
 
 <template>
+  <pre id="mappings">mappings...</pre>
   <pre id="option">Options...</pre>
   <pre id="out">Chargement...</pre>
   <CarteDepartement />
