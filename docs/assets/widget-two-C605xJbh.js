@@ -1,0 +1,1 @@
+import{a as e,l as t,n,t as r}from"./_plugin-vue_export-helper-BUchVoyg.js";var i={};function a(n,r){return t(),e(`h1`,null,`Hello World 2`)}n(r(i,[[`render`,a]])).mount(`#app`);
