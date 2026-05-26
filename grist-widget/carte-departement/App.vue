@@ -22,7 +22,7 @@ grist.onRecord((row) => {
 });
 
 grist.onOptions((options, settings) => {
-  const preElement = document.getElementById("out");
+  const preElement = document.getElementById("option");
   if (preElement) {
     preElement.textContent = JSON.stringify(`${options} ${settings}`, null, 2);
   }
@@ -30,6 +30,7 @@ grist.onOptions((options, settings) => {
 </script>
 
 <template>
+  <pre id="option">Options...</pre>
   <pre id="out">Chargement...</pre>
   <CarteDepartement />
 </template>
