@@ -1,1 +1,0 @@
-import{n as e,o as t,r as n,t as r}from"./_plugin-vue_export-helper-CsBNNgDr.js";var i={};function a(e,r){return t(),n(`h1`,null,`Hello World 2`)}e(r(i,[[`render`,a]])).mount(`#app`);
