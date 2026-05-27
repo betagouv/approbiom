@@ -38,7 +38,7 @@ grist.onOptions((_options, settings) => {
 <template>
   <pre id="out">Row ici</pre>
   <pre id="readout">Waiting for data...</pre>
-  <CarteDepartement />
+  <CarteDepartement :code-department-inputs="['64', '82']" />
 </template>
 
 <style scoped></style>
