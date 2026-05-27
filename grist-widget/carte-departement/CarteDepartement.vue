@@ -1,61 +1,42 @@
 <script setup lang="ts">
 import leaflet from "leaflet";
-import { computed, onMounted } from "vue";
-import type { DepartementFeature, DepartementFeatureCollection } from "./types/departement";
+import { computed, onMounted, onUnmounted, watch } from "vue";
+import type { DepartementFeatureCollection } from "./types/departement";
 import departementsRaw from "./data/departements.geojson";
 
 const departementsData = departementsRaw as DepartementFeatureCollection;
 
 interface Props {
-  codeDepartmentInputs?: [string, ...string[]] | null;
+  codeDepartmentInputs: [string, ...string[]] | null;
 }
 
-const { codeDepartmentInputs = null } = defineProps<Props>();
+const props = defineProps<Props>();
 
-const selectedDepartmentFeatures = computed(() => {
-  if (codeDepartmentInputs === null) {
-    return [];
+const centerOfFrance = { lat: 47.75, lng: 1.67 };
+const initialZoom = 6;
+
+const knownCodes = new Set(departementsData.features.map((f) => f.properties.DDEP_C_COD));
+
+const departmentValidation = computed(() => {
+  if (!props.codeDepartmentInputs) {
+    return { status: "empty" as const };
   }
-  const departmentFeaturesFound = departementsData.features.filter((feature) =>
-    codeDepartmentInputs.includes(feature.properties.DDEP_C_COD),
+  const invalidCodes = props.codeDepartmentInputs.filter((code) => !knownCodes.has(code));
+  if (invalidCodes.length > 0) {
+    return { status: "error" as const, invalidCodes };
+  }
+  const features = departementsData.features.filter((f) =>
+    props.codeDepartmentInputs!.includes(f.properties.DDEP_C_COD),
   );
-
-  if (departmentFeaturesFound.length === 0) {
-    throw new Error(`Les départements fournis n'ont pas été reconnus : ${codeDepartmentInputs}`);
-  }
-  return departmentFeaturesFound;
+  return { status: "ok" as const, features };
 });
-const firstFeature = selectedDepartmentFeatures.value?.[0];
-
-const initialZoom = 8;
 
 let map: leaflet.Map;
-
-function toLatLngExpression(geopoint: string) {
-  const splittedGeopoint = geopoint.split(",");
-  if (
-    splittedGeopoint.length !== 2 ||
-    !(splittedGeopoint[0] && Number(splittedGeopoint[0])) ||
-    !(splittedGeopoint[1] && Number(splittedGeopoint[1]))
-  ) {
-    throw new Error("geopoint should describe a latitude and a longitude");
-  }
-  const latlng: leaflet.LatLngExpression = [
-    Number(splittedGeopoint[0]),
-    Number(splittedGeopoint[1]),
-  ];
-  return latlng;
-}
+let geoJsonLayer: leaflet.GeoJSON | null = null;
 
 onMounted(() => {
-  map = leaflet
-    .map("map")
-    .setView(
-      firstFeature?.properties?._geopoint
-        ? toLatLngExpression(firstFeature?.properties?._geopoint)
-        : [47.75, 1.67],
-      initialZoom,
-    );
+  map = leaflet.map("map").setView(centerOfFrance, initialZoom);
+
   leaflet
     .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 9,
@@ -64,26 +45,58 @@ onMounted(() => {
     })
     .addTo(map);
 
-  leaflet
-    .geoJSON(departementsData, {
-      filter: function (feature) {
-        // TypeScript cannot infer that `feature` is a `DepartementFeature` here,
-        // so we explicitly assert the type in order to safely compare against the
-        // selected department list.
-        return selectedDepartmentFeatures.value.includes(feature as DepartementFeature);
-      },
-    })
-    .addTo(map);
+  watch(
+    departmentValidation,
+    (validation) => {
+      geoJsonLayer?.remove();
+      geoJsonLayer = null;
+
+      if (validation.status === "ok") {
+        geoJsonLayer = leaflet.geoJSON(validation.features).addTo(map);
+        map.fitBounds(geoJsonLayer.getBounds());
+      } else {
+        map.setView(centerOfFrance, initialZoom);
+      }
+    },
+    { immediate: true },
+  );
 });
+
+onUnmounted(() => map?.remove());
 </script>
 
 <template>
-  <div id="map"></div>
+  <div class="wrapper">
+    <div v-if="departmentValidation.status === 'error'" class="error-message">
+      <strong>
+        Département(s) non reconnu(s) : "{{ departmentValidation.invalidCodes.join('", "') }}"
+      </strong>
+      <br />
+      Les codes département sont des chaînes de caractères. Les départements à un seul chiffre
+      doivent commencer par zéro (ex : "09" et non "9").
+    </div>
+    <div id="map"></div>
+  </div>
 </template>
 
 <style scoped>
-#map {
+.wrapper {
+  display: flex;
+  flex-direction: column;
   height: 100vh;
+}
+
+.error-message {
+  padding: 8px 12px;
+  background: #fff3cd;
+  border-bottom: 1px solid #ffc107;
+  color: #856404;
+  font-size: 0.875rem;
+  flex-shrink: 0;
+}
+
+#map {
+  flex: 1;
   width: 100%;
 }
 </style>
