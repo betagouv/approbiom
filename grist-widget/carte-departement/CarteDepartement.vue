@@ -1,11 +1,31 @@
 <script setup lang="ts">
 import leaflet from "leaflet";
-import { onMounted } from "vue";
+import { computed, onMounted } from "vue";
 import type { DepartementFeature, DepartementFeatureCollection } from "./types/departement";
 import departementsRaw from "./data/departements.geojson";
 
 const departementsData = departementsRaw as DepartementFeatureCollection;
-const initialDepartement = departementsData.features[64] as DepartementFeature;
+
+interface Props {
+  codeDepartmentInputs?: [string, ...string[]] | null;
+}
+
+const { codeDepartmentInputs = null } = defineProps<Props>();
+
+const selectedDepartmentFeatures = computed(() => {
+  if (codeDepartmentInputs === null) {
+    return [];
+  }
+  const departmentFeaturesFound = departementsData.features.filter((feature) =>
+    codeDepartmentInputs.includes(feature.properties.DDEP_C_COD),
+  );
+
+  if (departmentFeaturesFound.length === 0) {
+    throw new Error(`Les départements fournis n'ont pas été reconnus : ${codeDepartmentInputs}`);
+  }
+  return departmentFeaturesFound;
+});
+const firstFeature = selectedDepartmentFeatures.value?.[0];
 
 const initialZoom = 8;
 
@@ -30,7 +50,12 @@ function toLatLngExpression(geopoint: string) {
 onMounted(() => {
   map = leaflet
     .map("map")
-    .setView(toLatLngExpression(initialDepartement.properties._geopoint), initialZoom);
+    .setView(
+      firstFeature?.properties?._geopoint
+        ? toLatLngExpression(firstFeature?.properties?._geopoint)
+        : [47.75, 1.67],
+      initialZoom,
+    );
   leaflet
     .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 9,
@@ -42,7 +67,10 @@ onMounted(() => {
   leaflet
     .geoJSON(departementsData, {
       filter: function (feature) {
-        return feature === initialDepartement;
+        // TypeScript cannot infer that `feature` is a `DepartementFeature` here,
+        // so we explicitly assert the type in order to safely compare against the
+        // selected department list.
+        return selectedDepartmentFeatures.value.includes(feature as DepartementFeature);
       },
     })
     .addTo(map);
