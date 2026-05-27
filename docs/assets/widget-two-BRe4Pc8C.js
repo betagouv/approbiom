@@ -1,0 +1,1 @@
+import{n as e,o as t,t as n,u as r}from"./_plugin-vue_export-helper-AEYRJCcA.js";var i={};function a(e,n){return r(),t(`h1`,null,`Hello World 2`)}e(n(i,[[`render`,a]])).mount(`#app`);
