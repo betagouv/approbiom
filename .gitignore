@@ -36,3 +36,6 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjs
+
+# Grist files for testing
+test/test-dev.grist
