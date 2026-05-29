@@ -7,7 +7,7 @@ import departementsRaw from "./data/departements.geojson";
 const departementsData = departementsRaw as DepartementFeatureCollection;
 
 interface Props {
-  codeDepartmentInputs: string[] | null;
+  codeDepartmentInputs: string[];
 }
 
 const props = defineProps<Props>();
@@ -18,7 +18,7 @@ const initialZoom = 6;
 const knownCodes = new Set(departementsData.features.map((f) => f.properties.DDEP_C_COD));
 
 const departmentValidation = computed(() => {
-  if (!props.codeDepartmentInputs || props.codeDepartmentInputs.length === 0) {
+  if (props.codeDepartmentInputs.length === 0) {
     return { status: "empty" as const };
   }
   const invalidCodes = props.codeDepartmentInputs.filter((code) => !knownCodes.has(code));
