@@ -1,59 +1,54 @@
 <script setup lang="ts">
-import { ref, computed } from "vue";
+import { ref, onMounted, computed } from "vue";
 import CarteDepartement from "./CarteDepartement.vue";
 
-const inputValue = ref("64");
+const codeDepartmentInputs = ref<string[]>([]);
 
-const codeDepartmentInputs = computed(() => {
-  const codes = inputValue.value
+const message = ref<string | undefined>();
+
+const displayMessage = computed(() => message!.value !== undefined);
+
+function formatCodeDepartmentInputs(value: string) {
+  const codes = value
     .split(",")
     .map((s) => s.trim())
     .filter(Boolean);
+  return codes;
+}
 
-  return codes.length > 0 ? codes : null;
-});
-
-grist.ready({
-  requiredAccess: "read table", // Possible values are: none, read table and full. https://support.getgrist.com/widget-custom/#access-level
-  columns: [{ name: "DDEP_C_COD", type: "Text", title: "Département" }],
+onMounted(() => {
+  grist.ready({
+    requiredAccess: "read table", //cf https://support.getgrist.com/widget-custom/#access-level
+    columns: [{ name: "DDEP_C_COD", type: "Text", title: "Département" }],
+  });
 });
 
 grist.onRecord((row, mappings) => {
   if (!mappings) {
-    throw new Error("mappings variable is undefined");
+    message.value = "Il y a un problème avec la correspondance des colonnes.";
+    return;
+  } else if (typeof mappings["DDEP_C_COD"] !== "string") {
+    message.value = "Il y a eu un problème avec la correspondance de la colonne Département.";
+    return;
+  } else if (!row) {
+    message.value = "Aucune ligne n'a été sélectionnée.";
+    return;
+  }
+  const depCodesValue = row[mappings["DDEP_C_COD"]];
+  if (depCodesValue !== undefined && typeof depCodesValue !== "string") {
+    message.value = "Le type de la colonne Département est incorrect.";
+    return;
   }
 
-  if (typeof mappings["DDEP_C_COD"] !== "string") {
-    throw new Error("No mapping for DDEP_C_COD");
-  }
-
-  if (row && row[mappings["DDEP_C_COD"]]) {
-    const preElement = document.getElementById("out");
-
-    if (preElement) {
-      //test display
-      preElement.textContent = JSON.stringify(row[mappings["DDEP_C_COD"]]);
-    }
-  }
-});
-
-grist.onOptions((_options, settings) => {
-  if (settings.accessLevel !== "none") {
-    const readoutElement = document.getElementById("readout");
-    if (readoutElement) {
-      readoutElement.remove();
-    }
-  }
+  message.value = undefined;
+  codeDepartmentInputs.value = depCodesValue ? formatCodeDepartmentInputs(depCodesValue) : [];
 });
 </script>
 
 <template>
-  <div style="padding: 8px; background: #f0f0f0; display: flex; gap: 8px; align-items: center">
-    <label>Départements (séparés par virgule) :</label>
-    <input v-model="inputValue" placeholder="ex: 64, 33, 75" style="padding: 4px 8px" />
+  <div v-if="displayMessage">
+    {{ message }}
   </div>
-  <pre id="out">Row ici</pre>
-  <pre id="readout">Waiting for data...</pre>
   <CarteDepartement :code-department-inputs="codeDepartmentInputs" />
 </template>
 
