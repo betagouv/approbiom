@@ -33,13 +33,22 @@ const departmentValidation = computed(() => {
 
 let map: leaflet.Map;
 let geoJsonLayer: leaflet.GeoJSON | null = null;
+let resizeObserver: ResizeObserver | null = null;
+
+const mapId = "map";
 
 onMounted(() => {
   map = leaflet
-    .map("map", {
+    .map(mapId, {
       zoomControl: false,
     })
     .setView(centerOfFrance, initialZoom);
+
+  // Grist loads the widget in an iframe whose size settles after init.
+  // Without this, Leaflet caches a stale container size and leaves grey tiles.
+  const mapEl = document.getElementById(mapId)!;
+  resizeObserver = new ResizeObserver(() => map.invalidateSize());
+  resizeObserver.observe(mapEl);
 
   leaflet
     .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
@@ -78,7 +87,10 @@ onMounted(() => {
   );
 });
 
-onUnmounted(() => map?.remove());
+onUnmounted(() => {
+  resizeObserver?.disconnect();
+  map?.remove();
+});
 </script>
 
 <template>
@@ -89,7 +101,7 @@ onUnmounted(() => map?.remove());
       description="Les codes de département doivent respecter la nomenclature officielle de l’INSEE. Les départements à un seul chiffre doivent comporter un zéro initial (ex : 09 et non 9)."
       type="warning"
     />
-    <div id="map"></div>
+    <div :id="mapId"></div>
   </div>
 </template>
 
