@@ -19,7 +19,7 @@ const knownCodes = new Set(departementsData.features.map((f) => f.properties.DDE
 
 const departmentValidation = computed(() => {
   if (props.codeDepartmentInputs.length === 0) {
-    return { status: "empty" as const };
+    return { status: "error" as const };
   }
   const invalidCodes = props.codeDepartmentInputs.filter((code) => !knownCodes.has(code));
   if (invalidCodes.length > 0) {
@@ -56,7 +56,19 @@ onMounted(() => {
       geoJsonLayer = null;
 
       if (validation.status === "ok") {
-        geoJsonLayer = leaflet.geoJSON(validation.features).addTo(map);
+        // Leaflet cannot read CSS custom properties — resolve the value from the DOM at runtime.
+        const blueActive = getComputedStyle(document.documentElement)
+          .getPropertyValue("--blue-france-sun-113-625-active")
+          .trim();
+
+        geoJsonLayer = leaflet
+          .geoJSON(validation.features, {
+            style: {
+              color: blueActive,
+              fillColor: blueActive,
+            },
+          })
+          .addTo(map);
         map.fitBounds(geoJsonLayer.getBounds());
       } else {
         map.setView(centerOfFrance, initialZoom);
@@ -71,14 +83,12 @@ onUnmounted(() => map?.remove());
 
 <template>
   <div class="wrapper">
-    <div v-if="departmentValidation.status === 'error'" class="error-message">
-      <strong>
-        Département(s) non reconnu(s) : "{{ departmentValidation.invalidCodes.join('", "') }}"
-      </strong>
-      <br />
-      Les codes département sont des chaînes de caractères. Les départements à un seul chiffre
-      doivent commencer par zéro (ex : "09" et non "9").
-    </div>
+    <DsfrAlert
+      v-if="departmentValidation.status === 'error'"
+      :title="`Département(s) non reconnu(s) : ${departmentValidation?.invalidCodes?.join(',')}`"
+      description="Les codes de département doivent respecter la nomenclature officielle de l’INSEE. Les départements à un seul chiffre doivent comporter un zéro initial (ex : 09 et non 9)."
+      type="warning"
+    />
     <div id="map"></div>
   </div>
 </template>
@@ -88,15 +98,6 @@ onUnmounted(() => map?.remove());
   display: flex;
   flex-direction: column;
   height: 100vh;
-}
-
-.error-message {
-  padding: 8px 12px;
-  background: #fff3cd;
-  border-bottom: 1px solid #ffc107;
-  color: #856404;
-  font-size: 0.875rem;
-  flex-shrink: 0;
 }
 
 #map {
