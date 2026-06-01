@@ -70,6 +70,13 @@ export default defineConfig({
       '@shared': fileURLToPath(new URL('./shared', import.meta.url)),
     },
   },
+  css: {
+    // DSFR ships legacy @media (min-width:0\0) IE hacks that LightningCSS rejects as invalid syntax.
+    // errorRecovery silently strips them instead of aborting the build.
+    lightningcss: {
+      errorRecovery: true,
+    },
+  },
   build: {
     outDir: 'docs',
     rollupOptions: {
