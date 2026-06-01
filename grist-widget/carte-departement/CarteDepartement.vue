@@ -35,7 +35,11 @@ let map: leaflet.Map;
 let geoJsonLayer: leaflet.GeoJSON | null = null;
 
 onMounted(() => {
-  map = leaflet.map("map").setView(centerOfFrance, initialZoom);
+  map = leaflet
+    .map("map", {
+      zoomControl: false,
+    })
+    .setView(centerOfFrance, initialZoom);
 
   leaflet
     .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
