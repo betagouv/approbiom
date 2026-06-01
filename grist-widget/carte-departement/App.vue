@@ -46,9 +46,7 @@ grist.onRecord((row, mappings) => {
 </script>
 
 <template>
-  <div v-if="displayMessage">
-    {{ message }}
-  </div>
+  <DsfrAlert v-if="displayMessage" :small="true" :description="message" type="warning" />
   <CarteDepartement :code-department-inputs="codeDepartmentInputs" />
 </template>
 
