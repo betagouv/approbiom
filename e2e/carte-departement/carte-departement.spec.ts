@@ -1,7 +1,7 @@
 import { test, expect } from "@playwright/test";
 
 const MOCK_PATH = "e2e/mocks/grist-plugin-api.js";
-const WIDGET_URL = "/grist-widget/carte-departement/";
+const WIDGET_URL = "grist-widget/carte-departement/";
 
 test.describe("carte-departement", () => {
   test.beforeEach(async ({ page }) => {

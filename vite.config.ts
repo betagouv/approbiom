@@ -19,7 +19,7 @@ const widgetEntries = Object.fromEntries(
 
 // https://vite.dev/config/
 export default defineConfig({
-  base: "/",
+  base: "/approbiom/",
   plugins: [
     vue(),
     vueDevTools(),
