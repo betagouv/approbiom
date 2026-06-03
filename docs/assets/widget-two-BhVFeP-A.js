@@ -1,1 +1,0 @@
-import{N as e,r as t,t as n,y as r}from"./_plugin-vue_export-helper-BRgO8hxT.js";var i={};function a(t,n){return e(),r(`h1`,null,`Hello World test2`)}t(n(i,[[`render`,a]])).mount(`#app`);
