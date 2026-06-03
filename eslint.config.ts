@@ -9,7 +9,7 @@ export default defineConfigWithVueTs(
     files: ['**/*.{vue,ts,mts,tsx}'],
   },
 
-  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**', '**/shared/types/grist-plugin-api.d.ts']),
+  globalIgnores(['**/dist/**', '**/dist-ssr/**', '**/coverage/**', 'docs/**', '**/shared/types/grist-plugin-api.d.ts']),
 
   ...pluginVue.configs['flat/essential'],
   vueTsConfigs.recommended,
