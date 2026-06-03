@@ -1,6 +1,5 @@
-import { test, expect } from "@playwright/test";
+import { test, expect } from "../fixtures";
 
-const MOCK_PATH = "e2e/mocks/grist-plugin-api.js";
 const WIDGET_URL = "grist-widget/carte-departement/";
 
 type GlobalWithGrist = typeof globalThis & {
@@ -9,9 +8,6 @@ type GlobalWithGrist = typeof globalThis & {
 
 test.describe("carte-departement", () => {
   test.beforeEach(async ({ page }) => {
-    await page.route("https://docs.getgrist.com/grist-plugin-api.js", (route) =>
-      route.fulfill({ contentType: "application/javascript", path: MOCK_PATH }),
-    );
     await page.goto(WIDGET_URL);
   });
 
