@@ -40,4 +40,4 @@ __screenshots__/
 /blob-report/
 
 # Vite
-*.timestamp-*-*.mjs
+*.timestamp-*-*.mjsdocs/
