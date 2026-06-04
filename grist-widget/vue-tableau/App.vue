@@ -53,6 +53,7 @@ function cancelConfig() {
       <h2 class="fr-h5 config-panel__heading">Configuration du tableau</h2>
       <DsfrInputGroup
         label="Titre du tableau"
+        label-visible
         :model-value="configTitle"
         :placeholder="DEFAULT_TITLE"
         @update:model-value="configTitle = String($event)"
