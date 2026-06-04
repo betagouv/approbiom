@@ -1,1 +1,0 @@
-import{M as e,n as t,v as n}from"./runtime-dom.esm-bundler-CryRKHiM.js";import{t as r}from"./_plugin-vue_export-helper-BDNMzG2s.js";var i={};function a(t,r){return e(),n(`h1`,null,`Hello World test with CI/CD 2`)}t(r(i,[[`render`,a]])).mount(`#app`);
