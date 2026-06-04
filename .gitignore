@@ -39,3 +39,6 @@ __screenshots__/
 
 # Vite
 *.timestamp-*-*.mjsdocs/
+
+# Build folder
+/docs
