@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, onMounted } from "vue";
-import Tableau from "./Tableau.vue";
+import VueTableau from "./VueTableau.vue";
 
 const records = ref<Record<string, unknown>[]>([]);
 
@@ -8,9 +8,7 @@ const headers = computed(() =>
   records.value.length > 0 ? Object.keys(records.value[0]).filter((k) => k !== "id") : [],
 );
 
-const rows = computed(() =>
-  records.value.map((r) => headers.value.map((h) => String(r[h] ?? ""))),
-);
+const rows = computed(() => records.value.map((r) => headers.value.map((h) => String(r[h] ?? ""))));
 
 onMounted(() => {
   grist.ready({ requiredAccess: "read table" });
@@ -22,7 +20,7 @@ grist.onRecords((data) => {
 </script>
 
 <template>
-  <Tableau :headers="headers" :rows="rows" />
+  <VueTableau :headers="headers" :rows="rows" />
 </template>
 
 <style scoped></style>

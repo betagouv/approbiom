@@ -1,12 +1,12 @@
 import { test, expect } from "../fixtures";
 
-const WIDGET_URL = "grist-widget/tableau/";
+const WIDGET_URL = "grist-widget/vue-tableau/";
 
 type GlobalWithGrist = typeof globalThis & {
   __gristOnRecords: (records: unknown[]) => void;
 };
 
-test.describe("tableau", () => {
+test.describe("Vue Tableau", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(WIDGET_URL);
   });
