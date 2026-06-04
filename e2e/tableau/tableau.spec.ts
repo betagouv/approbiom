@@ -36,6 +36,17 @@ test.describe("tableau", () => {
     await expect(page.locator("td").filter({ hasText: "Alice" })).toBeVisible();
   });
 
+  test("table body fills the full viewport width", async ({ page }) => {
+    await page.evaluate(() => {
+      (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+    });
+    const table = page.locator("tbody");
+    await expect(table).toBeVisible();
+    const tableBox = await table.boundingBox();
+    const viewportSize = page.viewportSize();
+    expect(tableBox?.width).toBe(viewportSize?.width);
+  });
+
   test("shows DSFR alert when no records", async ({ page }) => {
     await page.evaluate(() => {
       (globalThis as GlobalWithGrist).__gristOnRecords([]);
