@@ -15,4 +15,10 @@ defineProps<{
   <DsfrTable v-else title="Données du tableau" :headers="headers" :rows="rows" />
 </template>
 
-<style scoped></style>
+<style>
+/* DSFR sets display: block on .fr-table > table for horizontal scrolling, but that breaks
+   tbody from filling the full width. display: table restores normal table layout. */
+.fr-table table {
+  display: table !important;
+}
+</style>
