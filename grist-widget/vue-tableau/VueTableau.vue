@@ -2,6 +2,7 @@
 defineProps<{
   headers: string[];
   rows: string[][];
+  title: string;
 }>();
 </script>
 
@@ -12,7 +13,7 @@ defineProps<{
     :small="true"
     description="Aucune donnée à afficher."
   />
-  <DsfrTable v-else title="Données du tableau" :headers="headers" :rows="rows" />
+  <DsfrTable v-else :title="title" :headers="headers" :rows="rows" />
 </template>
 
 <style>

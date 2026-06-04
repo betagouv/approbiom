@@ -4,6 +4,8 @@ const WIDGET_URL = "grist-widget/vue-tableau/";
 
 type GlobalWithGrist = typeof globalThis & {
   __gristOnRecords: (records: unknown[]) => void;
+  __gristOnOptions: (options: unknown) => void;
+  __gristOnEditOptions: () => void;
 };
 
 test.describe("Vue Tableau", () => {
@@ -53,5 +55,47 @@ test.describe("Vue Tableau", () => {
     });
     await expect(page.locator("table")).not.toBeVisible();
     await expect(page.locator(".fr-alert")).toBeVisible();
+  });
+
+  test.describe("title configuration", () => {
+    test("shows default title when no options are configured", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice" }]);
+      });
+      await expect(page.locator("caption")).toHaveText("Données du tableau");
+    });
+
+    test("shows custom title from Grist options", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ title: "Mon tableau personnalisé" });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice" }]);
+      });
+      await expect(page.locator("caption")).toHaveText("Mon tableau personnalisé");
+    });
+
+    test("falls back to default title when options title is empty", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ title: "" });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice" }]);
+      });
+      await expect(page.locator("caption")).toHaveText("Données du tableau");
+    });
+
+    test("opens configuration panel when onEditOptions is triggered", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnEditOptions();
+      });
+      await expect(page.getByLabel("Titre du tableau")).toBeVisible();
+    });
+
+    test("saves new title and updates the table display", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice" }]);
+        (globalThis as GlobalWithGrist).__gristOnEditOptions();
+      });
+      await page.getByLabel("Titre du tableau").fill("Nouveau titre");
+      await page.locator("button", { hasText: "Enregistrer" }).click();
+      await expect(page.locator("caption")).toHaveText("Nouveau titre");
+    });
   });
 });
