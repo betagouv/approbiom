@@ -16,6 +16,9 @@ const isConfiguring = ref(false);
 // [...] = selected columns in user-defined order
 const selectedColumns = ref<string[] | null>(null);
 
+// Maps colId → human-readable label fetched from Grist metadata
+const columnLabels = ref<Record<string, string>>({});
+
 const availableColumns = computed(() =>
   records.value.length > 0 && records.value[0]
     ? Object.keys(records.value[0]).filter((k) => k !== "id")
@@ -27,11 +30,38 @@ const headers = computed(() => {
   return selectedColumns.value.filter((col) => availableColumns.value.includes(col));
 });
 
+// Column IDs replaced by their Grist labels for display; falls back to the ID if no label
+const displayHeaders = computed(() => headers.value.map((col) => columnLabels.value[col] || col));
+
 const rows = computed(() => records.value.map((r) => headers.value.map((h) => String(r[h] ?? ""))));
+
+// Fetch the colId → label map from Grist internal metadata.
+// Requires requiredAccess: "full" because fetchTable reads arbitrary tables.
+async function fetchColumnLabels() {
+  try {
+    const tableId = await grist.getSelectedTableId();
+    // _grist_Tables and _grist_Tables_column are Grist internal metadata tables.
+    // They return data in columnar format: { id: number[], tableId: string[], ... }
+    const tables = await grist.docApi.fetchTable("_grist_Tables");
+    const columns = await grist.docApi.fetchTable("_grist_Tables_column");
+    const tableRef = tables.id[tables.tableId.indexOf(tableId)];
+    const map: Record<string, string> = {};
+    for (let i = 0; i < columns.parentId.length; i++) {
+      if (columns.parentId[i] === tableRef) {
+        const colId = columns.colId[i] as string;
+        const label = columns.label[i] as string;
+        if (colId && label) map[colId] = label;
+      }
+    }
+    columnLabels.value = map;
+  } catch {
+    // Grist metadata unavailable (e.g. in tests) — column IDs will be used as fallback
+  }
+}
 
 onMounted(() => {
   grist.ready({
-    requiredAccess: "read table",
+    requiredAccess: "full", // in reality, we only need read table access only, but in order to have labels we have no choice to use full access
     onEditOptions() {
       isConfiguring.value = true;
     },
@@ -40,6 +70,7 @@ onMounted(() => {
 
 grist.onRecords((data) => {
   records.value = data;
+  fetchColumnLabels();
 });
 
 grist.onOptions((options) => {
@@ -60,6 +91,7 @@ async function handleSave(newTitle: string, newSelectedColumns: string[]) {
     :title="title"
     :available-columns="availableColumns"
     :selected-columns="selectedColumns"
+    :column-labels="columnLabels"
     @save="handleSave"
     @cancel="isConfiguring = false"
   />
@@ -69,5 +101,5 @@ async function handleSave(newTitle: string, newSelectedColumns: string[]) {
     :small="true"
     description="Aucune colonne configurée. Cliquez sur « Ouvrir la configuration » pour sélectionner les colonnes à afficher."
   />
-  <VueTableau v-else :headers="headers" :rows="rows" :title="title" />
+  <VueTableau v-else :headers="displayHeaders" :rows="rows" :title="title" />
 </template>

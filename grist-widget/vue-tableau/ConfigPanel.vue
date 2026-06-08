@@ -8,7 +8,13 @@ const props = defineProps<{
   title: string;
   availableColumns: string[];
   selectedColumns: string[] | null;
+  columnLabels: Record<string, string>;
 }>();
+
+// Returns the human-readable label for a column ID, falling back to the ID itself
+function label(col: string) {
+  return props.columnLabels[col] || col;
+}
 
 const emit = defineEmits<{
   save: [title: string, selectedColumns: string[]];
@@ -94,11 +100,11 @@ function save() {
             @dragend="onDragEnd"
           >
             <span class="column-item__handle" aria-hidden="true">⠿</span>
-            <span class="column-item__name">{{ col }}</span>
+            <span class="column-item__name">{{ label(col) }}</span>
             <DsfrButton
               icon="fr-icon-eye-off-line"
               icon-only
-              :label="`Masquer ${col}`"
+              :label="`Masquer ${label(col)}`"
               tertiary
               no-outline
               @click="removeFromVisible(idx)"
@@ -109,11 +115,11 @@ function save() {
         <div v-if="hiddenColumns.length > 0" class="columns-section">
           <p class="fr-label columns-section__title">Colonnes cachées</p>
           <div v-for="col in hiddenColumns" :key="col" class="column-item column-item--hidden">
-            <span class="column-item__name">{{ col }}</span>
+            <span class="column-item__name">{{ label(col) }}</span>
             <DsfrButton
               icon="fr-icon-eye-line"
               icon-only
-              :label="`Afficher ${col}`"
+              :label="`Afficher ${label(col)}`"
               tertiary
               no-outline
               @click="addToVisible(col)"
