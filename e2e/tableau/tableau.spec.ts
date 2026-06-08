@@ -98,4 +98,95 @@ test.describe("Vue Tableau", () => {
       await expect(page.locator("caption")).toHaveText("Nouveau titre");
     });
   });
+
+  test.describe("column selection", () => {
+    test("shows only the selected column when one column is configured", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: ["Nom"] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+      });
+      await expect(page.locator("th").filter({ hasText: "Nom" })).toBeVisible();
+      await expect(page.locator("th").filter({ hasText: "Age" })).not.toBeVisible();
+    });
+
+    test("shows alert when no columns are selected but records exist", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: [] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+      });
+      await expect(page.locator("table")).not.toBeVisible();
+      await expect(page.locator(".fr-alert")).toBeVisible();
+    });
+
+    test("shows selected columns in their configured order", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: ["Ville", "Nom"] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([
+          { id: 1, Nom: "Alice", Age: "30", Ville: "Paris" },
+        ]);
+      });
+      const headers = page.locator("th");
+      await expect(headers.nth(0)).toHaveText("Ville");
+      await expect(headers.nth(1)).toHaveText("Nom");
+    });
+
+    test("config panel shows visible and hidden sections", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: ["Nom"] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+        (globalThis as GlobalWithGrist).__gristOnEditOptions();
+      });
+      await expect(page.locator(".column-item--visible").filter({ hasText: "Nom" })).toBeVisible();
+      await expect(page.locator(".column-item--hidden").filter({ hasText: "Age" })).toBeVisible();
+    });
+
+    test("clicking add on a hidden column moves it to visible", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: ["Nom"] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+        (globalThis as GlobalWithGrist).__gristOnEditOptions();
+      });
+      await page.locator(".column-item--hidden").filter({ hasText: "Age" }).getByRole("button").click();
+      await expect(page.locator(".column-item--visible").filter({ hasText: "Age" })).toBeVisible();
+      await expect(page.locator(".column-item--hidden").filter({ hasText: "Age" })).not.toBeVisible();
+    });
+
+    test("clicking hide on a visible column moves it to hidden", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: ["Nom", "Age"] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+        (globalThis as GlobalWithGrist).__gristOnEditOptions();
+      });
+      await page.locator(".column-item--visible").filter({ hasText: "Nom" }).getByRole("button").click();
+      await expect(page.locator(".column-item--hidden").filter({ hasText: "Nom" })).toBeVisible();
+      await expect(page.locator(".column-item--visible").filter({ hasText: "Nom" })).not.toBeVisible();
+    });
+
+    test("drag and drop reorders visible columns", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: ["Nom", "Age"] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+        (globalThis as GlobalWithGrist).__gristOnEditOptions();
+      });
+      await page.dragAndDrop('[data-col="Age"]', '[data-col="Nom"]');
+      await page.locator("button", { hasText: "Enregistrer" }).click();
+      const headers = page.locator("th");
+      await expect(headers.nth(0)).toHaveText("Age");
+      await expect(headers.nth(1)).toHaveText("Nom");
+    });
+
+    test("saves column selection and shows only selected columns in the table", async ({
+      page,
+    }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristOnOptions({ selectedColumns: [] });
+        (globalThis as GlobalWithGrist).__gristOnRecords([{ id: 1, Nom: "Alice", Age: "30" }]);
+        (globalThis as GlobalWithGrist).__gristOnEditOptions();
+      });
+      await page.locator(".column-item--hidden").filter({ hasText: "Nom" }).getByRole("button").click();
+      await page.locator("button", { hasText: "Enregistrer" }).click();
+      await expect(page.locator("th").filter({ hasText: "Nom" })).toBeVisible();
+      await expect(page.locator("th").filter({ hasText: "Age" })).not.toBeVisible();
+    });
+  });
 });
