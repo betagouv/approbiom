@@ -3,6 +3,12 @@ window.grist = {
     if (config?.onEditOptions) {
       window.__gristOnEditOptions = config.onEditOptions;
     }
+    if (config?.allowSelectBy) {
+      window.__gristAllowSelectByCalled = true;
+    }
+  },
+  setSelectedRows: async (rowIds) => {
+    window.__gristSelectedRows = rowIds;
   },
   onRecord: (cb) => {
     window.__gristOnRecord = cb;
