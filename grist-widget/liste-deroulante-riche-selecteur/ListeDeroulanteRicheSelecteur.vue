@@ -28,7 +28,7 @@ function onUpdate(values: (string | number)[]) {
 </script>
 
 <template>
-  <div class="dropdown">
+  <div class="liste-deroulante-riche-selecteur">
     <DsfrMultiselect
       :model-value="selectedIds"
       :options="options"
@@ -46,7 +46,7 @@ function onUpdate(values: (string | number)[]) {
 </template>
 
 <style scoped>
-.dropdown {
+.liste-deroulante-riche-selecteur {
   padding: 1rem;
 }
 </style>

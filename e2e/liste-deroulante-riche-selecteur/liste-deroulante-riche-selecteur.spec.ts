@@ -1,7 +1,7 @@
 import { test, expect } from "../fixtures";
 import { Page } from "@playwright/test";
 
-const WIDGET_URL = "grist-widget/dropdown/";
+const WIDGET_URL = "grist-widget/liste-deroulante-riche-selecteur/";
 
 type GlobalWithGrist = typeof globalThis & {
   __gristOnRecords: (records: unknown[], mappings: unknown) => void;
@@ -27,7 +27,7 @@ async function injectRecords(page: Page, records: unknown[], mappings: unknown) 
   );
 }
 
-test.describe("Dropdown", () => {
+test.describe("Liste déroulante riche sélecteur", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(WIDGET_URL);
   });

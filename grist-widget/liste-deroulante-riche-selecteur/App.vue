@@ -1,7 +1,7 @@
 <script setup lang="ts">
 import { ref, onMounted } from "vue";
 import { DsfrAlert } from "@gouvminint/vue-dsfr";
-import Dropdown from "./Dropdown.vue";
+import ListeDeroulanteRicheSelecteur from "./ListeDeroulanteRicheSelecteur.vue";
 import ConfigPanel from "./ConfigPanel.vue";
 
 type Option = { id: number; label: string };
@@ -99,7 +99,7 @@ async function saveConfig(newLabel: string, newDescription: string) {
       :small="true"
       description="Aucune donnée à afficher."
     />
-    <Dropdown
+    <ListeDeroulanteRicheSelecteur
       v-else
       :options="options"
       :selected-ids="selectedIds"
