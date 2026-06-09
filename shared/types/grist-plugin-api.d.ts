@@ -214,6 +214,12 @@ declare namespace grist {
      * Handler that will be called by Grist to open additional configuration panel inside the Custom Widget.
      */
     onEditOptions?: () => unknown;
+    /**
+     * Show widget as linking source (SELECT BY).
+     * Added locally — missing from the upstream type definitions.
+     * See: https://support.getgrist.com/widget-custom/#ready
+     */
+    allowSelectBy?: boolean;
   }
   /**
    * Declare that a component is prepared to receive messages from the outside world.
