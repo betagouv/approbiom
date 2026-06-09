@@ -2,6 +2,7 @@
 import { ref, onMounted } from "vue";
 import { DsfrAlert } from "@gouvminint/vue-dsfr";
 import Dropdown from "./Dropdown.vue";
+import ConfigPanel from "./ConfigPanel.vue";
 
 type Option = { id: number; label: string };
 
@@ -10,14 +11,18 @@ const selectedIds = ref<number[]>([]);
 const errorMessage = ref("");
 const label = ref("Libellé");
 const description = ref("");
+const isConfiguring = ref(false);
 
 let allRecords: { id: number; [key: string]: unknown }[] = [];
 
 onMounted(() => {
   grist.ready({
-    columns: [{ name: "OptionsToSelect", title: "Options to select", type: "Any" }],
+    columns: [{ name: "OptionsToSelect", title: "Option à sélectionner", type: "Any" }],
     requiredAccess: "read table",
     allowSelectBy: true,
+    onEditOptions() {
+      isConfiguring.value = true;
+    },
   });
 });
 
@@ -68,27 +73,39 @@ async function onSelect(ids: number[]) {
     if (record) await (grist as any).setCursorPos({ rowId: record.id });
   }
 }
+
+async function saveConfig(newLabel: string, newDescription: string) {
+  await grist.setOption("label", newLabel);
+  await grist.setOption("description", newDescription);
+  label.value = newLabel;
+  description.value = newDescription;
+  isConfiguring.value = false;
+}
 </script>
 
 <template>
-  <DsfrAlert
-    v-if="errorMessage"
-    type="error"
-    :small="true"
-    :description="errorMessage"
-  />
-  <DsfrAlert
-    v-else-if="options.length === 0"
-    type="info"
-    :small="true"
-    description="Aucune donnée à afficher."
-  />
-  <Dropdown
-    v-else
-    :options="options"
-    :selected-ids="selectedIds"
+  <ConfigPanel
+    v-if="isConfiguring"
     :label="label"
     :description="description"
-    @select="onSelect"
+    @save="saveConfig"
+    @cancel="isConfiguring = false"
   />
+  <template v-else>
+    <DsfrAlert v-if="errorMessage" type="error" :small="true" :description="errorMessage" />
+    <DsfrAlert
+      v-else-if="options.length === 0"
+      type="info"
+      :small="true"
+      description="Aucune donnée à afficher."
+    />
+    <Dropdown
+      v-else
+      :options="options"
+      :selected-ids="selectedIds"
+      :label="label"
+      :description="description"
+      @select="onSelect"
+    />
+  </template>
 </template>
