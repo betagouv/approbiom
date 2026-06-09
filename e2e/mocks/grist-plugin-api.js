@@ -10,11 +10,29 @@ window.grist = {
   setSelectedRows: async (rowIds) => {
     window.__gristSelectedRows = rowIds;
   },
+  setCursorPos: async (pos) => {
+    window.__gristCursorPos = pos;
+  },
+  mapColumnNames: (data, options) => {
+    const mappings = options?.mappings ?? window.__gristCurrentMappings ?? null;
+    if (!mappings) return data;
+    const remap = (record) => {
+      const out = { id: record.id };
+      for (const [widgetCol, tableCol] of Object.entries(mappings)) {
+        if (typeof tableCol === "string") out[widgetCol] = record[tableCol];
+      }
+      return out;
+    };
+    return Array.isArray(data) ? data.map(remap) : remap(data);
+  },
   onRecord: (cb) => {
     window.__gristOnRecord = cb;
   },
   onRecords: (cb) => {
-    window.__gristOnRecords = cb;
+    window.__gristOnRecords = (records, mappings) => {
+      window.__gristCurrentMappings = mappings;
+      cb(records, mappings);
+    };
   },
   onOptions: (cb) => {
     window.__gristOnOptions = cb;

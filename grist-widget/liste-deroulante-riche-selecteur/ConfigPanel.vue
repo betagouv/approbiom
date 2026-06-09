@@ -4,33 +4,22 @@ import { DsfrInputGroup, DsfrButton } from "@gouvminint/vue-dsfr";
 
 const DEFAULT_LABEL = "Libellé";
 const DEFAULT_DESCRIPTION = "";
-const DEFAULT_PLACEHOLDER = "Sélectionner des options";
 
 const props = defineProps<{
   label: string;
   description: string;
-  placeholder: string;
-  enableMultipleSelection: boolean;
 }>();
 
 const emit = defineEmits<{
-  save: [label: string, description: string, placeholder: string, enableMultipleSelection: boolean];
+  save: [label: string, description: string];
   cancel: [];
 }>();
 
 const configLabel = ref(props.label);
 const configDescription = ref(props.description);
-const configPlaceholder = ref(props.placeholder);
-const configEnableMultipleSelection = ref(props.enableMultipleSelection);
 
 function save() {
-  emit(
-    "save",
-    configLabel.value || DEFAULT_LABEL,
-    configDescription.value,
-    configPlaceholder.value || DEFAULT_PLACEHOLDER,
-    configEnableMultipleSelection.value,
-  );
+  emit("save", configLabel.value || DEFAULT_LABEL, configDescription.value);
 }
 </script>
 
@@ -52,23 +41,6 @@ function save() {
         :placeholder="DEFAULT_DESCRIPTION"
         @update:model-value="configDescription = String($event)"
       />
-      <DsfrInputGroup
-        label="Placeholder"
-        label-visible
-        :model-value="configPlaceholder"
-        :placeholder="DEFAULT_PLACEHOLDER"
-        @update:model-value="configPlaceholder = String($event)"
-      />
-      <div class="fr-checkbox-group">
-        <input
-          id="enable-multiple-selection"
-          v-model="configEnableMultipleSelection"
-          type="checkbox"
-        />
-        <label class="fr-label" for="enable-multiple-selection">
-          Activer la sélection multiple
-        </label>
-      </div>
       <div class="config-panel__actions">
         <DsfrButton label="Annuler" secondary @click="emit('cancel')" />
         <DsfrButton label="Enregistrer" @click="save" />
