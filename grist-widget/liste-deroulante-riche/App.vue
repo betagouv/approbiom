@@ -6,7 +6,7 @@ import ConfigPanel from "./ConfigPanel.vue";
 
 type Option = { id: number; label: string };
 
-const DEFAULT_LABEL = "Libellé";
+const DEFAULT_LABEL = "Libqsdqsellé";
 const DEFAULT_DESCRIPTION = "";
 const DEFAULT_PLACEHOLDER = "Sélectionner une option";
 const DEFAULT_ENABLE_MULTIPLE_SELECTION = false;
@@ -42,6 +42,12 @@ grist.onRecords((records, mappings) => {
   }));
 });
 
+grist.onRecord((record) => {
+  if (record && !enableMultipleSelection.value) {
+    selectedIds.value = [record.id];
+  }
+});
+
 grist.onOptions((opts) => {
   label.value = opts?.label ?? DEFAULT_LABEL;
   description.value = opts?.description ?? DEFAULT_DESCRIPTION;
@@ -52,7 +58,10 @@ grist.onOptions((opts) => {
 
 async function onSelect(ids: number[]) {
   selectedIds.value = ids;
-  await grist.setSelectedRows(ids);
+  const rowId = ids[0];
+  if (rowId !== undefined) {
+    await (grist as any).setCursorPos({ rowId });
+  }
 }
 
 async function saveConfig(
@@ -67,7 +76,8 @@ async function saveConfig(
   await grist.setOption("enableMultipleSelection", newEnableMultipleSelection);
   if (!newEnableMultipleSelection && selectedIds.value.length > 1) {
     selectedIds.value = [selectedIds.value[0]!];
-    await grist.setSelectedRows(selectedIds.value);
+    const rowId = selectedIds.value[0];
+    if (rowId !== undefined) await (grist as any).setCursorPos({ rowId });
   }
   isConfiguring.value = false;
 }
