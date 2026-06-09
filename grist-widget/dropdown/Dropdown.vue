@@ -7,23 +7,23 @@ type Option = { id: number; label: string };
 const props = defineProps<{
   options: Option[];
   selectedIds: number[];
+  label: string;
+  description?: string;
 }>();
 
 const emit = defineEmits<{
-  select: [id: number];
+  select: [ids: number[]];
 }>();
 
 const buttonLabel = computed(() => {
-  if (props.selectedIds.length === 0) return "Sélectionner une option";
-  return props.options.find((o) => o.id === props.selectedIds[0])?.label ?? "Sélectionner une option";
+  const count = props.selectedIds.length;
+  if (count === 0) return "Sélectionner une option";
+  if (count === 1) return props.options.find((o) => o.id === props.selectedIds[0])?.label ?? "";
+  return `${count} options sélectionnées`;
 });
 
 function onUpdate(values: (string | number)[]) {
-  const ids = values.map(Number);
-  const newId = ids.find((id) => !props.selectedIds.includes(id));
-  if (newId !== undefined) {
-    emit("select", newId);
-  }
+  emit("select", values.map(Number));
 }
 </script>
 
@@ -35,7 +35,8 @@ function onUpdate(values: (string | number)[]) {
       :button-label="buttonLabel"
       :select-all="false"
       :search="true"
-      label=""
+      :label="label"
+      :hint="description"
       id-key="id"
       label-key="label"
       max-overflow-height="40vh"

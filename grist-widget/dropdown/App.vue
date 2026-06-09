@@ -8,6 +8,8 @@ type Option = { id: number; label: string };
 const options = ref<Option[]>([]);
 const selectedIds = ref<number[]>([]);
 const errorMessage = ref("");
+const label = ref("Libellé");
+const description = ref("");
 
 let allRecords: { id: number; [key: string]: unknown }[] = [];
 
@@ -44,6 +46,11 @@ grist.onRecords((records) => {
   options.value = rawOptions.map((v, i) => ({ id: i, label: String(v) }));
 });
 
+grist.onOptions((opts) => {
+  label.value = opts?.label ?? "Libellé";
+  description.value = opts?.description ?? "";
+});
+
 grist.onRecord((record) => {
   if (!record) return;
   const index = allRecords.findIndex((r) => r.id === record.id);
@@ -52,11 +59,13 @@ grist.onRecord((record) => {
   }
 });
 
-async function onSelect(id: number) {
-  selectedIds.value = [id];
-  const record = allRecords[id];
-  if (record) {
-    await (grist as any).setCursorPos({ rowId: record.id });
+async function onSelect(ids: number[]) {
+  const newId = ids.find((id) => !selectedIds.value.includes(id));
+  selectedIds.value = ids;
+  const targetId = newId ?? ids[ids.length - 1];
+  if (targetId !== undefined) {
+    const record = allRecords[targetId];
+    if (record) await (grist as any).setCursorPos({ rowId: record.id });
   }
 }
 </script>
@@ -78,6 +87,8 @@ async function onSelect(id: number) {
     v-else
     :options="options"
     :selected-ids="selectedIds"
+    :label="label"
+    :description="description"
     @select="onSelect"
   />
 </template>
