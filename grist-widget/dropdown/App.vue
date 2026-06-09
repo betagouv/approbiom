@@ -38,8 +38,8 @@ grist.onRecords((records) => {
   const mapped = grist.mapColumnNames(records);
 
   const rawOptions = mapped
-    .map((r) => r.OptionsToSelect)
-    .filter((v) => v !== null && v !== undefined);
+    .map((r: { OptionsToSelect: unknown }) => r.OptionsToSelect)
+    .filter((v: null | undefined | unknown) => v !== null && v !== undefined);
 
   if (rawOptions.length === 0) {
     errorMessage.value = "Aucune option valide trouvée.";
@@ -48,7 +48,7 @@ grist.onRecords((records) => {
   }
 
   errorMessage.value = "";
-  options.value = rawOptions.map((v, i) => ({ id: i, label: String(v) }));
+  options.value = rawOptions.map((v: unknown, i: unknown) => ({ id: i, label: String(v) }));
 });
 
 grist.onOptions((opts) => {
