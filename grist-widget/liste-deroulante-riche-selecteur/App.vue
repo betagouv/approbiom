@@ -28,7 +28,7 @@ onMounted(() => {
 
 grist.onRecords((records) => {
   if (!records || records.length === 0) {
-    errorMessage.value = "Aucune donnée reçue.";
+    errorMessage.value = "";
     options.value = [];
     allRecords = [];
     return;
