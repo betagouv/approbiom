@@ -54,6 +54,12 @@ declare namespace grist {
    */
   export const setSelectedRows: (rowIds: number[]) => Promise<void>;
   /**
+   * Move the cursor to the given row (and optionally field).
+   * Added locally — missing from the upstream type definitions.
+   * See: https://support.getgrist.com/widget-custom/#ready
+   */
+  export const setCursorPos: (pos: { rowId?: number; fieldIndex?: number }) => Promise<void>;
+  /**
    * Fetches data backing the widget as for [[GristView.fetchSelectedTable]],
    * but decoding data by default, replacing e.g. ['D', timestamp] with
    * a moment date. Option 'keepEncoded' skips the decoding step.
@@ -411,6 +417,12 @@ declare module "grist/GristAPI" {
      * Set the list of selected rows to be used against any linked widget. Requires 'allowSelectBy()'.
      */
     setSelectedRows(rowIds: number[]): Promise<void>;
+    /**
+     * Move the cursor to the given row (and optionally field).
+     * Added locally — missing from the upstream type definitions.
+     * See: https://support.getgrist.com/widget-custom/#ready
+     */
+    setCursorPos(pos: { rowId?: number; fieldIndex?: number }): Promise<void>;
   }
   /**
    * Options when creating access tokens.

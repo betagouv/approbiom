@@ -60,7 +60,7 @@ async function onSelect(ids: number[]) {
   selectedIds.value = ids;
   const rowId = ids[0];
   if (rowId !== undefined) {
-    await (grist as any).setCursorPos({ rowId });
+    await grist.setCursorPos({ rowId });
   }
 }
 
@@ -77,7 +77,7 @@ async function saveConfig(
   if (!newEnableMultipleSelection && selectedIds.value.length > 1) {
     selectedIds.value = [selectedIds.value[0]!];
     const rowId = selectedIds.value[0];
-    if (rowId !== undefined) await (grist as any).setCursorPos({ rowId });
+    if (rowId !== undefined) await grist.setCursorPos({ rowId });
   }
   isConfiguring.value = false;
 }

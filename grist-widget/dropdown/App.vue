@@ -70,7 +70,7 @@ async function onSelect(ids: number[]) {
   const targetId = newId ?? ids[ids.length - 1];
   if (targetId !== undefined) {
     const record = allRecords[targetId];
-    if (record) await (grist as any).setCursorPos({ rowId: record.id });
+    if (record) await grist.setCursorPos({ rowId: record.id });
   }
 }
 
