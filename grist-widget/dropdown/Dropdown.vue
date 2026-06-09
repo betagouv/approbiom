@@ -1,37 +1,45 @@
 <script setup lang="ts">
 import { computed } from "vue";
-import { DsfrSelect } from "@gouvminint/vue-dsfr";
+import { DsfrMultiselect } from "@gouvminint/vue-dsfr";
 
-type Option = { value: string; text: string };
+type Option = { id: number; label: string };
 
 const props = defineProps<{
   options: Option[];
-  selectedValue: string;
+  selectedIds: number[];
 }>();
 
 const emit = defineEmits<{
-  select: [value: string];
+  select: [id: number];
 }>();
 
-const selectOptions = computed(() => [
-  { value: "", text: "Sélectionner une option", disabled: true },
-  ...props.options,
-]);
+const buttonLabel = computed(() => {
+  if (props.selectedIds.length === 0) return "Sélectionner une option";
+  return props.options.find((o) => o.id === props.selectedIds[0])?.label ?? "Sélectionner une option";
+});
 
-function onChange(value: string | number | null) {
-  if (value !== null && value !== "") {
-    emit("select", String(value));
+function onUpdate(values: (string | number)[]) {
+  const ids = values.map(Number);
+  const newId = ids.find((id) => !props.selectedIds.includes(id));
+  if (newId !== undefined) {
+    emit("select", newId);
   }
 }
 </script>
 
 <template>
   <div class="dropdown">
-    <DsfrSelect
-      :model-value="selectedValue || ''"
-      :options="selectOptions"
+    <DsfrMultiselect
+      :model-value="selectedIds"
+      :options="options"
+      :button-label="buttonLabel"
+      :select-all="false"
+      :search="true"
       label=""
-      @update:model-value="onChange"
+      id-key="id"
+      label-key="label"
+      max-overflow-height="40vh"
+      @update:model-value="onUpdate"
     />
   </div>
 </template>

@@ -3,10 +3,10 @@ import { ref, onMounted } from "vue";
 import { DsfrAlert } from "@gouvminint/vue-dsfr";
 import Dropdown from "./Dropdown.vue";
 
-type Option = { value: string; text: string };
+type Option = { id: number; label: string };
 
 const options = ref<Option[]>([]);
-const selectedValue = ref("");
+const selectedIds = ref<number[]>([]);
 const errorMessage = ref("");
 
 let allRecords: { id: number; [key: string]: unknown }[] = [];
@@ -41,21 +41,20 @@ grist.onRecords((records) => {
   }
 
   errorMessage.value = "";
-  options.value = rawOptions.map((v, i) => ({ value: String(i), text: String(v) }));
+  options.value = rawOptions.map((v, i) => ({ id: i, label: String(v) }));
 });
 
 grist.onRecord((record) => {
   if (!record) return;
   const index = allRecords.findIndex((r) => r.id === record.id);
   if (index !== -1) {
-    selectedValue.value = String(index);
+    selectedIds.value = [index];
   }
 });
 
-async function onSelect(value: string) {
-  selectedValue.value = value;
-  const index = parseInt(value);
-  const record = allRecords[index];
+async function onSelect(id: number) {
+  selectedIds.value = [id];
+  const record = allRecords[id];
   if (record) {
     await (grist as any).setCursorPos({ rowId: record.id });
   }
@@ -78,7 +77,7 @@ async function onSelect(value: string) {
   <Dropdown
     v-else
     :options="options"
-    :selected-value="selectedValue"
+    :selected-ids="selectedIds"
     @select="onSelect"
   />
 </template>
