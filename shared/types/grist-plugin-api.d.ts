@@ -50,13 +50,15 @@ declare namespace grist {
    */
   export const allowSelectBy: () => Promise<void>;
   /**
-   * Shortcut for [[GristView.setSelectedRows]].
-   */
-  export const setSelectedRows: (rowIds: number[]) => Promise<void>;
-  /**
    * Move the cursor to the given row (and optionally field).
    * Added locally — missing from the upstream type definitions.
    * See: https://support.getgrist.com/widget-custom/#ready
+   */
+  export const setSelectedRows: (rowIds: number[] | null) => Promise<void>;
+  /**
+   * Set the list of selected rows to be used against any linked widget.
+   * Added locally — missing from the upstream type definitions.
+   * See: https://support.getgrist.com/code/modules/grist_plugin_api/#setselectedrows
    */
   export const setCursorPos: (pos: { rowId?: number; fieldIndex?: number }) => Promise<void>;
   /**
