@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { ref } from "vue";
-import { DsfrInputGroup, DsfrButton, DsfrToggleSwitch } from "@gouvminint/vue-dsfr";
 
 const props = defineProps<{
   title: string;
@@ -28,10 +27,6 @@ function save() {
         :model-value="configTitle"
         placeholder="Titre"
         @update:model-value="configTitle = String($event)"
-      />
-      <DsfrToggleSwitch
-        label="Sélection d'une ligne"
-        hint="Permet de cliquer sur une ligne pour positionner le curseur Grist."
       />
       <div class="config-panel__actions">
         <DsfrButton label="Annuler" secondary @click="emit('cancel')" />

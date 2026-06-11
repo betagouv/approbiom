@@ -7,8 +7,6 @@ const isConfiguring = ref(false);
 const title = ref("");
 const columnKeys = ref<string[]>([]);
 const columnLabels = ref<Record<string, string>>({});
-const currentRecordId = ref<number | null>(null);
-
 let allRecords: { id: number; [key: string]: unknown }[] = [];
 
 const tableHeader = computed(() =>
@@ -19,7 +17,7 @@ const tableHeader = computed(() =>
 );
 
 const tableRows = computed(() =>
-  allRecords.map((r) => columnKeys.value.map((key) => ({ value: r[key] ?? "", id: r.id }))),
+  allRecords.map((r) => columnKeys.value.map((key) => r[key] ?? "")),
 );
 
 async function fetchColumnLabels() {
@@ -65,9 +63,6 @@ grist.onRecords((records, mappings) => {
   fetchColumnLabels();
 });
 
-grist.onRecord((record) => {
-  currentRecordId.value = record?.id ?? null;
-});
 
 grist.onOptions((opts) => {
   title.value = opts?.title ?? "";
