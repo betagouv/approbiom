@@ -12,27 +12,6 @@ const allRecords = ref<{ id: number; [key: string]: unknown }[]>([]);
 const selectedRecordId = ref<number | null>(null);
 const tableWrapperRef = ref<HTMLElement | null>(null);
 
-const selectedRowKey = computed(() => {
-  if (selectedRecordId.value === null) return null;
-  const idx = allRecords.value.findIndex((r) => r.id === selectedRecordId.value);
-  return idx === -1 ? null : idx + 1;
-});
-
-watch(selectedRowKey, async (newKey, oldKey) => {
-  await nextTick();
-  if (!tableWrapperRef.value) return;
-  if (oldKey != null) {
-    tableWrapperRef.value
-      .querySelector(`tbody tr[data-row-key="${oldKey}"]`)
-      ?.classList.remove("fr-tr--selected");
-  }
-  if (newKey != null) {
-    tableWrapperRef.value
-      .querySelector(`tbody tr[data-row-key="${newKey}"]`)
-      ?.classList.add("fr-tr--selected");
-  }
-});
-
 function activateRow(tr: HTMLElement) {
   if (!tr.dataset.rowKey) return;
   const rowIdx = parseInt(tr.dataset.rowKey) - 1;
@@ -80,16 +59,14 @@ const tableHeader = computed(() =>
   })),
 );
 
-const tableRows = computed(() =>
-  allRecords.value.map((r) => columnKeys.value.map((key) => r[key] ?? "")),
-);
-
 async function fetchColumnLabels() {
   try {
     const tableId = await grist.getSelectedTableId();
     const tables = await grist.docApi.fetchTable("_grist_Tables");
     const columns = await grist.docApi.fetchTable("_grist_Tables_column");
-    const tableRef = tables.id[tables.tableId.indexOf(tableId)];
+    const tableIndex = tables.tableId.indexOf(tableId);
+    if (tableIndex === -1) return;
+    const tableRef = tables.id[tableIndex];
     const map: Record<string, string> = {};
     for (let i = 0; i < columns.parentId.length; i++) {
       if (columns.parentId[i] === tableRef) {
@@ -115,16 +92,19 @@ onMounted(() => {
   });
 });
 
+watch(columnKeys, fetchColumnLabels);
+
 grist.onRecords((records, mappings) => {
   allRecords.value = records ?? [];
-  const mapped = mappings;
-  const raw = mapped?.Colonnes;
-  columnKeys.value = Array.isArray(raw)
+  const raw = mappings?.Colonnes;
+  const newKeys = Array.isArray(raw)
     ? raw.filter((k): k is string => typeof k === "string")
     : typeof raw === "string"
       ? [raw]
       : [];
-  fetchColumnLabels();
+  if (newKeys.join(",") !== columnKeys.value.join(",")) {
+    columnKeys.value = newKeys;
+  }
 });
 
 grist.onOptions((opts) => {
@@ -152,23 +132,38 @@ async function saveConfig(newTitle: string) {
       description="Veuillez configurer les colonnes à afficher."
     />
     <div v-else ref="tableWrapperRef" @click="handleTableClick" @keydown="handleTableKeydown">
-      <DsfrDataTable
-        :title="title"
-        :no-caption="!title"
-        :headers-row="tableHeader"
-        :rows="tableRows"
-      />
+      <DsfrDataTable :title="title" :headers-row="tableHeader">
+        <template #thead>
+          <tr>
+            <th v-for="col in tableHeader" :key="col.key" scope="col">
+              {{ col.label }}
+            </th>
+          </tr>
+        </template>
+        <template #tbody>
+          <tr
+            v-for="(record, idx) in allRecords"
+            :key="record.id"
+            :data-row-key="idx + 1"
+            :class="{ 'fr-tr--selected': record.id === selectedRecordId }"
+          >
+            <td v-for="key in columnKeys" :key="key" tabindex="0">
+              {{ record[key] ?? "" }}
+            </td>
+          </tr>
+        </template>
+      </DsfrDataTable>
     </div>
   </template>
 </template>
 
 <style scoped>
-:deep(tbody tr) {
+tbody tr {
   cursor: pointer;
 }
 
-:deep(tbody tr.fr-tr--selected td),
-:deep(tbody tr.fr-tr--selected th) {
+tbody tr.fr-tr--selected td,
+tbody tr.fr-tr--selected th {
   background-color: var(--blue-france-950-100);
 }
 </style>
