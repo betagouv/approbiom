@@ -8,7 +8,6 @@ import {
   DsfrDataTable,
   DsfrInputGroup,
   DsfrButton,
-  DsfrToggleSwitch,
 } from "@gouvminint/vue-dsfr";
 
 createApp(App)
@@ -16,5 +15,4 @@ createApp(App)
   .component("DsfrDataTable", DsfrDataTable)
   .component("DsfrInputGroup", DsfrInputGroup)
   .component("DsfrButton", DsfrButton)
-  .component("DsfrToggleSwitch", DsfrToggleSwitch)
   .mount("#app");

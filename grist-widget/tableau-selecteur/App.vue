@@ -1,13 +1,77 @@
 <script setup lang="ts">
-import { ref, computed, onMounted } from "vue";
+import { ref, computed, onMounted, nextTick, watch } from "vue";
 import { DsfrAlert } from "@gouvminint/vue-dsfr";
 import ConfigPanel from "./ConfigPanel.vue";
 
 const isConfiguring = ref(false);
-const title = ref("");
+const title = ref("Titre du tableau");
 const columnKeys = ref<string[]>([]);
 const columnLabels = ref<Record<string, string>>({});
-let allRecords: { id: number; [key: string]: unknown }[] = [];
+const allRecords = ref<{ id: number; [key: string]: unknown }[]>([]);
+
+const selectedRecordId = ref<number | null>(null);
+const tableWrapperRef = ref<HTMLElement | null>(null);
+
+const selectedRowKey = computed(() => {
+  if (selectedRecordId.value === null) return null;
+  const idx = allRecords.value.findIndex((r) => r.id === selectedRecordId.value);
+  return idx === -1 ? null : idx + 1;
+});
+
+watch(selectedRowKey, async (newKey, oldKey) => {
+  await nextTick();
+  if (!tableWrapperRef.value) return;
+  if (oldKey != null) {
+    tableWrapperRef.value
+      .querySelector(`tbody tr[data-row-key="${oldKey}"]`)
+      ?.classList.remove("fr-tr--selected");
+  }
+  if (newKey != null) {
+    tableWrapperRef.value
+      .querySelector(`tbody tr[data-row-key="${newKey}"]`)
+      ?.classList.add("fr-tr--selected");
+  }
+});
+
+function activateRow(tr: HTMLElement) {
+  if (!tr.dataset.rowKey) return;
+  const rowIdx = parseInt(tr.dataset.rowKey) - 1;
+  const record = allRecords.value[rowIdx];
+  if (!record) return;
+  selectedRecordId.value = record.id;
+  grist.setCursorPos({ rowId: record.id });
+}
+
+function handleTableClick(event: MouseEvent) {
+  const tr = (event.target as HTMLElement).closest("tbody tr") as HTMLElement | null;
+  if (!tr) return;
+  activateRow(tr);
+}
+
+function handleTableKeydown(event: KeyboardEvent) {
+  if (event.key !== "Enter" && event.key !== " ") return;
+  const tr = (event.target as HTMLElement).closest("tbody tr") as HTMLElement | null;
+  if (!tr) return;
+  if (event.key === " ") event.preventDefault();
+  activateRow(tr);
+}
+
+grist.onRecord((record) => {
+  if (!record) {
+    selectedRecordId.value = null;
+    return;
+  }
+  if (selectedRecordId.value === record.id) return;
+  selectedRecordId.value = record.id;
+  const rowIdx = allRecords.value.findIndex((r) => r.id === record.id);
+  if (rowIdx === -1) return;
+  nextTick(() => {
+    const td = tableWrapperRef.value?.querySelector(
+      `tbody tr[data-row-key="${rowIdx + 1}"] td`,
+    ) as HTMLElement | null;
+    td?.scrollIntoView({ block: "nearest", behavior: "smooth" });
+  });
+});
 
 const tableHeader = computed(() =>
   columnKeys.value.map((key) => ({
@@ -17,7 +81,7 @@ const tableHeader = computed(() =>
 );
 
 const tableRows = computed(() =>
-  allRecords.map((r) => columnKeys.value.map((key) => r[key] ?? "")),
+  allRecords.value.map((r) => columnKeys.value.map((key) => r[key] ?? "")),
 );
 
 async function fetchColumnLabels() {
@@ -52,7 +116,7 @@ onMounted(() => {
 });
 
 grist.onRecords((records, mappings) => {
-  allRecords = records ?? [];
+  allRecords.value = records ?? [];
   const mapped = mappings;
   const raw = mapped?.Colonnes;
   columnKeys.value = Array.isArray(raw)
@@ -63,9 +127,8 @@ grist.onRecords((records, mappings) => {
   fetchColumnLabels();
 });
 
-
 grist.onOptions((opts) => {
-  title.value = opts?.title ?? "";
+  title.value = opts?.title ?? "Titre du tableau";
 });
 
 async function saveConfig(newTitle: string) {
@@ -88,13 +151,24 @@ async function saveConfig(newTitle: string) {
       :small="true"
       description="Veuillez configurer les colonnes à afficher."
     />
-    <DsfrDataTable
-      v-else
-      :title="title"
-      :no-caption="!title"
-      :headers-row="tableHeader"
-      :rows="tableRows"
-    >
-    </DsfrDataTable>
+    <div v-else ref="tableWrapperRef" @click="handleTableClick" @keydown="handleTableKeydown">
+      <DsfrDataTable
+        :title="title"
+        :no-caption="!title"
+        :headers-row="tableHeader"
+        :rows="tableRows"
+      />
+    </div>
   </template>
 </template>
+
+<style scoped>
+:deep(tbody tr) {
+  cursor: pointer;
+}
+
+:deep(tbody tr.fr-tr--selected td),
+:deep(tbody tr.fr-tr--selected th) {
+  background-color: var(--blue-france-950-100);
+}
+</style>

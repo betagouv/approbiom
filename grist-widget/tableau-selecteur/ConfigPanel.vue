@@ -19,20 +19,20 @@ function save() {
 
 <template>
   <div class="config-panel">
-    <div class="config-panel__content">
+    <form class="config-panel__content" novalidate @submit.prevent="save">
       <h2 class="fr-h5 config-panel__heading">Configuration du widget</h2>
       <DsfrInputGroup
         label="Titre du tableau"
         label-visible
         :model-value="configTitle"
-        placeholder="Titre"
+        placeholder="Titre du tableau"
         @update:model-value="configTitle = String($event)"
       />
       <div class="config-panel__actions">
-        <DsfrButton label="Annuler" secondary @click="emit('cancel')" />
-        <DsfrButton label="Enregistrer" @click="save" />
+        <DsfrButton label="Annuler" secondary type="button" @click="emit('cancel')" />
+        <DsfrButton label="Enregistrer" type="submit" />
       </div>
-    </div>
+    </form>
   </div>
 </template>
 
