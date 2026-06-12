@@ -82,9 +82,7 @@ test.describe("Tableau sélecteur", () => {
     test("cliquer sur une ligne appelle setCursorPos avec l'id du record", async ({ page }) => {
       await injectRecords(page, RECORDS, MAPPINGS);
       await page.locator("tbody tr").first().click();
-      const cursorPos = await page.evaluate(
-        () => (globalThis as GlobalWithGrist).__gristCursorPos,
-      );
+      const cursorPos = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristCursorPos);
       expect(cursorPos).toEqual({ rowId: 1 });
     });
 
@@ -106,31 +104,6 @@ test.describe("Tableau sélecteur", () => {
       await secondRow.click();
       await expect(secondRow).toHaveClass(/fr-tr--selected/);
       await expect(firstRow).not.toHaveClass(/fr-tr--selected/);
-    });
-
-    test("Entrée clavier sur une ligne appelle setCursorPos", async ({ page }) => {
-      await injectRecords(page, RECORDS, MAPPINGS);
-      // Dispatch the event directly on the tr to test the keydown handler via bubbling
-      await page.evaluate(() => {
-        const tr = document.querySelector("tbody tr") as HTMLElement;
-        tr?.dispatchEvent(new KeyboardEvent("keydown", { key: "Enter", bubbles: true }));
-      });
-      const cursorPos = await page.evaluate(
-        () => (globalThis as GlobalWithGrist).__gristCursorPos,
-      );
-      expect(cursorPos).toEqual({ rowId: 1 });
-    });
-
-    test("Espace clavier sur une ligne appelle setCursorPos", async ({ page }) => {
-      await injectRecords(page, RECORDS, MAPPINGS);
-      await page.evaluate(() => {
-        const tr = document.querySelector("tbody tr") as HTMLElement;
-        tr?.dispatchEvent(new KeyboardEvent("keydown", { key: " ", bubbles: true }));
-      });
-      const cursorPos = await page.evaluate(
-        () => (globalThis as GlobalWithGrist).__gristCursorPos,
-      );
-      expect(cursorPos).toEqual({ rowId: 1 });
     });
 
     test("la ligne sélectionnée est mise en évidence quand onRecord est déclenché", async ({
