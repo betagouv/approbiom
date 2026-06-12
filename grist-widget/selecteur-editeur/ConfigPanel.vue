@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, watch } from "vue";
+import { ref } from "vue";
 import type { ColumnInfo } from "@shared/utils/grist";
 
 const props = defineProps<{
@@ -51,14 +51,20 @@ function save() {
         <DsfrSelect
           label="Colonne de référence à modifier"
           label-visible
-          :options="[{ value: '', text: '— Sélectionner —' }, ...columns.map((c) => ({ value: c.colId, text: c.label }))]"
+          :options="[
+            { value: '', text: '— Sélectionner —' },
+            ...columns.map((c) => ({ value: c.colId, text: c.label })),
+          ]"
           :model-value="selectedRefColId"
           @update:model-value="onRefColChange(String($event))"
         />
         <DsfrSelect
           label="Colonne à afficher comme libellé"
           label-visible
-          :options="[{ value: '', text: '— Sélectionner —' }, ...refTableColumns.map((c) => ({ value: c.colId, text: c.label }))]"
+          :options="[
+            { value: '', text: '— Sélectionner —' },
+            ...refTableColumns.map((c) => ({ value: c.colId, text: c.label })),
+          ]"
           :model-value="selectedDisplayColId"
           :disabled="refTableColumns.length === 0"
           @update:model-value="selectedDisplayColId = String($event)"
