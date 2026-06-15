@@ -17,8 +17,11 @@ const emit = defineEmits<{
 const buttonLabel = computed(() => {
   const count = props.selectedIds.length;
   if (count === 0) return "Sélectionner des valeurs";
-  if (count === 1) return props.options.find((o) => o.id === props.selectedIds[0])?.label ?? "";
-  return `${count} valeurs sélectionnées`;
+  return [
+    ...props.options
+      .filter((option) => props.selectedIds.includes(option.id))
+      .map((option) => option.label),
+  ].join(", ");
 });
 
 function onUpdate(values: (string | number)[]) {
