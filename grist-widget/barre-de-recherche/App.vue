@@ -48,7 +48,12 @@ const columnLabels = ref<Record<string, string>>({});
 onMounted(() => {
   grist.ready({
     columns: [
-      { name: "ColonnesRecherche", title: "Colonnes à rechercher", type: "Any", allowMultiple: true },
+      {
+        name: "ColonnesRecherche",
+        title: "Colonnes à rechercher",
+        type: "Any",
+        allowMultiple: true,
+      },
     ],
     requiredAccess: "full",
     allowSelectBy: true,
@@ -119,7 +124,11 @@ function applyFilter() {
       const matchesSearch =
         !hasSearch ||
         colIds.value.length === 0 ||
-        colIds.value.some((id) => String(r[id] ?? "").toLowerCase().includes(q));
+        colIds.value.some((id) =>
+          String(r[id] ?? "")
+            .toLowerCase()
+            .includes(q),
+        );
       const matchesTags = activeTags.value.every((tag) => recordMatchesTag(r, tag));
       return matchesSearch && matchesTags;
     })
@@ -136,6 +145,37 @@ async function saveConfig(filters: TagFilter[]) {
 }
 </script>
 
+<style scoped>
+.search-row {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  justify-content: center;
+  gap: 1rem;
+  padding: 1rem;
+}
+
+.search-row :deep(.fr-search-bar) {
+  flex: 1 1 200px;
+  min-width: 0;
+  margin-bottom: 0;
+}
+
+.search-row :deep(.fr-tags-group) {
+  flex: 0 0 auto;
+  margin-bottom: 0;
+  gap: 0.5rem;
+}
+
+.search-row :deep(.fr-tags-group .fr-tag) {
+  margin: 0;
+}
+
+.search-row :deep(.fr-tags-group > li) {
+  line-height: 0;
+}
+</style>
+
 <template>
   <ConfigPanel
     v-if="isConfiguring"
@@ -147,27 +187,28 @@ async function saveConfig(filters: TagFilter[]) {
   <template v-else>
     <DsfrAlert v-if="errorMessage" type="error" :small="true" :description="errorMessage" />
     <template v-else>
-      <TagFilterBar
-        v-if="configuredFilters.length > 0"
-        :filters="configuredFilters"
-        :active-tags="activeTags"
-        :column-labels="columnLabels"
-        @update:active-tags="activeTags = $event"
-      />
       <DsfrAlert
         v-if="colIds.length === 0 && configuredFilters.length === 0"
         type="info"
         :small="true"
         description="Veuillez configurer au moins une colonne à rechercher."
       />
-      <DsfrSearchBar
-        v-else
-        v-model="searchQuery"
-        label=""
-        placeholder="Rechercher…"
-        @search="applyFilter()"
-        @update:model-value="applyFilter()"
-      />
+      <div v-else class="search-row">
+        <DsfrSearchBar
+          v-model="searchQuery"
+          label=""
+          placeholder="Rechercher…"
+          @search="applyFilter()"
+          @update:model-value="applyFilter()"
+        />
+        <TagFilterBar
+          v-if="configuredFilters.length > 0"
+          :filters="configuredFilters"
+          :active-tags="activeTags"
+          :column-labels="columnLabels"
+          @update:active-tags="activeTags = $event"
+        />
+      </div>
     </template>
   </template>
 </template>

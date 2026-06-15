@@ -85,9 +85,7 @@ test.describe("Barre de recherche", () => {
   test("filtre les lignes (insensible à la casse)", async ({ page }) => {
     await injectRecords(page, RECORDS, MAPPINGS_ONE);
     await page.locator('input[type="search"]').fill("par");
-    const selected = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristSelectedRows,
-    );
+    const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toEqual([1]);
   });
 
@@ -95,9 +93,7 @@ test.describe("Barre de recherche", () => {
     await injectRecords(page, RECORDS, MAPPINGS_ONE);
     await page.locator('input[type="search"]').fill("lyon");
     await page.locator('input[type="search"]').fill("");
-    const selected = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristSelectedRows,
-    );
+    const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toBeNull();
   });
 
@@ -106,9 +102,7 @@ test.describe("Barre de recherche", () => {
     const input = page.locator('input[type="search"]');
     await input.fill("marseille");
     await input.press("Enter");
-    const selected = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristSelectedRows,
-    );
+    const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toEqual([3]);
   });
 
@@ -116,9 +110,7 @@ test.describe("Barre de recherche", () => {
     await injectRecords(page, RECORDS, MAPPINGS_TWO);
     // "méd" matches "Médecin" (Paris, id=1) AND "Médiatrice" (Marseille, id=3)
     await page.locator('input[type="search"]').fill("méd");
-    const selected = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristSelectedRows,
-    );
+    const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toEqual([1, 3]);
   });
 
@@ -128,9 +120,7 @@ test.describe("Barre de recherche", () => {
     await injectRecords(page, RECORDS, MAPPINGS_TWO);
     // "arch" matches "Architecte" (Lyon, id=2) but not any ville
     await page.locator('input[type="search"]').fill("arch");
-    const selected = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristSelectedRows,
-    );
+    const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toEqual([2]);
   });
 
@@ -144,9 +134,7 @@ test.describe("Barre de recherche", () => {
     await expect(page.locator("button.fr-tag", { hasText: /Catégorie : A/ })).toBeVisible();
   });
 
-  test("le filtre par étiquette active sélectionne les lignes correspondantes", async ({
-    page,
-  }) => {
+  test("le filtre par tag actif sélectionne les lignes correspondantes", async ({ page }) => {
     await setColumnMeta(page, CHOICE_META.labels, CHOICE_META.types, CHOICE_META.widgetOptions);
     await injectOptions(page, {
       tagFilters: [{ colId: "categorie", value: "A", colType: "Choice" }],
@@ -154,9 +142,7 @@ test.describe("Barre de recherche", () => {
     // No search column mapping — tag-only filtering
     await injectRecords(page, RECORDS_CHOICES, null);
 
-    const selected = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristSelectedRows,
-    );
+    const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toEqual([1, 3]);
   });
 
@@ -172,9 +158,7 @@ test.describe("Barre de recherche", () => {
     // Tag "A" active → ids [1, 3]; search "paris" → id [1]; AND → [1]
     await page.locator('input[type="search"]').fill("paris");
 
-    const selected = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristSelectedRows,
-    );
+    const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toEqual([1]);
   });
 
@@ -195,9 +179,65 @@ test.describe("Barre de recherche", () => {
     await page.getByRole("button", { name: "Ajouter ce filtre" }).click();
     await page.getByRole("button", { name: "Enregistrer" }).click();
 
-    const stored = await page.evaluate(
-      () => (globalThis as GlobalWithGrist).__gristStoredOptions,
-    );
+    const stored = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristStoredOptions);
     expect(stored?.tagFilters).toEqual([{ colId: "categorie", value: "A", colType: "Choice" }]);
+  });
+
+  test("la barre de recherche et les étiquettes sont sur la même ligne (large fenêtre)", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 800, height: 600 });
+    await setColumnMeta(page, CHOICE_META.labels, CHOICE_META.types, CHOICE_META.widgetOptions);
+    await injectOptions(page, {
+      tagFilters: [{ colId: "categorie", value: "A", colType: "Choice" }],
+    });
+    await injectRecords(page, RECORDS_CHOICES, { ColonnesRecherche: "ville" });
+
+    const searchBar = page.locator(".fr-search-bar");
+    const tagsGroup = page.locator(".fr-tags-group");
+
+    await expect(searchBar).toBeVisible();
+    await expect(tagsGroup).toBeVisible();
+
+    const searchBox = await searchBar.boundingBox();
+    const tagsBox = await tagsGroup.boundingBox();
+
+    expect(searchBox).not.toBeNull();
+    expect(tagsBox).not.toBeNull();
+
+    // Both elements should share the same horizontal line:
+    // tags top is within the vertical span of the search bar (±10px tolerance)
+    expect(tagsBox!.y).toBeGreaterThanOrEqual(searchBox!.y - 10);
+    expect(tagsBox!.y).toBeLessThan(searchBox!.y + searchBox!.height + 10);
+  });
+
+  test("les étiquettes passent sous la barre de recherche quand la fenêtre est trop étroite", async ({
+    page,
+  }) => {
+    await page.setViewportSize({ width: 320, height: 600 });
+    await setColumnMeta(page, CHOICE_META.labels, CHOICE_META.types, CHOICE_META.widgetOptions);
+    await injectOptions(page, {
+      tagFilters: [
+        { colId: "categorie", value: "A", colType: "Choice" },
+        { colId: "categorie", value: "B", colType: "Choice" },
+        { colId: "categorie", value: "C", colType: "Choice" },
+      ],
+    });
+    await injectRecords(page, RECORDS_CHOICES, { ColonnesRecherche: "ville" });
+
+    const searchBar = page.locator(".fr-search-bar");
+    const tagsGroup = page.locator(".fr-tags-group");
+
+    await expect(searchBar).toBeVisible();
+    await expect(tagsGroup).toBeVisible();
+
+    const searchBox = await searchBar.boundingBox();
+    const tagsBox = await tagsGroup.boundingBox();
+
+    expect(searchBox).not.toBeNull();
+    expect(tagsBox).not.toBeNull();
+
+    // Tags should have wrapped below the search bar
+    expect(tagsBox!.y).toBeGreaterThanOrEqual(searchBox!.y + searchBox!.height - 5);
   });
 });

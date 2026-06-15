@@ -73,7 +73,7 @@ function save() {
 <template>
   <div class="config-panel">
     <form class="config-panel__content" novalidate @submit.prevent="save">
-      <h2 class="fr-h5 config-panel__heading">Configuration des filtres par étiquette</h2>
+      <h2 class="fr-h5 config-panel__heading">Configuration des filtres par tag</h2>
 
       <div v-if="draftFilters.length > 0" class="config-panel__filters">
         <p class="fr-label">Filtres configurés</p>
