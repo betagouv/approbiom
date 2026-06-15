@@ -39,7 +39,8 @@ grist.onRecord((record) => {
 grist.onOptions(async (opts) => {
   refColumnId.value = typeof opts?.refColumnId === "string" ? opts.refColumnId : null;
   displayColumnId.value = typeof opts?.displayColumnId === "string" ? opts.displayColumnId : null;
-  selectLabel.value = typeof opts?.selectLabel === "string" ? opts.selectLabel : "Valeur de référence";
+  selectLabel.value =
+    typeof opts?.selectLabel === "string" ? opts.selectLabel : "Valeur de référence";
 
   refColumns.value = await loadCurrentTableRefColumns();
 
@@ -92,8 +93,16 @@ async function onConfigRefColumnChange(colId: string) {
   refTableColumns.value = await loadColumnsOfRefTable(refCol);
 }
 
-async function saveConfig(payload: { refColumnId: string; displayColumnId: string; selectLabel: string }) {
-  await grist.setOptions({ refColumnId: payload.refColumnId, displayColumnId: payload.displayColumnId, selectLabel: payload.selectLabel });
+async function saveConfig(payload: {
+  refColumnId: string;
+  displayColumnId: string;
+  selectLabel: string;
+}) {
+  await grist.setOptions({
+    refColumnId: payload.refColumnId,
+    displayColumnId: payload.displayColumnId,
+    selectLabel: payload.selectLabel,
+  });
   isConfiguring.value = false;
 }
 
