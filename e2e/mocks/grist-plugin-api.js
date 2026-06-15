@@ -68,6 +68,7 @@ window.grist = {
       if (tableId === "_grist_Tables_column") {
         const labels = window.__gristColumnLabels || {};
         const types = window.__gristColumnTypes || {};
+        const widgetOpts = window.__gristWidgetOptions || {};
         const colIds = Object.keys(labels);
         return {
           id: colIds.map((_, i) => i + 1),
@@ -75,6 +76,7 @@ window.grist = {
           colId: colIds,
           label: colIds.map((id) => labels[id]),
           type: colIds.map((id) => types[id] || "Text"),
+          widgetOptions: colIds.map((id) => widgetOpts[id] || ""),
         };
       }
       if (window.__gristFetchTableData?.[tableId]) {

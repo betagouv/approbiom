@@ -1,73 +1,173 @@
 <script setup lang="ts">
-import { ref, onMounted } from "vue";
+import { ref, onMounted, watch } from "vue";
+import {
+  fetchAllTables,
+  fetchAllColumns,
+  getTableNumericalId,
+  getColumnsFromTable,
+  getChoiceOrChoiceListColumns,
+  type ColumnInfo,
+} from "@shared/utils/grist";
+import ConfigPanel from "./ConfigPanel.vue";
+import TagFilterBar from "./TagFilterBar.vue";
+
+type GristRecord = { id: number; [key: string]: unknown };
+
+interface TagFilter {
+  colId: string;
+  value: string;
+  colType: "Choice" | "ChoiceList";
+}
+
+function isTagFilter(v: unknown): v is TagFilter {
+  if (typeof v !== "object" || v === null) return false;
+  const obj = v as Record<string, unknown>;
+  return (
+    typeof obj.colId === "string" &&
+    typeof obj.value === "string" &&
+    (obj.colType === "Choice" || obj.colType === "ChoiceList")
+  );
+}
+
+function parseTagFilters(raw: unknown): TagFilter[] {
+  if (!Array.isArray(raw)) return [];
+  return raw.filter(isTagFilter);
+}
 
 const searchQuery = ref("");
-const columnKeys = ref<string[]>([]);
+const colIds = ref<string[]>([]);
 const errorMessage = ref("");
+const allRecords = ref<GristRecord[]>([]);
 
-let allRecords: { id: number; [key: string]: unknown }[] = [];
+const isConfiguring = ref(false);
+const configuredFilters = ref<TagFilter[]>([]);
+const activeTags = ref<TagFilter[]>([]);
+const choiceColumns = ref<ColumnInfo[]>([]);
+const columnLabels = ref<Record<string, string>>({});
 
 onMounted(() => {
   grist.ready({
     columns: [
       { name: "ColonnesRecherche", title: "Colonnes à rechercher", type: "Any", allowMultiple: true },
     ],
-    requiredAccess: "read table",
+    requiredAccess: "full",
     allowSelectBy: true,
+    onEditOptions() {
+      isConfiguring.value = true;
+    },
   });
 });
 
+grist.onOptions(async (opts) => {
+  configuredFilters.value = parseTagFilters(opts?.tagFilters);
+  activeTags.value = [...configuredFilters.value];
+  choiceColumns.value = await loadChoiceColumns();
+});
+
 grist.onRecords((records, mappings) => {
-  allRecords = records ?? [];
+  allRecords.value = records ?? [];
   const mapped = mappings as Record<string, unknown> | null;
   const raw = mapped?.ColonnesRecherche;
-  columnKeys.value = Array.isArray(raw)
+  colIds.value = Array.isArray(raw)
     ? raw.filter((k): k is string => typeof k === "string")
     : typeof raw === "string"
       ? [raw]
       : [];
-
-  if (allRecords.length === 0) {
-    errorMessage.value = "";
-    grist.setSelectedRows(null);
-    return;
-  }
-
   errorMessage.value = "";
-  applyFilter(searchQuery.value);
 });
 
-function applyFilter(query: string) {
-  if (columnKeys.value.length === 0) return;
+watch([searchQuery, activeTags, colIds, allRecords], applyFilter, { immediate: false });
 
-  if (!query.trim()) {
+async function loadChoiceColumns(): Promise<ColumnInfo[]> {
+  try {
+    const [allTables, tableId, allColsData] = await Promise.all([
+      fetchAllTables(),
+      grist.getSelectedTableId(),
+      fetchAllColumns(),
+    ]);
+    const numId = getTableNumericalId(allTables, tableId);
+    const cols = getColumnsFromTable(allColsData, numId);
+    columnLabels.value = Object.fromEntries(cols.map((c) => [c.colId, c.label]));
+    return getChoiceOrChoiceListColumns(cols);
+  } catch {
+    return [];
+  }
+}
+
+function recordMatchesTag(record: GristRecord, tag: TagFilter): boolean {
+  const val = record[tag.colId];
+  if (tag.colType === "ChoiceList") {
+    if (!Array.isArray(val) || val[0] !== "L") return false;
+    return (val as unknown[]).slice(1).includes(tag.value);
+  }
+  return String(val ?? "") === tag.value;
+}
+
+function applyFilter() {
+  const query = searchQuery.value.trim();
+  const hasSearch = query.length > 0;
+  const hasActiveTags = activeTags.value.length > 0;
+
+  if (!hasSearch && !hasActiveTags) {
     grist.setSelectedRows(null);
     return;
   }
 
   const q = query.toLowerCase();
-  const ids = allRecords
-    .filter((r) => columnKeys.value.some((key) => String(r[key] ?? "").toLowerCase().includes(q)))
+  const ids = allRecords.value
+    .filter((r) => {
+      const matchesSearch =
+        !hasSearch ||
+        colIds.value.length === 0 ||
+        colIds.value.some((id) => String(r[id] ?? "").toLowerCase().includes(q));
+      const matchesTags = activeTags.value.every((tag) => recordMatchesTag(r, tag));
+      return matchesSearch && matchesTags;
+    })
     .map((r) => r.id);
 
   grist.setSelectedRows(ids);
 }
+
+async function saveConfig(filters: TagFilter[]) {
+  await grist.setOptions({ tagFilters: filters });
+  configuredFilters.value = filters;
+  activeTags.value = [...filters];
+  isConfiguring.value = false;
+}
 </script>
 
 <template>
-  <DsfrAlert v-if="errorMessage" type="error" :small="true" :description="errorMessage" />
-  <DsfrAlert
-    v-else-if="columnKeys.length === 0"
-    type="info"
-    :small="true"
-    description="Veuillez configurer au moins une colonne à rechercher."
+  <ConfigPanel
+    v-if="isConfiguring"
+    :choice-columns="choiceColumns"
+    :saved-filters="configuredFilters"
+    @save="saveConfig"
+    @cancel="isConfiguring = false"
   />
-  <DsfrSearchBar
-    v-else
-    v-model="searchQuery"
-    label=""
-    placeholder="Rechercher…"
-    @search="applyFilter(searchQuery)"
-    @update:model-value="applyFilter($event)"
-  />
+  <template v-else>
+    <DsfrAlert v-if="errorMessage" type="error" :small="true" :description="errorMessage" />
+    <template v-else>
+      <TagFilterBar
+        v-if="configuredFilters.length > 0"
+        :filters="configuredFilters"
+        :active-tags="activeTags"
+        :column-labels="columnLabels"
+        @update:active-tags="activeTags = $event"
+      />
+      <DsfrAlert
+        v-if="colIds.length === 0 && configuredFilters.length === 0"
+        type="info"
+        :small="true"
+        description="Veuillez configurer au moins une colonne à rechercher."
+      />
+      <DsfrSearchBar
+        v-else
+        v-model="searchQuery"
+        label=""
+        placeholder="Rechercher…"
+        @search="applyFilter()"
+        @update:model-value="applyFilter()"
+      />
+    </template>
+  </template>
 </template>
