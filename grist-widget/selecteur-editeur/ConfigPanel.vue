@@ -3,36 +3,22 @@ import { ref } from "vue";
 import type { ColumnInfo } from "@shared/utils/grist";
 
 const props = defineProps<{
-  columns: ColumnInfo[];
   refTableColumns: ColumnInfo[];
-  selectLabel: string;
-  savedRefColumnId: string;
+  isRefMapped: boolean;
+  isRefValid: boolean;
   savedDisplayColumnId: string;
 }>();
 
 const emit = defineEmits<{
-  save: [payload: { refColumnId: string; displayColumnId: string; selectLabel: string }];
+  save: [payload: { displayColumnId: string }];
   cancel: [];
-  refColumnChange: [colId: string];
 }>();
 
-const selectedRefColId = ref(props.savedRefColumnId);
 const selectedDisplayColId = ref(props.savedDisplayColumnId);
-const configSelectLabel = ref(props.selectLabel);
-
-function onRefColChange(colId: string) {
-  selectedRefColId.value = colId;
-  selectedDisplayColId.value = "";
-  emit("refColumnChange", colId);
-}
 
 function save() {
-  if (!selectedRefColId.value || !selectedDisplayColId.value) return;
-  emit("save", {
-    refColumnId: selectedRefColId.value,
-    displayColumnId: selectedDisplayColId.value,
-    selectLabel: configSelectLabel.value,
-  });
+  if (!selectedDisplayColId.value) return;
+  emit("save", { displayColumnId: selectedDisplayColId.value });
 }
 </script>
 
@@ -42,48 +28,36 @@ function save() {
       <h2 class="fr-h5 config-panel__heading">Configuration du widget</h2>
 
       <DsfrAlert
-        v-if="columns.length === 0"
+        v-if="!isRefMapped"
+        type="warning"
+        :small="true"
+        description="Veuillez d'abord sélectionner une colonne via le panneau latéral Grist."
+      />
+      <DsfrAlert
+        v-else-if="!isRefValid"
         type="error"
         :small="true"
-        description="Aucune colonne de référence dans cette table."
+        description="La colonne sélectionnée doit être de type Référence (Ref)."
       />
-      <template v-else>
-        <DsfrSelect
-          label="Colonne de référence à modifier"
-          label-visible
-          :options="[
-            { value: '', text: '— Sélectionner —' },
-            ...columns.map((c) => ({ value: c.colId, text: c.label })),
-          ]"
-          :model-value="selectedRefColId"
-          @update:model-value="onRefColChange(String($event))"
-        />
-        <DsfrSelect
-          label="Colonne à afficher comme libellé"
-          label-visible
-          :options="[
-            { value: '', text: '— Sélectionner —' },
-            ...refTableColumns.map((c) => ({ value: c.colId, text: c.label })),
-          ]"
-          :model-value="selectedDisplayColId"
-          :disabled="refTableColumns.length === 0"
-          @update:model-value="selectedDisplayColId = String($event)"
-        />
-        <DsfrInputGroup
-          label="Libellé du sélecteur"
-          label-visible
-          :model-value="configSelectLabel"
-          placeholder="Valeur de référence"
-          @update:model-value="configSelectLabel = String($event)"
-        />
-      </template>
+      <DsfrSelect
+        v-else
+        label="Colonne à afficher comme libellé"
+        label-visible
+        :options="[
+          { value: '', text: '— Sélectionner —' },
+          ...refTableColumns.map((c) => ({ value: c.colId, text: c.label })),
+        ]"
+        :model-value="selectedDisplayColId"
+        :disabled="refTableColumns.length === 0"
+        @update:model-value="selectedDisplayColId = String($event)"
+      />
 
       <div class="config-panel__actions">
         <DsfrButton label="Annuler" secondary type="button" @click="emit('cancel')" />
         <DsfrButton
           label="Enregistrer"
           type="submit"
-          :disabled="columns.length === 0 || refTableColumns.length === 0"
+          :disabled="!isRefValid || !selectedDisplayColId"
         />
       </div>
     </form>

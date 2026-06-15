@@ -6,7 +6,6 @@ import {
   fetchAllColumns,
   getTableNumericalId,
   getColumnsFromTable,
-  getRefListColumns,
   getRefTableId,
   fetchTableRows,
   buildMultiselectOptions,
@@ -20,56 +19,95 @@ import SelecteurMultiple from "./SelecteurMultiple.vue";
 const isConfiguring = ref(false);
 const currentRecord = ref<RowRecord | null>(null);
 const refColumnId = ref<string | null>(null);
+const refColumnInfo = ref<ColumnInfo | null>(null);
 const displayColumnId = ref<string | null>(null);
-const refColumns = ref<ColumnInfo[]>([]);
 const refTableColumns = ref<ColumnInfo[]>([]);
 const multiselectOptions = ref<{ id: number; label: string }[]>([]);
-const selectLabel = ref("Valeurs de référence");
 const selectedIds = ref<number[]>([]);
 
-// Track the last row ID so we only sync selectedIds when the cursor moves to a NEW row.
-// When onRecord fires for the SAME row (Grist's confirmation after our write), we keep the
-// optimistic selection instead of resetting it to the pre-update value.
 let lastRecordId: number | null = null;
 
 onMounted(() => {
   grist.ready({
     requiredAccess: "full",
+    columns: [{ name: "ColonneRef", title: "Colonne à modifier", type: "Any" }],
     onEditOptions() {
       isConfiguring.value = true;
     },
   });
 });
 
-grist.onRecord((record) => {
+grist.onRecord(async (record, mappings) => {
   const isRowChange = record?.id !== lastRecordId;
   lastRecordId = record?.id ?? null;
   currentRecord.value = record;
 
-  if (isRowChange) {
-    selectedIds.value = record && refColumnId.value ? decodeRefList(record[refColumnId.value]) : [];
+  const mapped = mappings as Record<string, unknown> | null;
+  const colId = typeof mapped?.ColonneRef === "string" ? mapped.ColonneRef : null;
+
+  if (colId !== refColumnId.value) {
+    refColumnId.value = colId;
+    refColumnInfo.value = null;
+    refTableColumns.value = [];
+    multiselectOptions.value = [];
+    selectedIds.value = [];
+
+    if (!colId) return;
+
+    const info = await fetchCurrentColumnInfo(colId);
+    refColumnInfo.value = info;
+
+    if (!info?.type.startsWith("RefList:")) return;
+
+    refTableColumns.value = await loadColumnsOfRefTable(info);
+    if (displayColumnId.value) {
+      multiselectOptions.value = await buildOptionsFromRefTable(info, displayColumnId.value);
+      if (record && refColumnId.value) {
+        selectedIds.value = resolveSelectedIds(record[refColumnId.value]);
+      }
+    }
+  } else if (isRowChange) {
+    selectedIds.value =
+      record && refColumnId.value ? resolveSelectedIds(record[refColumnId.value]) : [];
   }
 });
 
 grist.onOptions(async (opts) => {
-  refColumnId.value = typeof opts?.refColumnId === "string" ? opts.refColumnId : null;
   displayColumnId.value = typeof opts?.displayColumnId === "string" ? opts.displayColumnId : null;
-  selectLabel.value =
-    typeof opts?.selectLabel === "string" ? opts.selectLabel : "Valeurs de référence";
 
-  refColumns.value = await loadCurrentTableRefListColumns();
-
-  if (!refColumnId.value) return;
-  const refCol = refColumns.value.find((c) => c.colId === refColumnId.value);
-  if (!refCol) return;
-
-  refTableColumns.value = await loadColumnsOfRefTable(refCol);
-
-  if (!displayColumnId.value) return;
-  multiselectOptions.value = await buildOptionsFromRefTable(refCol, displayColumnId.value);
+  if (!refColumnInfo.value?.type.startsWith("RefList:") || !displayColumnId.value) return;
+  multiselectOptions.value = await buildOptionsFromRefTable(
+    refColumnInfo.value,
+    displayColumnId.value,
+  );
+  if (currentRecord.value && refColumnId.value) {
+    selectedIds.value = resolveSelectedIds(currentRecord.value[refColumnId.value]);
+  }
 });
 
-async function loadCurrentTableRefListColumns(): Promise<ColumnInfo[]> {
+// Grist returns display labels (not raw row IDs) for mapped RefList columns.
+// Try numeric IDs first; fall back to reverse-lookup by label.
+function resolveSelectedIds(rawVal: unknown): number[] {
+  // Raw Grist format (without mapping): ["L", id1, id2, ...]
+  const numericIds = decodeRefList(rawVal);
+  if (numericIds.length > 0) return numericIds;
+
+  if (!Array.isArray(rawVal)) return [];
+
+  // Grist column-mapping format: plain array of numbers [id1, id2, ...]
+  const plainIds = (rawVal as unknown[]).filter((v): v is number => typeof v === "number");
+  if (plainIds.length > 0) return plainIds;
+
+  // Grist column-mapping format with display labels: ["L", "label1", ...] or ["label1", ...]
+  const labels = (rawVal as unknown[])
+    .filter((v) => v !== "L")
+    .filter((v): v is string => typeof v === "string");
+  return labels
+    .map((label) => multiselectOptions.value.find((o) => o.label === label)?.id)
+    .filter((id): id is number => id !== undefined);
+}
+
+async function fetchCurrentColumnInfo(colId: string): Promise<ColumnInfo | null> {
   const [allTables, selectedTableId, allColumnsData] = await Promise.all([
     fetchAllTables(),
     grist.getSelectedTableId(),
@@ -77,7 +115,7 @@ async function loadCurrentTableRefListColumns(): Promise<ColumnInfo[]> {
   ]);
   const tableNumericalId = getTableNumericalId(allTables, selectedTableId);
   const allCols = getColumnsFromTable(allColumnsData, tableNumericalId);
-  return getRefListColumns(allCols);
+  return allCols.find((c) => c.colId === colId) ?? null;
 }
 
 async function loadColumnsOfRefTable(refCol: ColumnInfo): Promise<ColumnInfo[]> {
@@ -97,22 +135,8 @@ async function buildOptionsFromRefTable(
   return buildMultiselectOptions(rows, displayColId);
 }
 
-async function onConfigRefColumnChange(colId: string) {
-  const refCol = refColumns.value.find((c) => c.colId === colId);
-  if (!refCol) return;
-  refTableColumns.value = await loadColumnsOfRefTable(refCol);
-}
-
-async function saveConfig(payload: {
-  refColumnId: string;
-  displayColumnId: string;
-  selectLabel: string;
-}) {
-  await grist.setOptions({
-    refColumnId: payload.refColumnId,
-    displayColumnId: payload.displayColumnId,
-    selectLabel: payload.selectLabel,
-  });
+async function saveConfig(payload: { displayColumnId: string }) {
+  await grist.setOptions({ displayColumnId: payload.displayColumnId });
   isConfiguring.value = false;
 }
 
@@ -129,18 +153,28 @@ async function onSelect(ids: number[]) {
 <template>
   <ConfigPanel
     v-if="isConfiguring"
-    :columns="refColumns"
     :ref-table-columns="refTableColumns"
-    :select-label="selectLabel"
-    :saved-ref-column-id="refColumnId ?? ''"
+    :is-ref-mapped="refColumnId !== null"
+    :is-ref-valid="refColumnInfo?.type.startsWith('RefList:') ?? false"
     :saved-display-column-id="displayColumnId ?? ''"
     @save="saveConfig"
     @cancel="isConfiguring = false"
-    @ref-column-change="onConfigRefColumnChange"
   />
   <template v-else>
     <DsfrAlert
       v-if="!refColumnId"
+      type="info"
+      :small="true"
+      description="Veuillez sélectionner une colonne via le panneau latéral Grist."
+    />
+    <DsfrAlert
+      v-else-if="!(refColumnInfo?.type.startsWith('RefList:') ?? false)"
+      type="error"
+      :small="true"
+      description="La colonne sélectionnée doit être de type Liste de références (RefList)."
+    />
+    <DsfrAlert
+      v-else-if="!displayColumnId"
       type="info"
       :small="true"
       description="Configurez le widget via le menu du widget."
@@ -155,7 +189,7 @@ async function onSelect(ids: number[]) {
       v-else
       :options="multiselectOptions"
       :selected-ids="selectedIds"
-      :label="selectLabel"
+      label="Valeurs de référence"
       @select="onSelect"
     />
   </template>
