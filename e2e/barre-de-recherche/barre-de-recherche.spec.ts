@@ -5,7 +5,9 @@ const WIDGET_URL = "grist-widget/barre-de-recherche/";
 
 type GlobalWithGrist = typeof globalThis & {
   __gristOnRecords: (records: unknown[], mappings: unknown) => void;
+  __gristOnRecord: (record: { id: number; [key: string]: unknown } | null) => void;
   __gristSelectedRows: number[] | null;
+  __gristCursorPos: { rowId: number } | undefined;
   __gristOnOptions: (options: unknown) => void;
   __gristOnEditOptions: () => void;
   __gristStoredOptions: Record<string, unknown>;
@@ -22,6 +24,16 @@ const RECORDS = [
 
 const MAPPINGS_ONE = { ColonnesRecherche: "ville" };
 const MAPPINGS_TWO = { ColonnesRecherche: ["ville", "metier"] };
+const MAPPINGS_CHOICES = { ColonnesRecherche: "ville", ColonnesAFiltrer: "categorie" };
+
+async function injectRecord(page: Page, record: { id: number; [key: string]: unknown } | null) {
+  await page.waitForFunction(
+    () => typeof (globalThis as GlobalWithGrist).__gristOnRecord === "function",
+  );
+  await page.evaluate((r) => {
+    (globalThis as GlobalWithGrist).__gristOnRecord(r);
+  }, record);
+}
 
 async function injectRecords(page: Page, records: unknown[], mappings: unknown) {
   await page.evaluate(
@@ -124,12 +136,12 @@ test.describe("Barre de recherche", () => {
     expect(selected).toEqual([2]);
   });
 
-  test("affiche les étiquettes configurées dans le widget", async ({ page }) => {
+  test("affiche les tags configurées dans le widget", async ({ page }) => {
     await setColumnMeta(page, CHOICE_META.labels, CHOICE_META.types, CHOICE_META.widgetOptions);
     await injectOptions(page, {
       tagFilters: [{ colId: "categorie", value: "A", colType: "Choice" }],
     });
-    await injectRecords(page, RECORDS_CHOICES, { ColonnesRecherche: "ville" });
+    await injectRecords(page, RECORDS_CHOICES, MAPPINGS_CHOICES);
 
     await expect(page.locator("button.fr-tag", { hasText: /Catégorie : A/ })).toBeVisible();
   });
@@ -139,8 +151,8 @@ test.describe("Barre de recherche", () => {
     await injectOptions(page, {
       tagFilters: [{ colId: "categorie", value: "A", colType: "Choice" }],
     });
-    // No search column mapping — tag-only filtering
-    await injectRecords(page, RECORDS_CHOICES, null);
+    // ColonnesAFiltrer maps categorie so records include it; no search column needed
+    await injectRecords(page, RECORDS_CHOICES, { ColonnesAFiltrer: "categorie" });
 
     const selected = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristSelectedRows);
     expect(selected).toEqual([1, 3]);
@@ -153,7 +165,7 @@ test.describe("Barre de recherche", () => {
     await injectOptions(page, {
       tagFilters: [{ colId: "categorie", value: "A", colType: "Choice" }],
     });
-    await injectRecords(page, RECORDS_CHOICES, { ColonnesRecherche: "ville" });
+    await injectRecords(page, RECORDS_CHOICES, MAPPINGS_CHOICES);
 
     // Tag "A" active → ids [1, 3]; search "paris" → id [1]; AND → [1]
     await page.locator('input[type="search"]').fill("paris");
@@ -168,6 +180,8 @@ test.describe("Barre de recherche", () => {
     await setColumnMeta(page, CHOICE_META.labels, CHOICE_META.types, CHOICE_META.widgetOptions);
     // injectOptions triggers onOptions → loadChoiceColumns (async)
     await injectOptions(page, {});
+    // Set ColonnesAFiltrer mapping so filteredChoiceColumns includes "categorie"
+    await injectRecords(page, [], { ColonnesAFiltrer: "categorie" });
 
     // Open config panel
     await page.evaluate(() => (globalThis as GlobalWithGrist).__gristOnEditOptions());
@@ -183,7 +197,7 @@ test.describe("Barre de recherche", () => {
     expect(stored?.tagFilters).toEqual([{ colId: "categorie", value: "A", colType: "Choice" }]);
   });
 
-  test("la barre de recherche et les étiquettes sont sur la même ligne (large fenêtre)", async ({
+  test("la barre de recherche et les tags sont sur la même ligne (large fenêtre)", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 800, height: 600 });
@@ -191,7 +205,7 @@ test.describe("Barre de recherche", () => {
     await injectOptions(page, {
       tagFilters: [{ colId: "categorie", value: "A", colType: "Choice" }],
     });
-    await injectRecords(page, RECORDS_CHOICES, { ColonnesRecherche: "ville" });
+    await injectRecords(page, RECORDS_CHOICES, MAPPINGS_CHOICES);
 
     const searchBar = page.locator(".fr-search-bar");
     const tagsGroup = page.locator(".fr-tags-group");
@@ -211,7 +225,7 @@ test.describe("Barre de recherche", () => {
     expect(tagsBox!.y).toBeLessThan(searchBox!.y + searchBox!.height + 10);
   });
 
-  test("les étiquettes passent sous la barre de recherche quand la fenêtre est trop étroite", async ({
+  test("les tags passent sous la barre de recherche quand la fenêtre est trop étroite", async ({
     page,
   }) => {
     await page.setViewportSize({ width: 320, height: 600 });
@@ -223,7 +237,7 @@ test.describe("Barre de recherche", () => {
         { colId: "categorie", value: "C", colType: "Choice" },
       ],
     });
-    await injectRecords(page, RECORDS_CHOICES, { ColonnesRecherche: "ville" });
+    await injectRecords(page, RECORDS_CHOICES, MAPPINGS_CHOICES);
 
     const searchBar = page.locator(".fr-search-bar");
     const tagsGroup = page.locator(".fr-tags-group");
@@ -239,5 +253,29 @@ test.describe("Barre de recherche", () => {
 
     // Tags should have wrapped below the search bar
     expect(tagsBox!.y).toBeGreaterThanOrEqual(searchBox!.y + searchBox!.height - 5);
+  });
+
+  test("le curseur reste sur la ligne courante si elle est encore dans les résultats", async ({
+    page,
+  }) => {
+    await injectRecords(page, RECORDS, MAPPINGS_ONE);
+    await injectRecord(page, { id: 1, ville: "Paris" });
+
+    await page.locator('input[type="search"]').fill("par");
+
+    const cursorPos = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristCursorPos);
+    expect(cursorPos).toBeUndefined();
+  });
+
+  test("le curseur se déplace vers le premier résultat si la ligne courante disparaît du filtre", async ({
+    page,
+  }) => {
+    await injectRecords(page, RECORDS, MAPPINGS_ONE);
+    await injectRecord(page, { id: 2, ville: "Lyon" });
+
+    await page.locator('input[type="search"]').fill("paris");
+
+    const cursorPos = await page.evaluate(() => (globalThis as GlobalWithGrist).__gristCursorPos);
+    expect(cursorPos).toEqual({ rowId: 1 });
   });
 });

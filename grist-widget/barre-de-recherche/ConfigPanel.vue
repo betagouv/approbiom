@@ -75,6 +75,13 @@ function save() {
     <form class="config-panel__content" novalidate @submit.prevent="save">
       <h2 class="fr-h5 config-panel__heading">Configuration des filtres par tag</h2>
 
+      <p class="fr-text--sm config-panel__description">
+        Les filtres s'appliquent aux colonnes de type <strong>Choix</strong> ou
+        <strong>Liste de choix</strong> sélectionnées dans <em>Colonnes à filtrer par tag</em>.
+        Configurez d'abord cette colonne dans les paramètres du widget, puis revenez ici pour
+        ajouter des filtres.
+      </p>
+
       <div v-if="draftFilters.length > 0" class="config-panel__filters">
         <p class="fr-label">Filtres configurés</p>
         <ul class="fr-tags-group">
@@ -90,7 +97,7 @@ function save() {
         v-if="choiceColumns.length === 0"
         type="info"
         :small="true"
-        description="Aucune colonne de type Choix ou Liste de choix dans cette table."
+        description="Aucune colonne de type Choix ou Liste de choix parmi les colonnes à filtrer. Mappez une colonne dans « Colonnes à filtrer par tag » dans les paramètres du widget."
       />
       <template v-else>
         <DsfrSelect
@@ -139,7 +146,12 @@ function save() {
 }
 
 .config-panel__heading {
+  margin-bottom: 0.5rem;
+}
+
+.config-panel__description {
   margin-bottom: 1rem;
+  color: var(--text-mention-grey, #666);
 }
 
 .config-panel__filters {

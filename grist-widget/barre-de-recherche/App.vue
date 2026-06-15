@@ -1,5 +1,5 @@
 <script setup lang="ts">
-import { ref, onMounted, watch } from "vue";
+import { ref, computed, onMounted, watch } from "vue";
 import {
   fetchAllTables,
   fetchAllColumns,
@@ -44,6 +44,8 @@ const configuredFilters = ref<TagFilter[]>([]);
 const activeTags = ref<TagFilter[]>([]);
 const choiceColumns = ref<ColumnInfo[]>([]);
 const columnLabels = ref<Record<string, string>>({});
+const currentRowId = ref<number | null>(null);
+const filterColIds = ref<string[]>([]);
 
 onMounted(() => {
   grist.ready({
@@ -51,6 +53,12 @@ onMounted(() => {
       {
         name: "ColonnesRecherche",
         title: "Colonnes à rechercher",
+        type: "Any",
+        allowMultiple: true,
+      },
+      {
+        name: "ColonnesAFiltrer",
+        title: "Colonnes à filtrer par tag",
         type: "Any",
         allowMultiple: true,
       },
@@ -69,15 +77,28 @@ grist.onOptions(async (opts) => {
   choiceColumns.value = await loadChoiceColumns();
 });
 
+grist.onRecord((record) => {
+  currentRowId.value = record?.id ?? null;
+});
+
 grist.onRecords((records, mappings) => {
   allRecords.value = records ?? [];
   const mapped = mappings as Record<string, unknown> | null;
-  const raw = mapped?.ColonnesRecherche;
-  colIds.value = Array.isArray(raw)
-    ? raw.filter((k): k is string => typeof k === "string")
-    : typeof raw === "string"
-      ? [raw]
+
+  const rawSearch = mapped?.ColonnesRecherche;
+  colIds.value = Array.isArray(rawSearch)
+    ? rawSearch.filter((k): k is string => typeof k === "string")
+    : typeof rawSearch === "string"
+      ? [rawSearch]
       : [];
+
+  const rawFilter = mapped?.ColonnesAFiltrer;
+  filterColIds.value = Array.isArray(rawFilter)
+    ? rawFilter.filter((k): k is string => typeof k === "string")
+    : typeof rawFilter === "string"
+      ? [rawFilter]
+      : [];
+
   errorMessage.value = "";
 });
 
@@ -99,6 +120,10 @@ async function loadChoiceColumns(): Promise<ColumnInfo[]> {
   }
 }
 
+const filteredChoiceColumns = computed(() =>
+  choiceColumns.value.filter((c) => filterColIds.value.includes(c.colId)),
+);
+
 function recordMatchesTag(record: GristRecord, tag: TagFilter): boolean {
   const val = record[tag.colId];
   if (tag.colType === "ChoiceList") {
@@ -112,7 +137,6 @@ function applyFilter() {
   const query = searchQuery.value.trim();
   const hasSearch = query.length > 0;
   const hasActiveTags = activeTags.value.length > 0;
-
   if (!hasSearch && !hasActiveTags) {
     grist.setSelectedRows(null);
     return;
@@ -130,11 +154,16 @@ function applyFilter() {
             .includes(q),
         );
       const matchesTags = activeTags.value.every((tag) => recordMatchesTag(r, tag));
+
       return matchesSearch && matchesTags;
     })
     .map((r) => r.id);
 
   grist.setSelectedRows(ids);
+
+  if (ids.length > 0 && currentRowId.value !== null && !ids.includes(currentRowId.value)) {
+    void grist.setCursorPos({ rowId: ids[0]! });
+  }
 }
 
 async function saveConfig(filters: TagFilter[]) {
@@ -179,7 +208,7 @@ async function saveConfig(filters: TagFilter[]) {
 <template>
   <ConfigPanel
     v-if="isConfiguring"
-    :choice-columns="choiceColumns"
+    :choice-columns="filteredChoiceColumns"
     :saved-filters="configuredFilters"
     @save="saveConfig"
     @cancel="isConfiguring = false"
