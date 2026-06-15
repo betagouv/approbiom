@@ -131,8 +131,20 @@ async function saveConfig(newTitle: string) {
       :small="true"
       description="Veuillez configurer les colonnes à afficher."
     />
-    <div v-else ref="tableWrapperRef" @click="handleTableClick" @keydown="handleTableKeydown">
-      <DsfrDataTable :title="title" :headers-row="tableHeader">
+    <div
+      v-else
+      class="table-scroll-wrapper"
+      ref="tableWrapperRef"
+      @click="handleTableClick"
+      @keydown="handleTableKeydown"
+    >
+      <DsfrDataTable
+        :title="title"
+        :headers-row="tableHeader"
+        :multilineTable="true"
+        :noCaption="true"
+        :noScroll="true"
+      >
         <template #thead>
           <tr>
             <th v-for="col in tableHeader" :key="col.key" scope="col">
@@ -158,6 +170,40 @@ async function saveConfig(newTitle: string) {
 </template>
 
 <style scoped>
+.table-scroll-wrapper {
+  width: 100%;
+  max-height: 100vh;
+  overflow-x: auto;
+  overflow-y: auto;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar {
+  width: 12px;
+  height: 12px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-track {
+  background: #e8e8e8;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb {
+  background: #b0b0b0;
+  border: 2px solid #e8e8e8;
+  border-radius: 6px;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-thumb:hover {
+  background: #888;
+}
+
+.table-scroll-wrapper::-webkit-scrollbar-corner {
+  background: #e8e8e8;
+}
+
+.fr-table {
+  margin: 0;
+}
+
 tbody tr {
   cursor: pointer;
 }
