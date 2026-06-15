@@ -65,9 +65,9 @@ test.describe("Sélecteur multiple éditeur — RefList column override", () => 
     await injectOptions(page, { refColumnId: "Contacts", displayColumnId: "nom" });
     await injectRecord(page, { id: 7, Contacts: ["L", 1] });
 
-    // Open the dropdown, then click "Bob" to add it to the selection
+    // Open the dropdown, then click "Bob" label to toggle the checkbox
     await page.locator("button.fr-select").click();
-    await page.getByRole("checkbox", { name: "Bob" }).click();
+    await page.locator("label", { hasText: "Bob" }).click();
 
     const updated = await page.evaluate(
       () => (globalThis as GlobalWithGrist).__gristUpdatedRecord,
