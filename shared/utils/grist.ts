@@ -17,6 +17,21 @@ export interface ColumnInfo {
   colId: string;
   label: string;
   type: string;
+  choices?: string[];
+}
+
+function parseWidgetOptionsChoices(json: string | undefined): string[] | undefined {
+  if (!json) return undefined;
+  try {
+    const opts = JSON.parse(json) as unknown;
+    if (typeof opts !== "object" || opts === null) return undefined;
+    const choices = (opts as Record<string, unknown>).choices;
+    return Array.isArray(choices)
+      ? choices.filter((c): c is string => typeof c === "string")
+      : undefined;
+  } catch {
+    return undefined;
+  }
 }
 
 export async function fetchAllTables(): Promise<GristTablesData> {
@@ -40,10 +55,16 @@ export function getColumnsFromTable(
   const result: ColumnInfo[] = [];
   for (let i = 0; i < allColumns.parentId.length; i++) {
     if (allColumns.parentId[i] !== tableNumericalId) continue;
+    const type = allColumns.type[i]!;
+    const choices =
+      type === "Choice" || type === "ChoiceList"
+        ? parseWidgetOptionsChoices(allColumns.widgetOptions?.[i])
+        : undefined;
     result.push({
       colId: allColumns.colId[i]!,
       label: allColumns.label[i]!,
-      type: allColumns.type[i]!,
+      type,
+      ...(choices !== undefined ? { choices } : {}),
     });
   }
   return result;
@@ -63,6 +84,10 @@ export function getRefColumns(columns: ColumnInfo[]): ColumnInfo[] {
 
 export function getRefListColumns(columns: ColumnInfo[]): ColumnInfo[] {
   return columns.filter((col) => col.type.startsWith("RefList:"));
+}
+
+export function getChoiceOrChoiceListColumns(columns: ColumnInfo[]): ColumnInfo[] {
+  return columns.filter((col) => col.type === "Choice" || col.type === "ChoiceList");
 }
 
 /**
