@@ -140,12 +140,19 @@ async function handleSelect(newRowId: unknown) {
       :small="true"
       description="Sélectionnez une ligne dans Grist."
     />
-    <DsfrSelect
-      v-else
-      :label="selectLabel"
-      :options="[{ value: '', text: '— Sélectionner —' }, ...selectOptions]"
-      :model-value="currentRecord[refColumnId] ? String(currentRecord[refColumnId]) : ''"
-      @update:model-value="handleSelect"
-    />
+    <div v-else class="container-select">
+      <DsfrSelect
+        :label="selectLabel"
+        :options="[{ value: '', text: '— Sélectionner —' }, ...selectOptions]"
+        :model-value="currentRecord[refColumnId] ? String(currentRecord[refColumnId]) : ''"
+        @update:model-value="handleSelect"
+      />
+    </div>
   </template>
 </template>
+
+<style>
+.container-select {
+  padding: 1rem;
+}
+</style>
