@@ -34,7 +34,10 @@ function parseTagFilters(raw: unknown): TagFilter[] {
   return raw.filter(isTagFilter);
 }
 
+const DEFAULT_PLACEHOLDER = "Rechercher…";
+
 const searchQuery = ref("");
+const searchPlaceholder = ref(DEFAULT_PLACEHOLDER);
 const colIds = ref<string[]>([]);
 const errorMessage = ref("");
 const allRecords = ref<GristRecord[]>([]);
@@ -74,6 +77,10 @@ onMounted(() => {
 grist.onOptions(async (opts) => {
   configuredFilters.value = parseTagFilters(opts?.tagFilters);
   activeTags.value = [...configuredFilters.value];
+  searchPlaceholder.value =
+    typeof opts?.searchPlaceholder === "string" && opts.searchPlaceholder.trim() !== ""
+      ? opts.searchPlaceholder
+      : DEFAULT_PLACEHOLDER;
   choiceColumns.value = await loadChoiceColumns();
 });
 
@@ -166,10 +173,12 @@ function applyFilter() {
   }
 }
 
-async function saveConfig(filters: TagFilter[]) {
-  await grist.setOptions({ tagFilters: filters });
+async function saveConfig(filters: TagFilter[], placeholder: string) {
+  const resolvedPlaceholder = placeholder.trim() !== "" ? placeholder : DEFAULT_PLACEHOLDER;
+  await grist.setOptions({ tagFilters: filters, searchPlaceholder: resolvedPlaceholder });
   configuredFilters.value = filters;
   activeTags.value = [...filters];
+  searchPlaceholder.value = resolvedPlaceholder;
   isConfiguring.value = false;
 }
 </script>
@@ -210,6 +219,7 @@ async function saveConfig(filters: TagFilter[]) {
     v-if="isConfiguring"
     :choice-columns="filteredChoiceColumns"
     :saved-filters="configuredFilters"
+    :saved-placeholder="searchPlaceholder"
     @save="saveConfig"
     @cancel="isConfiguring = false"
   />
@@ -226,7 +236,7 @@ async function saveConfig(filters: TagFilter[]) {
         <DsfrSearchBar
           v-model="searchQuery"
           label=""
-          placeholder="Rechercher…"
+          :placeholder="searchPlaceholder"
           @search="applyFilter()"
           @update:model-value="applyFilter()"
         />

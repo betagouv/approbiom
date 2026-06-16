@@ -11,14 +11,16 @@ interface TagFilter {
 const props = defineProps<{
   choiceColumns: ColumnInfo[];
   savedFilters: TagFilter[];
+  savedPlaceholder: string;
 }>();
 
 const emit = defineEmits<{
-  save: [filters: TagFilter[]];
+  save: [filters: TagFilter[], placeholder: string];
   cancel: [];
 }>();
 
 const draftFilters = ref<TagFilter[]>([...props.savedFilters]);
+const draftPlaceholder = ref(props.savedPlaceholder);
 const selectedColId = ref("");
 const selectedValue = ref("");
 
@@ -66,6 +68,7 @@ function save() {
   emit(
     "save",
     draftFilters.value.map((f) => ({ colId: f.colId, value: f.value, colType: f.colType })),
+    draftPlaceholder.value.trim(),
   );
 }
 </script>
@@ -73,7 +76,16 @@ function save() {
 <template>
   <div class="config-panel">
     <form class="config-panel__content" novalidate @submit.prevent="save">
-      <h2 class="fr-h5 config-panel__heading">Configuration des filtres par tag</h2>
+      <h2 class="fr-h5 config-panel__heading">Panneau de configuration</h2>
+
+      <DsfrInputGroup
+        label="Texte d'aide (placeholder)"
+        label-visible
+        hint="Texte affiché dans la barre de recherche lorsqu'elle est vide."
+        :model-value="draftPlaceholder"
+        placeholder="Rechercher…"
+        @update:model-value="draftPlaceholder = String($event)"
+      />
 
       <p class="fr-text--sm config-panel__description">
         Les filtres s'appliquent aux colonnes de type <strong>Choix</strong> ou

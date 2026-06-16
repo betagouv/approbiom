@@ -3,7 +3,14 @@ import App from "./App.vue";
 import "@gouvfr/dsfr/dist/dsfr.min.css";
 import "@gouvfr/dsfr/dist/utility/icons/icons.min.css";
 import "@gouvminint/vue-dsfr/styles";
-import { DsfrAlert, DsfrSearchBar, DsfrTags, DsfrButton, DsfrSelect } from "@gouvminint/vue-dsfr";
+import {
+  DsfrAlert,
+  DsfrSearchBar,
+  DsfrTags,
+  DsfrButton,
+  DsfrSelect,
+  DsfrInputGroup,
+} from "@gouvminint/vue-dsfr";
 
 createApp(App)
   .component("DsfrAlert", DsfrAlert)
@@ -11,4 +18,5 @@ createApp(App)
   .component("DsfrTags", DsfrTags)
   .component("DsfrButton", DsfrButton)
   .component("DsfrSelect", DsfrSelect)
+  .component("DsfrInputGroup", DsfrInputGroup)
   .mount("#app");
