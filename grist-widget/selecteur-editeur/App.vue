@@ -18,6 +18,7 @@ const currentRecord = ref<RowRecord | null>(null);
 const refColumnId = ref<string | null>(null);
 const refColumnInfo = ref<ColumnInfo | null>(null);
 const displayColumnId = ref<string | null>(null);
+const label = ref<string | undefined>();
 const refTableColumns = ref<ColumnInfo[]>([]);
 const selectOptions = ref<{ value: number | string; text: string }[]>([]);
 
@@ -58,6 +59,7 @@ grist.onRecord(async (record, mappings) => {
 
 grist.onOptions(async (opts) => {
   displayColumnId.value = typeof opts?.displayColumnId === "string" ? opts.displayColumnId : null;
+  label.value = typeof opts?.label === "string" && opts.label ? opts.label : "Valeur de référence";
 
   if (!refColumnInfo.value?.type.startsWith("Ref:") || !displayColumnId.value) return;
   selectOptions.value = await buildOptionsFromRefTable(refColumnInfo.value, displayColumnId.value);
@@ -105,8 +107,9 @@ const currentModelValue = computed((): string => {
   return match ? String(match.value) : "";
 });
 
-async function saveConfig(payload: { displayColumnId: string }) {
-  await grist.setOptions({ displayColumnId: payload.displayColumnId });
+async function saveConfig(payload: { displayColumnId: string; label: string }) {
+  await grist.setOptions({ displayColumnId: payload.displayColumnId, label: payload.label });
+  label.value = payload.label;
   isConfiguring.value = false;
 }
 
@@ -126,6 +129,7 @@ async function handleSelect(newRowId: unknown) {
     :is-ref-mapped="refColumnId !== null"
     :is-ref-valid="refColumnInfo?.type.startsWith('Ref:') ?? false"
     :saved-display-column-id="displayColumnId ?? ''"
+    :saved-label="label"
     @save="saveConfig"
     @cancel="isConfiguring = false"
   />
@@ -156,7 +160,7 @@ async function handleSelect(newRowId: unknown) {
     />
     <div v-else class="container-select">
       <DsfrSelect
-        label="Valeur de référence"
+        :label="label"
         :options="[
           { value: '', text: '— Sélectionner —' },
           ...selectOptions.map((o) => ({ value: String(o.value), text: o.text })),
