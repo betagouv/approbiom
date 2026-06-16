@@ -6,7 +6,9 @@ import ConfigPanel from "./ConfigPanel.vue";
 const isConfiguring = ref(false);
 const title = ref("Titre du tableau");
 const columnKeys = ref<string[]>([]);
+const totalColumnKeys = ref<string[]>([]);
 const columnLabels = ref<Record<string, string>>({});
+const columnTypes = ref<Record<string, string>>({});
 const allRecords = ref<{ id: number; [key: string]: unknown }[]>([]);
 
 const selectedRecordId = ref<number | null>(null);
@@ -59,6 +61,37 @@ const tableHeader = computed(() =>
   })),
 );
 
+const totalColumnsNotDisplayed = computed(() =>
+  totalColumnKeys.value.filter((key) => !columnKeys.value.includes(key)),
+);
+
+const totalColumnsNotInteger = computed(() =>
+  totalColumnKeys.value.filter(
+    (key) => columnKeys.value.includes(key) && columnTypes.value[key] !== "Int",
+  ),
+);
+
+const validTotalColumnKeys = computed(() =>
+  totalColumnKeys.value.filter(
+    (key) => columnKeys.value.includes(key) && columnTypes.value[key] === "Int",
+  ),
+);
+
+const columnTotals = computed(() => {
+  const totals: Record<string, number> = {};
+  for (const key of validTotalColumnKeys.value) {
+    totals[key] = allRecords.value.reduce((sum, record) => {
+      const value = record[key];
+      return sum + (typeof value === "number" ? value : 0);
+    }, 0);
+  }
+  return totals;
+});
+
+function labelsFor(keys: string[]): string {
+  return keys.map((key) => columnLabels.value[key] ?? key).join(", ");
+}
+
 async function fetchColumnLabels() {
   try {
     const tableId = await grist.getSelectedTableId();
@@ -67,15 +100,18 @@ async function fetchColumnLabels() {
     const tableIndex = tables.tableId.indexOf(tableId);
     if (tableIndex === -1) return;
     const tableRef = tables.id[tableIndex];
-    const map: Record<string, string> = {};
+    const labels: Record<string, string> = {};
+    const types: Record<string, string> = {};
     for (let i = 0; i < columns.parentId.length; i++) {
       if (columns.parentId[i] === tableRef) {
         const colId = columns.colId[i];
         const label = columns.label[i];
-        if (colId && label) map[colId] = label;
+        if (colId && label) labels[colId] = label;
+        if (colId) types[colId] = columns.type[i] ?? "";
       }
     }
-    columnLabels.value = map;
+    columnLabels.value = labels;
+    columnTypes.value = types;
   } catch {
     // Grist metadata unavailable (e.g. in tests) — column IDs used as fallback
   }
@@ -83,7 +119,16 @@ async function fetchColumnLabels() {
 
 onMounted(() => {
   grist.ready({
-    columns: [{ name: "Colonnes", title: "Colonnes à afficher", type: "Any", allowMultiple: true }],
+    columns: [
+      { name: "Colonnes", title: "Colonnes à afficher", type: "Any", allowMultiple: true },
+      {
+        name: "ColonnesPourTotal",
+        title: "Colonnes dont on souhaite afficher le total",
+        type: "Any",
+        allowMultiple: true,
+        optional: true,
+      },
+    ],
     allowSelectBy: true,
     requiredAccess: "full",
     onEditOptions() {
@@ -92,18 +137,25 @@ onMounted(() => {
   });
 });
 
-watch(columnKeys, fetchColumnLabels);
+watch([columnKeys, totalColumnKeys], fetchColumnLabels);
 
-grist.onRecords((records, mappings) => {
-  allRecords.value = records ?? [];
-  const raw = mappings?.Colonnes;
-  const newKeys = Array.isArray(raw)
+function mappedKeys(raw: unknown): string[] {
+  return Array.isArray(raw)
     ? raw.filter((k): k is string => typeof k === "string")
     : typeof raw === "string"
       ? [raw]
       : [];
+}
+
+grist.onRecords((records, mappings) => {
+  allRecords.value = records ?? [];
+  const newKeys = mappedKeys(mappings?.Colonnes);
   if (newKeys.join(",") !== columnKeys.value.join(",")) {
     columnKeys.value = newKeys;
+  }
+  const newTotalKeys = mappedKeys(mappings?.ColonnesPourTotal);
+  if (newTotalKeys.join(",") !== totalColumnKeys.value.join(",")) {
+    totalColumnKeys.value = newTotalKeys;
   }
 });
 
@@ -131,41 +183,59 @@ async function saveConfig(newTitle: string) {
       :small="true"
       description="Veuillez configurer les colonnes à afficher."
     />
-    <div
-      v-else
-      class="table-scroll-wrapper"
-      ref="tableWrapperRef"
-      @click="handleTableClick"
-      @keydown="handleTableKeydown"
-    >
-      <DsfrDataTable
-        :title="title"
-        :headers-row="tableHeader"
-        :multilineTable="true"
-        :noCaption="true"
-        :noScroll="true"
+    <template v-else>
+      <DsfrAlert
+        v-if="totalColumnsNotDisplayed.length > 0"
+        type="warning"
+        :small="true"
+        :description="`La colonne « ${labelsFor(totalColumnsNotDisplayed)} » utilisée pour le total n'est pas affichée dans le tableau. Ajoutez-la aux colonnes à afficher pour que son total soit calculé.`"
+      />
+      <DsfrAlert
+        v-if="totalColumnsNotInteger.length > 0"
+        type="warning"
+        :small="true"
+        :description="`La colonne « ${labelsFor(totalColumnsNotInteger)} » utilisée pour le total n'est pas de type Entier. Son total ne sera pas calculé.`"
+      />
+      <div
+        class="table-scroll-wrapper"
+        ref="tableWrapperRef"
+        @click="handleTableClick"
+        @keydown="handleTableKeydown"
       >
-        <template #thead>
-          <tr>
-            <th v-for="col in tableHeader" :key="col.key" scope="col">
-              {{ col.label }}
-            </th>
-          </tr>
-        </template>
-        <template #tbody>
-          <tr
-            v-for="(record, idx) in allRecords"
-            :key="record.id"
-            :data-row-key="idx + 1"
-            :class="{ 'fr-tr--selected': record.id === selectedRecordId }"
-          >
-            <td v-for="key in columnKeys" :key="key" tabindex="0">
-              {{ record[key] ?? "" }}
-            </td>
-          </tr>
-        </template>
-      </DsfrDataTable>
-    </div>
+        <DsfrDataTable
+          :title="title"
+          :headers-row="tableHeader"
+          :multilineTable="true"
+          :noCaption="true"
+          :noScroll="true"
+        >
+          <template #thead>
+            <tr>
+              <th v-for="col in tableHeader" :key="col.key" scope="col">
+                {{ col.label }}
+              </th>
+            </tr>
+          </template>
+          <template #tbody>
+            <tr
+              v-for="(record, idx) in allRecords"
+              :key="record.id"
+              :data-row-key="idx + 1"
+              :class="{ 'fr-tr--selected': record.id === selectedRecordId }"
+            >
+              <td v-for="key in columnKeys" :key="key" tabindex="0">
+                {{ record[key] ?? "" }}
+              </td>
+            </tr>
+          </template>
+        </DsfrDataTable>
+      </div>
+      <div v-if="validTotalColumnKeys.length > 0" class="totals-summary">
+        <p v-for="key in validTotalColumnKeys" :key="`total-${key}`">
+          Total {{ columnLabels[key] ?? key }} : {{ columnTotals[key] }}
+        </p>
+      </div>
+    </template>
   </template>
 </template>
 
@@ -211,5 +281,17 @@ tbody tr {
 tbody tr.fr-tr--selected td,
 tbody tr.fr-tr--selected th {
   background-color: var(--blue-france-950-100);
+}
+
+.totals-summary {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  margin-top: 1rem;
+  margin-right: 1rem;
+}
+
+.totals-summary p {
+  margin: 0;
 }
 </style>

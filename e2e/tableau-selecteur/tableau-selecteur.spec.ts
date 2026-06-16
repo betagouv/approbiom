@@ -11,6 +11,7 @@ type GlobalWithGrist = typeof globalThis & {
   __gristCursorPos: { rowId?: number };
   __gristStoredOptions: Record<string, unknown>;
   __gristColumnLabels: Record<string, string>;
+  __gristColumnTypes: Record<string, string>;
 };
 
 const RECORDS = [
@@ -166,6 +167,52 @@ test.describe("Tableau sélecteur", () => {
 
       await expect(page.getByText("Configuration du widget")).not.toBeVisible();
       await expect(page.locator("caption")).not.toHaveText("Titre modifié");
+    });
+  });
+
+  test.describe("total des colonnes", () => {
+    const RECORDS_WITH_MONTANT = [
+      { id: 1, nom: "Alice", montant: 10 },
+      { id: 2, nom: "Bob", montant: 25 },
+    ];
+
+    test("affiche le total d'une colonne entière sous le tableau", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristColumnLabels = { nom: "Nom", montant: "Montant" };
+        (globalThis as GlobalWithGrist).__gristColumnTypes = { nom: "Text", montant: "Int" };
+      });
+      await injectRecords(page, RECORDS_WITH_MONTANT, {
+        Colonnes: ["nom", "montant"],
+        ColonnesPourTotal: ["montant"],
+      });
+
+      await expect(page.locator(".totals-summary")).toHaveText("Total Montant : 35");
+    });
+
+    test("affiche une alerte si la colonne du total n'est pas de type Entier", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristColumnTypes = { nom: "Text", montant: "Text" };
+      });
+      await injectRecords(page, RECORDS_WITH_MONTANT, {
+        Colonnes: ["nom", "montant"],
+        ColonnesPourTotal: ["montant"],
+      });
+
+      await expect(page.locator(".fr-alert--warning")).toContainText("type Entier");
+      await expect(page.locator(".totals-summary")).not.toBeVisible();
+    });
+
+    test("affiche une alerte si la colonne du total n'est pas affichée", async ({ page }) => {
+      await page.evaluate(() => {
+        (globalThis as GlobalWithGrist).__gristColumnTypes = { nom: "Text", montant: "Int" };
+      });
+      await injectRecords(page, RECORDS_WITH_MONTANT, {
+        Colonnes: ["nom"],
+        ColonnesPourTotal: ["montant"],
+      });
+
+      await expect(page.locator(".fr-alert--warning")).toContainText("n'est pas affichée");
+      await expect(page.locator(".totals-summary")).not.toBeVisible();
     });
   });
 });
