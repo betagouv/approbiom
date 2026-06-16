@@ -2,23 +2,27 @@
 import { ref } from "vue";
 import type { ColumnInfo } from "@shared/utils/grist";
 
+const DEFAULT_LABEL = "Valeurs de référence";
+
 const props = defineProps<{
   refTableColumns: ColumnInfo[];
   isRefMapped: boolean;
   isRefValid: boolean;
   savedDisplayColumnId: string;
+  savedLabel: string;
 }>();
 
 const emit = defineEmits<{
-  save: [payload: { displayColumnId: string }];
+  save: [payload: { displayColumnId: string; label: string }];
   cancel: [];
 }>();
 
 const selectedDisplayColId = ref(props.savedDisplayColumnId);
+const label = ref(props.savedLabel);
 
 function save() {
   if (!selectedDisplayColId.value) return;
-  emit("save", { displayColumnId: selectedDisplayColId.value });
+  emit("save", { displayColumnId: selectedDisplayColId.value, label: label.value || DEFAULT_LABEL });
 }
 </script>
 
@@ -39,18 +43,26 @@ function save() {
         :small="true"
         description="La colonne sélectionnée doit être de type Liste de références (RefList)."
       />
-      <DsfrSelect
-        v-else
-        label="Colonne à afficher comme libellé"
-        label-visible
-        :options="[
-          { value: '', text: '— Sélectionner —' },
-          ...refTableColumns.map((c) => ({ value: c.colId, text: c.label })),
-        ]"
-        :model-value="selectedDisplayColId"
-        :disabled="refTableColumns.length === 0"
-        @update:model-value="selectedDisplayColId = String($event)"
-      />
+      <template v-else>
+        <DsfrSelect
+          label="Colonne à afficher comme libellé"
+          label-visible
+          :options="[
+            { value: '', text: '— Sélectionner —' },
+            ...refTableColumns.map((c) => ({ value: c.colId, text: c.label })),
+          ]"
+          :model-value="selectedDisplayColId"
+          :disabled="refTableColumns.length === 0"
+          @update:model-value="selectedDisplayColId = String($event)"
+        />
+        <DsfrInputGroup
+          label="Libellé"
+          label-visible
+          :model-value="label"
+          :placeholder="DEFAULT_LABEL"
+          @update:model-value="label = String($event)"
+        />
+      </template>
 
       <div class="config-panel__actions">
         <DsfrButton label="Annuler" secondary type="button" @click="emit('cancel')" />

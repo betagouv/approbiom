@@ -21,6 +21,7 @@ const currentRecord = ref<RowRecord | null>(null);
 const refColumnId = ref<string | null>(null);
 const refColumnInfo = ref<ColumnInfo | null>(null);
 const displayColumnId = ref<string | null>(null);
+const label = ref("Valeurs de référence");
 const refTableColumns = ref<ColumnInfo[]>([]);
 const multiselectOptions = ref<{ id: number; label: string }[]>([]);
 const selectedIds = ref<number[]>([]);
@@ -74,6 +75,7 @@ grist.onRecord(async (record, mappings) => {
 
 grist.onOptions(async (opts) => {
   displayColumnId.value = typeof opts?.displayColumnId === "string" ? opts.displayColumnId : null;
+  label.value = typeof opts?.label === "string" && opts.label ? opts.label : "Valeurs de référence";
 
   if (!refColumnInfo.value?.type.startsWith("RefList:") || !displayColumnId.value) return;
   multiselectOptions.value = await buildOptionsFromRefTable(
@@ -135,8 +137,9 @@ async function buildOptionsFromRefTable(
   return buildMultiselectOptions(rows, displayColId);
 }
 
-async function saveConfig(payload: { displayColumnId: string }) {
-  await grist.setOptions({ displayColumnId: payload.displayColumnId });
+async function saveConfig(payload: { displayColumnId: string; label: string }) {
+  await grist.setOptions({ displayColumnId: payload.displayColumnId, label: payload.label });
+  label.value = payload.label;
   isConfiguring.value = false;
 }
 
@@ -157,6 +160,7 @@ async function onSelect(ids: number[]) {
     :is-ref-mapped="refColumnId !== null"
     :is-ref-valid="refColumnInfo?.type.startsWith('RefList:') ?? false"
     :saved-display-column-id="displayColumnId ?? ''"
+    :saved-label="label"
     @save="saveConfig"
     @cancel="isConfiguring = false"
   />
@@ -189,7 +193,7 @@ async function onSelect(ids: number[]) {
       v-else
       :options="multiselectOptions"
       :selected-ids="selectedIds"
-      label="Valeurs de référence"
+      :label="label"
       @select="onSelect"
     />
   </template>
