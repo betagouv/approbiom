@@ -31,6 +31,14 @@ test.describe("carte-departement", () => {
     await expect(page.locator("#map")).toBeVisible();
   });
 
+  test("shows the map without warnings for a valid country COG code", async ({ page }) => {
+    await page.evaluate(() => {
+      (globalThis as GlobalWithGrist).__gristOnRecord({ col: "99109" }, { DDEP_C_COD: "col" });
+    });
+    await expect(page.locator(".fr-alert")).not.toBeVisible();
+    await expect(page.locator("#map")).toBeVisible();
+  });
+
   test("shows a warning for an unrecognised department code", async ({ page }) => {
     await page.evaluate(() => {
       (globalThis as GlobalWithGrist).__gristOnRecord({ col: "99" }, { DDEP_C_COD: "col" });

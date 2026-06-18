@@ -2,12 +2,20 @@
 import leaflet from "leaflet";
 import { computed, onMounted, onUnmounted, watch } from "vue";
 import type { DepartementFeatureCollection } from "./types/departement";
+import type { PaysFeatureCollection } from "./types/pays";
 import departementsRaw from "./data/departements.geojson";
+import paysRaw from "./data/World_Countries_Boundaries.geojson";
+import cogIsoRaw from "./data/pays-cog.json";
 
 const departementsData = departementsRaw as DepartementFeatureCollection;
+const paysData = paysRaw as PaysFeatureCollection;
+
+const cogToIso: Record<string, string> = Object.fromEntries(
+  Object.entries(cogIsoRaw as Record<string, string>).filter(([k]) => !k.startsWith("_")),
+);
 
 interface Props {
-  codeDepartmentInputs: string[];
+  codeInputs: string[];
 }
 
 const props = defineProps<Props>();
@@ -15,16 +23,33 @@ const props = defineProps<Props>();
 const centerOfFrance = { lat: 47.75, lng: 1.67 };
 const initialZoom = 6;
 
-const knownCodes = new Set(departementsData.features.map((f) => f.properties.DDEP_C_COD));
+const isCountryCode = (code: string) => /^99\d{3}$/.test(code);
 
-const departmentValidation = computed(() => {
-  if (props.codeDepartmentInputs.length === 0) {
+const departmentKnownCodes = new Set(departementsData.features.map((f) => f.properties.DDEP_C_COD));
+const countryKnownCodes = new Set(Object.keys(cogToIso));
+
+const territoireValidation = computed(() => {
+  if (props.codeInputs.length === 0) {
     return { status: "empty" as const };
   }
-  const invalidCodes = props.codeDepartmentInputs.filter((code) => !knownCodes.has(code));
-  const features = departementsData.features.filter((f) =>
-    props.codeDepartmentInputs.includes(f.properties.DDEP_C_COD),
+
+  const deptCodes = props.codeInputs.filter((c) => !isCountryCode(c));
+  const countryCodes = props.codeInputs.filter(isCountryCode);
+
+  const invalidCodes = [
+    ...deptCodes.filter((c) => !departmentKnownCodes.has(c)),
+    ...countryCodes.filter((c) => !countryKnownCodes.has(c)),
+  ];
+
+  const deptFeatures = departementsData.features.filter((f) =>
+    deptCodes.includes(f.properties.DDEP_C_COD),
   );
+  const countryFeatures = paysData.features.filter((f) =>
+    countryCodes.some((c) => cogToIso[c] === f.properties.ISO2),
+  );
+
+  const features = [...deptFeatures, ...countryFeatures];
+
   if (invalidCodes.length > 0) {
     return { status: "partial" as const, invalidCodes, features };
   }
@@ -53,13 +78,13 @@ onMounted(() => {
   leaflet
     .tileLayer("https://tile.openstreetmap.org/{z}/{x}/{y}.png", {
       maxZoom: 9,
-      minZoom: 5,
+      minZoom: 2,
       attribution: '&copy; <a href="http://www.openstreetmap.org/copyright">OpenStreetMap</a>',
     })
     .addTo(map);
 
   watch(
-    departmentValidation,
+    territoireValidation,
     (validation) => {
       geoJsonLayer?.remove();
       geoJsonLayer = null;
@@ -100,9 +125,9 @@ onUnmounted(() => {
 <template>
   <div class="wrapper">
     <DsfrAlert
-      v-if="departmentValidation.status === 'partial'"
-      :title="`Département(s) non reconnu(s) : ${departmentValidation.invalidCodes.join(', ')}`"
-      description="Les codes de département doivent respecter la nomenclature officielle de l’INSEE. Les départements à un seul chiffre doivent comporter un zéro initial (ex : 09 et non 9)."
+      v-if="territoireValidation.status === 'partial'"
+      :title="`Code(s) non reconnu(s) : ${territoireValidation.invalidCodes.join(', ')}`"
+      description="Les codes doivent respecter la nomenclature officielle de l'INSEE. Les codes de département à un seul chiffre doivent comporter un zéro initial (ex : 09 et non 9). Les codes pays sont des codes COG à 5 chiffres commençant par 99 (ex : 99109 pour l'Allemagne)."
       type="warning"
     />
     <div :id="mapId"></div>
