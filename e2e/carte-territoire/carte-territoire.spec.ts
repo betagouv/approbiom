@@ -1,12 +1,12 @@
 import { test, expect } from "../fixtures";
 
-const WIDGET_URL = "grist-widget/carte-departement/";
+const WIDGET_URL = "grist-widget/carte-territoire/";
 
 type GlobalWithGrist = typeof globalThis & {
   __gristOnRecord: (record: unknown, mappings: unknown) => void;
 };
 
-test.describe("carte-departement", () => {
+test.describe("carte-territoire", () => {
   test.beforeEach(async ({ page }) => {
     await page.goto(WIDGET_URL);
   });
