@@ -1,0 +1,267 @@
+ID;NOM_ALPHA;NOM_COURT;ARTICLE;ISO_ETAT;NOM_LONG_ETAT;ISO_3166_NOM;IND_TEL_UIT;ISO_CODE_NUM;ISO_alpha3;ISO_alpha2;SOUVERAIN;NOM_ONU;CODE_COG
+AF_003;Afrique du Sud;Afrique du Sud;l';ZA;République d'Afrique du Sud;Afrique du Sud (l');27;710;ZAF;ZA;O;Afrique du Sud;99303
+AF_007;Algérie;Algérie;l';DZ;République algérienne démocratique et populaire;Algérie (l');213;012;DZA;DZ;O;Algérie;99352
+AF_010;Angola;Angola;l';AO;République d'Angola;Angola (l');244;024;AGO;AO;O;Angola;99395
+AF_020;Ascension (Île de l');Île de l'Ascension;l';GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Sainte-Hélène, Ascension et Tristan da Cunha;247;654;SHN;SH;N;Sainte-Hélène;99306
+AF_034;Bénin;Bénin;le;BJ;République du Bénin;Bénin (le);229;204;BEN;BJ;O;Bénin;99327
+AF_042;Botswana;Botswana;le;BW;République du Botswana;Botswana (le);267;072;BWA;BW;O;Botswana;99347
+AF_048;Burkina;Burkina;le;BF;Burkina Faso;Burkina Faso (le);226;854;BFA;BF;O;Burkina Faso;99331
+AF_049;Burundi;Burundi;le;BI;République du Burundi;Burundi (le);257;108;BDI;BI;O;Burundi;99321
+AF_052;Cameroun;Cameroun;le;CM;République du Cameroun;Cameroun (le);237;120;CMR;CM;O;Cameroun;99322
+AF_054;Cap-Vert;Cap-Vert;le;CV;République du Cap-Vert;Cabo Verde;238;132;CPV;CV;O;Cabo Verde;99396
+AF_055;Centrafrique;Centrafrique;la;CF;République centrafricaine;République centrafricaine (la);236;140;CAF;CF;O;République centrafricaine;99323
+AF_063;Comores;Comores;les;KM;Union des Comores;Comores (les);269;174;COM;KM;O;Comores;99397
+AF_064;Congo;Congo;le;CG;République du Congo;Congo (le);242;178;COG;CG;O;Congo;99324
+AF_065;Congo (République démocratique du);République démocratique du Congo;la;CD;République démocratique du Congo;Congo (la République démocratique du);243;180;COD;CD;O;République démocratique du Congo;99312
+AF_071;Côte d'Ivoire;Côte d'Ivoire;la;CI;République de Côte d'Ivoire;Côte d'Ivoire (la);225;384;CIV;CI;O;Côte d’Ivoire;99326
+AF_076;Djibouti;Djibouti;le;DJ;République de Djibouti;Djibouti;253;262;DJI;DJ;O;Djibouti;99399
+AF_079;Égypte;Égypte;l';EG;République arabe d'Égypte;Égypte (l');20;818;EGY;EG;O;Égypte;99301
+AF_082;Érythrée;Érythrée;l';ER;État d'Érythrée;Érythrée (l');291;232;ERI;ER;O;Érythrée;99317
+AF_086;Éthiopie;Éthiopie;l';ET;République démocratique fédérale d'Éthiopie;Éthiopie (l');251;231;ETH;ET;O;Éthiopie;99315
+AF_092;Gabon;Gabon;le;GA;République gabonaise;Gabon (le);241;266;GAB;GA;O;Gabon;99328
+AF_093;Gambie;Gambie;la;GM;République de Gambie;Gambie (la);220;270;GMB;GM;O;Gambie;99304
+AF_097;Ghana;Ghana;le;GH;République du Ghana;Ghana (le);233;288;GHA;GH;O;Ghana;99329
+AF_107;Guinée;Guinée;la;GN;République de Guinée;Guinée (la);224;324;GIN;GN;O;Guinée;99330
+AF_108;Guinée équatoriale;Guinée équatoriale;la;GQ;République de Guinée équatoriale;Guinée équatoriale (la);240;226;GNQ;GQ;O;Guinée équatoriale;99314
+AF_109;Guinée-Bissao;Guinée-Bissao;la;GW;République de Guinée-Bissao;Guinée-Bissau (la);245;624;GNB;GW;O;Guinée-Bissau;99392
+AF_119;Indien (Territoire britannique de l'océan);Territoire britannique de l'océan Indien;le;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Indien (le Territoire britannique de l'océan);246;086;IOT;IO;N;Territoire britannique de l'océan Indien;99308
+AF_136;Kénya;Kénya;le;KE;République du Kénya;Kenya (le);254;404;KEN;KE;O;Kenya;99332
+AF_143;Lésotho;Lésotho;le;LS;Royaume du Lésotho;Lesotho (le);266;426;LSO;LS;O;Lesotho;99348
+AF_146;Libéria;Libéria;le;LR;République du Libéria;Libéria (le);231;430;LBR;LR;O;Libéria;99302
+AF_147;Libye;Libye;la;LY;État de Libye;Libye (la);218;434;LBY;LY;O;Libye;99316
+AF_153;Madagascar;Madagascar;;MG;République de Madagascar;Madagascar;261;450;MDG;MG;O;Madagascar;99333
+AF_156;Malawi;Malawi;le;MW;République du Malawi;Malawi (le);265;454;MWI;MW;O;Malawi;99334
+AF_158;Mali;Mali;le;ML;République du Mali;Mali (le);223;466;MLI;ML;O;Mali;99335
+AF_163;Maroc;Maroc;le;MA;Royaume du Maroc;Maroc (le);212;504;MAR;MA;O;Maroc;99350
+AF_166;Maurice;Maurice;;MU;République de Maurice;Maurice;230;480;MUS;MU;O;Maurice;99390
+AF_167;Mauritanie;Mauritanie;la;MR;République islamique de Mauritanie;Mauritanie (la);222;478;MRT;MR;O;Mauritanie;99336
+AF_168;Mayotte;Mayotte;;FR;République française;Mayotte;262;175;MYT;YT;N;Mayotte;
+AF_177;Mozambique;Mozambique;le;MZ;République du Mozambique;Mozambique (le);258;508;MOZ;MZ;O;Mozambique;99393
+AF_178;Namibie;Namibie;la;NA;République de Namibie;Namibie (la);264;516;NAM;NA;O;Namibie;99311
+AF_183;Niger;Niger;le;NE;République du Niger;Niger (le);227;562;NER;NE;O;Niger;99337
+AF_184;Nigéria;Nigéria;le;NG;République fédérale du Nigéria;Nigéria (le);234;566;NGA;NG;O;Nigéria;99338
+AF_212;Réunion (La);La Réunion;;FR;République française;Réunion (La);262;638;REU;RE;N;Réunion;
+AF_217;Rwanda;Rwanda;le;RW;République du Rwanda;Rwanda (le);250;646;RWA;RW;O;Rwanda;99340
+AF_219;Sahara occidental;Sahara occidental;le;;;Sahara occidental (le);;732;ESH;EH;N;Sahara occidental;99389
+AF_234;Sao Tomé-et-Principe;Sao Tomé-et-Principe;;ST;République démocratique de Sao Tomé-et-Principe;Sao Tomé-et-Principe;239;678;STP;ST;O;Sao Tomé-et-Principe;99394
+AF_235;Sénégal;Sénégal;le;SN;République du Sénégal;Sénégal (le);221;686;SEN;SN;O;Sénégal;99341
+AF_237;Seychelles;Seychelles;les;SC;République des Seychelles;Seychelles (les);248;690;SYC;SC;O;Seychelles;99398
+AF_239;Sierra Leone;Sierra Leone;la;SL;République de Sierra Leone;Sierra Leone (la);232;694;SLE;SL;O;Sierra Leone;99342
+AF_243;Somalie;Somalie;la;SO;République fédérale de Somalie;Somalie (la);252;706;SOM;SO;O;Somalie;99318
+AF_244;Soudan;Soudan;le;SD;République du Soudan;Soudan (le);249;729;SDN;SD;O;Soudan;99343
+AF_245;Soudan du Sud;Soudan du Sud;le;SS;République du Soudan du Sud;Soudan du Sud (le);211;728;SSD;SS;O;Soudan du Sud;99349
+AF_251;Eswatini;Eswatini;l';SZ;Royaume d'Eswatini;Eswatini (l');268;748;SWZ;SZ;O;Eswatini;99391
+AF_255;Tanzanie;Tanzanie;la;TZ;République unie de Tanzanie;Tanzanie (la République-Unie de);255;834;TZA;TZ;O;République-Unie de Tanzanie;99309
+AF_256;Tchad;Tchad;le;TD;République du Tchad;Tchad (le);235;148;TCD;TD;O;Tchad;99344
+AF_259;Togo;Togo;le;TG;République togolaise;Togo (le);228;768;TGO;TG;O;Togo;99345
+AF_263;Tristan da Cunha;Tristan da Cunha;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Sainte-Hélène, Ascension et Tristan da Cunha;290;654;SHN;SH;N;Sainte-Hélène;99306
+AF_265;Tunisie;Tunisie;la;TN;République tunisienne;Tunisie (la);216;788;TUN;TN;O;Tunisie;99351
+AF_281;Zambie;Zambie;la;ZM;République de Zambie;Zambie (la);260;894;ZMB;ZM;O;Zambie;99346
+AF_282;Zimbabwé;Zimbabwé;le;ZW;République du Zimbabwé;Zimbabwe (le);263;716;ZWE;ZW;O;Zimbabwe;99310
+AF_348;Sainte-Hélène;Sainte-Hélène;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Sainte-Hélène, Ascension et Tristan da Cunha;290;654;SHN;SH;N;Sainte-Hélène;99306
+AF_422;Provinces espagnoles d'Afrique;Provinces espagnoles d'Afrique;les;ES;Royaume d'Espagne;;;;;;N;;99313
+AF_423;Présides;Présides;les;ES;Royaume d'Espagne;;;;;;N;;99313
+AM_011;Anguilla;Anguilla;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Anguilla;1;660;AIA;AI;N;Anguilla;99425
+AM_015;Antigua-et-Barbuda;Antigua-et-Barbuda;;AG;Antigua-et-Barbuda;Antigua-et-Barbuda;1;028;ATG;AG;O;Antigua-et-Barbuda;99441
+AM_017;Argentine;Argentine;l';AR;République argentine;Argentine (l');54;032;ARG;AR;O;Argentine;99415
+AM_019;Aruba;Aruba;;NL;Royaume des Pays-Bas;Aruba;297;533;ABW;AW;N;Aruba;99135
+AM_026;Bahamas;Bahamas;les;BS;Commonwealth des Bahamas;Bahamas (les);1;044;BHS;BS;O;Bahamas;99436
+AM_030;Barbade;Barbade;la;BB;Barbade;Barbade (la);1;052;BRB;BB;O;Barbade;99434
+AM_033;Bélize;Bélize;le;BZ;Bélize;Belize (le);501;084;BLZ;BZ;O;Belize;99429
+AM_035;Bermudes;Bermudes;les;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Bermudes (les);1;060;BMU;BM;N;Bermudes;99425
+AM_039;Bolivie;Bolivie;la;BO;État plurinational de Bolivie;Bolivie (État plurinational de);591;068;BOL;BO;O;Bolivie (État plurinational de);99418
+AM_040;Bonaire;Bonaire;;NL;Pays-Bas caribéens;Bonaire, Saint-Eustache et Saba;599;535;BES;BQ;N;Bonaire, Saint-Eustache et Saba;99443
+AM_045;Brésil;Brésil;le;BR;République fédérative du Brésil;Brésil (le);55;076;BRA;BR;O;Brésil;99416
+AM_050;Caïmans (Îles);Îles Caïmans;les;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Caïmans (les Îles);1;136;CYM;KY;N;Îles Caïmanes;99425
+AM_053;Canada;Canada;le;CA;Canada;Canada (le);1;124;CAN;CA;O;Canada;99401
+AM_056;Chili;Chili;le;CL;République du Chili;Chili (le);56;152;CHL;CL;O;Chili;99417
+AM_062;Colombie;Colombie;la;CO;République de Colombie;Colombie (la);57;170;COL;CO;O;Colombie;99419
+AM_070;Costa Rica;Costa Rica;le;CR;République du Costa Rica;Costa Rica (le);506;188;CRI;CR;O;Costa Rica;99406
+AM_073;Cuba;Cuba;;CU;République de Cuba;Cuba;53;192;CUB;CU;O;Cuba;99407
+AM_074;Curaçao;Curaçao;;NL;Royaume des Pays-Bas;Curaçao;599;531;CUW;CW;N;Curaçao;99444
+AM_077;Dominicaine (République);République dominicaine;la;DO;République dominicaine;dominicaine (la République);1;214;DOM;DO;O;République dominicaine;99408
+AM_078;Dominique;Dominique;la;DM;Commonwealth de la Dominique;Dominique (la);1;212;DMA;DM;O;Dominique;99438
+AM_081;Équateur;Équateur;l';EC;République d'Équateur;Équateur (l');593;218;ECU;EC;O;Équateur;99420
+AM_085;États-Unis;États-Unis;les;US;États-Unis d'Amérique;États-Unis d'Amérique (les);1;840;USA;US;O;États-Unis d’Amérique;99404
+AM_101;Grenade;Grenade;la;GD;Grenade;Grenade (la);1;308;GRD;GD;O;Grenade;99435
+AM_103;Guadeloupe;Guadeloupe;la;FR;République française;Guadeloupe (la);590;312;GLP;GP;N;Guadeloupe;
+AM_105;Guatémala;Guatémala;le;GT;République du Guatémala;Guatemala (le);502;320;GTM;GT;O;Guatemala;99409
+AM_110;Guyana;Guyana;le;GY;République coopérative du Guyana;Guyana (le);592;328;GUY;GY;O;Guyana;99428
+AM_111;Guyane française;Guyane française;la;FR;République française;Guyane française (la );594;254;GUF;GF;N;Guyane française;
+AM_112;Haïti;Haïti;;HT;République d'Haïti;Haïti;509;332;HTI;HT;O;Haïti;99410
+AM_114;Honduras;Honduras;le;HN;République du Honduras;Honduras (le);504;340;HND;HN;O;Honduras;99411
+AM_127;Jamaïque;Jamaïque;la;JM;Jamaïque;Jamaïque (la;1;388;JAM;JM;O;Jamaïque;99426
+AM_159;Malouines (Îles);Îles Malouines;les;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Falkland (les Îles)/Malouines (les Îles);500;238;FLK;FK;N;Îles Falkland (Malvinas);99427
+AM_165;Martinique;Martinique;la;FR;République française;Martinique (la);596;474;MTQ;MQ;N;Martinique;
+AM_169;Mexique;Mexique;le;MX;États-Unis du Mexique;Mexique (le);52;484;MEX;MX;O;Mexique;99405
+AM_176;Montserrat;Montserrat;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Montserrat;1;500;MSR;MS;N;Montserrat;99425
+AM_182;Nicaragua;Nicaragua;le;NI;République du Nicaragua;Nicaragua (le);505;558;NIC;NI;O;Nicaragua;99412
+AM_197;Panama;Panama;le;PA;République du Panama;Panama (le);507;591;PAN;PA;O;Panama;99413
+AM_199;Paraguay;Paraguay;le;PY;République du Paraguay;Paraguay (le);595;600;PRY;PY;O;Paraguay;99421
+AM_201;Pérou;Pérou;le;PE;République du Pérou;Pérou (le);51;604;PER;PE;O;Pérou;99422
+AM_207;Porto Rico;Porto Rico;;US;États-Unis d'Amérique;Porto Rico;1;630;PRI;PR;N;Porto Rico;99432
+AM_218;Saba;Saba;;NL;Pays-Bas caribéens;Bonaire, Saint-Eustache et Saba;599;535;BES;BQ;N;Bonaire, Saint-Eustache et Saba;99443
+AM_220;Saint-Barthélemy;Saint-Barthélemy;;FR;République française;Saint-Barthélemy;;652;BLM;BL;N;Saint-Barthélemy;
+AM_221;Saint-Christophe-et-Niévès;Saint-Christophe-et-Niévès;;KN;Fédération de Saint-Christophe-et-Niévès;Saint-Kitts-et-Nevis;1;659;KNA;KN;O;Saint-Kitts-et-Nevis;99442
+AM_223;Sainte-Lucie;Sainte-Lucie;;LC;Sainte-Lucie;Sainte-Lucie;1;662;LCA;LC;O;Sainte-Lucie;99439
+AM_224;Saint-Eustache;Saint-Eustache;;NL;Pays-Bas caribéens;Bonaire, Saint-Eustache et Saba;599;535;BES;BQ;N;Bonaire, Saint-Eustache et Saba;99443
+AM_226;Saint-Martin (partie française);Saint-Martin (partie française);;FR;République française;Saint-Martin (partie française);;663;MAF;MF;N;Saint-Martin (partie française);
+AM_227;Saint-Martin (partie néerlandaise);Saint-Martin (partie néerlandaise);;NL;Royaume des Pays-Bas;Saint-Martin (partie néerlandaise);1;534;SXM;SX;N;Saint-Martin (partie néerlandaise);99445
+AM_228;Saint-Pierre-et-Miquelon;Saint-Pierre-et-Miquelon;;FR;République française;Saint-Pierre-et-Miquelon;508;666;SPM;PM;N;Saint-Pierre-et-Miquelon;
+AM_229;Saint-Vincent-et-les-Grenadines;Saint-Vincent-et-les-Grenadines;;VC;Saint-Vincent-et-les-Grenadines;Saint-Vincent-et-les Grenadines;1;670;VCT;VC;O;Saint-Vincent-et-les Grenadines;99440
+AM_231;Salvador;Salvador;le;SV;République du Salvador;El Salvador;503;222;SLV;SV;O;El Salvador;99414
+AM_249;Suriname;Suriname;le;SR;République du Suriname;Suriname (le);597;740;SUR;SR;O;Suriname;99437
+AM_262;Trinité-et-Tobago;Trinité-et-Tobago;la;TT;République de Trinité-et-Tobago;Trinité-et-Tobago (la);1;780;TTO;TT;O;Trinité-et-Tobago;99433
+AM_267;Turks-et-Caïcos (Îles);Îles Turks-et-Caïcos;les;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Turks-et-Caïcos (les Îles);1;796;TCA;TC;N;Îles Turques-et-Caïques;99425
+AM_271;Uruguay;Uruguay;l';UY;République orientale de l'Uruguay;Uruguay (l');598;858;URY;UY;O;Uruguay;99423
+AM_274;Vénézuéla;Vénézuéla;le;VE;République bolivarienne du Vénézuéla;Venezuela (République bolivarienne du);58;862;VEN;VE;O;Venezuela (République bolivarienne du);99424
+AM_275;Vierges britanniques (Îles);Îles Vierges britanniques;les;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Vierges britanniques (les Îles);1;092;VGB;VG;N;Îles Vierges britanniques;99425
+AM_276;Vierges des États-Unis (Îles);Îles Vierges des États-Unis;les;US;États-Unis d'Amérique;Vierges des États-Unis (les Îles);1;850;VIR;VI;N;Îles Vierges américaines;99432
+AM_425;Territoires des États-Unis en Amérique;Territoires des États-Unis en Amérique;les;US;États-Unis d'Amérique;;;;;;N;;99432
+AM_427;Territoires du Royaume-Uni aux Antilles;Territoires du Royaume-Uni aux Antilles;les;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;;;;;;N;;99425
+AM_428;Territoires du Royaume-Uni dans l'Atlantique Sud;Territoires du Royaume-Uni dans l'Atlantique Sud;les;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;;;;;;N;;99427
+AS_002;Afghanistan;Afghanistan;l';AF;République islamique d'Afghanistan;Afghanistan (l');93;004;AFG;AF;O;Afghanistan;99212
+AS_016;Arabie saoudite;Arabie saoudite;l';SA;Royaume d'Arabie saoudite;Arabie saoudite (l');966;682;SAU;SA;O;Arabie saoudite;99201
+AS_027;Bahreïn;Bahreïn;;BH;Royaume de Bahreïn;Bahreïn;973;048;BHR;BH;O;Bahreïn;99249
+AS_029;Bangladesh;Bangladesh;le;BD;République populaire du Bangladesh;Bangladesh (le);880;050;BGD;BD;O;Bangladesh;99246
+AS_036;Bhoutan;Bhoutan;le;BT;Royaume du Bhoutan;Bhoutan (le);975;064;BTN;BT;O;Bhoutan;99214
+AS_038;Birmanie;Birmanie;la;MM;République de l'Union de Birmanie;Myanmar (le);95;104;MMR;MM;O;Myanmar;99224
+AS_046;Brunei;Brunei;le;BN;Brunei Darussalam;Brunéi Darussalam (le);673;096;BRN;BN;O;Brunéi Darussalam;99225
+AS_051;Cambodge;Cambodge;le;KH;Royaume du Cambodge;Cambodge (le);855;116;KHM;KH;O;Cambodge;99234
+AS_057;Chine;Chine;la;CN;République populaire de Chine;Chine (la);86;156;CHN;CN;O;Chine;99216
+AS_068;Corée du Nord;Corée du Nord;la;KP;République populaire démocratique de Corée;Corée (la République populaire démocratique de);850;408;PRK;KP;O;République populaire démocratique de Corée;99238
+AS_069;Corée du Sud;Corée du Sud;la;KR;République de Corée;Corée (la République de);82;410;KOR;KR;O;République de Corée;99239
+AS_080;Émirats arabes unis;Émirats arabes unis;les;AE;Émirats arabes unis;Émirats arabes unis (les);971;784;ARE;AE;O;Émirats arabes unis;99247
+AS_115;Hong Kong;Hong Kong;;CN;République populaire de Chine;Hong Kong;852;344;HKG;HK;N;Chine, région administrative spéciale de Hong Kong;99230
+AS_118;Inde;Inde;l';IN;République de l'Inde;Inde (l');91;356;IND;IN;O;Inde;99223
+AS_120;Indonésie;Indonésie;l';ID;République d'Indonésie;Indonésie (l');62;360;IDN;ID;O;Indonésie;99231
+AS_121;Irak;Irak;l';IQ;République d'Irak;Iraq (l');964;368;IRQ;IQ;O;Iraq;99203
+AS_122;Iran;Iran;l';IR;République islamique d'Iran;Iran (République Islamique d');98;364;IRN;IR;O;Iran (République islamique d’);99204
+AS_125;Israël;Israël;;IL;État d'Israël;Israël;972;376;ISR;IL;O;Israël;99207
+AS_129;Japon;Japon;le;JP;Japon;Japon (le);81;392;JPN;JP;O;Japon;99217
+AS_133;Jordanie;Jordanie;la;JO;Royaume hachémite de Jordanie;Jordanie (la);962;400;JOR;JO;O;Jordanie;99222
+AS_135;Kazakhstan;Kazakhstan;le;KZ;République du Kazakhstan;Kazakhstan (le);7;398;KAZ;KZ;O;Kazakhstan;99256
+AS_138;Kirghizstan;Kirghizstan;le;KG;République kirghize;Kirghizistan (le);996;417;KGZ;KG;O;Kirghizistan;99257
+AS_141;Koweït;Koweït;le;KW;État du Koweït;Koweït (le);965;414;KWT;KW;O;Koweït;99240
+AS_142;Laos;Laos;le;LA;République démocratique populaire lao;Lao (la République démocratique populaire);856;418;LAO;LA;O;République démocratique populaire lao;99241
+AS_145;Liban;Liban;le;LB;République libanaise;Liban (le);961;422;LBN;LB;O;Liban;99205
+AS_151;Macao;Macao;;CN;République populaire de Chine;Macao;853;446;MAC;MO;N;Chine, région administrative spéciale de Macao;99232
+AS_155;Malaisie;Malaisie;la;MY;Malaisie;Malaisie (la);60;458;MYS;MY;O;Malaisie;99227
+AS_157;Maldives;Maldives;les;MV;République des Maldives;Maldives (les;960;462;MDV;MV;O;Maldives;99229
+AS_174;Mongolie;Mongolie;la;MN;Mongolie;Mongolie (la);976;496;MNG;MN;O;Mongolie;99242
+AS_181;Népal;Népal;le;NP;République démocratique fédérale du Népal;Népal (le);977;524;NPL;NP;O;Népal;99215
+AS_190;Oman;Oman;;OM;Sultanat d'Oman;Oman;968;512;OMN;OM;O;Oman;99250
+AS_191;Ouganda;Ouganda;l';UG;République d'Ouganda;Ouganda (l');256;800;UGA;UG;O;Ouganda;99339
+AS_192;Ouzbékistan;Ouzbékistan;l';UZ;République d'Ouzbékistan;Ouzbékistan (l');998;860;UZB;UZ;O;Ouzbékistan;99258
+AS_193;Pakistan;Pakistan;le;PK;République islamique du Pakistan;Pakistan (le);92;586;PAK;PK;O;Pakistan;99213
+AS_195;Palestiniens (Territoires);Territoires palestiniens;les;;;Palestine, État de;;275;PSE;PS;N;État de Palestine;99261
+AS_202;Philippines;Philippines;les;PH;République des Philippines;Philippines (les);63;608;PHL;PH;O;Philippines;99220
+AS_209;Qatar;Qatar;le;QA;État du Qatar;Qatar (le);974;634;QAT;QA;O;Qatar;99248
+AS_240;Singapour;Singapour;;SG;République de Singapour;Singapour;65;702;SGP;SG;O;Singapour;99226
+AS_246;Sri Lanka;Sri Lanka;le;LK;République démocratique socialiste du Sri Lanka;Sri Lanka;94;144;LKA;LK;O;Sri Lanka;99235
+AS_252;Syrie;Syrie;la;SY;République arabe syrienne;République arabe syrienne (la);963;760;SYR;SY;O;République arabe syrienne;99206
+AS_253;Tadjikistan;Tadjikistan;le;TJ;République du Tadjikistan;Tadjikistan (le);992;762;TJK;TJ;O;Tadjikistan;99259
+AS_254;Taïwan;Taïwan;;;;Taïwan (Province de Chine);886;158;TWN;TW;N;;99236
+AS_257;Thaïlande;Thaïlande;la;TH;Royaume de Thaïlande;Thaïlande (la);66;764;THA;TH;O;Thaïlande;99219
+AS_258;Timor oriental;Timor oriental;le;TL;République démocratique du Timor oriental;Timor-Leste (le);670;626;TLS;TL;O;Timor-Leste;99262
+AS_266;Turkménistan;Turkménistan;le;TM;Turkménistan;Turkménistan (le);993;795;TKM;TM;O;Turkménistan;99260
+AS_268;Turquie;Turquie;la;TR;République de Turquie;Türkiye (la);90;792;TUR;TR;O;Türkiye;99208
+AS_277;Vietnam;Vietnam;le;VN;République socialiste du Vietnam;Viet Nam (le);84;704;VNM;VN;O;Viet Nam;99243
+AS_280;Yémen;Yémen;le;YE;République du Yémen;Yémen (le);967;887;YEM;YE;O;Yémen;99251
+EU_001;Açores;Açores;les;PT;République portugaise;;;;;;N;;99319
+EU_005;Åland (Îles);Îles Åland;les;FI;République de Finlande;Åland (les Îles);;248;ALA;AX;N;Îles d’Åland;
+EU_006;Albanie;Albanie;l';AL;République d'Albanie;Albanie (l');355;008;ALB;AL;O;Albanie;99125
+EU_008;Allemagne;Allemagne;l';DE;République fédérale d'Allemagne;Allemagne (l');49;276;DEU;DE;O;Allemagne;99109
+EU_009;Andorre;Andorre;l';AD;Principauté d'Andorre;Andorre (l');376;020;AND;AD;O;Andorre;99130
+EU_018;Arménie;Arménie;l';AM;République d'Arménie;Arménie (l');374;051;ARM;AM;O;Arménie;99252
+EU_024;Autriche;Autriche;l';AT;République d'Autriche;Autriche (l');43;040;AUT;AT;O;Autriche;99110
+EU_025;Azerbaïdjan;Azerbaïdjan;l';AZ;République d'Azerbaïdjan;Azerbaïdjan (l');994;031;AZE;AZ;O;Azerbaïdjan;99253
+EU_032;Belgique;Belgique;la;BE;Royaume de Belgique;Belgique (la);32;056;BEL;BE;O;Belgique;99131
+EU_037;Biélorussie;Biélorussie;la;BY;République de Biélorussie;Bélarus (le);375;112;BLR;BY;O;Bélarus;99148
+EU_041;Bosnie-Herzégovine;Bosnie-Herzégovine;la;BA;Bosnie-Herzégovine;Bosnie-Herzégovine (la);387;070;BIH;BA;O;Bosnie-Herzégovine;99118
+EU_047;Bulgarie;Bulgarie;la;BG;République de Bulgarie;Bulgarie (la);359;100;BGR;BG;O;Bulgarie;99111
+EU_059;Chypre;Chypre;;CY;République de Chypre;Chypre;357;196;CYP;CY;O;Chypre;99254
+EU_072;Croatie;Croatie;la;HR;République de Croatie;Croatie (la);385;191;HRV;HR;O;Croatie;99119
+EU_075;Danemark;Danemark;le;DK;Royaume du Danemark;Danemark (le);45;208;DNK;DK;O;Danemark;99101
+EU_083;Espagne;Espagne;l';ES;Royaume d'Espagne;Espagne (l');34;724;ESP;ES;O;Espagne;99134
+EU_084;Estonie;Estonie;l';EE;République d'Estonie;Estonie (l');372;233;EST;EE;O;Estonie;99106
+EU_088;Féroé (Îles);Îles Féroé;les;DK;Royaume du Danemark;Féroé (les Îles);298;234;FRO;FO;N;Îles Féroé;99101
+EU_090;Finlande;Finlande;la;FI;République de Finlande;Finlande (la);358;246;FIN;FI;O;Finlande;99105
+EU_091;France;France;la;FR;République française;France (la);33;250;FRA;FR;O;France;
+EU_095;Géorgie;Géorgie;la;GE;Géorgie;Géorgie (la);995;268;GEO;GE;O;Géorgie;99255
+EU_098;Gibraltar;Gibraltar;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Gibraltar;350;292;GIB;GI;N;Gibraltar;99133
+EU_100;Grèce;Grèce;la;GR;République hellénique;Grèce (la);30;300;GRC;GR;O;Grèce;99126
+EU_102;Groenland;Groenland;le;DK;Royaume du Danemark;Groenland (le);299;304;GRL;GL;N;Groenland;99430
+EU_106;Guernesey;Guernesey;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Guernesey;;831;GGY;GG;N;Guernesey;99132
+EU_116;Hongrie;Hongrie;la;HU;Hongrie;Hongrie (la);36;348;HUN;HU;O;Hongrie;99112
+EU_123;Irlande;Irlande;l';IE;Irlande;Irlande (l');353;372;IRL;IE;O;Irlande;99136
+EU_124;Islande;Islande;l';IS;République d'Islande;Islande (l');354;352;ISL;IS;O;Islande;99102
+EU_126;Italie;Italie;l';IT;République italienne;Italie (l');39;380;ITA;IT;O;Italie;99127
+EU_128;Jan Mayen (Île);Île Jan Mayen;l';NO;Royaume de Norvège;Svalbard et l'Île Jan Mayen (le);;744;SJM;SJ;N;Îles Svalbard-et-Jan Mayen;99103
+EU_131;Jersey;Jersey;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Jersey;;832;JEY;JE;N;Jersey;99132
+EU_140;Kosovo;Kosovo;le;YK;République du Kosovo;;383;;;YK;O;;99157
+EU_144;Lettonie;Lettonie;la;LV;République de Lettonie;Lettonie (la);371;428;LVA;LV;O;Lettonie;99107
+EU_148;Liechtenstein;Liechtenstein;le;LI;Principauté du Liechtenstein;Liechtenstein (le);423;438;LIE;LI;O;Liechtenstein;99113
+EU_149;Lituanie;Lituanie;la;LT;République de Lituanie;Lituanie (la);370;440;LTU;LT;O;Lituanie;99108
+EU_150;Luxembourg;Luxembourg;le;LU;Grand-Duché de Luxembourg;Luxembourg (le);352;442;LUX;LU;O;Luxembourg;99137
+EU_152;Macédoine du Nord;Macédoine du Nord;la;MK;République de Macédoine du Nord;Macédoine du Nord (la);389;807;MKD;MK;O;Macédoine du Nord;99156
+EU_154;Madère;Madère;;PT;République portugaise;;;;;;N;;99319
+EU_160;Malte;Malte;;MT;République de Malte;Malte;356;470;MLT;MT;O;Malte;99144
+EU_161;Man (Île de);Île de Man;l';GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Île de Man;;833;IMN;IM;N;Île de Man;99132
+EU_172;Moldavie;Moldavie;la;MD;République de Moldavie;Moldova (la République de);373;498;MDA;MD;O;République de Moldova;99151
+EU_173;Monaco;Monaco;;MC;Principauté de Monaco;Monaco;377;492;MCO;MC;O;Monaco;99138
+EU_175;Monténégro;Monténégro;le;ME;Monténégro;Monténégro (le);382;499;MNE;ME;O;Monténégro;99120
+EU_187;Norvège;Norvège;la;NO;Royaume de Norvège;Norvège (la);47;578;NOR;NO;O;Norvège;99103
+EU_200;Pays-Bas;Pays-Bas;les;NL;Royaume des Pays-Bas;Pays-Bas (les);31;528;NLD;NL;O;Pays-Bas;99135
+EU_205;Pologne;Pologne;la;PL;République de Pologne;Pologne (la);48;616;POL;PL;O;Pologne;99122
+EU_208;Portugal;Portugal;le;PT;République portugaise;Portugal (le);351;620;PRT;PT;O;Portugal;99139
+EU_211;Tchéquie;Tchéquie;la;CZ;République tchèque;Tchéquie (la);420;203;CZE;CZ;O;Tchéquie;99116
+EU_214;Roumanie;Roumanie;la;RO;Roumanie;Roumanie (la);40;642;ROU;RO;O;Roumanie;99114
+EU_215;Royaume-Uni;Royaume-Uni;le;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord (le);44;826;GBR;GB;O;Royaume-Uni de Grande-Bretagne et d’Irlande du Nord;99132
+EU_216;Russie;Russie;la;RU;Fédération de Russie;Russie (la Fédération de);7;643;RUS;RU;O;Fédération de Russie;99123
+EU_225;Saint-Marin;Saint-Marin;;SM;République de Saint-Marin;Saint-Marin;378;674;SMR;SM;O;Saint-Marin;99128
+EU_236;Serbie;Serbie;la;RS;République de Serbie;Serbie (la);381;688;SRB;RS;O;Serbie;99121
+EU_241;Slovaquie;Slovaquie;la;SK;République slovaque;Slovaquie (la);421;703;SVK;SK;O;Slovaquie;99117
+EU_242;Slovénie;Slovénie;la;SI;République de Slovénie;Slovénie (la);386;705;SVN;SI;O;Slovénie;99145
+EU_247;Suède;Suède;la;SE;Royaume de Suède;Suède (la);46;752;SWE;SE;O;Suède;99104
+EU_248;Suisse;Suisse;la;CH;Confédération suisse;Suisse (la);41;756;CHE;CH;O;Suisse;99140
+EU_250;Svalbard;Svalbard;le;NO;Royaume de Norvège;Svalbard et l'Île Jan Mayen (le);;744;SJM;SJ;N;Îles Svalbard-et-Jan Mayen;99103
+EU_270;Ukraine;Ukraine;l';UA;Ukraine;Ukraine (l');380;804;UKR;UA;O;Ukraine;99155
+EU_273;Vatican;Vatican;le;VA;Vatican (Saint-Siège);Saint-Siège (le);39;336;VAT;VA;O;Saint-Siège;99129
+EU_273;Vatican;Vatican;le;VA;Vatican (Saint-Siège);Saint-Siège (le);379;336;VAT;VA;O;Saint-Siège;99129
+EU_304;Canaries (Îles);Canaries;les;ES;Royaume d'Espagne;;;;;;N;;99313
+EU_354;Sercq;Sercq;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;;;680;;;N;Sercq;
+OC_012;Antarctique;Antarctique;l';;;Antarctique (l');;010;ATA;AQ;N;Antarctique;
+OC_022;Australes et antarctiques françaises (Terres);Terres australes et antarctiques françaises;les;FR;République française;Terres australes françaises (les);262;260;ATF;TF;N;Terres australes françaises;
+OC_023;Australie;Australie;l';AU;Commonwealth d'Australie;Australie (l');61;036;AUS;AU;O;Australie;99501
+OC_044;Bouvet (Île); Île Bouvet;l';NO;Royaume de Norvège;Bouvet (l'Île);;074;BVT;BV;N;Île Bouvet;99103
+OC_058;Christmas (Île);Île Christmas;l';AU;Commonwealth d'Australie;Christmas (l'Île);672;162;CXR;CX;N;Île Christmas;99501
+OC_061;Cocos (Îles);Îles Cocos;les;AU;Commonwealth d'Australie;Cocos (les Îles)/ Keeling (les Îles);672;166;CCK;CC;N;Îles des Cocos (Keeling);99501
+OC_066;Cook (Îles);Îles Cook;les;CK;Îles Cook;Cook (les Îles);682;184;COK;CK;O;Îles Cook;99502
+OC_089;Fidji;Fidji;les;FJ;République des Fidji;Fidji (les);679;242;FJI;FJ;O;Fidji;99508
+OC_104;Guam;Guam;;US;États-Unis d'Amérique;Guam;1;316;GUM;GU;N;Guam;99505
+OC_113;Heard-et-MacDonald (Îles);Îles Heard-et-MacDonald;les;AU;Commonwealth d'Australie;Heard-et-Îles MacDonald (l'Île);672;334;HMD;HM;N;Île Heard-et-Îles MacDonald;99501
+OC_139;Kiribati;Kiribati;les;KI;République des Kiribati;Kiribati;686;296;KIR;KI;O;Kiribati;99513
+OC_162;Mariannes du Nord (Îles);Îles Mariannes du Nord;les;US;États-Unis d'Amérique;Mariannes du Nord (les Îles);1;580;MNP;MP;N;Îles Mariannes du Nord;99505
+OC_164;Marshall (Îles);Îles Marshall;les;MH;République des Îles Marshall;Marshall (les Îles);692;584;MHL;MH;O;Îles Marshall;99515
+OC_170;Micronésie;Micronésie;la;FM;États fédérés de Micronésie;Micronésie (États fédérés de);691;583;FSM;FM;O;Micronésie (États fédérés de);99516
+OC_179;Nauru;Nauru;;NR;République de Nauru;Nauru;674;520;NRU;NR;O;Nauru;99507
+OC_185;Niue;Niue;;NU;Niue;Niue;683;570;NIU;NU;O;Nioué;99502
+OC_186;Norfolk (Île);Île Norfolk;l';AU;Commonwealth d'Australie;Norfolk (l'Île);672;574;NFK;NF;N;Île Norfolk;99501
+OC_188;Nouvelle-Calédonie;Nouvelle-Calédonie;la;FR;République française;Nouvelle-Calédonie (la);687;540;NCL;NC;N;Nouvelle-Calédonie;
+OC_189;Nouvelle-Zélande;Nouvelle-Zélande;la;NZ;Nouvelle-Zélande;Nouvelle-Zélande (la);64;554;NZL;NZ;O;Nouvelle-Zélande;99502
+OC_192;Géorgie du Sud-et-les Îles Sandwich du Sud;Géorgie du Sud-et-les Îles Sandwich du Sud;la;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Géorgie du Sud-et-les Îles Sandwich du Sud (la);;239;SGS;GS;N;Géorgie du Sud-et-les Îles Sandwich du Sud;99427
+OC_194;Palaos;Palaos;les;PW;République des Palaos;Palaos (les);680;585;PLW;PW;O;Palaos;99517
+OC_198;Papouasie-Nouvelle-Guinée;Papouasie-Nouvelle-Guinée;la;PG;État indépendant de Papouasie-Nouvelle-Guinée;Papouasie-Nouvelle-Guinée (la);675;598;PNG;PG;O;Papouasie-Nouvelle-Guinée;99510
+OC_204;Pitcairn;Pitcairn;;GB;Royaume-Uni de Grande-Bretagne et d'Irlande du Nord;Pitcairn;;612;PCN;PN;N;Pitcairn;99503
+OC_206;Polynésie française;Polynésie française;la;FR;République française;Polynésie française (la);689;258;PYF;PF;N;Polynésie française;
+OC_230;Salomon;Salomon;les;SB;Îles Salomon;Salomon (les Îles);677;090;SLB;SB;O;Îles Salomon;99512
+OC_232;Samoa;Samoa;les;WS;État indépendant des Samoa;Samoa (le);685;882;WSM;WS;O;Samoa;99506
+OC_233;Samoa américaines;Samoa américaines;les;US;États-Unis d'Amérique;Samoa américaines (les);1;016;ASM;AS;N;Samoa américaines;99505
+OC_260;Tokelau;Tokelau;les;NZ;Nouvelle-Zélande;Tokelau (les);690;772;TKL;TK;N;Tokélaou;99502
+OC_261;Tonga;Tonga;les;TO;Royaume des Tonga;Tonga (les);676;776;TON;TO;O;Tonga;99509
+OC_269;Tuvalu;Tuvalu;les;TV;Tuvalu;Tuvalu (les);688;798;TUV;TV;O;Tuvalu;99511
+OC_272;Vanuatu;Vanuatu;le;VU;République du Vanuatu;Vanuatu (le);678;548;VUT;VU;O;Vanuatu;99514
+OC_279;Wallis-et-Futuna ;Wallis-et-Futuna ;;FR;République française;Wallis-et-Futuna ;681;876;WLF;WF;N;Îles Wallis-et-Futuna;
+OC_424;États-Unis (Îles mineures éloignées des);Îles mineures éloignées des États-Unis;les;US;États-Unis d'Amérique;Îles mineures éloignées des États-Unis (les);;581;UMI;UM;N;Îles mineures éloignées des États-Unis;
+OC_426;Territoires des États-Unis en Océanie;Territoires des États-Unis en Océanie;les;US;États-Unis d'Amérique;;;;;;N;;99505
