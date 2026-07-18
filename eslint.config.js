@@ -17,7 +17,9 @@ const browserFiles = [
 const reactFiles = ['widgets/**/*.{jsx,tsx}', 'shared/**/*.{jsx,tsx}']
 
 export default defineConfig([
-    globalIgnores(['dist/']),
+    // The Grist types are vendored from upstream, so linting them only produces
+    // findings we cannot act on.
+    globalIgnores(['dist/', 'shared/grist/grist-plugin-api.d.ts']),
 
     {
         files: ['**/*.{js,mjs,cjs,jsx}'],

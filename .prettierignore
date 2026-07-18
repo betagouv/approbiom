@@ -5,3 +5,7 @@
 # lockfile, a diff on every install.
 pnpm-lock.yaml
 .claude/
+
+# Vendored upstream: keep byte-identical so it can be diffed against the
+# gristlabs/grist-widget copy when it is refreshed.
+shared/grist/grist-plugin-api.d.ts
