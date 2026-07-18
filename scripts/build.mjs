@@ -21,35 +21,35 @@ rmSync(outputDir, { recursive: true, force: true })
 mkdirSync(outputDir, { recursive: true })
 
 const widgets = readdirSync(widgetsDir, { withFileTypes: true })
-  .filter((entry) => entry.isDirectory())
-  .map((entry) => entry.name)
+    .filter((entry) => entry.isDirectory())
+    .map((entry) => entry.name)
 
 for (const name of widgets) {
-  console.log(`\n▶ Building ${name}…`)
+    console.log(`\n▶ Building ${name}…`)
 
-  await build({
-    // Reuse the shared config (base, alias, React plugin) and only override
-    // where this widget differs.
-    configFile: resolve(projectRoot, 'vite.config.js'),
+    await build({
+        // Reuse the shared config (base, alias, React plugin) and only override
+        // where this widget differs.
+        configFile: resolve(projectRoot, 'vite.config.js'),
 
-    // This widget's folder is the root: its index.html is the entry point.
-    root: resolve(widgetsDir, name),
+        // This widget's folder is the root: its index.html is the entry point.
+        root: resolve(widgetsDir, name),
 
-    build: {
-      outDir: resolve(outputDir, name),
-      // Required because outDir sits outside root — without it Vite refuses
-      // to clear the folder and prints a warning.
-      emptyOutDir: true,
-    },
-  })
+        build: {
+            outDir: resolve(outputDir, name),
+            // Required because outDir sits outside root — without it Vite refuses
+            // to clear the folder and prints a warning.
+            emptyOutDir: true,
+        },
+    })
 }
 
 // The launcher page is plain HTML with no imports, so a copy is enough.
 // (If it ever imports a stylesheet or a script, it will need a real Vite
 // build of its own instead of this copy.)
 copyFileSync(
-  resolve(projectRoot, 'index.html'),
-  resolve(outputDir, 'index.html'),
+    resolve(projectRoot, 'index.html'),
+    resolve(outputDir, 'index.html')
 )
 
 console.log(`\n✓ Built ${widgets.length} widget(s) into dist/staging/`)

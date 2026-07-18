@@ -8,10 +8,10 @@ Ce répertoire contient plusieurs custom widgets Grist utilisés dans le Grist d
 
 ## Pré-requis
 
-* **Node.js `^20.19.0 || >=22.12.0`** — version exigée par Vite 8. Le projet est
+- **Node.js `^20.19.0 || >=22.12.0`** — version exigée par Vite 8. Le projet est
   développé sous Node 24, version fixée dans `.nvmrc` : avec nvm, un
   `nvm use` à la racine sélectionne la bonne version. Vérifier avec `node -v`.
-* **pnpm `>=10`** — vérifier avec `pnpm -v`. Installation :
+- **pnpm `>=10`** — vérifier avec `pnpm -v`. Installation :
   `corepack enable pnpm`, ou voir https://pnpm.io/installation.
 
 npm et yarn ne sont pas supportés : seul `pnpm-lock.yaml` est versionné.

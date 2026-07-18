@@ -31,7 +31,7 @@ between two runs.
 one-iframe-per-widget model: each is deployable at its own URL, and no widget can
 break another through shared runtime state.
 
-**Vite.** It is entry-point-oriented — an `index.html` *is* the unit of build —
+**Vite.** It is entry-point-oriented — an `index.html` _is_ the unit of build —
 ships a hot-reload dev server, and exposes a JS API so `scripts/build.mjs` can
 drive it per widget. Its `base` option is what makes promotion-by-copy possible.
 
@@ -50,7 +50,7 @@ plugin rewrites `/widget-a/*` to `/widgets/widget-a/*` so dev and production URL
 stay identical.
 
 **One Vite build per widget, not a single multi-page build.** Multi-page output
-mirrors the *input* folder structure, so it would produce
+mirrors the _input_ folder structure, so it would produce
 `dist/widgets/widget-a/` and require a post-build move — trading a loop for file
 shuffling. It would also factor common code into chunks shared between entries,
 which couples widgets that Grist loads in separate iframes and never benefits

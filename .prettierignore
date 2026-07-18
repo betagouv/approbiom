@@ -1,0 +1,7 @@
+**/node_modules
+**/dist
+
+# Generated / tool-owned files: reformatting them creates noise and, for the
+# lockfile, a diff on every install.
+pnpm-lock.yaml
+.claude/

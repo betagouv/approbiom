@@ -1,0 +1,42 @@
+{
+    "compilerOptions": {
+        "target": "ES2022",
+        "lib": ["ES2023", "DOM", "DOM.Iterable"],
+        "module": "ESNext",
+        "moduleResolution": "bundler",
+        "moduleDetection": "force",
+        "jsx": "react-jsx",
+        "types": ["vite/client"],
+
+        "strict": true,
+        "noUnusedLocals": true,
+        "noUnusedParameters": true,
+        "noFallthroughCasesInSwitch": true,
+
+        // The codebase is mid-migration: .js/.jsx files are resolved and bundled,
+        // but not type-checked. Flip `checkJs` on once they are converted.
+        "allowJs": true,
+        "checkJs": false,
+
+        "baseUrl": ".",
+        "paths": {
+            "@shared/*": ["shared/*"]
+        },
+
+        // Vite compiles each file in isolation and does the emitting itself, so
+        // tsc is only ever used as a type checker here.
+        "noEmit": true,
+        "isolatedModules": true,
+        "verbatimModuleSyntax": true,
+        "resolveJsonModule": true,
+        "skipLibCheck": true
+    },
+    "include": [
+        "widgets",
+        "shared",
+        "scripts",
+        "vite.config.js",
+        "eslint.config.js"
+    ],
+    "exclude": ["node_modules", "dist"]
+}

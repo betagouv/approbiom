@@ -16,8 +16,8 @@ const staging = resolve(projectRoot, 'dist/staging')
 const prod = resolve(projectRoot, 'dist/prod')
 
 if (!existsSync(staging)) {
-  console.error('✗ dist/staging/ not found — run `pnpm build:staging` first.')
-  process.exit(1)
+    console.error('✗ dist/staging/ not found — run `pnpm build:staging` first.')
+    process.exit(1)
 }
 
 rmSync(prod, { recursive: true, force: true })
