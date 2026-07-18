@@ -1,0 +1,21 @@
+/*
+  Widget base styles.
+  Deliberately minimal: DSFR (@gouvfr/dsfr) will be imported here later.
+*/
+
+:root {
+  font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
+  line-height: 1.5;
+  color: #161616;
+}
+
+* {
+  box-sizing: border-box;
+}
+
+body {
+  margin: 0;
+  /* A Grist widget lives inside an iframe: let the page size itself
+     instead of forcing a fixed height. */
+  background: #fff;
+}
