@@ -38,14 +38,15 @@ pnpm run dev
 
 ## Guide de déploiement
 
-Pour déployer sur l'environnement de staging, lancer :
+Les widgets Grist sont hébergés sur GitHub Pages et accessibles via les URLs suivantes
 
-```bash
-pnpm run build:staging
-```
+- **Production** : https://betagouv.github.io/approbiom/prod/
+- **Staging** : https://betagouv.github.io/approbiom/staging/
 
-Pour promouvoir la version en production, lancer :
+Les fichiers servis se trouvent dans les dossiers "staging" et "prod" du dossier "dist".
+On peut retrouver ces dossiers sur la branche "gh-pages".
 
-```bash
-pnpm run build:prod
-```
+Le déploiement de "staging" est automatique et s'effectue dès qu'un commit est fusionné sur la branche "main".
+Le déploiement de "prod" est manuellement déclenché par la GitHub Action CD Pipeline. Cette action promouvoit la prod, c'est-à-dire qu'elle copie le contenu du dossier staging vers le dossier prod.
+
+Pour améliorer le processus de déploiement continu, il reste à implémenter une GitHub Action dédiée au rollback de l'environnement de production.
