@@ -46,6 +46,18 @@ jobs:
             - name: Build staging
               run: pnpm run build:staging
 
+            # Each job runs on its own runner and they share no filesystem, so
+            # this artifact is the only way the build reaches the deploy job —
+            # and it is what lets deploy publish the exact bytes checked here
+            # instead of rebuilding them.
+            - name: Upload the built site
+              uses: actions/upload-artifact@043fb46d1a93c77aae656e7c1c64a875d1fc6a0a # v7.0.1
+              with:
+                  name: staging-site
+                  path: dist/staging
+                  retention-days: 7
+                  if-no-files-found: error
+
     deploy-staging:
         needs: ci
 
