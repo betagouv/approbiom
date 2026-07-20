@@ -3,6 +3,7 @@
     "private": true,
     "version": "0.0.0",
     "type": "module",
+    "packageManager": "pnpm@10.27.0",
     "engines": {
         "node": "^20.19.0 || >=22.12.0",
         "pnpm": ">=10"
@@ -15,7 +16,8 @@
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
         "format": "prettier --write .",
-        "format:check": "prettier --check ."
+        "format:check": "prettier --check .",
+        "ci": "pnpm run format:check && pnpm run lint && pnpm run typecheck"
     },
     "dependencies": {
         "react": "^19.2.7",

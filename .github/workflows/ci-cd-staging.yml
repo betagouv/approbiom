@@ -1,0 +1,78 @@
+name: CI / CD Staging
+
+concurrency:
+    group: ${{ github.workflow }}-${{ github.ref }}
+    cancel-in-progress: ${{ github.event_name == 'pull_request' }}
+
+permissions:
+    contents: read
+
+on:
+    push:
+        branches: [main]
+    pull_request:
+        branches: [main]
+
+jobs:
+    ci:
+        runs-on: ubuntu-24.04
+        permissions:
+            contents: read
+        steps:
+            - name: Checkout
+              uses: actions/checkout@df4cb1c069e1874edd31b4311f1884172cec0e10 # v6.0.3
+
+            - name: Install pnpm
+              uses: pnpm/action-setup@0ebf47130e4866e96fce0953f49152a61190b271 # v6.0.9
+
+            # Must run after pnpm is installed, otherwise the pnpm store cache
+            # cannot be located.
+            - name: Install Node
+              uses: actions/setup-node@820762786026740c76f36085b0efc47a31fe5020 # v7.0.0
+              with:
+                  node-version-file: .nvmrc
+                  cache: pnpm
+
+            - name: Install dependencies
+              run: pnpm install --frozen-lockfile
+
+            - name: Check formatting, lint and types
+              run: pnpm run ci
+
+            # Runs on pull requests too, where it is purely a check that every
+            # widget still compiles. On main the output is also what gets
+            # deployed, so nothing is ever rebuilt between validation and
+            # release.
+            - name: Build staging
+              run: pnpm run build:staging
+
+    deploy-staging:
+        needs: ci
+
+        if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+
+        runs-on: ubuntu-24.04
+        permissions:
+            contents: write
+        environment:
+            name: staging
+            url: https://${{ github.repository_owner }}.github.io/${{ github.event.repository.name }}/staging/
+        steps:
+            - name: Download the built site
+              uses: actions/download-artifact@3e5f45b2cfb9172054b4087a40e8e0b5a5461e7c # v8.0.1
+              with:
+                  name: staging-site
+                  path: dist/staging
+
+            # `destination_dir` is what lets two environments share one Pages
+            # site: only the staging/ folder of the branch is replaced, so the
+            # prod/ folder next to it keeps serving untouched. This is why we
+            # publish to a branch rather than with actions/deploy-pages, which
+            # can only replace the site as a whole.
+            - name: Publish to gh-pages under staging/
+              uses: peaceiris/actions-gh-pages@84c30a85c19949d7eee79c4ff27748b70285e453 # v4.1.0
+              with:
+                  github_token: ${{ secrets.GITHUB_TOKEN }}
+                  publish_dir: ./dist/staging
+                  destination_dir: staging
+                  commit_message: 'deploy(staging): ${{ github.sha }}'
