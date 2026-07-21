@@ -1,0 +1,68 @@
+/* CSS lives next to its component: MultiSelect.tsx imports this file directly,
+   so the styles follow the component into whichever widget uses it.
+
+   Everything DSFR already answers for is left to DSFR — the grey box of the
+   control, the checkboxes, the buttons, the legend, and hiding the legend
+   (`fr-sr-only`, in core). What is left is the panel, which DSFR 1.14.4 has no
+   class for, and the two places where a DSFR class has to be adjusted. */
+
+/* `fr-select` paints its own chevron as a background image and already reserves
+   the room for it in its right padding, so the chevron is left to DSFR. What a
+   button needs on top of it is the text handling a `<select>` gets for free:
+   left-aligned, and kept to one line so a long selection ends in an ellipsis
+   instead of pushing the box open. */
+.shared-multi-select__trigger {
+    text-align: left;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* The panel floats under the control, so it needs a surface of its own to sit
+   on. Both colours are DSFR tokens, so it follows the light and dark themes. */
+.shared-multi-select__panel {
+    /* Lifted out of the flow so the page below keeps its layout whether the
+       panel is open or closed. The anchor is DSFR's own `fr-select-group`,
+       which is already `position: relative` — that is why the root of the
+       component carries that class.
+
+       `right: 0` rather than a width: the panel lines up with the control on
+       both sides, whatever the control is wide.
+
+       This can only overlay what is inside the same document. In a Grist
+       widget the iframe clips it, so a panel opened near the bottom of the
+       frame is cut off there — hence the capped height below. */
+    position: absolute;
+    top: 100%;
+    left: 0;
+    right: 0;
+    /* Above the page content, below anything the design system itself stacks
+       (DSFR keeps its own overlays well above 1). */
+    z-index: 1;
+    padding: 1rem;
+    background-color: var(--background-default-grey);
+    border: 1px solid var(--border-default-grey);
+    /* DSFR's own token for a surface that sits over another one. */
+    box-shadow: var(--overlap-shadow);
+}
+
+.shared-multi-select__select-all {
+    width: 100% !important;
+    justify-content: center;
+    margin-bottom: 1rem;
+}
+
+/* A rich list is long by nature: it scrolls inside the panel rather than
+   pushing the rest of the page down. */
+.shared-multi-select__options {
+    max-height: 20rem;
+    overflow-y: auto;
+}
+
+/* The indent is what says an option belongs to the group above it, so it is
+   part of the component rather than a skin over it. The options are siblings of
+   the group's checkbox in the markup — this rule is the only thing that groups
+   them visually. */
+.shared-multi-select__group-options {
+    padding-left: 1.5rem;
+}
