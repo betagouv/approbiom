@@ -35,7 +35,9 @@ describe('App Widget Accueil', () => {
 
         render(<App />)
 
-        expect(screen.getByText('Connexion à Grist en cours…')).toBeDefined()
+        expect(
+            screen.getByText('Information : connexion à Grist en cours…')
+        ).toBeDefined()
     })
 
     it('displays the loading message when Grist data is being fetched', () => {
@@ -49,7 +51,9 @@ describe('App Widget Accueil', () => {
 
         render(<App />)
 
-        expect(screen.getByText('Chargement des données…')).toBeDefined()
+        expect(
+            screen.getByText('Information : chargement des données…')
+        ).toBeDefined()
     })
 
     it('displays the access denied message when the user does not have the required permissions', () => {
@@ -65,7 +69,7 @@ describe('App Widget Accueil', () => {
 
         expect(
             screen.getByText(
-                `Ce widget a besoin d’un accès complet au document. Ouvrez le panneau de configuration du widget et choisissez « Accès complet au document ».`
+                `Avertissement : ce widget a besoin d’un accès complet au document. Ouvrez le panneau de configuration du widget et choisissez « Accès complet au document ».`
             )
         ).toBeDefined()
     })
@@ -83,7 +87,7 @@ describe('App Widget Accueil', () => {
 
         expect(
             screen.getByText(
-                'Impossible de charger les données : There was an error'
+                'Erreur : impossible de charger les données : There was an error'
             )
         ).toBeDefined()
     })
