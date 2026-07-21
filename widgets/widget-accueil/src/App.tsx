@@ -1,4 +1,5 @@
 import { useGrist } from '@shared/hooks/useGrist'
+import Alert from '@shared/components/Alert'
 import Accueil from './Accueil'
 
 export default function App() {
@@ -7,25 +8,31 @@ export default function App() {
     return (
         <main className="app">
             {gristState.status === 'connecting' && (
-                <p>Connexion à Grist en cours…</p>
+                <Alert severity="info" title="Connexion en cours">
+                    Information : connexion à Grist en cours…
+                </Alert>
             )}
 
             {gristState.status === 'denied' && (
-                <p>
-                    Ce widget a besoin d’un accès complet au document. Ouvrez le
-                    panneau de configuration du widget et choisissez « Accès
-                    complet au document ».
-                </p>
+                <Alert severity="warning" title="Accès insuffisant">
+                    Avertissement : ce widget a besoin d’un accès complet au
+                    document. Ouvrez le panneau de configuration du widget et
+                    choisissez « Accès complet au document ».
+                </Alert>
             )}
 
-            {gristState.status === 'loading' && <p>Chargement des données…</p>}
+            {gristState.status === 'loading' && (
+                <Alert severity="info" title="Chargement">
+                    Information : chargement des données…
+                </Alert>
+            )}
 
             {gristState.status === 'error' && (
                 <>
-                    <p>
-                        Impossible de charger les données :{' '}
+                    <Alert severity="error" title="Erreur">
+                        Erreur : impossible de charger les données :{' '}
                         {gristState.error.message}
-                    </p>
+                    </Alert>
                     <button onClick={gristState.refetch}>Réessayer</button>
                 </>
             )}

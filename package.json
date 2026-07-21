@@ -22,6 +22,7 @@
         "ci": "pnpm run format:check && pnpm run lint && pnpm run typecheck && pnpm run test:run"
     },
     "dependencies": {
+        "@gouvfr/dsfr": "1.14.4",
         "react": "^19.2.7",
         "react-dom": "^19.2.7"
     },
