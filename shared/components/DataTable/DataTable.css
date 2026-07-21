@@ -1,0 +1,24 @@
+/* CSS lives next to its component: DataTable.tsx imports this file directly,
+   so the styles follow the component into whichever widget uses it.
+
+   Only one rule is needed. The sticky selection column is not implemented here:
+   `fr-cell--fixed` is DSFR's own class and already carries `position: sticky`,
+   `left: 0` and a z-index, and DSFR paints every cell opaque
+   (`--background-default-grey` on `td`, `--background-alt-grey` on `thead th`)
+   so scrolled content cannot show through. The blue outline of a selected row
+   comes from DSFR too, keyed on `tr[aria-selected=true]`, borders between
+   adjacent selected rows included. */
+
+/* The tint has to be set on the cells, not on the row: DSFR paints each cell
+   with an opaque background, so a colour on the `<tr>` would sit behind them
+   and never be seen. Targeting the children also covers the sticky selection
+   cell, which has to carry the same colour or it would break the row in two
+   while scrolling.
+
+   `--background-alt-blue-france` is the design system's own light blue surface,
+   paired with the default text colour, so the contrast is the one DSFR
+   validated. The colour is only ever a second signal: the checkbox is what
+   actually states the row is selected. */
+.shared-data-table__row--selected > * {
+    background-color: var(--background-alt-blue-france);
+}
