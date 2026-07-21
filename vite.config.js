@@ -50,6 +50,10 @@ export default defineConfig({
 
     plugins: [react(), widgetDevUrls()],
 
+    test: {
+        environment: 'jsdom',
+    },
+
     resolve: {
         alias: {
             '@shared': fileURLToPath(new URL('./shared', import.meta.url)),
