@@ -22,3 +22,43 @@
 .shared-data-table__row--selected > * {
     background-color: var(--background-alt-blue-france);
 }
+
+/* The header row, kept in place while the rows scroll under it. DSFR has no
+   class for this, but it has the vertical half of it: `fr-cell--fixed` sticks a
+   column with `position: sticky; left: 0`. This is the same mechanism turned the
+   other way, and it works here for two reasons that are DSFR's doing —
+   `fr-table__container` is already the scrolling box (`overflow: auto`), and
+   header cells are already painted opaque (`--background-alt-grey`), so rows
+   pass behind them rather than through them.
+
+   The usual trap does not apply either: `position: sticky` on a `<th>` is
+   unreliable under `border-collapse: collapse`, which the table does use — but
+   DSFR draws its rules as `background-image` gradients rather than borders, so
+   there are none to lose.
+
+   This does nothing on a table that is not itself bounded in height: sticky
+   needs something to scroll against. Giving it that is the page's business. */
+.shared-data-table--sticky-header .fr-table__content thead th {
+    position: sticky;
+    top: 0;
+    /* Above `fr-cell--fixed`, which DSFR puts at 1: without this, scrolling
+       sideways slides the frozen selection column over the header. */
+    z-index: 2;
+}
+
+/* WCAG 2.4.11: a stuck header must not end up covering whatever has just taken
+   focus. Tabbing into a row near the bottom scrolls it into view, and without a
+   margin the browser is free to stop with the row tucked under the header.
+
+   The height is a variable because only the caller knows it — headers that wrap
+   onto two lines are taller than the default assumed here. */
+.shared-data-table--sticky-header {
+    --shared-data-table-header-height: 3.5rem;
+}
+
+.shared-data-table--sticky-header
+    .fr-table__content
+    tbody
+    :is(a, button, input) {
+    scroll-margin-top: var(--shared-data-table-header-height);
+}

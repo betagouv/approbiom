@@ -20,13 +20,32 @@ describe('App Widget Accueil', () => {
         render(<App />)
 
         expect(
-            screen.getByRole('heading', { level: 1, name: 'Accueil' })
+            screen.getByRole('heading', {
+                level: 1,
+                name: 'Suivi des plans d’approvisionnement',
+            })
         ).toBeDefined()
     })
 
     it('displays the connecting message when connecting to Grist', () => {
         vi.mocked(useGrist).mockReturnValue({
             status: 'connecting',
+            data: null,
+            error: null,
+            accessLevel: null,
+            refetch: () => '',
+        })
+
+        render(<App />)
+
+        expect(
+            screen.getByText('Information : connexion à Grist en cours…')
+        ).toBeDefined()
+    })
+
+    it('displays the "not in a Grist iframe" message when not in a Grist custom widget', () => {
+        vi.mocked(useGrist).mockReturnValue({
+            status: 'grist undefined',
             data: null,
             error: null,
             accessLevel: null,

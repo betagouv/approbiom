@@ -36,9 +36,8 @@
     top: 100%;
     left: 0;
     right: 0;
-    /* Above the page content, below anything the design system itself stacks
-       (DSFR keeps its own overlays well above 1). */
-    z-index: 1;
+
+    z-index: 4;
     padding: 1rem;
     background-color: var(--background-default-grey);
     border: 1px solid var(--border-default-grey);

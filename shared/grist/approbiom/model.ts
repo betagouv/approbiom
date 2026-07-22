@@ -31,6 +31,8 @@ export const TABLE_COLUMNS = {
         deprecie_Synthese: true,
         Nom: true,
         Usage_principal: true,
+        est_Filtre_Dans_Accueil: true,
+        Ouvrir_la_fiche: true,
         Appel_a_projet: true,
         Mise_en_service_projet: true,
         Departement_de_situation: true,

@@ -1,0 +1,102 @@
+/* CSS lives next to its component: Tag.tsx imports this file directly, so the
+   styles follow the component into whichever widget uses it.
+
+   All of it answers one thing. DSFR only paints a tag that can be clicked:
+   every `fr-tag--<couleur>` rule it ships is scoped to `a`, `button` and
+   `input[type=…]`, so the read-only `<p>` form of a tag comes out grey
+   whatever colour it is given. The colours are put back here for that form.
+
+   The tokens are the ones DSFR itself uses for coloured labels that cannot be
+   clicked — the badge pair, `--background-contrast-*` / `--text-label-*` —
+   rather than the clickable tag's `--background-action-low-*`, which is tuned
+   to read as an affordance. Tokens rather than colours, so light and dark
+   themes still follow.
+
+   The seventeen illustrative colours DSFR ships all have a rule below, so any
+   of them can be asked for by name. `color` being a plain string, a name that
+   is not one of them is not caught by the compiler — it comes out grey. */
+
+.shared-tag.fr-tag--beige-gris-galet {
+    background-color: var(--background-contrast-beige-gris-galet);
+    color: var(--text-label-beige-gris-galet);
+}
+
+.shared-tag.fr-tag--blue-cumulus {
+    background-color: var(--background-contrast-blue-cumulus);
+    color: var(--text-label-blue-cumulus);
+}
+
+.shared-tag.fr-tag--blue-ecume {
+    background-color: var(--background-contrast-blue-ecume);
+    color: var(--text-label-blue-ecume);
+}
+
+.shared-tag.fr-tag--brown-cafe-creme {
+    background-color: var(--background-contrast-brown-cafe-creme);
+    color: var(--text-label-brown-cafe-creme);
+}
+
+.shared-tag.fr-tag--brown-caramel {
+    background-color: var(--background-contrast-brown-caramel);
+    color: var(--text-label-brown-caramel);
+}
+
+.shared-tag.fr-tag--brown-opera {
+    background-color: var(--background-contrast-brown-opera);
+    color: var(--text-label-brown-opera);
+}
+
+.shared-tag.fr-tag--green-archipel {
+    background-color: var(--background-contrast-green-archipel);
+    color: var(--text-label-green-archipel);
+}
+
+.shared-tag.fr-tag--green-bourgeon {
+    background-color: var(--background-contrast-green-bourgeon);
+    color: var(--text-label-green-bourgeon);
+}
+
+.shared-tag.fr-tag--green-emeraude {
+    background-color: var(--background-contrast-green-emeraude);
+    color: var(--text-label-green-emeraude);
+}
+
+.shared-tag.fr-tag--green-menthe {
+    background-color: var(--background-contrast-green-menthe);
+    color: var(--text-label-green-menthe);
+}
+
+.shared-tag.fr-tag--green-tilleul-verveine {
+    background-color: var(--background-contrast-green-tilleul-verveine);
+    color: var(--text-label-green-tilleul-verveine);
+}
+
+.shared-tag.fr-tag--orange-terre-battue {
+    background-color: var(--background-contrast-orange-terre-battue);
+    color: var(--text-label-orange-terre-battue);
+}
+
+.shared-tag.fr-tag--pink-macaron {
+    background-color: var(--background-contrast-pink-macaron);
+    color: var(--text-label-pink-macaron);
+}
+
+.shared-tag.fr-tag--pink-tuile {
+    background-color: var(--background-contrast-pink-tuile);
+    color: var(--text-label-pink-tuile);
+}
+
+.shared-tag.fr-tag--purple-glycine {
+    background-color: var(--background-contrast-purple-glycine);
+    color: var(--text-label-purple-glycine);
+}
+
+.shared-tag.fr-tag--yellow-moutarde {
+    background-color: var(--background-contrast-yellow-moutarde);
+    color: var(--text-label-yellow-moutarde);
+}
+
+.shared-tag.fr-tag--yellow-tournesol {
+    background-color: var(--background-contrast-yellow-tournesol);
+    color: var(--text-label-yellow-tournesol);
+}

@@ -6,6 +6,7 @@ const REQUIRED_ACCESS_FULL_LEVEL = 'full'
 
 type GristState =
     | { status: 'connecting'; data: null; error: null; accessLevel: null }
+    | { status: 'grist undefined'; data: null; error: null; accessLevel: null }
     | {
           status: 'denied' | 'loading'
           data: null
@@ -46,6 +47,13 @@ export function useGrist(): UseGristResult {
 
         grist.ready({
             requiredAccess: REQUIRED_ACCESS_FULL_LEVEL,
+        })
+
+        setState({
+            status: 'grist undefined',
+            data: null,
+            error: null,
+            accessLevel: null,
         })
     }, [])
 

@@ -1,6 +1,3 @@
-// The DSFR table script is deliberately not loaded — it only drives sorting and
-// row selection, which this component does not do. Horizontal scrolling is pure
-// CSS (`.fr-table__container { overflow: auto }`).
 import '@gouvfr/dsfr/dist/component/table/table.main.min.css'
 import '@gouvfr/dsfr/dist/component/checkbox/checkbox.main.min.css'
 import './DataTable.css'
@@ -11,6 +8,8 @@ export default function DataTable<T>({
     caption,
     rows,
     columns,
+    bordered = false,
+    stickyHeader = false,
     selectedRows,
     onSelectionChange,
     selectionLabel,
@@ -19,7 +18,6 @@ export default function DataTable<T>({
     // the same page from pointing their labels at each other's checkboxes.
     const id = useId()
 
-    // Selection is controlled: this is a read of the prop, never state.
     const selected = new Set(selectedRows)
     const isSelectable = onSelectionChange !== undefined
     const allSelected =
@@ -38,8 +36,18 @@ export default function DataTable<T>({
         onSelectionChange?.(rows.filter((candidate) => next.has(candidate)))
     }
 
+    const rootClassName = [
+        'fr-table',
+        ' fr-table--multiline',
+        'fr-table--sm',
+        bordered && 'fr-table--bordered',
+        stickyHeader && 'shared-data-table--sticky-header',
+    ]
+        .filter(Boolean)
+        .join(' ')
+
     return (
-        <div className="fr-table">
+        <div className={rootClassName}>
             <div className="fr-table__wrapper">
                 <div className="fr-table__container">
                     <div className="fr-table__content">
@@ -48,11 +56,6 @@ export default function DataTable<T>({
                             <thead>
                                 <tr>
                                     {isSelectable && (
-                                        // `fr-cell--fixed` is DSFR's own sticky
-                                        // cell: it carries position/left/z-index
-                                        // and hides the label text of a checkbox
-                                        // it contains while keeping it as the
-                                        // accessible name.
                                         <th
                                             scope="col"
                                             className="fr-cell--fixed"
@@ -62,8 +65,6 @@ export default function DataTable<T>({
                                                     type="checkbox"
                                                     id={`${id}-all`}
                                                     checked={allSelected}
-                                                    // Nothing to select, so the
-                                                    // control has nothing to say.
                                                     disabled={rows.length === 0}
                                                     // `indeterminate` is a DOM
                                                     // property with no HTML
@@ -96,7 +97,11 @@ export default function DataTable<T>({
                                         // `scope="col"` ties every cell below
                                         // to this header when a screen reader
                                         // announces a row.
-                                        <th key={column.id} scope="col">
+                                        <th
+                                            className="fr-col--xs"
+                                            key={column.id}
+                                            scope="col"
+                                        >
                                             {column.header}
                                         </th>
                                     ))}
