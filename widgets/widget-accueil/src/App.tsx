@@ -1,7 +1,7 @@
 import { useGrist } from '@shared/hooks/useGrist'
 import Alert from '@shared/components/Alert'
-import Accueil from './Accueil'
-import { FAKE_PLANS } from './fakePlans'
+import Accueil from './components/Accueil'
+import { FAKE_PLANS } from './data/fakePlans'
 
 export default function App() {
     const gristState = useGrist()

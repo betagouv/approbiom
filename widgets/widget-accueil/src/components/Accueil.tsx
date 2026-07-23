@@ -6,10 +6,10 @@ import './Accueil.css'
 import DataTable, { type Column } from '@shared/components/DataTable'
 import MultiSelect from '@shared/components/MultiSelect'
 import SearchBar from '@shared/components/SearchBar'
-import TagNature from './components/TagNature'
-import TagStatut from './components/TagStatut'
-import TagType from './components/TagType'
-import TagUsage from './components/TagUsage'
+import TagNature from './TagNature'
+import TagStatut from './TagStatut'
+import TagType from './TagType'
+import TagUsage from './TagUsage'
 import type { Plan_d_approvisionnement } from '@shared/grist/approbiom/tables'
 import { useState } from 'react'
 import {
@@ -17,8 +17,8 @@ import {
     getFilteredRows,
     getLieuOptions,
     getStatutOptions,
-} from './utils'
-import Drawer from './components/Drawer'
+} from '../utils'
+import Drawer from './Drawer'
 
 function buildColumns(
     onOpen: (plan: Plan_d_approvisionnement) => void
