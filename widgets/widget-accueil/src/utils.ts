@@ -13,9 +13,9 @@ export type PlanFilters = {
 
 function matchesSelection(
     selection: readonly string[],
-    value: string
+    value: string | null
 ): boolean {
-    return selection.length === 0 || selection.includes(value)
+    return selection.length === 0 || selection.includes(value ?? '')
 }
 
 export function getFilteredRows(
@@ -26,17 +26,19 @@ export function getFilteredRows(
 
     return rows.filter(
         (row) =>
-            (query === '' || row.Nom.toLowerCase().includes(query)) &&
+            (query === '' || (row.Nom ?? '').toLowerCase().includes(query)) &&
             matchesSelection(statuts, row.Statut) &&
             matchesSelection(appelsAProjet, row.Appel_a_projet) &&
             matchesSelection(lieux, row.Departement_de_situation)
     )
 }
 
-function distinct(values: readonly string[]): string[] {
-    return [...new Set(values.filter((value) => value !== ''))].sort((a, b) =>
-        a.localeCompare(b, 'fr')
-    )
+function distinct(values: readonly (string | null)[]): string[] {
+    return [
+        ...new Set(
+            values.filter((v): v is string => typeof v === 'string' && v !== '')
+        ),
+    ].sort((a, b) => a.localeCompare(b, 'fr'))
 }
 
 function asOptions(values: readonly string[]): MultiSelectOption<string>[] {
@@ -57,10 +59,7 @@ export function getAppelAProjetOptions(
 ): MultiSelectOption<string>[] {
     const options = asOptions(distinct(rows.map((row) => row.Appel_a_projet)))
 
-    // Being attached to no call at all is worth filtering on, unlike the other
-    // criteria, and the empty string is what the document stores for it. Last,
-    // because it is not a call.
-    return rows.some((row) => row.Appel_a_projet === '')
+    return rows.some((row) => (row.Appel_a_projet ?? '') === '')
         ? [...options, { value: '', label: 'Aucun' }]
         : options
 }

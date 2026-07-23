@@ -47,7 +47,7 @@ function buildColumns(
         {
             id: 'usage',
             header: 'Usage',
-            render: (plan) => <TagUsage usage={plan.Usage_principal} />,
+            render: (plan) => <TagUsage usage={plan.Usage_principal ?? ''} />,
         },
         {
             id: 'mise-en-service',

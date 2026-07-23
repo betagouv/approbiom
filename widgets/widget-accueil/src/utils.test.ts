@@ -219,4 +219,29 @@ describe('getFilteredRows', () => {
 
         expect(rows).toEqual([valFleuri, belOrme, plaineSud])
     })
+
+    describe('with null formula columns', () => {
+        const nullish = planWith({
+            id_pa: 4,
+            Nom: null,
+            Appel_a_projet: null,
+            Departement_de_situation: null,
+        })
+        const withNull: readonly Plan_d_approvisionnement[] = [
+            valFleuri,
+            nullish,
+        ]
+
+        it('does not throw and skips a null name on a nom search', () => {
+            expect(getFilteredRows(withNull, { nom: 'rcu' })).toEqual([
+                valFleuri,
+            ])
+        })
+
+        it('treats a null appel à projet as « no call »', () => {
+            expect(getFilteredRows(withNull, { appelsAProjet: [''] })).toEqual([
+                nullish,
+            ])
+        })
+    })
 })
