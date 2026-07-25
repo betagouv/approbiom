@@ -2,13 +2,13 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 import './Drawer.css'
 import Tag from '@shared/components/Tag'
-import type { Plan_d_approvisionnement } from '@shared/grist/approbiom/tables'
+import type { PlanDapprovisionnementAccueil } from '@shared/hooks/useGrist'
 import { useEffect, useId, useRef } from 'react'
 
 const A_VENIR = 'À venir'
 
 export type DrawerProps = {
-    plan: Plan_d_approvisionnement
+    plan: PlanDapprovisionnementAccueil
     onClose: () => void
 }
 

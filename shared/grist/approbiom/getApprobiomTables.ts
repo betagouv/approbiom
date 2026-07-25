@@ -1,43 +1,29 @@
 import { fetchRows } from '@shared/grist/api/client'
-import {
-    type ApprobiomTables,
-    type TableId,
-    APPROBIOM_TABLE_IDS,
-    TABLE_COLUMNS,
-} from './model'
+import type { Plan_d_approvisionnement } from './tables'
 
-// A column can be renamed or removed in the Grist document without the widget
-// being rebuilt, and the generated types would still promise it exists. Fail
-// loudly at load time instead of letting `undefined` spread through the UI.
-function assertColumns(
-    tableId: TableId,
-    rows: Record<string, unknown>[]
-): void {
-    // Every row is built from the same column list, so the first one is
-    // representative. An empty table carries no column information at all.
-    const [firstRow] = rows
-    if (firstRow === undefined) return
-
-    const missing = Object.keys(TABLE_COLUMNS[tableId]).filter(
-        (colId) => !(colId in firstRow)
-    )
-
-    if (missing.length > 0) {
-        throw new Error(
-            `Grist table "${tableId}" is missing expected column(s): ${missing.join(', ')}. ` +
-                `Regenerate shared/grist/approbiom/tables.d.ts if the document schema changed.`
-        )
-    }
+type TableRowMap = {
+    Plan_d_approvisionnement: Plan_d_approvisionnement
 }
 
-export async function getApprobiomTables(): Promise<ApprobiomTables> {
-    const tables = await Promise.all(
-        APPROBIOM_TABLE_IDS.map(async (tableId) => {
-            const rows = await fetchRows(tableId)
-            assertColumns(tableId, rows)
-            return [tableId, rows] as const
-        })
-    )
+type TableId = keyof TableRowMap
 
-    return Object.fromEntries(tables) as ApprobiomTables
+type ColumnId<K extends TableId> = keyof TableRowMap[K] & string
+
+/**
+ * Fetches one Approbiom table, keeping only the requested columns and narrowing
+ * the row type to exactly those columns — so a page can ask for a subset instead
+ * of the whole row.
+ *
+ * @example
+ * const plans = await getApprobiomTable('Plan_d_approvisionnement', ['Nom', 'Statut'])
+ * //    ^? Pick<Plan_d_approvisionnement, 'Nom' | 'Statut'>[]
+ *
+ * @throws If a requested column is absent from the fetched table (see `fetchRows`).
+ */
+export async function getApprobiomTable<
+    K extends TableId,
+    C extends ColumnId<K>,
+>(tableId: K, columnIds: readonly C[]): Promise<Pick<TableRowMap[K], C>[]> {
+    const rows = await fetchRows(tableId, columnIds)
+    return rows as Pick<TableRowMap[K], C>[]
 }

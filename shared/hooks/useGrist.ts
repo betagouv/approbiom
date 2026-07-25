@@ -1,8 +1,28 @@
-import { getApprobiomTables } from '@shared/grist/approbiom/getApprobiomTables'
-import type { ApprobiomTables } from '@shared/grist/approbiom/model'
+import { getApprobiomTable } from '@shared/grist/approbiom/getApprobiomTables'
+import type { Plan_d_approvisionnement } from '@shared/grist/approbiom/tables'
 import { useState, useCallback, useEffect } from 'react'
 
 const REQUIRED_ACCESS_FULL_LEVEL = 'full'
+
+const ACCUEIL_PLAN_COLUMNS = [
+    'Nom',
+    'Departement_de_situation',
+    'Appel_a_projet',
+    'Type_de_plan',
+    'Usage_principal',
+    'Mise_en_service_projet',
+    'Nature_Donnee',
+    'Statut',
+] as const satisfies readonly (keyof Plan_d_approvisionnement)[]
+
+export type PlanDapprovisionnementAccueil = Pick<
+    Plan_d_approvisionnement,
+    (typeof ACCUEIL_PLAN_COLUMNS)[number]
+>
+
+type AccueilTables = {
+    Plan_d_approvisionnement: PlanDapprovisionnementAccueil[]
+}
 
 type GristState =
     | { status: 'connecting'; data: null; error: null; accessLevel: null }
@@ -16,7 +36,7 @@ type GristState =
     | { status: 'error'; data: null; error: Error; accessLevel: string | null }
     | {
           status: 'ready'
-          data: ApprobiomTables
+          data: AccueilTables
           error: null
           accessLevel: string
       }
@@ -82,7 +102,11 @@ export function useGrist(): UseGristResult {
                 accessLevel,
             })
 
-            const data = await getApprobiomTables()
+            const rows = await getApprobiomTable(
+                'Plan_d_approvisionnement',
+                ACCUEIL_PLAN_COLUMNS
+            )
+            const data: AccueilTables = { Plan_d_approvisionnement: rows }
 
             if (cancelled) return
 

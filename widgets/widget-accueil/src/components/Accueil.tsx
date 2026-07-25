@@ -10,7 +10,7 @@ import TagNature from './TagNature'
 import TagStatut from './TagStatut'
 import TagType from './TagType'
 import TagUsage from './TagUsage'
-import type { Plan_d_approvisionnement } from '@shared/grist/approbiom/tables'
+import type { PlanDapprovisionnementAccueil } from '@shared/hooks/useGrist'
 import { useState } from 'react'
 import {
     getAppelAProjetOptions,
@@ -21,8 +21,8 @@ import {
 import Drawer from './Drawer'
 
 function buildColumns(
-    onOpen: (plan: Plan_d_approvisionnement) => void
-): readonly Column<Plan_d_approvisionnement>[] {
+    onOpen: (plan: PlanDapprovisionnementAccueil) => void
+): readonly Column<PlanDapprovisionnementAccueil>[] {
     return [
         {
             id: 'nom',
@@ -83,7 +83,7 @@ function buildColumns(
 }
 
 export type AccueilProps = {
-    plansApprovisionnement: readonly Plan_d_approvisionnement[]
+    plansApprovisionnement: readonly PlanDapprovisionnementAccueil[]
 }
 
 export default function Accueil({ plansApprovisionnement }: AccueilProps) {
@@ -99,7 +99,7 @@ export default function Accueil({ plansApprovisionnement }: AccueilProps) {
     const [searchGeneration, setSearchGeneration] = useState(0)
 
     const [openedPlan, setOpenedPlan] =
-        useState<Plan_d_approvisionnement | null>(null)
+        useState<PlanDapprovisionnementAccueil | null>(null)
 
     const columns = buildColumns(setOpenedPlan)
 

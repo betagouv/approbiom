@@ -1,4 +1,4 @@
-import type { Plan_d_approvisionnement } from '@shared/grist/approbiom/tables'
+import type { PlanDapprovisionnementAccueil } from '@shared/hooks/useGrist'
 import type {
     MultiSelectGroup,
     MultiSelectOption,
@@ -19,9 +19,9 @@ function matchesSelection(
 }
 
 export function getFilteredRows(
-    rows: readonly Plan_d_approvisionnement[],
+    rows: readonly PlanDapprovisionnementAccueil[],
     { nom = '', statuts = [], appelsAProjet = [], lieux = [] }: PlanFilters = {}
-): Plan_d_approvisionnement[] {
+): PlanDapprovisionnementAccueil[] {
     const query = nom.trim().toLowerCase()
 
     return rows.filter(
@@ -49,13 +49,13 @@ function asOptions(values: readonly string[]): MultiSelectOption<string>[] {
 }
 
 export function getStatutOptions(
-    rows: readonly Plan_d_approvisionnement[]
+    rows: readonly PlanDapprovisionnementAccueil[]
 ): MultiSelectOption<string>[] {
     return asOptions(distinct(rows.map((row) => row.Statut)))
 }
 
 export function getAppelAProjetOptions(
-    rows: readonly Plan_d_approvisionnement[]
+    rows: readonly PlanDapprovisionnementAccueil[]
 ): MultiSelectOption<string>[] {
     const options = asOptions(distinct(rows.map((row) => row.Appel_a_projet)))
 
@@ -68,7 +68,7 @@ export function getAppelAProjetOptions(
 const DEPARTEMENT = /\((\d+)\)\s*$/
 
 export function getLieuOptions(
-    rows: readonly Plan_d_approvisionnement[]
+    rows: readonly PlanDapprovisionnementAccueil[]
 ): MultiSelectGroup<string>[] {
     const byDepartement = new Map<string, MultiSelectOption<string>[]>()
 
