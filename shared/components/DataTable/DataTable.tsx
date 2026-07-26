@@ -38,7 +38,6 @@ export default function DataTable<T>({
 
     const rootClassName = [
         'fr-table',
-        ' fr-table--multiline',
         'fr-table--sm',
         bordered && 'fr-table--bordered',
         stickyHeader && 'shared-data-table--sticky-header',

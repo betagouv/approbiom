@@ -10,7 +10,7 @@ import TagNature from './TagNature'
 import TagStatut from './TagStatut'
 import TagType from './TagType'
 import TagUsage from './TagUsage'
-import type { PlanDapprovisionnementAccueil } from '@shared/hooks/useGrist'
+import type { PlanDapprovisionnementAccueil } from '../grist'
 import { useState } from 'react'
 import {
     getAppelAProjetOptions,

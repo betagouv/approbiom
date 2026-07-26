@@ -23,6 +23,7 @@ export type Installation = {
 }
 
 export type Plan_d_approvisionnement = {
+    id: number // Implicit Grist rowId
     Installation: number | boolean // Ref -> Installation
     Mise_en_service_Projet_raw: number | boolean | null
     MES_Reel: number | boolean | null
@@ -218,6 +219,7 @@ export type Page_Tests = {
 }
 
 export type Fournisseur = {
+    id: number // Implicit Grist rowId
     Siret: number | boolean | null
     Denomination: string
     Code_NAF: string
@@ -270,6 +272,7 @@ export type Test_installations = {
 }
 
 export type Meta_Ressource = {
+    id: number // Implicit Grist rowId
     id_meta_r: number | boolean | null
     Famille_ressource: string
     Code_ressource_Approbiom: string

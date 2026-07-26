@@ -2,6 +2,7 @@ import { useGrist } from '@shared/hooks/useGrist'
 import App from './App'
 import { render, screen } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
+import type { ACCUEIL_SPEC } from './grist'
 
 vi.mock('@shared/hooks/useGrist', () => ({
     useGrist: vi.fn(),
@@ -9,9 +10,21 @@ vi.mock('@shared/hooks/useGrist', () => ({
 
 describe('App Widget Accueil', () => {
     it('displays Accueil when Grist data is ready', () => {
-        vi.mocked(useGrist).mockReturnValue({
+        vi.mock('@/hooks/useGrist', () => ({
+            useGrist: vi.fn(),
+        }))
+
+        const mockedUseGrist = vi.mocked(
+            useGrist as (
+                spec: typeof ACCUEIL_SPEC
+            ) => ReturnType<typeof useGrist<typeof ACCUEIL_SPEC>>
+        )
+
+        mockedUseGrist.mockReturnValue({
             status: 'ready',
-            data: { Plan_d_approvisionnement: [] },
+            data: {
+                Plan_d_approvisionnement: [],
+            },
             error: null,
             accessLevel: 'full',
             refetch: vi.fn(),

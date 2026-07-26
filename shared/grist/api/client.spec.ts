@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { fetchRows, toRows, type ColumnMajorTable } from './client'
+import { fetchRows, indexByKey, toRows, type ColumnMajorTable } from './client'
 
 describe('toRows', () => {
     const records: ColumnMajorTable = {
@@ -45,6 +45,20 @@ describe('fetchRows', () => {
         expect(rows).toEqual([{ Statut: 'projet' }, { Statut: 'obsolète' }])
     })
 
+    it('keeps the id (rowId) column when it is requested — the join key', async () => {
+        mockFetchTable({
+            id: [1, 2],
+            Nom: ['Nom1', 'Nom2'],
+        })
+
+        const rows = await fetchRows('Plan_d_approvisionnement', ['id', 'Nom'])
+
+        expect(rows).toEqual([
+            { id: 1, Nom: 'Nom1' },
+            { id: 2, Nom: 'Nom2' },
+        ])
+    })
+
     it('throws when a requested column is absent from the fetched table', async () => {
         mockFetchTable({
             id: [1, 2],
@@ -65,5 +79,45 @@ describe('fetchRows', () => {
         await expect(
             fetchRows('Plan_d_approvisionnement', ['Nom', 'Usage_principal'])
         ).rejects.toThrow('Nom, Usage_principal')
+    })
+})
+
+describe('indexByKey', () => {
+    it('indexes rows by their numeric key', () => {
+        const rows = [
+            { id: 1, nom: 'a' },
+            { id: 2, nom: 'b' },
+        ]
+
+        const index = indexByKey(rows, (row) => row.id)
+
+        expect(index.size).toBe(2)
+        expect(index.get(1)).toEqual({ id: 1, nom: 'a' })
+        expect(index.get(2)).toEqual({ id: 2, nom: 'b' })
+    })
+
+    it('skips rows whose key is null', () => {
+        const rows = [{ ref: 1 }, { ref: null }]
+
+        const index = indexByKey(rows, (row) => row.ref)
+
+        expect(index.size).toBe(1)
+        expect(index.get(1)).toEqual({ ref: 1 })
+    })
+
+    it('keeps the last row on a duplicate key', () => {
+        const rows = [
+            { id: 1, v: 'first' },
+            { id: 1, v: 'second' },
+        ]
+
+        const index = indexByKey(rows, (row) => row.id)
+
+        expect(index.size).toBe(1)
+        expect(index.get(1)).toEqual({ id: 1, v: 'second' })
+    })
+
+    it('returns an empty map for no rows', () => {
+        expect(indexByKey([], () => 1).size).toBe(0)
     })
 })

@@ -14,6 +14,7 @@ function planWith(
         Usage_principal: 'énergie',
         Mise_en_service_projet: '2025',
         Nature_Donnee: 'prévision',
+        id: 1,
         id_pa: 1,
         Installation: 1,
         Installation_Nom: 'Plan',
@@ -29,6 +30,7 @@ function planWith(
 }
 
 const valFleuri = planWith({
+    id: 1,
     id_pa: 1,
     Nom: 'RCU Val-Fleuri 1',
     Statut: 'projet',
@@ -36,6 +38,7 @@ const valFleuri = planWith({
     Appel_a_projet: 'CHALEUR+ (2024)',
 })
 const belOrme = planWith({
+    id: 2,
     id_pa: 2,
     Nom: 'Chaufferie de Bel-Orme',
     Statut: 'abandonné',
@@ -43,6 +46,7 @@ const belOrme = planWith({
     Appel_a_projet: 'GRANULÉS NA (2023)',
 })
 const plaineSud = planWith({
+    id: 3,
     id_pa: 3,
     Nom: 'PLAINE-SUD phase 1',
     Statut: 'projet',
@@ -222,6 +226,7 @@ describe('getFilteredRows', () => {
 
     describe('with null formula columns', () => {
         const nullish = planWith({
+            id: 4,
             id_pa: 4,
             Nom: null,
             Appel_a_projet: null,

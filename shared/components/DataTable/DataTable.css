@@ -9,18 +9,20 @@
    comes from DSFR too, keyed on `tr[aria-selected=true]`, borders between
    adjacent selected rows included. */
 
-/* The tint has to be set on the cells, not on the row: DSFR paints each cell
-   with an opaque background, so a colour on the `<tr>` would sit behind them
-   and never be seen. Targeting the children also covers the sticky selection
-   cell, which has to carry the same colour or it would break the row in two
-   while scrolling.
+.fr-table__content table tbody tr.shared-data-table__row--selected > * {
+    --hover: var(--background-contrast-blue-france-hover);
+    --active: var(--background-contrast-blue-france-active);
+    background-color: var(--background-contrast-blue-france);
+}
 
-   `--background-alt-blue-france` is the design system's own light blue surface,
-   paired with the default text colour, so the contrast is the one DSFR
-   validated. The colour is only ever a second signal: the checkbox is what
-   actually states the row is selected. */
-.shared-data-table__row--selected > * {
-    background-color: var(--background-alt-blue-france);
+/* DSFR's bordered variant draws a bottom + right rule on every cell, so the
+   inner grid and the table's right and bottom edges are there, but its top and
+   left edges are left open. Those cell rules are background-gradients, not real
+   borders, so a real border on the collapsed table closes the frame with nothing
+   to collide with — in the body grid's own colour so all four edges match. */
+.fr-table--bordered .fr-table__content table {
+    border-top: 1px solid var(--border-contrast-grey);
+    border-left: 1px solid var(--border-contrast-grey);
 }
 
 /* The header row, kept in place while the rows scroll under it. DSFR has no

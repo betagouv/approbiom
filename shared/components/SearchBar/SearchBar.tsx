@@ -26,11 +26,11 @@ export default function SearchBar<T>({
     // below, leaving it open.
     const rootRef = useRef<HTMLDivElement>(null)
 
-    // Asking for the panel is not enough to get one: with nothing to suggest
-    // there is nothing to draw, and `aria-expanded` would be lying about a list
-    // that is not there. Filtering `options` against what has been typed comes
-    // later; for now the caller decides what the list holds.
-    const isOpen = isRequested && options.length > 0
+    const visibleOptions = options.filter((option) =>
+        option.label.toLowerCase().includes(query.trim().toLowerCase())
+    )
+
+    const isOpen = isRequested && visibleOptions.length > 0
 
     // Escape is the keyboard's half of dismissing the panel: the click-outside
     // below is mouse and touch only. Focus is already in the input and stays
@@ -98,7 +98,14 @@ export default function SearchBar<T>({
                     placeholder={displayedPlaceholder}
                     id={inputId}
                     value={query}
-                    onChange={(event) => setQuery(event.target.value)}
+                    // Editing the text is a fresh request for suggestions, so it
+                    // reopens a panel the user had dismissed (Enter, the button,
+                    // Escape, a click away). Without this, removing a letter can't
+                    // re-open a list that a no-match query had emptied.
+                    onChange={(event) => {
+                        setQuery(event.target.value)
+                        setIsRequested(true)
+                    }}
                     // `type="search"` for the browser's own clear button, which
                     // DSFR styles; `role="combobox"` for what the field
                     // actually is once there is a list under it.
@@ -134,7 +141,7 @@ export default function SearchBar<T>({
                     role="listbox"
                     aria-label={label}
                 >
-                    {options.map((option, index) => (
+                    {visibleOptions.map((option, index) => (
                         <li
                             key={index}
                             className="shared-search-bar__option"

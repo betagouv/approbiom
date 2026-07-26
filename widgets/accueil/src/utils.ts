@@ -1,4 +1,4 @@
-import type { PlanDapprovisionnementAccueil } from '@shared/hooks/useGrist'
+import type { PlanDapprovisionnementAccueil } from './grist'
 import type {
     MultiSelectGroup,
     MultiSelectOption,

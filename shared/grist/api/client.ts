@@ -1,5 +1,17 @@
 export type ColumnMajorTable = Record<string, unknown[]>
 
+export function indexByKey<T>(
+    rows: readonly T[],
+    keyOf: (row: T) => number | null
+): Map<number, T> {
+    const index = new Map<number, T>()
+    for (const row of rows) {
+        const key = keyOf(row)
+        if (key !== null) index.set(key, row)
+    }
+    return index
+}
+
 /**
  * Pivots Grist's column-major table (one array per column) into one plain object
  * per row. Every column present in `columns` lands in every row, so filter the

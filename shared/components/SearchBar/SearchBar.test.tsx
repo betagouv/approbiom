@@ -43,6 +43,41 @@ describe('SearchBar', () => {
         ).toEqual(['Chaufferie', 'RC St Junien', 'BIO2 St Gaudens'])
     })
 
+    it('restricts the suggestions to those matching what is typed', () => {
+        render(<SearchBar label="Rechercher un plan" options={options} />)
+        fireEvent.click(getInput())
+
+        type('st')
+
+        expect(
+            screen.getAllByRole('option').map((option) => option.textContent)
+        ).toEqual(['RC St Junien', 'BIO2 St Gaudens'])
+    })
+
+    it('closes the panel when nothing matches what is typed', () => {
+        render(<SearchBar label="Rechercher un plan" options={options} />)
+        fireEvent.click(getInput())
+
+        type('zzz')
+
+        expect(screen.queryByRole('listbox')).toBeNull()
+    })
+
+    it('reopens the panel when a letter is removed after Enter closed it', () => {
+        render(<SearchBar label="Rechercher un plan" options={options} />)
+        fireEvent.click(getInput())
+
+        type('chaufx')
+        fireEvent.submit(getInput())
+        expect(screen.queryByRole('listbox')).toBeNull()
+
+        type('chauf')
+
+        expect(
+            screen.getAllByRole('option').map((option) => option.textContent)
+        ).toEqual(['Chaufferie'])
+    })
+
     it('opens the suggestion panel when the field is reached with the keyboard', () => {
         render(<SearchBar label="Rechercher un plan" options={options} />)
 
