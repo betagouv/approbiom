@@ -15,11 +15,11 @@ import { useState } from 'react'
 import {
     getAppelAProjetOptions,
     getFilteredRows,
-    getLieuOptions,
     getResultCountLabel,
     getStatutOptions,
     type DemandeSubvention,
 } from '../utils'
+import { LIEU_OPTIONS } from '../data/lieuOptions'
 import Drawer from './Drawer'
 
 function buildColumns(
@@ -107,7 +107,6 @@ export default function Accueil({
     const columns = buildColumns(setOpenedPlan)
 
     const statutOptions = getStatutOptions(plansApprovisionnement)
-    const lieuOptions = getLieuOptions(plansApprovisionnement)
     const appelAProjetOptions = getAppelAProjetOptions(plansApprovisionnement)
 
     const displayedRows = getFilteredRows(plansApprovisionnement, {
@@ -165,11 +164,11 @@ export default function Accueil({
                     <div className="accueil__filter">
                         <MultiSelect
                             label="Lieu"
-                            options={lieuOptions}
+                            options={LIEU_OPTIONS}
                             selectedValues={lieux}
                             onSelectionChange={setLieux}
                             showSelectAll
-                            legend="Communes, par département"
+                            legend="Départements, par région"
                             hideLegend
                         />
                     </div>

@@ -4,10 +4,7 @@ import type {
     InstructionCrbAccueil,
     PlanDapprovisionnementAccueil,
 } from './grist'
-import type {
-    MultiSelectGroup,
-    MultiSelectOption,
-} from '@shared/components/MultiSelect'
+import type { MultiSelectOption } from '@shared/components/MultiSelect'
 
 export type PlanFilters = {
     nom?: string
@@ -23,6 +20,15 @@ function matchesSelection(
     return selection.length === 0 || selection.includes(value ?? '')
 }
 
+// « Poitiers (86) » — the code in brackets is the only département the document
+// stores, so it is what a selected département is matched against. Corsica is
+// written 2A/2B and the overseas départements on three digits, hence the alternative.
+const DEPARTEMENT = /\((2[AB]|\d{2,3})\)\s*$/
+
+function getDepartementCode(lieu: string | null): string {
+    return DEPARTEMENT.exec(lieu ?? '')?.[1] ?? ''
+}
+
 export function getFilteredRows(
     rows: readonly PlanDapprovisionnementAccueil[],
     { nom = '', statuts = [], appelsAProjet = [], lieux = [] }: PlanFilters = {}
@@ -34,7 +40,10 @@ export function getFilteredRows(
             (query === '' || (row.Nom ?? '').toLowerCase().includes(query)) &&
             matchesSelection(statuts, row.Statut) &&
             matchesSelection(appelsAProjet, row.Appel_a_projet) &&
-            matchesSelection(lieux, row.Departement_de_situation)
+            matchesSelection(
+                lieux,
+                getDepartementCode(row.Departement_de_situation)
+            )
     )
 }
 
@@ -195,37 +204,4 @@ export function getPhasesInstruction(
         .flatMap((demande) => demande.fils)
         .map((fil) => fil.phase)
         .filter((phase) => phase !== '')
-}
-
-// « Poitiers (86) » — what the communes are grouped by is the code in brackets.
-const DEPARTEMENT = /\((\d+)\)\s*$/
-
-export function getLieuOptions(
-    rows: readonly PlanDapprovisionnementAccueil[]
-): MultiSelectGroup<string>[] {
-    const byDepartement = new Map<string, MultiSelectOption<string>[]>()
-
-    for (const commune of distinct(
-        rows.map((row) => row.Departement_de_situation)
-    )) {
-        // A commune written some other way becomes a group of its own rather
-        // than being dropped: the filter still offers it, just ungrouped.
-        const code = DEPARTEMENT.exec(commune)?.[1] ?? commune
-
-        byDepartement.set(code, [
-            ...(byDepartement.get(code) ?? []),
-            { value: commune, label: commune },
-        ])
-    }
-
-    // Grouping is what makes a long list usable — ticking a group ticks all the
-    // communes of that département, which is how one filters by département
-    // without the document ever storing one.
-    return [...byDepartement]
-        .sort(([a], [b]) => a.localeCompare(b, 'fr', { numeric: true }))
-        .map(([code, options]) => ({
-            id: code,
-            label: DEPARTEMENT.test(`(${code})`) ? `Département ${code}` : code,
-            options,
-        }))
 }

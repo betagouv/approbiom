@@ -160,22 +160,55 @@ describe('getFilteredRows', () => {
     })
 
     describe('on lieux', () => {
-        it('keeps the rows situated in the selected commune', () => {
-            expect(getFilteredRows(plans, { lieux: ['Guéret (23)'] })).toEqual([
+        it('keeps the rows situated in the selected département', () => {
+            expect(getFilteredRows(plans, { lieux: ['23'] })).toEqual([belOrme])
+        })
+
+        it('keeps the rows of several départements, in order', () => {
+            expect(getFilteredRows(plans, { lieux: ['86', '23'] })).toEqual([
+                valFleuri,
                 belOrme,
+                plaineSud,
             ])
         })
 
-        it('keeps the rows of several communes, in order', () => {
-            expect(
-                getFilteredRows(plans, {
-                    lieux: ['Poitiers (86)', 'Guéret (23)'],
-                })
-            ).toEqual([valFleuri, belOrme, plaineSud])
+        it('returns nothing when no row is situated there', () => {
+            expect(getFilteredRows(plans, { lieux: ['64'] })).toEqual([])
         })
 
-        it('returns nothing when no row is situated there', () => {
-            expect(getFilteredRows(plans, { lieux: ['Lacq (64)'] })).toEqual([])
+        it('reads the overseas and Corsican codes too', () => {
+            const ajaccio = planWith({
+                id: 4,
+                Departement_de_situation: 'Ajaccio (2A)',
+            })
+            const cayenne = planWith({
+                id: 5,
+                Departement_de_situation: 'Cayenne (973)',
+            })
+
+            expect(
+                getFilteredRows([...plans, ajaccio, cayenne], {
+                    lieux: ['2A', '973'],
+                })
+            ).toEqual([ajaccio, cayenne])
+        })
+
+        describe('on a lieu carrying no département', () => {
+            const sansLieu = planWith({
+                id: 6,
+                Departement_de_situation: null,
+            })
+            const rows = [valFleuri, sansLieu]
+
+            it('keeps it while no département is selected', () => {
+                expect(getFilteredRows(rows, { lieux: [] })).toEqual(rows)
+            })
+
+            it('drops it as soon as one is', () => {
+                expect(getFilteredRows(rows, { lieux: ['86'] })).toEqual([
+                    valFleuri,
+                ])
+            })
         })
     })
 
