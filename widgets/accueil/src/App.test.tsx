@@ -10,10 +10,6 @@ vi.mock('@shared/hooks/useGrist', () => ({
 
 describe('App Widget Accueil', () => {
     it('displays Accueil when Grist data is ready', () => {
-        vi.mock('@/hooks/useGrist', () => ({
-            useGrist: vi.fn(),
-        }))
-
         const mockedUseGrist = vi.mocked(
             useGrist as (
                 spec: typeof ACCUEIL_SPEC

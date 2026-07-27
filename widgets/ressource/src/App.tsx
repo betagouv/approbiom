@@ -16,8 +16,8 @@ export default function App() {
                         data.Meta_Ressource,
                         (row) => row.id
                     )
-                    const fournisseurById = indexByKey(
-                        data.Fournisseur,
+                    const entrepriseById = indexByKey(
+                        data.Entreprise,
                         (row) => row.id
                     )
 
@@ -37,7 +37,7 @@ export default function App() {
                                 data.Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource
                             }
                             metaRessourceById={metaRessourceById}
-                            fournisseurById={fournisseurById}
+                            entrepriseById={entrepriseById}
                         />
                     )
                 }}

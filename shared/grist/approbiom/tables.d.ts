@@ -1,6 +1,6 @@
 /**
  * Auto-generated Grist type definitions
- * Generated: 2026-07-26T14:54:01.998Z
+ * Generated: 2026-07-27T11:45:40.824Z
  * Document ID: gimgk9U5dnfd
  */
 
@@ -210,7 +210,7 @@ export type Page_Tests = {
     A: string
 }
 
-export type Fournisseur = {
+export type Entreprise = {
     id: number // Implicit Grist rowId
     Siret: number | boolean | null
     Denomination: string
@@ -361,6 +361,7 @@ export type Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisi
         group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
         count: number | boolean | null // Formula
         Total_en_tMv_an_: number | boolean | null // Formula
+        Repartition: number | boolean | null // Formula
     }
 
 export type Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource =
@@ -371,6 +372,7 @@ export type Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource 
         group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
         count: number | boolean | null // Formula
         Total_en_tMv_an_: number | boolean | null // Formula
+        Repartition: number | boolean | null // Formula
     }
 
 export type Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource =
@@ -381,6 +383,7 @@ export type Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Resso
         group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
         count: number | boolean | null // Formula
         Total_en_tMv_an_: number | boolean | null // Formula
+        Repartition: number | boolean | null // Formula
     }
 
 export type Claire_fournisseur = {
