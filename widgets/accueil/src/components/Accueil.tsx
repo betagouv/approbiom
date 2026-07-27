@@ -16,7 +16,9 @@ import {
     getAppelAProjetOptions,
     getFilteredRows,
     getLieuOptions,
+    getResultCountLabel,
     getStatutOptions,
+    type DemandeSubvention,
 } from '../utils'
 import Drawer from './Drawer'
 
@@ -25,13 +27,27 @@ function buildColumns(
 ): readonly Column<PlanDapprovisionnementAccueil>[] {
     return [
         {
+            id: 'action',
+            header: 'Action',
+
+            render: (plan) => (
+                <button
+                    type="button"
+                    className="fr-btn fr-btn--secondary fr-btn--sm"
+                    onClick={() => onOpen(plan)}
+                >
+                    Voir le dossier
+                </button>
+            ),
+        },
+        {
             id: 'nom',
             header: 'Nom du dossier',
             render: (plan) => plan.Nom,
         },
         {
             id: 'departement-de-situation',
-            header: 'Département de situation',
+            header: 'Lieu installation',
             render: (plan) => plan.Departement_de_situation,
         },
         {
@@ -50,12 +66,6 @@ function buildColumns(
             render: (plan) => <TagUsage usage={plan.Usage_principal ?? ''} />,
         },
         {
-            id: 'mise-en-service',
-            header: 'Mise en service projet',
-
-            render: (plan) => plan.Mise_en_service_projet || '-',
-        },
-        {
             id: 'nature-donnee',
             header: 'Nature de la donnée',
             render: (plan) => <TagNature nature={plan.Nature_Donnee} />,
@@ -65,28 +75,21 @@ function buildColumns(
             header: 'Statut',
             render: (plan) => <TagStatut statut={plan.Statut} />,
         },
-        {
-            id: 'action',
-            header: 'Action',
-
-            render: (plan) => (
-                <button
-                    type="button"
-                    className="fr-btn fr-btn--secondary"
-                    onClick={() => onOpen(plan)}
-                >
-                    Voir le dossier
-                </button>
-            ),
-        },
     ]
 }
 
 export type AccueilProps = {
     plansApprovisionnement: readonly PlanDapprovisionnementAccueil[]
+    demandesSubventionByPlanId: ReadonlyMap<
+        number,
+        readonly DemandeSubvention[]
+    >
 }
 
-export default function Accueil({ plansApprovisionnement }: AccueilProps) {
+export default function Accueil({
+    plansApprovisionnement,
+    demandesSubventionByPlanId,
+}: AccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
     const [lieux, setLieux] = useState<string[]>([])
@@ -137,15 +140,19 @@ export default function Accueil({ plansApprovisionnement }: AccueilProps) {
                     </h1>
                 </header>
 
-                <SearchBar
-                    key={searchGeneration}
-                    label="Rechercher un dossier par nom"
-                    placeholder="Rechercher un dossier par nom"
-                    onSearch={setNom}
-                />
+                <div className="accueil__search">
+                    <SearchBar
+                        key={searchGeneration}
+                        label="Rechercher un dossier par nom"
+                        placeholder="Rechercher un dossier par nom"
+                        onSearch={setNom}
+                    />
+                    <p className="accueil__results" aria-live="polite">
+                        {getResultCountLabel(displayedRows.length)}
+                    </p>
+                </div>
 
                 <div className="accueil__filters">
-                    <p className="accueil__filters-label">Filtrer :</p>
                     <div className="accueil__filter">
                         <MultiSelect
                             label="Statut"
@@ -197,7 +204,13 @@ export default function Accueil({ plansApprovisionnement }: AccueilProps) {
             </div>
 
             {openedPlan && (
-                <Drawer plan={openedPlan} onClose={() => setOpenedPlan(null)} />
+                <Drawer
+                    plan={openedPlan}
+                    demandesSubvention={
+                        demandesSubventionByPlanId.get(openedPlan.id) ?? []
+                    }
+                    onClose={() => setOpenedPlan(null)}
+                />
             )}
         </>
     )

@@ -5,7 +5,10 @@ import type {
     Approvisionnement_summary_Plan_d_approvisionnement,
     Approvisionnement_summary_Plan_d_approvisionnement_Ressource,
     Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource,
+    Crb,
+    Demande_subvention,
     Fournisseur,
+    Instruction_crb,
     Meta_Ressource,
     Plan_d_approvisionnement,
 } from './tables'
@@ -19,6 +22,9 @@ type TableRowMap = {
     Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource: Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource
     Meta_Ressource: Meta_Ressource
     Fournisseur: Fournisseur
+    Demande_subvention: Demande_subvention
+    Instruction_crb: Instruction_crb
+    Crb: Crb
 }
 
 export type TableId = keyof TableRowMap

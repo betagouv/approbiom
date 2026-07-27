@@ -1,4 +1,9 @@
 import type { Plan_d_approvisionnement } from '@shared/grist/approbiom/tables'
+import type {
+    CrbAccueil,
+    DemandeSubventionAccueil,
+    InstructionCrbAccueil,
+} from '../grist'
 
 export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
     {
@@ -18,9 +23,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'RCU Les Grands Prés',
@@ -39,9 +46,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Scierie du Haut-Bois',
@@ -60,9 +69,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'RCU Rive-Verte',
@@ -81,9 +92,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Panneaux Bois du Causse',
@@ -102,9 +115,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Séchoir de la Vallée Claire',
@@ -123,9 +138,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Menuiseries de Fontaine-Ronde',
@@ -144,9 +161,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Verrerie de Beauregard',
@@ -165,9 +184,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Menuiseries de Fontaine-Ronde 2',
@@ -186,9 +207,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Scierie de Roche-Longue C',
@@ -207,9 +230,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Gélatines de Bel-Air',
@@ -228,9 +253,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Cartonnerie de Fontcombe',
@@ -249,9 +276,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Plâtrerie de Champlong',
@@ -270,9 +299,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Chaudière des Sablons',
@@ -291,9 +322,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Fromagerie du Val d’Ombre',
@@ -312,9 +345,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Papeterie du Moulin Blanc',
@@ -333,9 +368,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Scierie des Quatre Vents',
@@ -354,9 +391,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Granulés de Terre-Haute G',
@@ -375,9 +414,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Scierie de Roche-Longue G',
@@ -396,9 +437,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'RCU Les Grands Prés G',
@@ -417,9 +460,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'RCU Clair-Village',
@@ -438,9 +483,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'RCU Clair-Village',
@@ -459,9 +506,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Granulés de Terre-Haute C',
@@ -480,9 +529,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Chaudière des Sablons 2',
@@ -501,9 +552,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Scierie de Mi-Bois C',
@@ -522,9 +575,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Auvergne-Rhône-Alpes',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Sécherie des Landes Claires',
@@ -543,9 +598,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Contreplaqué de Bel-Orme C',
@@ -564,9 +621,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Contreplaqué de Bel-Orme TJ',
@@ -585,9 +644,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Contreplaqué de Bel-Orme 3C',
@@ -606,9 +667,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: '',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Papeterie d’Aube-Vive',
@@ -627,9 +690,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Bois Construction 2030',
@@ -648,9 +713,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Bioraffinerie de Plaine-Sud',
@@ -669,9 +736,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine, Occitanie',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Chaudière BM Laiterie du Pré',
@@ -690,9 +759,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Chaudière BM Stratifiés Ouest',
@@ -711,9 +782,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'oui',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Chaudière BM Emballages Sud',
@@ -732,9 +805,11 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
     {
         Nom: 'Chaudière BM Hygiène Atlantique',
@@ -753,8 +828,92 @@ export const FAKE_PLANS: readonly Plan_d_approvisionnement[] = [
         MES_Reel: null,
         Derniere_mise_a_jour: null,
         Commentaire: '',
-        deprecie_Synthese: '',
-        est_Filtre_Dans_Accueil: null,
-        Ouvrir_la_fiche: null,
+        Voir_la_fiche: '',
+        est_Laureat: 'non',
+        CRB_competentes: 'Nouvelle-Aquitaine',
+        demande_subvention: null,
+        Voir_les_ressources: '',
     },
 ]
+
+// The two tables below stand in for what the widget fetches, not for the whole
+// Grist tables: only the columns the join and the panel read are there.
+//
+// They are derived from the plans rather than written out row by row, so that a
+// plan which answered an appel à projet always has the demande de subvention it
+// would have in the document — a plan with a demande no one filed, or an
+// instruction hanging off nothing, would be fiction of the wrong kind.
+
+// Every plan answers an appel à projet, so a plan whose appel is empty is one
+// nobody finished filling in — and the rest of the chain is missing with it: no
+// demande, no instruction, no phase to show. Those plans are what the panel's
+// empty states are here to cover.
+export const FAKE_DEMANDES_SUBVENTION: readonly DemandeSubventionAccueil[] =
+    FAKE_PLANS.filter((plan) => plan.Appel_a_projet !== '').map((plan) => ({
+        id: plan.id,
+        Plan_d_approvisionnement: plan.id,
+    }))
+
+export const FAKE_CRB: readonly CrbAccueil[] = [
+    { id: 1, Nom: 'CRB Nouvelle-Aquitaine' },
+    { id: 2, Nom: 'CRB Occitanie' },
+]
+
+function jour(annee: number, mois: number, jourDuMois: number): number {
+    return Date.UTC(annee, mois - 1, jourDuMois) / 1000
+}
+
+const SAISINE_CRB = jour(2024, 3, 12)
+const AVIS_CRB = jour(2024, 5, 28)
+const AVIS_PREFET = jour(2024, 6, 14)
+
+const AVANCEMENT = {
+    'Saisine CRB à venir': {
+        Date_saisine_CRB: null,
+        Date_avis_CRB: null,
+        Date_avis_Prefet: null,
+    },
+    'Avis CRB en attente': {
+        Date_saisine_CRB: SAISINE_CRB,
+        Date_avis_CRB: null,
+        Date_avis_Prefet: null,
+    },
+    'Avis préfet en attente': {
+        Date_saisine_CRB: SAISINE_CRB,
+        Date_avis_CRB: AVIS_CRB,
+        Date_avis_Prefet: null,
+    },
+    'Instruction terminée': {
+        Date_saisine_CRB: SAISINE_CRB,
+        Date_avis_CRB: AVIS_CRB,
+        Date_avis_Prefet: AVIS_PREFET,
+    },
+}
+
+const PHASES = Object.keys(AVANCEMENT) as (keyof typeof AVANCEMENT)[]
+
+export const FAKE_INSTRUCTIONS_CRB: readonly InstructionCrbAccueil[] =
+    FAKE_DEMANDES_SUBVENTION.flatMap((demande, index) => [
+        {
+            // Two instructions can share a demande, so the ids are numbered
+            // apart from the demandes' own.
+            id: index * 2 + 1,
+            subvention: demande.id,
+            crb: 1,
+            Phase_de_l_instruction: PHASES[index % PHASES.length],
+            ...AVANCEMENT[PHASES[index % PHASES.length]],
+        },
+        // One demande in three is instructed by a second CRB, which is the case
+        // the panel shows as two fils under one chronologie.
+        ...(index % 3 === 0
+            ? [
+                  {
+                      id: index * 2 + 2,
+                      subvention: demande.id,
+                      crb: 2,
+                      Phase_de_l_instruction: 'Avis CRB en attente',
+                      ...AVANCEMENT['Avis CRB en attente'],
+                  },
+              ]
+            : []),
+    ])

@@ -24,18 +24,31 @@
     color: var(--text-title-blue-france);
 }
 
+/* The count sits beside the field rather than under it: it answers what was
+   just typed, and a line of its own would push the table further down. */
+.accueil__search {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+.accueil__search .shared-search-bar {
+    flex: 1;
+    min-width: 0;
+}
+
+.accueil__results {
+    margin: 0;
+    white-space: nowrap;
+    color: var(--text-mention-grey);
+}
+
 .accueil__filters {
     display: flex;
     flex-wrap: wrap;
 
     align-items: flex-end;
     gap: 1rem;
-}
-
-.accueil__filters-label {
-    margin: 0;
-
-    padding-bottom: 0.5rem;
 }
 
 .accueil__filter {

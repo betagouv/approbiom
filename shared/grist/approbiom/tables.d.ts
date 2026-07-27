@@ -1,6 +1,6 @@
 /**
  * Auto-generated Grist type definitions
- * Generated: 2026-07-23T07:47:01.147Z
+ * Generated: 2026-07-26T14:54:01.998Z
  * Document ID: gimgk9U5dnfd
  */
 
@@ -33,15 +33,17 @@ export type Plan_d_approvisionnement = {
     Statut: string
     Commentaire: string
     Derniere_mise_a_jour: number | boolean | null
-    deprecie_Synthese: string
     Nom: string | null // Formula
     Usage_principal: string | null // Formula
     Appel_a_projet: string | null // Formula
     Mise_en_service_projet: string | null // Formula
     Departement_de_situation: string | null // Formula
     Installation_Nom: string | null // Formula
-    Ouvrir_la_fiche: unknown // Formula
-    est_Filtre_Dans_Accueil: boolean | 1 | 0 | null // Formula
+    Voir_la_fiche: string
+    est_Laureat: string
+    CRB_competentes: string | null // Formula
+    demande_subvention: [GristObjCode.List, ...CellValue[]] | null // RefList -> Demande_subvention
+    Voir_les_ressources: string | null // Formula
 }
 
 export type Instruction = {
@@ -71,16 +73,6 @@ export type Prog_aides = {
     date_laureat: number | boolean | null
     date_rep_crb: number | boolean | null
     Appel_a_projet: unknown // Formula
-}
-
-export type Coeff_bois = {
-    id_coeff: number | boolean | null
-    essence: string
-    mass_vol_he: number | boolean | null
-    taux_ecorce_vsp2530: string
-    taux_ecorce_vsp3540: string
-    taux_ecorce_vsp_bm: string
-    taux_ecorce_vsp_gb: string
 }
 
 export type INSEE_Departement = {
@@ -288,7 +280,12 @@ export type Meta_Ressource = {
 }
 
 export type Type_d_installation = {
-    Nom: string
+    Type_installation: string
+    Type_de_Production: string
+    unite_production_annuelle: string
+    Puissance_thermique_utile_de_combustion: string
+    Libelle_produit: string
+    Usage_principal: string
 }
 
 export type Referentiel_des_pays_et_des_territoires = {
@@ -308,8 +305,9 @@ export type Referentiel_des_pays_et_des_territoires = {
     CODE_COG: number | boolean | null
 }
 
-export type Page_Documentation = {
-    Permissions_avancees: string
+export type Documentation = {
+    Contenu: string
+    titre: string
 }
 
 export type Test_unitaire = {
@@ -323,15 +321,14 @@ export type Test_unitaire = {
 
 export type Approvisionnement = {
     Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
-    Fournisseur: number | boolean // Ref -> Fournisseur
+    Fournisseur: number | boolean // Ref -> Entreprise
     Ressource: number | boolean // Ref -> Meta_Ressource
     Departement_de_provenance: number | boolean // Ref -> INSEE_Departement
     Total_en_tMv_an_: number | boolean | null
     Region: unknown // Formula
     Respect_contrainte_unicite: boolean | 1 | 0 | null // Formula
     Commentaire: string
-    Cree_le: number | boolean | null
-    Commentaire_Ressource: unknown // Formula
+    Derniere_mise_a_jour: number | boolean | null
 }
 
 export type Approvisionnement_summary_Plan_d_approvisionnement = {
@@ -339,7 +336,6 @@ export type Approvisionnement_summary_Plan_d_approvisionnement = {
     group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
     count: number | boolean | null // Formula
     Total_en_tMv_an_: number | boolean | null // Formula
-    Plan_d_approvisionnement_Installation: number | boolean | null // Formula
 }
 
 export type Approvisionnement_summary_Plan_d_approvisionnement_Ressource = {
@@ -365,7 +361,6 @@ export type Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisi
         group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
         count: number | boolean | null // Formula
         Total_en_tMv_an_: number | boolean | null // Formula
-        Plan_d_approvisionnement_Installation: number | boolean | null // Formula
     }
 
 export type Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource =
@@ -376,18 +371,16 @@ export type Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource 
         group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
         count: number | boolean | null // Formula
         Total_en_tMv_an_: number | boolean | null // Formula
-        Plan_d_approvisionnement_Installation: number | boolean | null // Formula
     }
 
 export type Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource =
     {
         Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
-        Fournisseur: number | boolean // Ref -> Fournisseur
+        Fournisseur: number | boolean // Ref -> Entreprise
         Ressource: number | boolean // Ref -> Meta_Ressource
         group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
         count: number | boolean | null // Formula
         Total_en_tMv_an_: number | boolean | null // Formula
-        Plan_d_approvisionnement_Installation: number | boolean | null // Formula
     }
 
 export type Claire_fournisseur = {
@@ -400,7 +393,7 @@ export type Claire_fournisseur = {
 
 export type Correspondance_Fournisseur = {
     Old_fournisseur: string
-    New_fournisseur: number | boolean // Ref -> Fournisseur
+    New_fournisseur: number | boolean // Ref -> Entreprise
     New_fournisseur_texte: string
 }
 
@@ -416,10 +409,58 @@ export type Page_Migration_de_donnees = {
     C: unknown // Formula
 }
 
-export type Parametres_Accueil = {
-    utlisateur: string
+export type Piece_jointe = {
+    Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
+    type: string
+    piece_jointe: [GristObjCode.List, ...CellValue[]] | null
+}
+
+export type Subvention = {
+    id_aides: number | boolean | null
+    id_prog_aides: number | boolean // Ref -> Prog_aides
+    date_avis_crb: number | boolean | null
+    avis_crb: string
+    laureat: string
+    commentaire: string
+    cout_total: number | boolean | null
+    subvention: number | boolean | null
+    date_sign_prefet: number | boolean | null
+    avis_prefet: string
+    audition_crb: number | boolean | null
+    date_cra: number | boolean | null
+    id_installation26: number | boolean | null
+    id_planappro: number | boolean // Ref -> Plan_d_approvisionnement
     Nom: string
-    Lieu: [GristObjCode.List, ...CellValue[]] | null // RefList -> Plan_d_approvisionnement
-    Statut: [GristObjCode.List, ...CellValue[]] | null // RefList -> Plan_d_approvisionnement
-    Appel_a_projet: [GristObjCode.List, ...CellValue[]] | null // RefList -> Plan_d_approvisionnement
+}
+
+export type Crb = {
+    id: number // Implicit Grist rowId
+    Nom: string
+    Region: number | boolean // Ref -> INSEE_Region
+}
+
+export type Instruction_crb = {
+    id: number // Implicit Grist rowId
+    crb: number | boolean // Ref -> Crb
+    subvention: number | boolean // Ref -> Demande_subvention
+    Plan_d_approvisionnement: unknown // Formula
+    Avis_CRB_Requis: boolean | 1 | 0 | null
+    Date_saisine_CRB: number | boolean | null
+    Date_avis_CRB: number | boolean | null
+    Avis_CRB: string
+    Date_avis_Prefet: number | boolean | null
+    Avis_Prefet: string
+    Avis_CRB_PJ: [GristObjCode.List, ...CellValue[]] | null
+    Fichier_recupere_de_la_prefecture:
+        [GristObjCode.List, ...CellValue[]] | null
+    Fiche_analyse_CRB: [GristObjCode.List, ...CellValue[]] | null
+    Phase_de_l_instruction: string | null // Formula
+}
+
+export type Demande_subvention = {
+    id: number // Implicit Grist rowId
+    id_demande_subvention: unknown // Formula
+    Programme_d_aide: number | boolean // Ref -> Prog_aides
+    Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
+    instruction_crb: [GristObjCode.List, ...CellValue[]] | null // RefList -> Instruction_crb
 }

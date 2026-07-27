@@ -75,7 +75,7 @@ export default function SearchBar<T>({
                 button means something: pressing Enter in the field and clicking
                 the button then arrive at the same handler, for free. */}
             <form
-                className="fr-search-bar fr-search-bar--lg"
+                className="fr-search-bar fr-search-bar--sm"
                 role="search"
                 onSubmit={(event) => {
                     // Nothing to post to — the search happens in the page.

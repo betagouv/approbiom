@@ -96,11 +96,7 @@ export default function DataTable<T>({
                                         // `scope="col"` ties every cell below
                                         // to this header when a screen reader
                                         // announces a row.
-                                        <th
-                                            className="fr-col--xs"
-                                            key={column.id}
-                                            scope="col"
-                                        >
+                                        <th key={column.id} scope="col">
                                             {column.header}
                                         </th>
                                     ))}

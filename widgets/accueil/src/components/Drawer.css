@@ -35,6 +35,13 @@
     margin-top: 1rem;
 }
 
+.drawer__tags {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-end;
+    gap: 0.5rem;
+}
+
 .drawer__pending {
     color: var(--text-mention-grey);
 }
@@ -67,4 +74,13 @@
 
 .drawer__panel h3 {
     margin-bottom: 1rem;
+}
+
+.drawer__fil + .drawer__fil {
+    margin-top: 2rem;
+}
+
+.drawer__fil-titre {
+    margin-bottom: 1rem;
+    color: var(--text-mention-grey);
 }
