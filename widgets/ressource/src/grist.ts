@@ -12,6 +12,7 @@ export const SPEC = {
         'Ressource',
         'Total_en_tMv_an_',
         'Departements_formattes',
+        'Repartition',
     ],
     Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource: [
         'Plan_d_approvisionnement',

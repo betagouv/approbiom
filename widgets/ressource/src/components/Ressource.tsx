@@ -114,6 +114,11 @@ export default function Ressource({
             header: 'Total (en tonnes de matière verte / an)',
             render: (r) => r.Total_en_tMv_an_ ?? '—',
         },
+        {
+            id: 'repartition',
+            header: 'Répartition',
+            render: (r) => repartitionLabel(r.Repartition),
+        },
     ]
 
     const fournisseurColumns: readonly Column<Fetched_Fournisseur>[] = [

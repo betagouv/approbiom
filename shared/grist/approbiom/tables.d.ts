@@ -1,6 +1,6 @@
 /**
  * Auto-generated Grist type definitions
- * Generated: 2026-07-28T12:43:01.732Z
+ * Generated: 2026-07-28T14:14:44.006Z
  * Document ID: gimgk9U5dnfd
  */
 
@@ -156,10 +156,12 @@ export type Centre_geographique_departements = {
 
 export type Parametres_Concurrence = {
     id: number // Grist native Id column
-    Ressource: number | boolean // Ref -> Meta_Ressource
+    Ressources: [GristObjCode.List, ...CellValue[]] | null // RefList -> Meta_Ressource
     Departement: [GristObjCode.List, ...CellValue[]] | null // RefList -> INSEE_Departement
     utilisateur: string
     Duplica_dans_utilisateur: boolean | 1 | 0 | null // Formula
+    Appel_a_projet: [GristObjCode.List, ...CellValue[]] | null // RefList -> Plan_d_approvisionnement
+    Fournisseurs: [GristObjCode.List, ...CellValue[]] | null // RefList -> Entreprise
 }
 
 export type Enumeration = {
@@ -357,14 +359,16 @@ export type Approvisionnement = {
     Respect_contrainte_unicite: boolean | 1 | 0 | null // Formula
     Commentaire: string
     Derniere_mise_a_jour: number | boolean | null
+    Plan_d_approvisionnement_Installation_Nom: string | null // Formula
+    Plan_d_approvisionnement_Installation: number | boolean | null // Formula, Ref -> Installation
 }
 
-export type Approvisionnement_summary_Plan_d_approvisionnement = {
+export type Demande_subvention = {
     id: number // Grist native Id column
+    id_demande_subvention: unknown // Formula
+    Programme_d_aide: number | boolean // Ref -> Prog_aides
     Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
-    group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
-    count: number | boolean | null // Formula
-    Total_en_tMv_an_: number | boolean | null // Formula
+    instruction_crb: [GristObjCode.List, ...CellValue[]] | null // RefList -> Instruction_crb
 }
 
 export type Approvisionnement_summary_Plan_d_approvisionnement_Ressource = {
@@ -381,6 +385,7 @@ export type Approvisionnement_summary_Plan_d_approvisionnement_Ressource = {
     estGarde: boolean | 1 | 0 | null // Formula
     Departement_de_situation: unknown // Formula
     Appel_a_projet: unknown // Formula
+    Repartition: number | boolean | null // Formula
 }
 
 export type Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource =
@@ -496,12 +501,4 @@ export type Instruction_crb = {
     Fichier_recupere_de_la_prefecture: Attachments
     Fiche_analyse_CRB: Attachments
     Phase_de_l_instruction: string | null // Formula
-}
-
-export type Demande_subvention = {
-    id: number // Grist native Id column
-    id_demande_subvention: unknown // Formula
-    Programme_d_aide: number | boolean // Ref -> Prog_aides
-    Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
-    instruction_crb: [GristObjCode.List, ...CellValue[]] | null // RefList -> Instruction_crb
 }

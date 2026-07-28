@@ -2,7 +2,6 @@ import { fetchRows } from '@shared/grist/api/client'
 import type {
     Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource,
     Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource,
-    Approvisionnement_summary_Plan_d_approvisionnement,
     Approvisionnement_summary_Plan_d_approvisionnement_Ressource,
     Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource,
     Crb,
@@ -16,7 +15,6 @@ import type {
 
 type TableRowMap = {
     Plan_d_approvisionnement: Plan_d_approvisionnement
-    Approvisionnement_summary_Plan_d_approvisionnement: Approvisionnement_summary_Plan_d_approvisionnement
     Approvisionnement_summary_Plan_d_approvisionnement_Ressource: Approvisionnement_summary_Plan_d_approvisionnement_Ressource
     Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource: Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource
     Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource: Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource
