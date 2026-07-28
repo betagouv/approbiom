@@ -42,6 +42,7 @@ export const SPEC = {
     // own name when the table was renamed.
     Meta_Ressource: ['id', 'Description_courte'],
     Entreprise: ['id', 'Denomination'],
+    INSEE_Departement: ['id', 'LIBELLE'],
 } as const satisfies TableSpec
 
 export type Fetched_Plan_d_approvisionnement = FetchedData<
@@ -69,3 +70,7 @@ export type Fetched_Meta_Ressource = FetchedData<
 >['Meta_Ressource'][number]
 
 export type Fetched_Entreprise = FetchedData<typeof SPEC>['Entreprise'][number]
+
+export type Fetched_INSEE_Departement = FetchedData<
+    typeof SPEC
+>['INSEE_Departement'][number]

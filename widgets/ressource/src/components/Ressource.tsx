@@ -10,6 +10,7 @@ import type {
     Fetched_Departement,
     Fetched_Meta_Ressource,
     Fetched_Entreprise,
+    Fetched_INSEE_Departement,
 } from '../grist'
 
 type RessourceProps = {
@@ -22,6 +23,7 @@ type RessourceProps = {
     // What a summary's `Fournisseur` column points at: the supplier's row in
     // `Entreprise`, keyed by rowId.
     entrepriseById: ReadonlyMap<number, Fetched_Entreprise>
+    departementById: ReadonlyMap<number, Fetched_INSEE_Departement>
 }
 
 const REPARTITION = new Intl.NumberFormat('fr-FR', {
@@ -58,24 +60,6 @@ const regionColumns: readonly Column<Fetched_Region>[] = [
     },
 ]
 
-const departementColumns: readonly Column<Fetched_Departement>[] = [
-    {
-        id: 'departement',
-        header: 'Département de provenance',
-        render: (r) => String(r.Departement_de_provenance),
-    },
-    {
-        id: 'total',
-        header: 'Total (en tonnes de matière verte / an)',
-        render: (r) => r.Total_en_tMv_an_ ?? '—',
-    },
-    {
-        id: 'repartition',
-        header: 'Répartition',
-        render: (r) => repartitionLabel(r.Repartition),
-    },
-]
-
 export default function Ressource({
     plans,
     ressources,
@@ -84,6 +68,7 @@ export default function Ressource({
     departements,
     metaRessourceById,
     entrepriseById,
+    departementById,
 }: RessourceProps) {
     const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null)
     const [selectedRessource, setSelectedRessource] =
@@ -103,12 +88,37 @@ export default function Ressource({
             typeof ref === 'number' ? entrepriseById.get(ref) : undefined
         return row?.Denomination ?? String(ref)
     }
+    // `LIBELLE` is the département's name as INSEE spells it — « Ain »,
+    // « Côte-d'Or ».
+    const departementLabel = (ref: number | boolean): string => {
+        const row =
+            typeof ref === 'number' ? departementById.get(ref) : undefined
+        return row?.LIBELLE ?? String(ref)
+    }
 
     const ressourceColumns: readonly Column<Fetched_Ressource>[] = [
         {
             id: 'ressource',
             header: 'Ressource',
             render: (r) => ressourceLabel(r.Ressource),
+        },
+        {
+            id: 'total',
+            header: 'Total (en tonnes de matière verte / an)',
+            render: (r) => r.Total_en_tMv_an_ ?? '—',
+        },
+        {
+            id: 'repartition',
+            header: 'Répartition',
+            render: (r) => repartitionLabel(r.Repartition),
+        },
+    ]
+
+    const departementColumns: readonly Column<Fetched_Departement>[] = [
+        {
+            id: 'departement',
+            header: 'Département de provenance',
+            render: (r) => departementLabel(r.Departement_de_provenance),
         },
         {
             id: 'total',

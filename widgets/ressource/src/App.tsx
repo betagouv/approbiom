@@ -20,6 +20,10 @@ export default function App() {
                         data.Entreprise,
                         (row) => row.id
                     )
+                    const departementById = indexByKey(
+                        data.INSEE_Departement,
+                        (row) => row.id
+                    )
 
                     return (
                         <Ressource
@@ -38,6 +42,7 @@ export default function App() {
                             }
                             metaRessourceById={metaRessourceById}
                             entrepriseById={entrepriseById}
+                            departementById={departementById}
                         />
                     )
                 }}

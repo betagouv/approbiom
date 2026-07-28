@@ -6,6 +6,7 @@ import type {
     Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource,
     Crb,
     Demande_subvention,
+    INSEE_Departement,
     Instruction_crb,
     Meta_Ressource,
     Plan_d_approvisionnement,
@@ -21,6 +22,7 @@ type TableRowMap = {
     Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource: Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource
     Meta_Ressource: Meta_Ressource
     Entreprise: Entreprise
+    INSEE_Departement: INSEE_Departement
     Demande_subvention: Demande_subvention
     Instruction_crb: Instruction_crb
     Crb: Crb
