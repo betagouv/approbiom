@@ -1,12 +1,15 @@
 /**
  * Auto-generated Grist type definitions
- * Generated: 2026-07-27T11:45:40.824Z
+ * Generated: 2026-07-28T12:43:01.732Z
  * Document ID: gimgk9U5dnfd
  */
 
-import type { GristObjCode, CellValue } from '../grist/types'
+import type { GristObjCode, CellValue } from '../grist/GristData'
+
+export type Attachments = [GristObjCode.List, ...number[]] | null
 
 export type Installation = {
+    id: number // Grist native Id column
     id_installation: number | boolean | null
     Nom: string
     Type: number | boolean // Ref -> Type_d_installation
@@ -23,7 +26,7 @@ export type Installation = {
 }
 
 export type Plan_d_approvisionnement = {
-    id: number // Implicit Grist rowId
+    id: number // Grist native Id column
     Installation: number | boolean // Ref -> Installation
     Mise_en_service_Projet_raw: number | boolean | null
     MES_Reel: number | boolean | null
@@ -47,6 +50,7 @@ export type Plan_d_approvisionnement = {
 }
 
 export type Instruction = {
+    id: number // Grist native Id column
     id_instruction: number | boolean | null
     prog_aides: number | boolean // Ref -> Prog_aides
     date_avis_crb: number | boolean | null
@@ -62,6 +66,7 @@ export type Instruction = {
 }
 
 export type Prog_aides = {
+    id: number // Grist native Id column
     id_prog_aides: number | boolean | null
     Annee: number | boolean | null
     Nom_raccourci: string
@@ -76,6 +81,7 @@ export type Prog_aides = {
 }
 
 export type INSEE_Departement = {
+    id: number // Grist native Id column
     DEP: string
     REG: number | boolean // Ref -> INSEE_Region
     CHEFLIEU: string
@@ -88,6 +94,7 @@ export type INSEE_Departement = {
 }
 
 export type INSEE_Region = {
+    id: number // Grist native Id column
     REG: string
     CHEFLIEU: string
     TNCC: string
@@ -98,20 +105,24 @@ export type INSEE_Region = {
 }
 
 export type Donnees_INSEE = {
+    id: number // Grist native Id column
     A: string
 }
 
 export type Page_Espace_de_travail_CRB = {
+    id: number // Grist native Id column
     A: string
     Lien_de_la_page: string
     Page: string
 }
 
 export type Page_Donnees_Sources = {
+    id: number // Grist native Id column
     A: string
 }
 
 export type INSEE_Commune = {
+    id: number // Grist native Id column
     TYPECOM: string
     COM: string
     REG: string
@@ -127,10 +138,12 @@ export type INSEE_Commune = {
 }
 
 export type Usage_Principal = {
+    id: number // Grist native Id column
     Libelle: string
 }
 
 export type Centre_geographique_departements = {
+    id: number // Grist native Id column
     A: number | boolean // Ref -> INSEE_Departement
     B: string
     C: number | boolean | null
@@ -142,6 +155,7 @@ export type Centre_geographique_departements = {
 }
 
 export type Parametres_Concurrence = {
+    id: number // Grist native Id column
     Ressource: number | boolean // Ref -> Meta_Ressource
     Departement: [GristObjCode.List, ...CellValue[]] | null // RefList -> INSEE_Departement
     utilisateur: string
@@ -149,15 +163,18 @@ export type Parametres_Concurrence = {
 }
 
 export type Enumeration = {
+    id: number // Grist native Id column
     A: string
 }
 
 export type Test_NR_Resultat = {
+    id: number // Grist native Id column
     Plan_d_appro: string | null // Formula
     installations: unknown // Formula
 }
 
 export type Test_plansappro = {
+    id: number // Grist native Id column
     id_installation26: number | boolean | null
     mes_projet: number | boolean | null
     mes_reel: number | boolean | null
@@ -169,11 +186,13 @@ export type Test_plansappro = {
 }
 
 export type Usage = {
+    id: number // Grist native Id column
     Libelle: string
     Usage_principal: number | boolean // Ref -> Usage_Principal
 }
 
 export type Test_provenance = {
+    id: number // Grist native Id column
     id_ressource: number | boolean // Ref -> Test_ressource
     reg: number | boolean | null
     tonnage_reg_an_mv: number | boolean | null
@@ -201,17 +220,19 @@ export type Test_provenance = {
 }
 
 export type Tables_Claires = {
+    id: number // Grist native Id column
     A: string
     B: unknown // Formula
     C: unknown // Formula
 }
 
 export type Page_Tests = {
+    id: number // Grist native Id column
     A: string
 }
 
 export type Entreprise = {
-    id: number // Implicit Grist rowId
+    id: number // Grist native Id column
     Siret: number | boolean | null
     Denomination: string
     Code_NAF: string
@@ -219,6 +240,7 @@ export type Entreprise = {
 }
 
 export type Test_ressource = {
+    id: number // Grist native Id column
     id_ressource: number | boolean | null
     id_installation: number | boolean | null
     tonnage_an_mv: number | boolean | null
@@ -250,6 +272,7 @@ export type Test_ressource = {
 }
 
 export type Test_installations = {
+    id: number // Grist native Id column
     id_installation: number | boolean | null
     nom_installation: string
     type_installation: string
@@ -264,7 +287,7 @@ export type Test_installations = {
 }
 
 export type Meta_Ressource = {
-    id: number // Implicit Grist rowId
+    id: number // Grist native Id column
     id_meta_r: number | boolean | null
     Famille_ressource: string
     Code_ressource_Approbiom: string
@@ -280,6 +303,7 @@ export type Meta_Ressource = {
 }
 
 export type Type_d_installation = {
+    id: number // Grist native Id column
     Type_installation: string
     Type_de_Production: string
     unite_production_annuelle: string
@@ -289,6 +313,7 @@ export type Type_d_installation = {
 }
 
 export type Referentiel_des_pays_et_des_territoires = {
+    id: number // Grist native Id column
     ID2: string
     NOM_ALPHA: string
     NOM_COURT: string
@@ -306,11 +331,13 @@ export type Referentiel_des_pays_et_des_territoires = {
 }
 
 export type Documentation = {
+    id: number // Grist native Id column
     Contenu: string
     titre: string
 }
 
 export type Test_unitaire = {
+    id: number // Grist native Id column
     Plan_d_appro: number | boolean // Ref -> Plan_d_approvisionnement
     Tonnage_total_theorique: number | boolean | null
     Tonnage_retenu_theorique: number | boolean | null
@@ -320,6 +347,7 @@ export type Test_unitaire = {
 }
 
 export type Approvisionnement = {
+    id: number // Grist native Id column
     Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
     Fournisseur: number | boolean // Ref -> Entreprise
     Ressource: number | boolean // Ref -> Meta_Ressource
@@ -332,6 +360,7 @@ export type Approvisionnement = {
 }
 
 export type Approvisionnement_summary_Plan_d_approvisionnement = {
+    id: number // Grist native Id column
     Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
     group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
     count: number | boolean | null // Formula
@@ -339,6 +368,7 @@ export type Approvisionnement_summary_Plan_d_approvisionnement = {
 }
 
 export type Approvisionnement_summary_Plan_d_approvisionnement_Ressource = {
+    id: number // Grist native Id column
     Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
     Ressource: number | boolean // Ref -> Meta_Ressource
     group: [GristObjCode.List, ...CellValue[]] | null // Formula, RefList -> Approvisionnement
@@ -355,6 +385,7 @@ export type Approvisionnement_summary_Plan_d_approvisionnement_Ressource = {
 
 export type Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource =
     {
+        id: number // Grist native Id column
         Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
         Ressource: number | boolean // Ref -> Meta_Ressource
         Departement_de_provenance: number | boolean // Ref -> INSEE_Departement
@@ -366,6 +397,7 @@ export type Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisi
 
 export type Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource =
     {
+        id: number // Grist native Id column
         Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
         Ressource: number | boolean // Ref -> Meta_Ressource
         Region: unknown
@@ -377,6 +409,7 @@ export type Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource 
 
 export type Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource =
     {
+        id: number // Grist native Id column
         Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
         Fournisseur: number | boolean // Ref -> Entreprise
         Ressource: number | boolean // Ref -> Meta_Ressource
@@ -387,6 +420,7 @@ export type Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Resso
     }
 
 export type Claire_fournisseur = {
+    id: number // Grist native Id column
     id_fournisseur: number | boolean | null
     nom_fournisseur: string
     tonnage_an_mv: number | boolean | null
@@ -395,30 +429,35 @@ export type Claire_fournisseur = {
 }
 
 export type Correspondance_Fournisseur = {
+    id: number // Grist native Id column
     Old_fournisseur: string
     New_fournisseur: number | boolean // Ref -> Entreprise
     New_fournisseur_texte: string
 }
 
 export type Correspondance_Libelle_Ressource = {
+    id: number // Grist native Id column
     Old_libelle_ressource: string
     New_libelle_ressource: number | boolean // Ref -> Meta_Ressource
     New_libelle_ressource_Code_ressource_Approbiom: string | null // Formula
 }
 
 export type Page_Migration_de_donnees = {
+    id: number // Grist native Id column
     A: unknown // Formula
     B: unknown // Formula
     C: unknown // Formula
 }
 
 export type Piece_jointe = {
+    id: number // Grist native Id column
     Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
     type: string
-    piece_jointe: [GristObjCode.List, ...CellValue[]] | null
+    piece_jointe: Attachments
 }
 
 export type Subvention = {
+    id: number // Grist native Id column
     id_aides: number | boolean | null
     id_prog_aides: number | boolean // Ref -> Prog_aides
     date_avis_crb: number | boolean | null
@@ -437,13 +476,13 @@ export type Subvention = {
 }
 
 export type Crb = {
-    id: number // Implicit Grist rowId
+    id: number // Grist native Id column
     Nom: string
     Region: number | boolean // Ref -> INSEE_Region
 }
 
 export type Instruction_crb = {
-    id: number // Implicit Grist rowId
+    id: number // Grist native Id column
     crb: number | boolean // Ref -> Crb
     subvention: number | boolean // Ref -> Demande_subvention
     Plan_d_approvisionnement: unknown // Formula
@@ -453,15 +492,14 @@ export type Instruction_crb = {
     Avis_CRB: string
     Date_avis_Prefet: number | boolean | null
     Avis_Prefet: string
-    Avis_CRB_PJ: [GristObjCode.List, ...CellValue[]] | null
-    Fichier_recupere_de_la_prefecture:
-        [GristObjCode.List, ...CellValue[]] | null
-    Fiche_analyse_CRB: [GristObjCode.List, ...CellValue[]] | null
+    Avis_CRB_PJ: Attachments
+    Fichier_recupere_de_la_prefecture: Attachments
+    Fiche_analyse_CRB: Attachments
     Phase_de_l_instruction: string | null // Formula
 }
 
 export type Demande_subvention = {
-    id: number // Implicit Grist rowId
+    id: number // Grist native Id column
     id_demande_subvention: unknown // Formula
     Programme_d_aide: number | boolean // Ref -> Prog_aides
     Plan_d_approvisionnement: number | boolean // Ref -> Plan_d_approvisionnement
