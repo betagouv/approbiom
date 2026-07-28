@@ -3,17 +3,19 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 import './Drawer.css'
 import Tag from '@shared/components/Tag'
 
-import type { PlanDapprovisionnementAccueil } from '../grist'
+import type {
+    PieceJointeAccueil,
+    PlanDapprovisionnementAccueil,
+} from '../../grist'
 import {
     asDate,
     getPhasesInstruction,
     isLaureat,
     type DemandeSubvention,
-} from '../utils'
+} from '../../utils'
 import { useEffect, useId, useRef } from 'react'
 import CardChronologie from './CardChronologie'
-
-const A_VENIR = 'À venir'
+import CardPiecesJointes from './CardPiecesJointes'
 
 const FIL_NON_DEFINI = 'Fil d’instruction non renseigné'
 
@@ -22,12 +24,14 @@ const CRB_NON_RENSEIGNEE = 'CRB non renseignée'
 export type DrawerProps = {
     plan: PlanDapprovisionnementAccueil
     demandesSubvention: readonly DemandeSubvention[]
+    piecesJointes: readonly PieceJointeAccueil[]
     onClose: () => void
 }
 
 export default function Drawer({
     plan,
     demandesSubvention,
+    piecesJointes,
     onClose,
 }: DrawerProps) {
     const phasesInstruction = getPhasesInstruction(demandesSubvention)
@@ -111,6 +115,8 @@ export default function Drawer({
                     </div>
                 </dl>
 
+                <CardPiecesJointes piecesJointes={piecesJointes} />
+
                 {demandesSubvention.map((demande) => (
                     <section
                         key={demande.id}
@@ -159,32 +165,6 @@ export default function Drawer({
                         </p>
                     </section>
                 )}
-
-                <section className="drawer__panel fr-p-3w fr-mb-3w">
-                    <h3 className="fr-text--md">Pièces du dossier</h3>
-                    <p className="drawer__pending fr-mb-3w">{A_VENIR}</p>
-
-                    <ul className="fr-btns-group fr-btns-group--inline-md">
-                        <li>
-                            <button
-                                type="button"
-                                className="fr-btn fr-btn--secondary"
-                                disabled
-                            >
-                                Voir le dossier complet
-                            </button>
-                        </li>
-                        <li>
-                            <button
-                                type="button"
-                                className="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-download-line"
-                                disabled
-                            >
-                                Télécharger le dossier complet
-                            </button>
-                        </li>
-                    </ul>
-                </section>
             </section>
         </>
     )

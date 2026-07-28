@@ -23,6 +23,7 @@ describe('App Widget Accueil', () => {
                 Demande_subvention: [],
                 Instruction_crb: [],
                 Crb: [],
+                Piece_jointe: [],
             },
             error: null,
             accessLevel: 'full',

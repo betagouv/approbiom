@@ -10,7 +10,10 @@ import TagNature from './TagNature'
 import TagStatut from './TagStatut'
 import TagType from './TagType'
 import TagUsage from './TagUsage'
-import type { PlanDapprovisionnementAccueil } from '../grist'
+import type {
+    PieceJointeAccueil,
+    PlanDapprovisionnementAccueil,
+} from '../grist'
 import { useState } from 'react'
 import {
     getAppelAProjetOptions,
@@ -84,11 +87,13 @@ export type AccueilProps = {
         number,
         readonly DemandeSubvention[]
     >
+    piecesJointesByPlanId: ReadonlyMap<number, readonly PieceJointeAccueil[]>
 }
 
 export default function Accueil({
     plansApprovisionnement,
     demandesSubventionByPlanId,
+    piecesJointesByPlanId,
 }: AccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
@@ -207,6 +212,9 @@ export default function Accueil({
                     plan={openedPlan}
                     demandesSubvention={
                         demandesSubventionByPlanId.get(openedPlan.id) ?? []
+                    }
+                    piecesJointes={
+                        piecesJointesByPlanId.get(openedPlan.id) ?? []
                     }
                     onClose={() => setOpenedPlan(null)}
                 />

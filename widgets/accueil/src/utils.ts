@@ -2,6 +2,7 @@ import type {
     CrbAccueil,
     DemandeSubventionAccueil,
     InstructionCrbAccueil,
+    PieceJointeAccueil,
     PlanDapprovisionnementAccueil,
 } from './grist'
 import type { MultiSelectOption } from '@shared/components/MultiSelect'
@@ -195,6 +196,33 @@ export function getDemandesSubventionByPlanId(
     }
 
     return demandesByPlanId
+}
+
+export function getPiecesJointesByPlanId(
+    piecesJointes: readonly PieceJointeAccueil[]
+): Map<number, PieceJointeAccueil[]> {
+    const piecesByPlanId = new Map<number, PieceJointeAccueil[]>()
+
+    for (const piece of piecesJointes) {
+        const planId = asRowId(piece.Plan_d_approvisionnement)
+
+        if (planId === null) continue
+
+        piecesByPlanId.set(planId, [
+            ...(piecesByPlanId.get(planId) ?? []),
+            piece,
+        ])
+    }
+
+    return piecesByPlanId
+}
+
+export function getAttachmentIds(
+    cell: PieceJointeAccueil['piece_jointe']
+): number[] {
+    return cell === null
+        ? []
+        : cell.filter((value): value is number => typeof value === 'number')
 }
 
 export function getPhasesInstruction(

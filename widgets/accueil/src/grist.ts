@@ -29,6 +29,7 @@ export const ACCUEIL_SPEC = {
         'Date_avis_Prefet',
     ],
     Crb: ['id', 'Nom'],
+    Piece_jointe: ['id', 'Plan_d_approvisionnement', 'type', 'piece_jointe'],
 } as const satisfies TableSpec
 
 export type PlanDapprovisionnementAccueil = FetchedData<
@@ -44,3 +45,7 @@ export type InstructionCrbAccueil = FetchedData<
 >['Instruction_crb'][number]
 
 export type CrbAccueil = FetchedData<typeof ACCUEIL_SPEC>['Crb'][number]
+
+export type PieceJointeAccueil = FetchedData<
+    typeof ACCUEIL_SPEC
+>['Piece_jointe'][number]

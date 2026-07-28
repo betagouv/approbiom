@@ -29,6 +29,17 @@ export function toRows(columns: ColumnMajorTable): Record<string, unknown>[] {
     )
 }
 
+export type AttachmentUrlBuilder = (attachmentId: number) => string
+
+export async function getAttachmentUrlBuilder(): Promise<AttachmentUrlBuilder> {
+    const { baseUrl, token } = await grist.docApi.getAccessToken({
+        readOnly: true,
+    })
+
+    return (attachmentId) =>
+        `${baseUrl}/attachments/${attachmentId}/download?auth=${encodeURIComponent(token)}`
+}
+
 /**
  * Fetches a Grist table and returns it row by row, keeping only the requested
  * columns.

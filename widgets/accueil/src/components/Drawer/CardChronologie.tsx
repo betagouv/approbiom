@@ -1,6 +1,6 @@
 import '@gouvfr/dsfr/dist/component/badge/badge.main.min.css'
 import './CardChronologie.css'
-import { formatDate, getDerniereEtapeFaite } from '../utils'
+import { formatDate, getDerniereEtapeFaite } from '../../utils'
 
 export type Etape = {
     label: string
