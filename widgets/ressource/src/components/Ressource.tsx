@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import SearchBar from '@shared/components/SearchBar'
 import DataTable, { type Column } from '@shared/components/DataTable'
+import './Ressource.css'
 import type {
     Fetched_Plan_d_approvisionnement,
     Fetched_Ressource,
@@ -207,7 +208,7 @@ export default function Ressource({
                             `Sélectionner la ressource ${ressourceLabel(row.Ressource)}`
                         }
                     />
-                    <p>
+                    <p className="ressource__total fr-mt-1w">
                         <strong>
                             Total : {ressourceTotal.toLocaleString('fr-FR')}{' '}
                             tonnes de matières vertes / an
