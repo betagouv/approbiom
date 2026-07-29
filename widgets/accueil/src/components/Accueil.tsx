@@ -88,12 +88,14 @@ export type AccueilProps = {
         readonly DemandeSubvention[]
     >
     piecesJointesByPlanId: ReadonlyMap<number, readonly PieceJointeAccueil[]>
+    onRefetchPlan: () => Promise<void>
 }
 
 export default function Accueil({
     plansApprovisionnement,
     demandesSubventionByPlanId,
     piecesJointesByPlanId,
+    onRefetchPlan,
 }: AccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
@@ -106,10 +108,12 @@ export default function Accueil({
     // giving SearchBar a controlled value.
     const [searchGeneration, setSearchGeneration] = useState(0)
 
-    const [openedPlan, setOpenedPlan] =
-        useState<PlanDapprovisionnementAccueil | null>(null)
+    const [openedPlanId, setOpenedPlanId] = useState<number | null>(null)
 
-    const columns = buildColumns(setOpenedPlan)
+    const openedPlan =
+        plansApprovisionnement.find((plan) => plan.id === openedPlanId) ?? null
+
+    const columns = buildColumns((plan) => setOpenedPlanId(plan.id))
 
     const statutOptions = getStatutOptions(plansApprovisionnement)
     const appelAProjetOptions = getAppelAProjetOptions(plansApprovisionnement)
@@ -216,7 +220,8 @@ export default function Accueil({
                     piecesJointes={
                         piecesJointesByPlanId.get(openedPlan.id) ?? []
                     }
-                    onClose={() => setOpenedPlan(null)}
+                    onRefetchPlan={onRefetchPlan}
+                    onClose={() => setOpenedPlanId(null)}
                 />
             )}
         </>

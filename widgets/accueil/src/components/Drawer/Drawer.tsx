@@ -16,6 +16,7 @@ import {
 import { useEffect, useId, useRef } from 'react'
 import CardChronologie from './CardChronologie'
 import CardPiecesJointes from './CardPiecesJointes'
+import SelectStatut from './SelectStatut'
 
 const FIL_NON_DEFINI = 'Fil d’instruction non renseigné'
 
@@ -25,6 +26,7 @@ export type DrawerProps = {
     plan: PlanDapprovisionnementAccueil
     demandesSubvention: readonly DemandeSubvention[]
     piecesJointes: readonly PieceJointeAccueil[]
+    onRefetchPlan: () => Promise<void>
     onClose: () => void
 }
 
@@ -32,6 +34,7 @@ export default function Drawer({
     plan,
     demandesSubvention,
     piecesJointes,
+    onRefetchPlan,
     onClose,
 }: DrawerProps) {
     const phasesInstruction = getPhasesInstruction(demandesSubvention)
@@ -114,6 +117,14 @@ export default function Drawer({
                         </dd>
                     </div>
                 </dl>
+
+                <section className="drawer__panel fr-p-3w fr-mb-3w">
+                    <SelectStatut
+                        planId={plan.id}
+                        statut={plan.Statut}
+                        onRefetchPlan={onRefetchPlan}
+                    />
+                </section>
 
                 <CardPiecesJointes piecesJointes={piecesJointes} />
 

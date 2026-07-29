@@ -26,6 +26,7 @@ describe('GristGate', () => {
             error: null,
             accessLevel: null,
             refetch: vi.fn(),
+            refetchTable: vi.fn(),
         })
 
         expect(
@@ -40,6 +41,7 @@ describe('GristGate', () => {
             error: null,
             accessLevel: null,
             refetch: vi.fn(),
+            refetchTable: vi.fn(),
         })
 
         expect(
@@ -55,6 +57,7 @@ describe('GristGate', () => {
                 error: null,
                 accessLevel: null,
                 refetch: vi.fn(),
+                refetchTable: vi.fn(),
             },
             { fakeData: { items: ['x', 'y'] } }
         )
@@ -72,6 +75,7 @@ describe('GristGate', () => {
             error: null,
             accessLevel: 'read table',
             refetch: vi.fn(),
+            refetchTable: vi.fn(),
         })
 
         expect(
@@ -86,6 +90,7 @@ describe('GristGate', () => {
             error: null,
             accessLevel: 'full',
             refetch: vi.fn(),
+            refetchTable: vi.fn(),
         })
 
         expect(
@@ -101,6 +106,7 @@ describe('GristGate', () => {
             error: new Error('boom'),
             accessLevel: 'full',
             refetch,
+            refetchTable: vi.fn(),
         })
 
         expect(
@@ -120,6 +126,7 @@ describe('GristGate', () => {
             error: null,
             accessLevel: 'full',
             refetch: vi.fn(),
+            refetchTable: vi.fn(),
         })
 
         expect(screen.getByText('Chargé : a, b')).toBeDefined()

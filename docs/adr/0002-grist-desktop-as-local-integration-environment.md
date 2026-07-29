@@ -43,3 +43,4 @@ deployed instance — is not covered by this environment and is still only
 exercised later, in the staging Grist document.
 
 The environment also differs from a standard browser environment, so browser-specific behavior should still be verified separately.
+For instance, it misses Grist native custom widgets.

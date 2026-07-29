@@ -1,8 +1,10 @@
 import {
     getApprobiomTables,
     type FetchedData,
+    type TableId,
     type TableSpec,
 } from '@shared/grist/approbiom/getApprobiomTables'
+import { fetchRows } from '@shared/grist/api/client'
 import { useState, useCallback, useEffect, useRef } from 'react'
 
 const REQUIRED_ACCESS_FULL_LEVEL = 'full'
@@ -19,7 +21,10 @@ type GristState<D> =
     | { status: 'error'; data: null; error: Error; accessLevel: string | null }
     | { status: 'ready'; data: D; error: null; accessLevel: string }
 
-export type UseGristResult<D> = GristState<D> & { refetch: () => void }
+export type UseGristResult<D> = GristState<D> & {
+    refetch: () => void
+    refetchTable: (tableId: TableId) => Promise<void>
+}
 
 export function useGrist<const S extends TableSpec>(
     spec: S
@@ -48,6 +53,41 @@ export function useGrist<const S extends TableSpec>(
     const specRef = useRef(spec)
     specRef.current = spec
     const specKey = JSON.stringify(spec)
+
+    // Same reason as `specRef`: `refetchTable` is created once, so it reads the
+    // state it has to patch through a ref rather than through a stale closure.
+    const stateRef = useRef(state)
+    stateRef.current = state
+
+    /**
+     * Re-reads one table and swaps it into the cached data, leaving the others
+     * untouched. Unlike `refetch`, the status stays `ready` throughout, so the
+     * tree is never unmounted and whatever the user had open stays open.
+     *
+     * Call it after writing to the document: the write may recompute formula
+     * columns, so reading the row back is the only way to display what Grist
+     * actually stored. Tables absent from the spec are ignored — they have no
+     * entry to patch, and inventing one would break `FetchedData`.
+     */
+    const refetchTable = useCallback(async (tableId: TableId) => {
+        const current = stateRef.current
+        if (current.status !== 'ready' || !(tableId in current.data)) return
+
+        const currentSpec: TableSpec = specRef.current
+        const rows = await fetchRows(tableId, currentSpec[tableId])
+
+        setState((prev) =>
+            prev.status !== 'ready'
+                ? prev
+                : {
+                      ...prev,
+                      data: {
+                          ...prev.data,
+                          [tableId]: rows,
+                      } as unknown as Data,
+                  }
+        )
+    }, [])
 
     // Connection to Grist
     useEffect(() => {
@@ -124,5 +164,6 @@ export function useGrist<const S extends TableSpec>(
     return {
         ...state,
         refetch,
+        refetchTable,
     }
 }

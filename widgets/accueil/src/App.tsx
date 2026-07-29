@@ -31,6 +31,9 @@ export default function App() {
                 {(data) => (
                     <Accueil
                         plansApprovisionnement={data.Plan_d_approvisionnement}
+                        onRefetchPlan={() =>
+                            gristState.refetchTable('Plan_d_approvisionnement')
+                        }
                         demandesSubventionByPlanId={getDemandesSubventionByPlanId(
                             data.Demande_subvention,
                             data.Instruction_crb,

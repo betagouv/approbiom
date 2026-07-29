@@ -28,6 +28,7 @@ describe('App Widget Accueil', () => {
             error: null,
             accessLevel: 'full',
             refetch: vi.fn(),
+            refetchTable: vi.fn(),
         })
 
         render(<App />)
@@ -47,6 +48,7 @@ describe('App Widget Accueil', () => {
             error: null,
             accessLevel: null,
             refetch: () => '',
+            refetchTable: async () => Promise.resolve(),
         })
 
         render(<App />)
@@ -63,6 +65,7 @@ describe('App Widget Accueil', () => {
             error: null,
             accessLevel: null,
             refetch: () => '',
+            refetchTable: async () => Promise.resolve(),
         })
 
         render(<App />)
@@ -79,6 +82,7 @@ describe('App Widget Accueil', () => {
             error: null,
             accessLevel: 'full',
             refetch: () => '',
+            refetchTable: async () => Promise.resolve(),
         })
 
         render(<App />)
@@ -95,6 +99,7 @@ describe('App Widget Accueil', () => {
             error: null,
             accessLevel: 'full',
             refetch: () => '',
+            refetchTable: async () => Promise.resolve(),
         })
 
         render(<App />)
@@ -113,6 +118,7 @@ describe('App Widget Accueil', () => {
             error: { message: 'There was an error', name: 'Grist API Error' },
             accessLevel: 'full',
             refetch: vi.fn(),
+            refetchTable: async () => Promise.resolve(),
         })
 
         render(<App />)
