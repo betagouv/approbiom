@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    within,
+} from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import DataTable from './DataTable'
 
@@ -170,5 +176,158 @@ describe('DataTable', () => {
         fireEvent.click(getCheckbox('Tout sélectionner'))
 
         expect(onSelectionChange).toHaveBeenCalledWith([])
+    })
+
+    describe('sorting', () => {
+        type Ressource = { nom: string; tonnage: number }
+
+        // Deliberately awkward values. Alphabetically, "Écorces" only lands
+        // between "Broyat" and "Plaquettes" under French collation — by code
+        // point "É" sorts after "P". And 9 / 10 / 100 only come out in that
+        // order numerically; as text they read 10, 100, 9.
+        const ressources: Ressource[] = [
+            { nom: 'Plaquettes', tonnage: 10 },
+            { nom: 'Broyat', tonnage: 100 },
+            { nom: 'Écorces', tonnage: 9 },
+        ]
+
+        const sortableColumns = [
+            {
+                id: 'nom',
+                header: 'Nom',
+                render: (ressource: Ressource) => ressource.nom,
+                sortBy: (ressource: Ressource) => ressource.nom,
+            },
+            {
+                id: 'tonnage',
+                header: 'Tonnage',
+                // Rendered as text, sorted on the number behind it — the whole
+                // reason `sortBy` exists separately from `render`.
+                render: (ressource: Ressource) => `${ressource.tonnage} t`,
+                sortBy: (ressource: Ressource) => ressource.tonnage,
+            },
+        ]
+
+        const renderTable = () =>
+            render(
+                <DataTable
+                    caption="Ressources"
+                    rows={ressources}
+                    columns={sortableColumns}
+                />
+            )
+
+        // Scoped to its own header rather than picked out of a flat list of
+        // buttons: every sort button is named "Trier", so only the column it
+        // sits in tells them apart.
+        const headerFor = (name: string) =>
+            screen.getByRole('columnheader', { name: new RegExp(name) })
+
+        const sortButtonFor = (name: string) =>
+            within(headerFor(name)).getByRole('button')
+
+        const columnValues = (index: number) =>
+            screen
+                .getAllByRole('row')
+                // Drops the header row, leaving the body in display order.
+                .slice(1)
+                .map((row) => row.querySelectorAll('td')[index].textContent)
+
+        it('renders no sort button on a column that did not ask for one', () => {
+            render(
+                <DataTable
+                    caption="Plans d’approvisionnement"
+                    rows={plans}
+                    columns={columns}
+                />
+            )
+
+            expect(screen.queryAllByRole('button')).toHaveLength(0)
+            // Not even `aria-sort="none"`: the column is not sortable at all,
+            // which is a different thing from being sortable and unsorted.
+            expect(
+                screen.getAllByRole('columnheader')[0].getAttribute('aria-sort')
+            ).toBeNull()
+        })
+
+        it('starts unsorted, in the order the rows were given', () => {
+            renderTable()
+
+            expect(columnValues(0)).toEqual(['Plaquettes', 'Broyat', 'Écorces'])
+            expect(headerFor('Nom').getAttribute('aria-sort')).toBe('none')
+        })
+
+        it('sorts ascending on the first click', () => {
+            renderTable()
+
+            fireEvent.click(sortButtonFor('Nom'))
+
+            expect(columnValues(0)).toEqual(['Broyat', 'Écorces', 'Plaquettes'])
+            expect(headerFor('Nom').getAttribute('aria-sort')).toBe('ascending')
+        })
+
+        it('sorts descending on the second click', () => {
+            renderTable()
+
+            fireEvent.click(sortButtonFor('Nom'))
+            fireEvent.click(sortButtonFor('Nom'))
+
+            expect(columnValues(0)).toEqual(['Plaquettes', 'Écorces', 'Broyat'])
+            expect(headerFor('Nom').getAttribute('aria-sort')).toBe(
+                'descending'
+            )
+        })
+
+        it('goes back to ascending on the third click, never to unsorted', () => {
+            renderTable()
+
+            fireEvent.click(sortButtonFor('Nom'))
+            fireEvent.click(sortButtonFor('Nom'))
+            fireEvent.click(sortButtonFor('Nom'))
+
+            expect(columnValues(0)).toEqual(['Broyat', 'Écorces', 'Plaquettes'])
+            expect(headerFor('Nom').getAttribute('aria-sort')).toBe('ascending')
+        })
+
+        it('restarts from ascending when another column takes over', () => {
+            renderTable()
+
+            fireEvent.click(sortButtonFor('Nom'))
+            fireEvent.click(sortButtonFor('Nom'))
+            fireEvent.click(sortButtonFor('Tonnage'))
+
+            expect(headerFor('Tonnage').getAttribute('aria-sort')).toBe(
+                'ascending'
+            )
+            // The column it left reports itself sortable but unsorted again.
+            expect(headerFor('Nom').getAttribute('aria-sort')).toBe('none')
+        })
+
+        it('sorts numbers numerically rather than as text', () => {
+            renderTable()
+
+            fireEvent.click(sortButtonFor('Tonnage'))
+
+            expect(columnValues(1)).toEqual(['9 t', '10 t', '100 t'])
+        })
+
+        it('sorts on `sortBy`, not on what the cell displays', () => {
+            renderTable()
+
+            fireEvent.click(sortButtonFor('Tonnage'))
+
+            // Sorting the rendered strings would have given 10, 100, 9; the
+            // rows follow the numbers, so the names line up with them.
+            expect(columnValues(0)).toEqual(['Écorces', 'Plaquettes', 'Broyat'])
+        })
+
+        it('leaves the array it was given untouched', () => {
+            const givenOrder = [...ressources]
+            renderTable()
+
+            fireEvent.click(sortButtonFor('Nom'))
+
+            expect(ressources).toEqual(givenOrder)
+        })
     })
 })

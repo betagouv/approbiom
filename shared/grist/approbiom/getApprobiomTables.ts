@@ -4,6 +4,7 @@ import type {
     Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource,
     Approvisionnement_summary_Plan_d_approvisionnement_Ressource,
     Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource,
+    Approvisionnement,
     Crb,
     Demande_subvention,
     INSEE_Departement,
@@ -12,6 +13,9 @@ import type {
     Plan_d_approvisionnement,
     Entreprise,
     Piece_jointe,
+    INSEE_Commune,
+    Installation,
+    INSEE_Region,
 } from './tables'
 
 type TableRowMap = {
@@ -23,10 +27,14 @@ type TableRowMap = {
     Meta_Ressource: Meta_Ressource
     Entreprise: Entreprise
     INSEE_Departement: INSEE_Departement
+    INSEE_Region: INSEE_Region
+    INSEE_Commune: INSEE_Commune
     Demande_subvention: Demande_subvention
     Instruction_crb: Instruction_crb
     Crb: Crb
     Piece_jointe: Piece_jointe
+    Installation: Installation
+    Approvisionnement: Approvisionnement
 }
 
 export type TableId = keyof TableRowMap

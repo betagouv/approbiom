@@ -1,0 +1,85 @@
+/* CSS lives next to its component: Concurrence.tsx imports this file directly. */
+
+.concurrence {
+    display: flex;
+    flex-direction: column;
+
+    gap: 1.5rem;
+    padding: 2rem;
+
+    height: 100vh;
+    overflow: auto;
+}
+
+.concurrence__title {
+    margin: 0;
+}
+
+.concurrence__filters_title {
+    margin: 0;
+}
+
+.concurrence__filters {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: flex-end;
+    gap: 1rem;
+}
+
+.concurrence__filter {
+    flex: 0 1 17rem;
+    min-width: 0;
+}
+
+.concurrence__filter .fr-select-group {
+    margin-bottom: 0;
+}
+
+.concurrence__table {
+    flex: 1;
+    min-height: 0;
+}
+
+/* The title block takes the height it needs, the wrapper takes whatever is
+   left, and the container inside it is the only thing that scrolls — so the
+   scrollbar runs alongside the rows rather than the whole table. */
+.concurrence__table .fr-table {
+    display: flex;
+    flex-direction: column;
+    height: 100%;
+    margin: 0;
+    min-height: 0;
+}
+
+.concurrence__table .fr-table__wrapper {
+    flex: 1;
+    margin: 0;
+    min-height: 0;
+}
+
+.concurrence__table .fr-table__container {
+    height: 100%;
+    margin: 0;
+    min-height: 0;
+    padding-top: 0;
+}
+
+/* Detail panel of an expanded row: label/value pairs, laid out side by side
+   while there is room and stacked once there is not. */
+.concurrence__detail {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.5rem 3rem;
+    margin: 0;
+    padding: 0.5rem 0;
+}
+
+.concurrence__detail dt {
+    color: var(--text-mention-grey);
+    font-size: 0.875rem;
+}
+
+.concurrence__detail dd {
+    margin: 0;
+}

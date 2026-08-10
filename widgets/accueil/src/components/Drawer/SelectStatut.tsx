@@ -1,6 +1,6 @@
 import Alert from '@shared/components/Alert'
 import { RadioGroup, type RadioOption } from '@shared/components/Radio'
-import type { PlanStatus } from '@shared/domain/plan_approvisionnement'
+import type { PlanStatus } from '@shared/domain/plan-d-approvisionnement'
 import { updatePlanStatus } from '@shared/use-cases/updatePlanStatus'
 
 import { useState } from 'react'

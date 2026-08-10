@@ -1,4 +1,4 @@
-import type { PlanStatus } from '@shared/domain/plan_approvisionnement'
+import type { PlanStatus } from '@shared/domain/plan-d-approvisionnement'
 import { updatePlanStatusInGrist } from '@shared/grist/approbiom/plan-grist-service'
 
 type UpdatePlanStatusInput = {

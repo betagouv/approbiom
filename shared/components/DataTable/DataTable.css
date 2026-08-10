@@ -64,3 +64,76 @@
     :is(a, button, input) {
     scroll-margin-top: var(--shared-data-table-header-height);
 }
+
+/* The header block sits outside `fr-table__wrapper`, so it no longer inherits
+   DSFR's `caption` typography — restated here, from the same rules, so moving it
+   out of the table changed where it lives and not how it reads. */
+.fr-table .shared-data-table__header {
+    margin-bottom: 1rem;
+}
+
+.fr-table .shared-data-table__header-title {
+    align-items: baseline;
+    display: flex;
+    font-size: 1.5rem;
+    font-weight: 700;
+    gap: 1rem;
+    justify-content: space-between;
+    line-height: 2rem;
+}
+
+/* `flex-shrink: 0` keeps "169 résultats" on one line when a long title competes
+   for the width. */
+.fr-table .shared-data-table__result-count {
+    color: var(--text-mention-grey);
+    flex-shrink: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+}
+
+.fr-table .shared-data-table__description {
+    color: var(--text-mention-grey);
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+    margin: 0.5rem 0 0;
+}
+
+/* The disclosure sits inside a cell and has to keep reading as cell text, so it
+   is a button stripped back to its own content: the semantics are what matter
+   (`aria-expanded`, keyboard operability), not the default button chrome. */
+.shared-data-table__disclosure {
+    align-items: center;
+    background: none;
+    border: 0;
+    color: inherit;
+    cursor: pointer;
+    display: inline-flex;
+    font: inherit;
+    gap: 0.25rem;
+    padding: 0;
+    text-align: left;
+}
+
+.shared-data-table__disclosure-icon {
+    color: var(--text-action-high-blue-france);
+    flex-shrink: 0;
+    transition: transform 0.2s;
+}
+
+/* Points down once open, the usual way a disclosure says so without words. */
+.shared-data-table__disclosure[aria-expanded='true']
+    .shared-data-table__disclosure-icon {
+    transform: rotate(90deg);
+}
+
+/* `[hidden]` alone is only `display: none` at user-agent weight, which any rule
+   setting `display: table-row` would outrank. Stated here so it cannot lose. */
+.fr-table__content table tbody tr.shared-data-table__detail[hidden] {
+    display: none;
+}
+
+.fr-table__content table tbody tr.shared-data-table__detail > td {
+    background-color: var(--background-alt-grey);
+}

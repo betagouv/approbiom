@@ -61,7 +61,15 @@ export async function fetchRows(
     tableId: string,
     columnIds?: readonly string[]
 ): Promise<Record<string, unknown>[]> {
-    const columns = (await grist.docApi.fetchTable(tableId)) as ColumnMajorTable
+    let columns: ColumnMajorTable
+    try {
+        columns = (await grist.docApi.fetchTable(tableId)) as ColumnMajorTable
+    } catch (cause) {
+        throw new Error(
+            `Grist table "${tableId}" could not be read — check it still exists in the document. `,
+            { cause }
+        )
+    }
 
     if (!columnIds || columnIds.length === 0) {
         return toRows(columns)
@@ -70,8 +78,7 @@ export async function fetchRows(
     const missing = columnIds.filter((colId) => !(colId in columns))
     if (missing.length > 0) {
         throw new Error(
-            `Grist table "${tableId}" is missing requested column(s): ${missing.join(', ')}. ` +
-                `Regenerate shared/grist/approbiom/tables.d.ts if the document schema changed.`
+            `Grist table "${tableId}" is missing requested column(s): ${missing.join(', ')}. `
         )
     }
 

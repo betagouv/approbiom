@@ -6,6 +6,7 @@ import type {
     PlanDapprovisionnementAccueil,
 } from './grist'
 import type { MultiSelectOption } from '@shared/components/MultiSelect'
+import { getOptions } from '@shared/utils/getOptions'
 
 export type PlanFilters = {
     nom?: string
@@ -54,31 +55,31 @@ export function getResultCountLabel(count: number): string {
     return `${count} résultat${count > 1 ? 's' : ''}`
 }
 
-function distinct(values: readonly (string | null)[]): string[] {
-    return [
-        ...new Set(
-            values.filter((v): v is string => typeof v === 'string' && v !== '')
-        ),
-    ].sort((a, b) => a.localeCompare(b, 'fr'))
+function capitalize(value: string): string {
+    return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
-function asOptions(values: readonly string[]): MultiSelectOption<string>[] {
-    return values.map((value) => ({
-        value,
-        label: value.charAt(0).toUpperCase() + value.slice(1),
-    }))
+// The document stores the values in no particular order, so the list is sorted
+// here — alphabetically, the only order a filter can be read in.
+function asOptions(
+    rows: readonly PlanDapprovisionnementAccueil[],
+    getValue: (row: PlanDapprovisionnementAccueil) => string | null
+): MultiSelectOption<string>[] {
+    return getOptions(rows, (row) => getValue(row) ?? '', capitalize).sort(
+        (a, b) => a.label.localeCompare(b.label, 'fr')
+    )
 }
 
 export function getStatutOptions(
     rows: readonly PlanDapprovisionnementAccueil[]
 ): MultiSelectOption<string>[] {
-    return asOptions(distinct(rows.map((row) => row.Statut)))
+    return asOptions(rows, (row) => row.Statut)
 }
 
 export function getAppelAProjetOptions(
     rows: readonly PlanDapprovisionnementAccueil[]
 ): MultiSelectOption<string>[] {
-    const options = asOptions(distinct(rows.map((row) => row.Appel_a_projet)))
+    const options = asOptions(rows, (row) => row.Appel_a_projet)
     return rows.some((row) => (row.Appel_a_projet ?? '') === '')
         ? [...options, { value: '', label: 'Non renseigné' }]
         : options
