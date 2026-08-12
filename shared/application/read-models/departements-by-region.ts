@@ -1,5 +1,5 @@
-import type { Departement } from '@shared/domain/departement'
-import type { Region } from '@shared/domain/region'
+import type { Departement } from '@shared/application/domain/departement'
+import type { Region } from '@shared/application/domain/region'
 
 export type DepartementsByRegion = {
     region: Pick<Region, 'libelle' | 'reg'>

@@ -1,3 +1,3 @@
-import type { PlanDApprovisionnement } from '@shared/domain/plan-d-approvisionnement'
+import type { PlanDApprovisionnement } from '@shared/application/domain/plan-d-approvisionnement'
 
 export type Plan = PlanDApprovisionnement

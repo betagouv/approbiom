@@ -5,11 +5,11 @@ import type { InstallationQuery } from '@shared/application/ports/installation-q
 import type { PlanQuery } from '@shared/application/ports/plan-query'
 import type { RessourceQuery } from '@shared/application/ports/ressource-query'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { Approvisionnement } from '@shared/domain/approvisionnement'
-import type { Departement } from '@shared/domain/departement'
-import type { Entreprise } from '@shared/domain/entreprise'
-import type { PlanDApprovisionnement } from '@shared/domain/plan-d-approvisionnement'
-import type { Ressource } from '@shared/domain/ressource'
+import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
+import type { Departement } from '@shared/application/domain/departement'
+import type { Entreprise } from '@shared/application/domain/entreprise'
+import type { PlanDApprovisionnement } from '@shared/application/domain/plan-d-approvisionnement'
+import type { Ressource } from '@shared/application/domain/ressource'
 
 export type ConcurrencePorts = {
     approvisionnements: ApprovisionnementQuery

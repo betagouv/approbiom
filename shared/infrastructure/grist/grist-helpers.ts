@@ -30,6 +30,14 @@ export const asString = (value: unknown): string =>
 export const asNumber = (value: unknown): number | undefined =>
     typeof value === 'number' ? value : undefined
 
+/** Grist carries a Date as seconds since the epoch; an unset cell is null. */
+export const asDate = (value: unknown): Date | null =>
+    typeof value === 'number' ? new Date(value * 1000) : null
+
+/** A Grist toggle reads as a boolean, but an untouched cell can be 1, 0 or null. */
+export const asBoolean = (value: unknown): boolean =>
+    value === true || value === 1
+
 export function lookup<T>(index: Map<number, T>, id: unknown): T | undefined {
     return typeof id === 'number' && id !== 0 ? index.get(id) : undefined
 }

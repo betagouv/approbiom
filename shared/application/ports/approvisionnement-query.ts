@@ -1,4 +1,4 @@
-import type { Approvisionnement } from '@shared/domain/approvisionnement'
+import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
 import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
 import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
 import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'

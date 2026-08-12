@@ -5,11 +5,11 @@ import MultiSelect, {
 } from '@shared/components/MultiSelect'
 import { getOptions } from '@shared/utils/getOptions'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { Approvisionnement } from '@shared/domain/approvisionnement'
-import type { Departement } from '@shared/domain/departement'
+import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
+import type { Departement } from '@shared/application/domain/departement'
 
 import { useCallback, useMemo, useState } from 'react'
-import type { Entreprise } from '@shared/domain/entreprise'
+import type { Entreprise } from '@shared/application/domain/entreprise'
 import type { ConcurrenceRow } from '../load-concurrence'
 
 type Props = {

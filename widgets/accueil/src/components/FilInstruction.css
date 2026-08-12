@@ -1,0 +1,25 @@
+/* Programmes are spaced further apart than the chronologies inside one, so a
+   block reads as one programme's instructions rather than as a flat list. */
+.fil-instruction {
+    display: flex;
+    flex-direction: column;
+    gap: 2.5rem;
+}
+
+.fil-instruction__programme {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+}
+
+.fil-instruction__instruction {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+/* The gaps above space every heading; their own margins would double it. */
+.fil-instruction__titre,
+.fil-instruction__crb {
+    margin: 0;
+}

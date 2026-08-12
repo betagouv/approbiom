@@ -2,10 +2,15 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
 import './Dossier.css'
+import FilInstruction from './FilInstruction'
 import TabNav, { type TabNavItem } from '@shared/components/TabNav'
 import Ressource, { type RessourceScreen } from '@shared/screens/ressource'
 import type { Plan } from '@shared/application/read-models/plan'
-import { useState } from 'react'
+import {
+    getInstructionsByProgrammeAide,
+    type FilInstructionData,
+} from '@shared/application/read-models/instructions-by-programme-aide'
+import { useMemo, useState } from 'react'
 
 const SECTIONS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
@@ -15,11 +20,24 @@ const SECTIONS: readonly TabNavItem[] = [
 export type DossierProps = {
     plan: Plan
     ressource: RessourceScreen
+    filInstruction: FilInstructionData
     onClose: () => void
 }
 
-export default function Dossier({ plan, ressource, onClose }: DossierProps) {
+export default function Dossier({
+    plan,
+    ressource,
+    filInstruction,
+    onClose,
+}: DossierProps) {
     const [section, setSection] = useState(SECTIONS[0].id)
+
+    // Everything is loaded for every dossier; which chronologies belong to
+    // this one is settled here, once, rather than on every tab change.
+    const programmes = useMemo(
+        () => getInstructionsByProgrammeAide(filInstruction, plan.id),
+        [filInstruction, plan.id]
+    )
 
     return (
         <div className="dossier">
@@ -39,6 +57,10 @@ export default function Dossier({ plan, ressource, onClose }: DossierProps) {
                 currentId={section}
                 onSelect={setSection}
             />
+
+            {section === 'fil-instruction' && (
+                <FilInstruction programmes={programmes} />
+            )}
 
             {section === 'ressources' && (
                 <Ressource {...ressource} plan={plan.id} />

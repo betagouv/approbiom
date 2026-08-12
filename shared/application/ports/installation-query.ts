@@ -1,4 +1,4 @@
-import type { Installation } from '@shared/domain/installation'
+import type { Installation } from '@shared/application/domain/installation'
 
 /**
  * The installation directory. A plan references an installation, and the

@@ -6,6 +6,9 @@ import {
 } from '@shared/application/errors'
 import type { PlanQuery } from '@shared/application/ports/plan-query'
 import type { Plan } from '@shared/application/read-models/plan'
+import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
+import type { Instruction } from '@shared/application/domain/instruction'
+import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import App from './App'
 import type { AccueilPorts } from './load-accueil'
 
@@ -29,6 +32,9 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         ressources: { list: rows([]) },
         entreprises: { list: rows([]) },
         insee: { listDepartementsByRegion: rows([]) },
+        demandesSubvention: { list: rows([]) },
+        programmesAide: { list: rows([]) },
+        instructions: { list: rows([]) },
         ...overrides,
     }
 }
@@ -41,6 +47,33 @@ const saintJunien: Plan = {
     usage: 'énergie',
     natureDonnee: 'prévision',
     statut: 'en fonctionnement',
+}
+
+const bciat: ProgrammeAide = {
+    id: 1,
+    year: 2023,
+    name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
+    shortName: 'BCIAT',
+    appelAProjet: 'BCIAT (2023)',
+}
+
+const demandeBciat: DemandeSubvention = {
+    id: 1,
+    programmeAide: bciat.id,
+    planDApprovisionnement: saintJunien.id,
+}
+
+const nouvelleAquitaine: Instruction = {
+    crb: 'Nouvelle Aquitaine',
+    subvention: demandeBciat.id,
+    name: 'Instruction 1',
+    avisCrbRequis: true,
+    dateSaisineCrb: new Date('2026-03-15'),
+    dateAvisCrb: new Date('2026-08-05'),
+    avisCRB: 'Avis favorable',
+    dateAvisPrefet: null,
+    avisPrefet: 'En attente',
+    phase: 'Avis préfet en attente',
 }
 
 const openDossier = async () =>
@@ -140,6 +173,52 @@ describe('App', () => {
                 level: 1,
                 name: 'Suivi des plans d’approvisionnement',
             })
+        ).toBeDefined()
+    })
+
+    it('opens the dossier on the chronologies of its instructions', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planQuery(rows([saintJunien])),
+                    demandesSubvention: { list: rows([demandeBciat]) },
+                    programmesAide: { list: rows([bciat]) },
+                    instructions: { list: rows([nouvelleAquitaine]) },
+                })}
+            />
+        )
+
+        await openDossier()
+
+        expect(
+            screen.getByRole('heading', {
+                name: 'Chronologie de l’instruction - BCIAT',
+            })
+        ).toBeDefined()
+        expect(
+            screen.getByRole('heading', { name: 'Nouvelle Aquitaine' })
+        ).toBeDefined()
+        expect(screen.getByText('5 août 2026')).toBeDefined()
+        expect(screen.getByText('Avis favorable')).toBeDefined()
+    })
+
+    it('leaves the fil d’instruction empty for a dossier with no demande', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planQuery(rows([saintJunien])),
+                    programmesAide: { list: rows([bciat]) },
+                    instructions: { list: rows([nouvelleAquitaine]) },
+                })}
+            />
+        )
+
+        await openDossier()
+
+        expect(
+            screen.getByText(
+                'Aucune demande de subvention n’est rattachée à ce dossier.'
+            )
         ).toBeDefined()
     })
 

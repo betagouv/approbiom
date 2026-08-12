@@ -18,6 +18,10 @@ export const TABLE = {
     commune: 'INSEE_Commune',
     departement: 'INSEE_Departement',
     region: 'INSEE_Region',
+    demandeSubvention: 'Demande_subvention',
+    instruction: 'Instruction_crb',
+    crb: 'Crb',
+    programmeAide: 'Prog_aides',
 } as const
 
 /** The columns every summary is keyed and measured by, whatever it groups on. */
@@ -58,4 +62,25 @@ export const COLUMNS = {
     commune: ['id', 'COM', 'LIBELLE', 'DEP'],
     departement: ['id', 'DEP', 'LIBELLE', 'REG'],
     region: ['id', 'REG', 'LIBELLE'],
+    demandeSubvention: ['id', 'Programme_d_aide', 'Plan_d_approvisionnement'],
+    instruction: [
+        'Nom',
+        'crb',
+        'subvention',
+        'Avis_CRB_Requis',
+        'Date_saisine_CRB',
+        'Date_avis_CRB',
+        'Avis_CRB',
+        'Date_avis_Prefet',
+        'Avis_Prefet',
+        'Phase_de_l_instruction',
+    ],
+    crb: ['id', 'Nom'],
+    programmeAide: [
+        'id',
+        'Annee',
+        'Nom_complet',
+        'Nom_raccourci',
+        'Appel_a_projet',
+    ],
 } as const satisfies Record<string, readonly string[]>

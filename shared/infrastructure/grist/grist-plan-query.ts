@@ -1,5 +1,5 @@
 import type { PlanQuery } from '@shared/application/ports/plan-query'
-import { isUsageType } from '@shared/domain/plan-d-approvisionnement'
+import { isUsageType } from '@shared/application/domain/plan-d-approvisionnement'
 import { gristReady } from './grist-ready'
 import { asNumber, asString, fetchRowsOnce } from './grist-helpers'
 import { COLUMNS, TABLE } from './grist-tables'

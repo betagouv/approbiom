@@ -1,0 +1,112 @@
+.chronologie {
+    display: grid;
+    grid-auto-flow: column;
+    /* Equal columns that stop shrinking rather than crush their labels; past
+       that the card scrolls sideways inside the Grist iframe. */
+    grid-auto-columns: minmax(8rem, 1fr);
+    grid-template-rows: repeat(4, auto);
+
+    margin: 0;
+    padding: 1.5rem 1rem;
+    list-style: none;
+    overflow-x: auto;
+
+    background-color: var(--background-alt-grey);
+    border-radius: 0.5rem;
+}
+
+.chronologie__etape {
+    display: grid;
+    grid-row: 1 / -1;
+    grid-template-rows: subgrid;
+    row-gap: 0.5rem;
+
+    justify-items: center;
+    text-align: center;
+}
+
+.chronologie__date {
+    margin: 0;
+    font-size: 0.75rem;
+    font-weight: 700;
+    color: var(--text-mention-grey);
+}
+
+/* A step still to come has nothing to date, so its « En attente » is not
+   given the weight of one. */
+.chronologie__etape--pending .chronologie__date,
+.chronologie__etape--skipped .chronologie__date {
+    font-weight: 400;
+}
+
+/* Full column width, so the connector below can be measured against it: the
+   distance between two dots is exactly one column. */
+.chronologie__jalon {
+    position: relative;
+
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    width: 100%;
+    height: 1rem;
+}
+
+/* The line comes in from the step before, so the first one has none. It stops
+   short of both dots rather than running under them. */
+.chronologie__etape:not(:first-child) .chronologie__jalon::before {
+    content: '';
+
+    position: absolute;
+    top: 50%;
+    right: calc(50% + 0.75rem);
+    width: calc(100% - 1.5rem);
+    height: 2px;
+    transform: translateY(-50%);
+
+    background-color: var(--border-default-grey);
+}
+
+/* The line is painted by the step it arrives at: it is blue as far as the
+   instruction has got, grey from there on. */
+.chronologie__etape--done .chronologie__jalon::before,
+.chronologie__etape--current .chronologie__jalon::before {
+    background-color: var(--background-active-blue-france);
+}
+
+.chronologie__marqueur {
+    box-sizing: border-box;
+    width: 0.625rem;
+    height: 0.625rem;
+
+    border: 2px solid var(--border-default-grey);
+    border-radius: 50%;
+}
+
+/* Behind us: solid. Where we are: a wider ring, open, so the eye stops on it.
+   Ahead: the grey ring it starts as. */
+.chronologie__etape--done .chronologie__marqueur {
+    background-color: var(--background-active-blue-france);
+    border-color: var(--background-active-blue-france);
+}
+
+.chronologie__etape--current .chronologie__marqueur {
+    width: 0.875rem;
+    height: 0.875rem;
+    border-color: var(--background-active-blue-france);
+}
+
+.chronologie__label {
+    margin: 0;
+    font-size: 0.875rem;
+    font-weight: 700;
+    color: var(--text-title-grey);
+}
+
+.chronologie__etape--current .chronologie__label {
+    color: var(--text-active-blue-france);
+}
+
+.chronologie__etape--skipped .chronologie__label {
+    color: var(--text-mention-grey);
+}
