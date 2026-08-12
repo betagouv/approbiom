@@ -1,143 +1,142 @@
 import type { ApprovisionnementQuery } from '@shared/application/ports/approvisionnement-query'
 import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
-import { fetchRows } from '@shared/grist/api/client'
 import { gristReady } from './grist-ready'
-import { asNumber, asString, byColumn, byRowId, lookup } from './grist-helpers'
+import {
+    asNumber,
+    asString,
+    byRowId,
+    fetchRowsOnce,
+    lookup,
+    type GristRow,
+} from './grist-helpers'
+import { COLUMNS, TABLE } from './grist-tables'
 
-const GRIST_TABLE_ID_ROW_BY_PLAN_AND_RESSOURCE =
-    'Approvisionnement_summary_Plan_d_approvisionnement_Ressource'
-// The nested list comes from the raw table rather than a summary: no summary
-// carries both the département de provenance and the fournisseur — Grist groups
-// by one or the other — and one row here is exactly one `Approvisionnement`.
-const GRIST_TABLE_ID_APPROVISIONNEMENT = 'Approvisionnement'
-const GRIST_TABLE_ID_ENTREPRISE = 'Entreprise'
-const GRIST_TABLE_ID_META_RESSOURCE = 'Meta_Ressource'
-const GRIST_TABLE_ID_PLAN_D_APPROVISIONNEMENT = 'Plan_d_approvisionnement'
-const GRIST_TABLE_ID_INSTALLATION = 'Installation'
-const GRIST_TABLE_ID_INSEE_COMMUNE = 'INSEE_Commune'
-const GRIST_TABLE_ID_INSEE_DEPARTEMENT = 'INSEE_Departement'
+/**
+ * Reads a cell that holds a number but means text. `Siret` is stored numeric in
+ * the document while it identifies an entreprise, so it crosses into the domain
+ * as the string it is.
+ */
+const asText = (value: unknown): string =>
+    typeof value === 'number' ? String(value) : asString(value)
 
-type RequestedApprovisionnement =
-    ApprovisionnementByPlanAndRessource['approvisionnements'][number]
+/** A Ref to `Meta_Ressource`, read as the code the ressource is keyed by. */
+const ressourceCode = (index: Map<number, GristRow>, ref: unknown): string =>
+    asString(lookup(index, ref)?.Code_ressource_Approbiom)
 
-/** The pair both summaries are grouped by, as a Map key. */
-const pairKey = (plan: unknown, ressource: unknown) =>
-    `${String(plan)}:${String(ressource)}`
+/** The fields every summary carries, whichever dimension it adds to them. */
+function toTotal(
+    row: GristRow,
+    ressources: Map<number, GristRow>
+): ApprovisionnementByPlanAndRessource {
+    return {
+        planDApprovisionnement: asNumber(row.Plan_d_approvisionnement) ?? 0,
+        ressource: ressourceCode(ressources, row.Ressource),
+        sumTonnageTotal: asNumber(row.Total_en_tMv_an_),
+        repartition: asNumber(row.Repartition),
+    }
+}
 
 export function createGristApprovisionnementQuery(): ApprovisionnementQuery {
+    /** Every summary needs the ressource directory to resolve its Ref. */
+    const readTotals = async (tableId: string, columns: readonly string[]) => {
+        await gristReady()
+
+        const [rows, ressources] = await Promise.all([
+            fetchRowsOnce(tableId, columns),
+            fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
+        ])
+
+        return { rows, ressources: byRowId(ressources) }
+    }
+
     return {
-        async listByPlanAndRessource() {
+        async listApprovisionnements() {
             await gristReady()
 
-            const [
-                totals,
-                approvisionnements,
-                plans,
-                ressources,
-                installations,
-                communes,
-                departements,
-                entreprises,
-            ] = await Promise.all([
-                fetchRows(GRIST_TABLE_ID_ROW_BY_PLAN_AND_RESSOURCE, [
-                    'Plan_d_approvisionnement',
-                    'Ressource',
-                    'Total_en_tMv_an_',
-                ]),
-                fetchRows(GRIST_TABLE_ID_APPROVISIONNEMENT, [
-                    'Plan_d_approvisionnement',
-                    'Ressource',
-                    'Departement_de_provenance',
-                    'Fournisseur',
-                    'Total_en_tMv_an_',
-                ]),
-                fetchRows(GRIST_TABLE_ID_PLAN_D_APPROVISIONNEMENT, [
-                    'id',
-                    'Nom',
-                    'Installation',
-                ]),
-                fetchRows(GRIST_TABLE_ID_META_RESSOURCE, [
-                    'id',
-                    'Description_courte',
-                ]),
-                fetchRows(GRIST_TABLE_ID_INSTALLATION, ['id', 'Commune']),
-                fetchRows(GRIST_TABLE_ID_INSEE_COMMUNE, ['id', 'DEP']),
-                fetchRows(GRIST_TABLE_ID_INSEE_DEPARTEMENT, [
-                    'id',
-                    'DEP',
-                    'LIBELLE',
-                ]),
-                // Suppliers live in `Entreprise`; the `Fournisseur` column kept
-                // its own name when the table was renamed.
-                fetchRows(GRIST_TABLE_ID_ENTREPRISE, ['id', 'Denomination']),
-            ])
+            const [rows, ressources, entreprises, departements] =
+                await Promise.all([
+                    fetchRowsOnce(
+                        TABLE.approvisionnement,
+                        COLUMNS.approvisionnement
+                    ),
+                    fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
+                    fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise),
+                    fetchRowsOnce(TABLE.departement, COLUMNS.departement),
+                ])
 
-            const planById = byRowId(plans)
             const ressourceById = byRowId(ressources)
-            const installationById = byRowId(installations)
-            const communeById = byRowId(communes)
-
-            // Départements are joined two ways: by rowId for the provenance Ref,
-            // by code for the situation, which the commune carries as text.
-            const departementById = byRowId(departements)
-            const departementByCode = byColumn(departements, 'DEP')
             const entrepriseById = byRowId(entreprises)
+            const departementById = byRowId(departements)
 
-            const approvisionnementsByPair = new Map<
-                string,
-                RequestedApprovisionnement[]
-            >()
-            for (const approvisionnement of approvisionnements) {
-                const key = pairKey(
-                    approvisionnement.Plan_d_approvisionnement,
-                    approvisionnement.Ressource
-                )
-                const group = approvisionnementsByPair.get(key) ?? []
-                group.push({
-                    departementDeProvenance: asString(
-                        lookup(
-                            departementById,
-                            approvisionnement.Departement_de_provenance
-                        )?.DEP
-                    ),
-                    fournisseur: asString(
-                        lookup(entrepriseById, approvisionnement.Fournisseur)
-                            ?.Denomination
-                    ),
-                    tonnageTotal:
-                        asNumber(approvisionnement.Total_en_tMv_an_) ?? 0,
-                })
-                approvisionnementsByPair.set(key, group)
-            }
+            return rows.map((row) => ({
+                planDApprovisionnement:
+                    asNumber(row.Plan_d_approvisionnement) ?? 0,
+                ressource: ressourceCode(ressourceById, row.Ressource),
+                departementDeProvenance: asString(
+                    lookup(departementById, row.Departement_de_provenance)?.DEP
+                ),
+                fournisseur: asText(
+                    lookup(entrepriseById, row.Fournisseur)?.Siret
+                ),
+                tonnageTotal: asNumber(row.Total_en_tMv_an_) ?? 0,
+            }))
+        },
 
-            return totals.map((total) => {
-                const plan = lookup(planById, total.Plan_d_approvisionnement)
-                const installation = lookup(
-                    installationById,
-                    plan?.Installation
-                )
-                const commune = lookup(communeById, installation?.Commune)
-                const departement = departementByCode.get(
-                    asString(commune?.DEP)
-                )
+        async listByPlanAndRessource() {
+            const { rows, ressources } = await readTotals(
+                TABLE.totalByPlanAndRessource,
+                COLUMNS.totalByPlanAndRessource
+            )
 
-                return {
-                    planDApprovisionnement: asString(plan?.Nom),
-                    ressource: asString(
-                        lookup(ressourceById, total.Ressource)
-                            ?.Description_courte
-                    ),
-                    departementDeSituation: asString(departement?.LIBELLE),
-                    approvisionnements:
-                        approvisionnementsByPair.get(
-                            pairKey(
-                                total.Plan_d_approvisionnement,
-                                total.Ressource
-                            )
-                        ) ?? [],
-                    sumTonnageTotal: asNumber(total.Total_en_tMv_an_),
-                }
-            })
+            return rows.map((row) => toTotal(row, ressources))
+        },
+
+        async listByPlanRessourceAndRegion() {
+            const { rows, ressources } = await readTotals(
+                TABLE.totalByRegion,
+                COLUMNS.totalByRegion
+            )
+
+            // `Region` is a formula, not a Ref: it already reads as a libellé,
+            // so there is no code to resolve against a directory.
+            return rows.map((row) => ({
+                ...toTotal(row, ressources),
+                region: asString(row.Region),
+            }))
+        },
+
+        async listByPlanRessourceAndFournisseur() {
+            const { rows, ressources } = await readTotals(
+                TABLE.totalByFournisseur,
+                COLUMNS.totalByFournisseur
+            )
+            const entrepriseById = byRowId(
+                await fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise)
+            )
+
+            return rows.map((row) => ({
+                ...toTotal(row, ressources),
+                fournisseur: asText(
+                    lookup(entrepriseById, row.Fournisseur)?.Siret
+                ),
+            }))
+        },
+
+        async listByPlanRessourceAndDepartementDeProvenance() {
+            const { rows, ressources } = await readTotals(
+                TABLE.totalByDepartementDeProvenance,
+                COLUMNS.totalByDepartementDeProvenance
+            )
+            const departementById = byRowId(
+                await fetchRowsOnce(TABLE.departement, COLUMNS.departement)
+            )
+
+            return rows.map((row) => ({
+                ...toTotal(row, ressources),
+                departementDeProvenance: asString(
+                    lookup(departementById, row.Departement_de_provenance)?.DEP
+                ),
+            }))
         },
     }
 }

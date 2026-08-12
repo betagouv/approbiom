@@ -4,41 +4,42 @@ import MultiSelect, {
     type MultiSelectGroup,
 } from '@shared/components/MultiSelect'
 import { getOptions } from '@shared/utils/getOptions'
-import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
+import type { Approvisionnement } from '@shared/domain/approvisionnement'
 import type { Departement } from '@shared/domain/departement'
 
 import { useCallback, useMemo, useState } from 'react'
 import type { Entreprise } from '@shared/domain/entreprise'
-
-type Approvisionnement =
-    ApprovisionnementByPlanAndRessource['approvisionnements'][number]
+import type { ConcurrenceRow } from '../load-concurrence'
 
 type Props = {
-    approvisionnementsByPlanAndRessource: readonly ApprovisionnementByPlanAndRessource[]
+    approvisionnementsByPlanAndRessource: readonly ConcurrenceRow[]
     departementsByRegion: readonly DepartementsByRegion[]
+    fournisseurs: readonly Entreprise[]
 }
 
 export default function Concurrence({
-    approvisionnementsByPlanAndRessource: approvisionnementsByPlanAndRessource,
+    approvisionnementsByPlanAndRessource,
     departementsByRegion,
+    fournisseurs: entreprises,
 }: Props) {
     const [ressource, setRessource] = useState<string[]>([])
     const [departements, setDepartements] = useState<Departement['dep'][]>([])
-    const [fournisseurs, setFournisseurs] = useState<
-        Entreprise['denomination'][]
-    >([])
+    const [fournisseurs, setFournisseurs] = useState<Entreprise['siret'][]>([])
 
     const ressourceOptions = getOptions(
         approvisionnementsByPlanAndRessource,
         (item) => item.ressource
     )
 
-    const fournisseurOptions = getOptions(
-        approvisionnementsByPlanAndRessource.flatMap(
-            (item) => item.approvisionnements
-        ),
-        (approvisionnement) => approvisionnement.fournisseur
+    const fournisseurOptions = entreprises.map((entreprise) => ({
+        value: entreprise.siret,
+        label: entreprise.denomination || entreprise.siret,
+    }))
+
+    const denominationBySiret = useMemo(
+        () => new Map(entreprises.map((e) => [e.siret, e.denomination])),
+        [entreprises]
     )
 
     const departementOptions: readonly MultiSelectGroup<Departement['dep']>[] =
@@ -88,7 +89,7 @@ export default function Concurrence({
     )
 
     const getSelectedApprovisionnements = useCallback(
-        (item: ApprovisionnementByPlanAndRessource) => {
+        (item: ConcurrenceRow) => {
             const selectedApprovisionnements =
                 item.approvisionnements.filter(isSelected)
 
@@ -104,7 +105,10 @@ export default function Concurrence({
                 fournisseurs: [
                     ...new Set(
                         selectedApprovisionnements.map(
-                            (approvisionnement) => approvisionnement.fournisseur
+                            (approvisionnement) =>
+                                denominationBySiret.get(
+                                    approvisionnement.fournisseur
+                                ) || approvisionnement.fournisseur
                         )
                     ),
                 ].join(', '),
@@ -115,55 +119,54 @@ export default function Concurrence({
                 ),
             }
         },
-        [isSelected]
+        [isSelected, denominationBySiret]
     )
 
-    const columns: readonly Column<ApprovisionnementByPlanAndRessource>[] =
-        useMemo(
-            () => [
-                {
-                    header: 'Plan d’approvisionnement',
-                    id: 'plan_d_approvisionnement',
-                    render: (item) => item.planDApprovisionnement,
-                    sortBy: (item) => item.planDApprovisionnement,
-                },
-                {
-                    header: 'Département de situation',
-                    id: 'departement_de_situation',
-                    render: (item) => item.departementDeSituation,
-                },
-                {
-                    header: 'Départements de provenance',
-                    id: 'departements_de_provenance',
-                    render: (item) =>
-                        item.approvisionnements
-                            .map(
-                                (approvisionnement) =>
-                                    approvisionnement.departementDeProvenance
-                            )
-                            .join(', '),
-                },
-                {
-                    header: 'Tonnage total (en tonne de matière verte par an)',
-                    id: 'tonnage_total',
-                    render: (item) =>
-                        !item.sumTonnageTotal ? 'N/A' : item.sumTonnageTotal,
-                },
-                {
-                    header: 'Départements retenus',
-                    id: 'departements_retenus',
-                    render: (item) =>
-                        getSelectedApprovisionnements(item).departements,
-                },
-                {
-                    header: 'Tonnage retenu (en tonne de matière verte par an)',
-                    id: 'tonnage_retenu',
-                    render: (item) =>
-                        getSelectedApprovisionnements(item).sumTonnageRetenu,
-                },
-            ],
-            [getSelectedApprovisionnements]
-        )
+    const columns: readonly Column<ConcurrenceRow>[] = useMemo(
+        () => [
+            {
+                header: 'Plan d’approvisionnement',
+                id: 'plan_d_approvisionnement',
+                render: (item) => item.planDApprovisionnement,
+                sortBy: (item) => item.planDApprovisionnement,
+            },
+            {
+                header: 'Département de situation',
+                id: 'departement_de_situation',
+                render: (item) => item.departementDeSituation,
+            },
+            {
+                header: 'Départements de provenance',
+                id: 'departements_de_provenance',
+                render: (item) =>
+                    item.approvisionnements
+                        .map(
+                            (approvisionnement) =>
+                                approvisionnement.departementDeProvenance
+                        )
+                        .join(', '),
+            },
+            {
+                header: 'Tonnage total (en tonne de matière verte par an)',
+                id: 'tonnage_total',
+                render: (item) =>
+                    !item.sumTonnageTotal ? 'N/A' : item.sumTonnageTotal,
+            },
+            {
+                header: 'Départements retenus',
+                id: 'departements_retenus',
+                render: (item) =>
+                    getSelectedApprovisionnements(item).departements,
+            },
+            {
+                header: 'Tonnage retenu (en tonne de matière verte par an)',
+                id: 'tonnage_retenu',
+                render: (item) =>
+                    getSelectedApprovisionnements(item).sumTonnageRetenu,
+            },
+        ],
+        [getSelectedApprovisionnements]
+    )
 
     return (
         <div className="concurrence">

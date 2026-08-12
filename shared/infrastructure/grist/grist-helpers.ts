@@ -1,6 +1,28 @@
-import { indexByKey } from '@shared/grist/api/client'
+import { fetchRows, indexByKey } from '@shared/grist/api/client'
 
 export type GristRow = Record<string, unknown>
+
+const inFlight = new Map<string, Promise<GristRow[]>>()
+
+/**
+ * `fetchRows`, minus the reads a single load duplicates.
+ */
+export function fetchRowsOnce(
+    tableId: string,
+    columnIds: readonly string[]
+): Promise<GristRow[]> {
+    const key = `${tableId}(${columnIds.join(',')})`
+
+    const pending = inFlight.get(key)
+    if (pending) return pending
+
+    const reading = fetchRows(tableId, columnIds).finally(() => {
+        inFlight.delete(key)
+    })
+    inFlight.set(key, reading)
+
+    return reading
+}
 
 export const asString = (value: unknown): string =>
     typeof value === 'string' ? value : ''

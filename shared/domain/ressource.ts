@@ -1,4 +1,7 @@
 export type Ressource = {
-    id: string
+    /**
+     * Ressource code created by Approbiom team
+     */
+    code: string
     title: string
 }

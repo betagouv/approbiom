@@ -1,0 +1,53 @@
+/**
+ * Every table id and column list the adapters read, in one place.
+ */
+export const TABLE = {
+    approvisionnement: 'Approvisionnement',
+    totalByPlanAndRessource:
+        'Approvisionnement_summary_Plan_d_approvisionnement_Ressource',
+    totalByRegion:
+        'Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource',
+    totalByFournisseur:
+        'Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource',
+    totalByDepartementDeProvenance:
+        'Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource',
+    plan: 'Plan_d_approvisionnement',
+    metaRessource: 'Meta_Ressource',
+    entreprise: 'Entreprise',
+    installation: 'Installation',
+    commune: 'INSEE_Commune',
+    departement: 'INSEE_Departement',
+    region: 'INSEE_Region',
+} as const
+
+/** The columns every summary is keyed and measured by, whatever it groups on. */
+const TOTAL_COLUMNS = [
+    'Plan_d_approvisionnement',
+    'Ressource',
+    'Total_en_tMv_an_',
+    'Repartition',
+] as const
+
+export const COLUMNS = {
+    approvisionnement: [
+        'Plan_d_approvisionnement',
+        'Ressource',
+        'Departement_de_provenance',
+        'Fournisseur',
+        'Total_en_tMv_an_',
+    ],
+    totalByPlanAndRessource: TOTAL_COLUMNS,
+    totalByRegion: [...TOTAL_COLUMNS, 'Region'],
+    totalByFournisseur: [...TOTAL_COLUMNS, 'Fournisseur'],
+    totalByDepartementDeProvenance: [
+        ...TOTAL_COLUMNS,
+        'Departement_de_provenance',
+    ],
+    plan: ['id', 'Nom', 'Installation'],
+    metaRessource: ['id', 'Code_ressource_Approbiom', 'Description_courte'],
+    entreprise: ['id', 'Siret', 'Denomination'],
+    installation: ['id', 'Nom', 'Commune'],
+    commune: ['id', 'COM', 'LIBELLE', 'DEP'],
+    departement: ['id', 'DEP', 'LIBELLE', 'REG'],
+    region: ['id', 'REG', 'LIBELLE'],
+} as const satisfies Record<string, readonly string[]>

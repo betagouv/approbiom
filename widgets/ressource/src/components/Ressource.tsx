@@ -2,189 +2,125 @@ import { useState } from 'react'
 import SearchBar from '@shared/components/SearchBar'
 import DataTable, { type Column } from '@shared/components/DataTable'
 import './Ressource.css'
-import type {
-    Fetched_Plan_d_approvisionnement,
-    Fetched_Ressource,
-    Fetched_Region,
-    Fetched_Fournisseur,
-    Fetched_Departement,
-    Fetched_Meta_Ressource,
-    Fetched_Entreprise,
-    Fetched_INSEE_Departement,
-} from '../grist'
-
-type RessourceProps = {
-    plans: readonly Fetched_Plan_d_approvisionnement[]
-    ressources: readonly Fetched_Ressource[]
-    regions: readonly Fetched_Region[]
-    fournisseurs: readonly Fetched_Fournisseur[]
-    departements: readonly Fetched_Departement[]
-    metaRessourceById: ReadonlyMap<number, Fetched_Meta_Ressource>
-    // What a summary's `Fournisseur` column points at: the supplier's row in
-    // `Entreprise`, keyed by rowId.
-    entrepriseById: ReadonlyMap<number, Fetched_Entreprise>
-    departementById: ReadonlyMap<number, Fetched_INSEE_Departement>
-}
+import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
+import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
+import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
+import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-region'
+import type { RessourceScreen } from '../load-ressource'
 
 const REPARTITION = new Intl.NumberFormat('fr-FR', {
     style: 'percent',
     maximumFractionDigits: 1,
 })
 
-function repartitionLabel(repartition: number | boolean | null): string {
-    return typeof repartition === 'number'
-        ? REPARTITION.format(repartition)
-        : '—'
+/**
+ * The two columns every breakdown ends with. All four aggregates extend the
+ * plan+ressource total, so the measures are written once and the tables differ
+ * only by the dimension they lead with.
+ */
+function measureColumns<
+    T extends ApprovisionnementByPlanAndRessource,
+>(): readonly Column<T>[] {
+    return [
+        {
+            id: 'total',
+            header: 'Total (en tonnes de matière verte / an)',
+            render: (row) => row.sumTonnageTotal ?? '—',
+        },
+        {
+            id: 'repartition',
+            header: 'Répartition',
+            render: (row) =>
+                row.repartition === undefined
+                    ? '—'
+                    : REPARTITION.format(row.repartition),
+        },
+    ]
 }
-
-const regionColumns: readonly Column<Fetched_Region>[] = [
-    {
-        id: 'region',
-        header: 'Région',
-        // Region is a formula column typed `unknown`; render it only when it is
-        // a primitive, so an unexpected object can't stringify to [object Object].
-        render: (r) =>
-            typeof r.Region === 'string' || typeof r.Region === 'number'
-                ? r.Region
-                : '—',
-    },
-    {
-        id: 'total',
-        header: 'Total (en tonnes de matière verte / an)',
-        render: (r) => r.Total_en_tMv_an_ ?? '—',
-    },
-    {
-        id: 'repartition',
-        header: 'Répartition',
-        render: (r) => repartitionLabel(r.Repartition),
-    },
-]
 
 export default function Ressource({
     plans,
-    ressources,
-    regions,
-    fournisseurs,
-    departements,
-    metaRessourceById,
-    entrepriseById,
-    departementById,
-}: RessourceProps) {
-    const [selectedPlanId, setSelectedPlanId] = useState<number | null>(null)
-    const [selectedRessource, setSelectedRessource] =
-        useState<Fetched_Ressource | null>(null)
-
-    // Resolve a Ref (a rowId) to its label from the reference table, falling
-    // back to the raw id when the row is missing or the ref is not a rowId.
-    const ressourceLabel = (ref: number | boolean): string => {
-        const row =
-            typeof ref === 'number' ? metaRessourceById.get(ref) : undefined
-        return row?.Description_courte ?? String(ref)
-    }
-    // A fournisseur is an entreprise: the column kept its name when the table it
-    // points at was renamed, so the label is read from `Entreprise`.
-    const fournisseurLabel = (ref: number | boolean): string => {
-        const row =
-            typeof ref === 'number' ? entrepriseById.get(ref) : undefined
-        return row?.Denomination ?? String(ref)
-    }
-    // `LIBELLE` is the département's name as INSEE spells it — « Ain »,
-    // « Côte-d'Or ».
-    const departementLabel = (ref: number | boolean): string => {
-        const row =
-            typeof ref === 'number' ? departementById.get(ref) : undefined
-        return row?.LIBELLE ?? String(ref)
-    }
-
-    const ressourceColumns: readonly Column<Fetched_Ressource>[] = [
-        {
-            id: 'ressource',
-            header: 'Ressource',
-            render: (r) => ressourceLabel(r.Ressource),
-        },
-        {
-            id: 'total',
-            header: 'Total (en tonnes de matière verte / an)',
-            render: (r) => r.Total_en_tMv_an_ ?? '—',
-        },
-        {
-            id: 'repartition',
-            header: 'Répartition',
-            render: (r) => repartitionLabel(r.Repartition),
-        },
-    ]
-
-    const departementColumns: readonly Column<Fetched_Departement>[] = [
-        {
-            id: 'departement',
-            header: 'Département de provenance',
-            render: (r) => departementLabel(r.Departement_de_provenance),
-        },
-        {
-            id: 'total',
-            header: 'Total (en tonnes de matière verte / an)',
-            render: (r) => r.Total_en_tMv_an_ ?? '—',
-        },
-        {
-            id: 'repartition',
-            header: 'Répartition',
-            render: (r) => repartitionLabel(r.Repartition),
-        },
-    ]
-
-    const fournisseurColumns: readonly Column<Fetched_Fournisseur>[] = [
-        {
-            id: 'fournisseur',
-            header: 'Fournisseur',
-            render: (r) => fournisseurLabel(r.Fournisseur),
-        },
-        {
-            id: 'total',
-            header: 'Total (en tonnes de matière verte / an)',
-            render: (r) => r.Total_en_tMv_an_ ?? '—',
-        },
-        {
-            id: 'repartition',
-            header: 'Répartition',
-            render: (r) => repartitionLabel(r.Repartition),
-        },
-    ]
+    totals,
+    byRegion,
+    byFournisseur,
+    byDepartementDeProvenance,
+    ressourceTitles,
+    fournisseurNames,
+    departementNames,
+}: RessourceScreen) {
+    const [selectedPlan, setSelectedPlan] = useState<number | null>(null)
+    // The ressource's code, not the row it came from: rows are rebuilt on every
+    // load, so identity is not something a selection can be pinned to.
+    const [selectedRessource, setSelectedRessource] = useState<string | null>(
+        null
+    )
 
     const planOptions = plans.map((plan) => ({
         value: plan.id,
-        label: plan.Nom ?? `Plan ${plan.id}`,
+        label: plan.nom || `Plan ${plan.id}`,
     }))
 
-    const ressourceRows = ressources.filter(
-        (row) => row.Plan_d_approvisionnement === selectedPlanId
+    const ressourceTitle = (code: string) => ressourceTitles.get(code) ?? code
+
+    const ressourceRows = totals.filter(
+        (row) => row.planDApprovisionnement === selectedPlan
     )
 
     const ressourceTotal = ressourceRows.reduce(
-        (sum, row) =>
-            sum +
-            (typeof row.Total_en_tMv_an_ === 'number'
-                ? row.Total_en_tMv_an_
-                : 0),
+        (sum, row) => sum + (row.sumTonnageTotal ?? 0),
         0
     )
 
-    const selectedRessourceRef =
-        selectedRessource && typeof selectedRessource.Ressource === 'number'
-            ? selectedRessource.Ressource
-            : null
+    // The three breakdowns all narrow to the same selected (plan, ressource).
+    const matchesSelection = (row: ApprovisionnementByPlanAndRessource) =>
+        row.planDApprovisionnement === selectedPlan &&
+        row.ressource === selectedRessource
 
-    // The region, fournisseur and département breakdowns all narrow to the same
-    // selected (plan, ressource) pair.
-    const matchesSelection = (row: {
-        Plan_d_approvisionnement: number | boolean
-        Ressource: number | boolean
-    }) =>
-        row.Plan_d_approvisionnement === selectedPlanId &&
-        row.Ressource === selectedRessourceRef
+    const ressourceColumns: readonly Column<ApprovisionnementByPlanAndRessource>[] =
+        [
+            {
+                id: 'ressource',
+                header: 'Ressource',
+                render: (row) => ressourceTitle(row.ressource),
+            },
+            ...measureColumns<ApprovisionnementByPlanAndRessource>(),
+        ]
 
-    const regionRows = regions.filter(matchesSelection)
-    const fournisseurRows = fournisseurs.filter(matchesSelection)
-    const departementRows = departements.filter(matchesSelection)
+    const regionColumns: readonly Column<ApprovisionnementByPlanRessourceAndRegion>[] =
+        [
+            {
+                id: 'region',
+                header: 'Région',
+                render: (row) => row.region || '—',
+            },
+            ...measureColumns<ApprovisionnementByPlanRessourceAndRegion>(),
+        ]
+
+    const departementColumns: readonly Column<ApprovisionnementByPlanRessourceAndDepartementDeProvenance>[] =
+        [
+            {
+                id: 'departement',
+                header: 'Département de provenance',
+                render: (row) =>
+                    departementNames.get(row.departementDeProvenance) ||
+                    row.departementDeProvenance ||
+                    '—',
+            },
+            ...measureColumns<ApprovisionnementByPlanRessourceAndDepartementDeProvenance>(),
+        ]
+
+    const fournisseurColumns: readonly Column<ApprovisionnementByPlanRessourceAndFournisseur>[] =
+        [
+            {
+                id: 'fournisseur',
+                header: 'Fournisseur',
+                render: (row) =>
+                    fournisseurNames.get(row.fournisseur) ||
+                    row.fournisseur ||
+                    '—',
+            },
+            ...measureColumns<ApprovisionnementByPlanRessourceAndFournisseur>(),
+        ]
 
     return (
         <div className="fr-p-2w">
@@ -193,29 +129,30 @@ export default function Ressource({
                 placeholder="Rechercher un plan d’approvisionnement"
                 options={planOptions}
                 onSelect={(planId) => {
-                    setSelectedPlanId(planId)
+                    setSelectedPlan(planId)
                     setSelectedRessource(null)
                 }}
             />
 
-            {selectedPlanId !== null && (
+            {selectedPlan !== null && (
                 <div className="fr-mt-4w">
                     <DataTable
                         caption="Ressources du plan sélectionné"
                         rows={ressourceRows}
                         columns={ressourceColumns}
                         bordered
-                        selectedRows={
-                            selectedRessource ? [selectedRessource] : []
-                        }
+                        selectedRows={ressourceRows.filter(
+                            (row) => row.ressource === selectedRessource
+                        )}
                         onSelectionChange={(rows) =>
                             setSelectedRessource(
-                                rows.find((row) => row !== selectedRessource) ??
-                                    null
+                                rows.find(
+                                    (row) => row.ressource !== selectedRessource
+                                )?.ressource ?? null
                             )
                         }
                         selectionLabel={(row) =>
-                            `Sélectionner la ressource ${ressourceLabel(row.Ressource)}`
+                            `Sélectionner la ressource ${ressourceTitle(row.ressource)}`
                         }
                     />
                     <p className="ressource__total fr-mt-1w">
@@ -227,12 +164,12 @@ export default function Ressource({
                 </div>
             )}
 
-            {selectedRessource && (
+            {selectedRessource !== null && (
                 <>
                     <div className="fr-mt-4w">
                         <DataTable
                             caption="Ventilation par région"
-                            rows={regionRows}
+                            rows={byRegion.filter(matchesSelection)}
                             columns={regionColumns}
                             bordered
                         />
@@ -241,7 +178,9 @@ export default function Ressource({
                     <div className="fr-mt-4w">
                         <DataTable
                             caption="Ventilation par département"
-                            rows={departementRows}
+                            rows={byDepartementDeProvenance.filter(
+                                matchesSelection
+                            )}
                             columns={departementColumns}
                             bordered
                         />
@@ -250,7 +189,7 @@ export default function Ressource({
                     <div className="fr-mt-4w">
                         <DataTable
                             caption="Ventilation par fournisseur"
-                            rows={fournisseurRows}
+                            rows={byFournisseur.filter(matchesSelection)}
                             columns={fournisseurColumns}
                             bordered
                         />

@@ -1,8 +1,8 @@
 import type { InseeQuery } from '@shared/application/ports/insee-query'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import { fetchRows } from '@shared/grist/api/client'
 import { gristReady } from './grist-ready'
-import { asNumber, asString } from './grist-helpers'
+import { asNumber, asString, fetchRowsOnce } from './grist-helpers'
+import { COLUMNS, TABLE } from './grist-tables'
 
 type Departements = DepartementsByRegion['departements'][number][]
 
@@ -12,8 +12,8 @@ export function createGristInseeQuery(): InseeQuery {
             await gristReady()
 
             const [regions, departements] = await Promise.all([
-                fetchRows('INSEE_Region', ['id', 'REG', 'LIBELLE']),
-                fetchRows('INSEE_Departement', ['DEP', 'REG']),
+                fetchRowsOnce(TABLE.region, COLUMNS.region),
+                fetchRowsOnce(TABLE.departement, COLUMNS.departement),
             ])
 
             // `REG` on a département is a Ref: it holds the région's rowId.
@@ -23,7 +23,10 @@ export function createGristInseeQuery(): InseeQuery {
                 if (regionId === undefined) continue
 
                 const group = departementsByRegionId.get(regionId) ?? []
-                group.push({ dep: asString(departement.DEP) })
+                group.push({
+                    dep: asString(departement.DEP),
+                    libelle: asString(departement.LIBELLE),
+                })
                 departementsByRegionId.set(regionId, group)
             }
 

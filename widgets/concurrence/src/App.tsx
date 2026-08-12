@@ -4,10 +4,8 @@ import { useAsyncData } from '@shared/react/useAsyncData'
 import Concurrence from './components/Concurrence'
 import { loadConcurrence, type ConcurrencePorts } from './load-concurrence'
 
-export default function App({ approvisionnements, insee }: ConcurrencePorts) {
-    const state = useAsyncData(() =>
-        loadConcurrence({ approvisionnements, insee })
-    )
+export default function App(ports: ConcurrencePorts) {
+    const state = useAsyncData(() => loadConcurrence(ports))
 
     return (
         <main className="app">
