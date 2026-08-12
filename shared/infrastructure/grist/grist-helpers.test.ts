@@ -1,5 +1,10 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import { fetchRows, indexByKey, toRows, type ColumnMajorTable } from './client'
+import {
+    fetchRows,
+    indexByKey,
+    toRows,
+    type ColumnMajorTable,
+} from './grist-helpers'
 
 describe('toRows', () => {
     const records: ColumnMajorTable = {
