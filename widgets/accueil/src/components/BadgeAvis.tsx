@@ -1,4 +1,4 @@
-import Tag from '@shared/components/Tag'
+import Badge from '@shared/components/Badge'
 import type {
     AvisCRB,
     AvisPrefet,
@@ -11,10 +11,10 @@ const COLOR: Record<string, string> = {
     'Avis défavorable': 'pink-tuile',
 }
 
-export default function TagAvis({ avis }: { avis: AvisCRB | AvisPrefet }) {
+export default function BadgeAvis({ avis }: { avis: AvisCRB | AvisPrefet }) {
     return (
-        <Tag color={COLOR[avis]} size="sm">
+        <Badge color={COLOR[avis]} size="sm">
             {avis}
-        </Tag>
+        </Badge>
     )
 }

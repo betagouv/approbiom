@@ -1,5 +1,5 @@
 import './Chronologie.css'
-import TagAvis from './TagAvis'
+import BadgeAvis from './BadgeAvis'
 import {
     getEtapes,
     type EtapeId,
@@ -62,7 +62,7 @@ export default function Chronologie({ instruction }: ChronologieProps) {
                     <p className="chronologie__label">{LABELS[etape.id]}</p>
 
                     <div className="chronologie__avis">
-                        {etape.avis !== null && <TagAvis avis={etape.avis} />}
+                        {etape.avis !== null && <BadgeAvis avis={etape.avis} />}
                     </div>
                 </li>
             ))}
