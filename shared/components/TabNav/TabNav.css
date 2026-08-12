@@ -1,0 +1,118 @@
+/* CSS lives next to its component: TabNav.tsx imports this file directly, so
+   the styles follow the component into whichever widget uses it.
+
+   All of it is ours, which is not the case of the other components here. They
+   import a DSFR stylesheet and add to it; « navigation tertiaire » has none —
+   it is published as a design only. What is drawn below is its anatomy: the
+   labels in a row, a separator under the whole navigation, and a thicker blue
+   underline on the page being read.
+
+   The classes are `shared-tabnav`, never `fr-tabnav`. The DSFR component is in
+   beta and, when it lands in code, will bring rules of its own under that name:
+   ours would then be two stylesheets fighting over the same selectors. Only
+   `fr-raw-list` is borrowed, from core, and that one exists.
+
+   The colours are DSFR tokens rather than values, so light and dark themes both
+   follow, and they are the tokens DSFR itself uses on the current entry of a
+   navigation — `--text-active-blue-france` for the label,
+   `--background-active-blue-france` for the bar under it. */
+
+.shared-tabnav {
+    /* Grist gives a widget whatever width the document's column leaves it,
+       which can be narrow. Scrolling keeps the row a row — the DSFR design has
+       one line of labels — where wrapping would leave the entries of the first
+       line underlined by nothing. */
+    overflow-x: auto;
+}
+
+.shared-tabnav__list {
+    display: flex;
+
+    /* `max-content` so the separator runs the full length of the entries when
+       they overflow and the navigation scrolls, `min-width` so it still spans
+       the whole width when they do not fill it. Either way the line ends where
+       the reader expects it to.  */
+    width: max-content;
+    min-width: 100%;
+
+    /* An inset shadow rather than `border-bottom`: this way the separator is
+       painted inside the list's own box, on the very line the underline of the
+       current entry sits on, so that underline covers it instead of stacking a
+       blue bar on top of a grey one. */
+    box-shadow: inset 0 -1px 0 0 var(--border-default-grey);
+}
+
+/* One rule for both forms of an entry — `<a>` when it has somewhere to go,
+   `<button>` when the page switches in place. They are told apart by their
+   markup, never by how they look: a reader should not have to know which of the
+   two a navigation was built from.
+
+   The metrics are `fr-nav__link`'s, so a tertiary navigation sits under the
+   navigations above it without redrawing its own idea of a menu entry. The
+   weight is not: DSFR sets its main navigation in bold, and the anatomy of this
+   one shows regular text. */
+.shared-tabnav__link {
+    position: relative;
+    display: block;
+
+    margin: 0;
+    padding: 0.75rem 1rem;
+    border: 0;
+
+    background-color: transparent;
+    color: var(--text-action-high-grey);
+
+    /* A `<button>` inherits neither the page's typeface nor its size, so both
+       are named here rather than left to the browser's own form controls. */
+    font-family: inherit;
+    font-size: 1rem;
+    line-height: 1.5rem;
+
+    text-align: left;
+    text-decoration: none;
+
+    /* Labels break the row rather than themselves: the navigation scrolls, and
+       a wrapped label would make one entry twice the height of its neighbours. */
+    white-space: nowrap;
+
+    cursor: pointer;
+}
+
+.shared-tabnav__link:hover {
+    background-color: var(--background-default-grey-hover);
+}
+
+.shared-tabnav__link:active {
+    background-color: var(--background-default-grey-active);
+}
+
+/* `[aria-current]:not([aria-current=false])` — DSFR's own way of writing this —
+   rather than `[aria-current="page"]`: it also catches the other values the
+   attribute takes (`step`, `location`…), so an entry announced as current is
+   never left looking like the others. */
+.shared-tabnav__link[aria-current]:not([aria-current='false']) {
+    color: var(--text-active-blue-france);
+}
+
+/* The underline is a pseudo-element rather than a border, so it appears and
+   disappears without moving the label by two pixels. It is laid over the
+   separator, not under it — `bottom: 0` inside a box whose own bottom line is
+   the inset shadow above. */
+.shared-tabnav__link[aria-current]:not([aria-current='false'])::before {
+    content: '';
+    position: absolute;
+    inset: auto 0 0 0;
+    height: 2px;
+    background-color: var(--background-active-blue-france);
+}
+
+/* Forced colours drop the palette for the user's own, taking the underline's
+   background with it — and the label's colour along with it, so the underline
+   is then the only thing left saying which page is open. `highlight` is the
+   system colour for exactly that, and what DSFR falls back to in its own
+   navigation. */
+@media (forced-colors: active) {
+    .shared-tabnav__link[aria-current]:not([aria-current='false'])::before {
+        background-color: highlight;
+    }
+}
