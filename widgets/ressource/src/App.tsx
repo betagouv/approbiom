@@ -1,8 +1,8 @@
 import AsyncGate from '@shared/react/AsyncGate'
 import { renderError } from '@shared/react/render-error'
 import { useAsyncData } from '@shared/react/useAsyncData'
-import Ressource from './components/Ressource'
-import { loadRessource, type RessourcePorts } from './load-ressource'
+import { loadRessource, type RessourcePorts } from '@shared/screens/ressource'
+import RechercheDePlan from './components/RechercheDePlan'
 
 export default function App(ports: RessourcePorts) {
     const state = useAsyncData(() => loadRessource(ports))
@@ -10,7 +10,7 @@ export default function App(ports: RessourcePorts) {
     return (
         <main className="app">
             <AsyncGate state={state} renderError={renderError}>
-                {(screen) => <Ressource {...screen} />}
+                {(screen) => <RechercheDePlan {...screen} />}
             </AsyncGate>
         </main>
     )

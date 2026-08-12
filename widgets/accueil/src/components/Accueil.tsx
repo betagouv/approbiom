@@ -11,62 +11,72 @@ import TagStatut from './TagStatut'
 import TagType from './TagType'
 import TagUsage from './TagUsage'
 import type { Plan } from '@shared/application/read-models/plan'
-import { useState } from 'react'
+import { useMemo, useState } from 'react'
 import { getFilteredRows, getStatutOptions } from '../utils'
 
-const columns: readonly Column<Plan>[] = [
-    {
-        id: 'action',
-        header: 'Action',
+function getColumns(
+    onOpenDossier: (plan: Plan) => void
+): readonly Column<Plan>[] {
+    return [
+        {
+            id: 'action',
+            header: 'Action',
 
-        render: () => (
-            <button
-                type="button"
-                className="fr-btn fr-btn--secondary fr-btn--sm"
-                disabled
-            >
-                Voir le dossier
-            </button>
-        ),
-    },
-    {
-        id: 'nom',
-        header: 'Nom du dossier',
-        render: (plan) => plan.nom,
-        sortBy: (plan) => plan.nom,
-    },
-    {
-        id: 'type',
-        header: 'Type de plan',
-        render: (plan) => <TagType type={plan.typeDePlan} />,
-    },
-    {
-        id: 'usage',
-        header: 'Usage principal',
-        render: (plan) =>
-            plan.usage === null ? '—' : <TagUsage usage={plan.usage} />,
-    },
-    {
-        id: 'nature-donnee',
-        header: 'Nature de la donnée',
-        render: (plan) => <TagNature nature={plan.natureDonnee} />,
-    },
-    {
-        id: 'statut',
-        header: 'Statut',
-        render: (plan) => <TagStatut statut={plan.statut} />,
-    },
-]
+            render: (plan) => (
+                <button
+                    type="button"
+                    className="fr-btn fr-btn--secondary fr-btn--sm"
+                    onClick={() => onOpenDossier(plan)}
+                >
+                    Voir le dossier
+                </button>
+            ),
+        },
+        {
+            id: 'nom',
+            header: 'Nom du dossier',
+            render: (plan) => plan.nom,
+            sortBy: (plan) => plan.nom,
+        },
+        {
+            id: 'type',
+            header: 'Type de plan',
+            render: (plan) => <TagType type={plan.typeDePlan} />,
+        },
+        {
+            id: 'usage',
+            header: 'Usage principal',
+            render: (plan) =>
+                plan.usage === null ? '—' : <TagUsage usage={plan.usage} />,
+        },
+        {
+            id: 'nature-donnee',
+            header: 'Nature de la donnée',
+            render: (plan) => <TagNature nature={plan.natureDonnee} />,
+        },
+        {
+            id: 'statut',
+            header: 'Statut',
+            render: (plan) => <TagStatut statut={plan.statut} />,
+        },
+    ]
+}
 
 export type AccueilProps = {
     plansApprovisionnement: readonly Plan[]
+    onOpenDossier: (plan: Plan) => void
 }
 
-export default function Accueil({ plansApprovisionnement }: AccueilProps) {
+export default function Accueil({
+    plansApprovisionnement,
+    onOpenDossier,
+}: AccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
 
     const [searchGeneration, setSearchGeneration] = useState(0)
+
+    const columns = useMemo(() => getColumns(onOpenDossier), [onOpenDossier])
 
     const statutOptions = getStatutOptions(plansApprovisionnement)
 

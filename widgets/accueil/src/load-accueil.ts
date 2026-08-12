@@ -1,14 +1,22 @@
-import type { PlanQuery } from '@shared/application/ports/plan-query'
 import type { Plan } from '@shared/application/read-models/plan'
+import {
+    loadRessource,
+    type RessourcePorts,
+    type RessourceScreen,
+} from '@shared/screens/ressource'
 
-export type AccueilPorts = {
-    plans: PlanQuery
-}
+export type AccueilPorts = RessourcePorts
 
 export type AccueilScreen = {
     plansApprovisionnement: readonly Plan[]
+    ressource: RessourceScreen
 }
 
 export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
-    return { plansApprovisionnement: await ports.plans.list() }
+    const [plansApprovisionnement, ressource] = await Promise.all([
+        ports.plans.list(),
+        loadRessource(ports),
+    ])
+
+    return { plansApprovisionnement, ressource }
 }

@@ -1,0 +1,8 @@
+.ressource {
+    display: flex;
+    flex-direction: column;
+}
+
+.ressource__total {
+    text-align: right;
+}

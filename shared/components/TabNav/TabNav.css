@@ -23,6 +23,15 @@
        one line of labels — where wrapping would leave the entries of the first
        line underlined by nothing. */
     overflow-x: auto;
+
+    /* Not optional, and it is the line above that makes it so. A flex item is
+       kept from shrinking past its content by an automatic minimum size, but
+       that minimum only holds while overflow is `visible` — and `overflow-x`
+       above makes `overflow-y` compute to `auto` as well. The navigation is
+       then free to be squashed to nothing by a tall sibling in a flex column
+       with a bounded height, which is exactly what a page of tables is. A
+       navigation is a fixed strip: it never gives up its height. */
+    flex-shrink: 0;
 }
 
 .shared-tabnav__list {

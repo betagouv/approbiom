@@ -1,12 +1,12 @@
 import { useState } from 'react'
-import SearchBar from '@shared/components/SearchBar'
 import DataTable, { type Column } from '@shared/components/DataTable'
 import './Ressource.css'
 import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
 import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
 import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
 import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-region'
-import type { RessourceScreen } from '../load-ressource'
+import type { Plan } from '@shared/application/read-models/plan'
+import type { RessourceScreen } from './load-ressource'
 
 const REPARTITION = new Intl.NumberFormat('fr-FR', {
     style: 'percent',
@@ -38,8 +38,12 @@ function measureColumns<
     ]
 }
 
+export type RessourceProps = RessourceScreen & {
+    plan: Plan['id']
+}
+
 export default function Ressource({
-    plans,
+    plan,
     totals,
     byRegion,
     byFournisseur,
@@ -47,23 +51,17 @@ export default function Ressource({
     ressourceTitles,
     fournisseurNames,
     departementNames,
-}: RessourceScreen) {
-    const [selectedPlan, setSelectedPlan] = useState<number | null>(null)
+}: RessourceProps) {
     // The ressource's code, not the row it came from: rows are rebuilt on every
     // load, so identity is not something a selection can be pinned to.
     const [selectedRessource, setSelectedRessource] = useState<string | null>(
         null
     )
 
-    const planOptions = plans.map((plan) => ({
-        value: plan.id,
-        label: plan.nom || `Plan ${plan.id}`,
-    }))
-
     const ressourceTitle = (code: string) => ressourceTitles.get(code) ?? code
 
     const ressourceRows = totals.filter(
-        (row) => row.planDApprovisionnement === selectedPlan
+        (row) => row.planDApprovisionnement === plan
     )
 
     const ressourceTotal = ressourceRows.reduce(
@@ -71,9 +69,9 @@ export default function Ressource({
         0
     )
 
-    // The three breakdowns all narrow to the same selected (plan, ressource).
+    // The three breakdowns all narrow to the same (plan, ressource).
     const matchesSelection = (row: ApprovisionnementByPlanAndRessource) =>
-        row.planDApprovisionnement === selectedPlan &&
+        row.planDApprovisionnement === plan &&
         row.ressource === selectedRessource
 
     const ressourceColumns: readonly Column<ApprovisionnementByPlanAndRessource>[] =
@@ -123,77 +121,62 @@ export default function Ressource({
         ]
 
     return (
-        <div className="fr-p-2w">
-            <SearchBar
-                label="Rechercher un plan d’approvisionnement"
-                placeholder="Rechercher un plan d’approvisionnement"
-                options={planOptions}
-                onSelect={(planId) => {
-                    setSelectedPlan(planId)
-                    setSelectedRessource(null)
-                }}
-            />
-
-            {selectedPlan !== null && (
-                <div className="fr-mt-4w">
-                    <DataTable
-                        caption="Ressources du plan sélectionné"
-                        rows={ressourceRows}
-                        columns={ressourceColumns}
-                        bordered
-                        selectedRows={ressourceRows.filter(
-                            (row) => row.ressource === selectedRessource
-                        )}
-                        onSelectionChange={(rows) =>
-                            setSelectedRessource(
-                                rows.find(
-                                    (row) => row.ressource !== selectedRessource
-                                )?.ressource ?? null
-                            )
-                        }
-                        selectionLabel={(row) =>
-                            `Sélectionner la ressource ${ressourceTitle(row.ressource)}`
-                        }
-                    />
-                    <p className="ressource__total fr-mt-1w">
-                        <strong>
-                            Total : {ressourceTotal.toLocaleString('fr-FR')}{' '}
-                            tonnes de matières vertes / an
-                        </strong>
-                    </p>
-                </div>
-            )}
+        // The blocks are spaced by the stylesheet rather than by a top margin
+        // on each: what sits above the screen is the caller's, and a leading
+        // margin of ours would push against it.
+        <div className="ressource">
+            <div>
+                <DataTable
+                    caption="Ressources du plan sélectionné"
+                    rows={ressourceRows}
+                    columns={ressourceColumns}
+                    bordered
+                    selectedRows={ressourceRows.filter(
+                        (row) => row.ressource === selectedRessource
+                    )}
+                    onSelectionChange={(rows) =>
+                        setSelectedRessource(
+                            rows.find(
+                                (row) => row.ressource !== selectedRessource
+                            )?.ressource ?? null
+                        )
+                    }
+                    selectionLabel={(row) =>
+                        `Sélectionner la ressource ${ressourceTitle(row.ressource)}`
+                    }
+                />
+                <p className="ressource__total fr-mt-1w">
+                    <strong>
+                        Total : {ressourceTotal.toLocaleString('fr-FR')} tonnes
+                        de matières vertes / an
+                    </strong>
+                </p>
+            </div>
 
             {selectedRessource !== null && (
                 <>
-                    <div className="fr-mt-4w">
-                        <DataTable
-                            caption="Ventilation par région"
-                            rows={byRegion.filter(matchesSelection)}
-                            columns={regionColumns}
-                            bordered
-                        />
-                    </div>
+                    <DataTable
+                        caption="Ventilation par région"
+                        rows={byRegion.filter(matchesSelection)}
+                        columns={regionColumns}
+                        bordered
+                    />
 
-                    <div className="fr-mt-4w">
-                        <DataTable
-                            caption="Ventilation par département"
-                            rows={byDepartementDeProvenance.filter(
-                                matchesSelection
-                            )}
-                            columns={departementColumns}
-                            bordered
-                        />
-                    </div>
+                    <DataTable
+                        caption="Ventilation par département"
+                        rows={byDepartementDeProvenance.filter(
+                            matchesSelection
+                        )}
+                        columns={departementColumns}
+                        bordered
+                    />
 
-                    <div className="fr-mt-4w">
-                        <DataTable
-                            caption="Ventilation par fournisseur"
-                            rows={byFournisseur.filter(matchesSelection)}
-                            columns={fournisseurColumns}
-                            bordered
-                        />
-                    </div>
+                    <DataTable
+                        caption="Ventilation par fournisseur"
+                        rows={byFournisseur.filter(matchesSelection)}
+                        columns={fournisseurColumns}
+                        bordered
+                    />
                 </>
             )}
         </div>

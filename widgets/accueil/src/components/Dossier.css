@@ -1,0 +1,24 @@
+/* The same frame as the list it replaces — full height, its own scrollbar,
+   2rem of padding — so opening a dossier does not shift the page inside the
+   Grist iframe. */
+.dossier {
+    display: flex;
+    flex-direction: column;
+
+    gap: 1.5rem;
+    padding: 2rem;
+
+    height: 100vh;
+    overflow: auto;
+}
+
+/* Only as wide as its label: a stretched flex item would leave the whole line
+   clickable, well past the words. */
+.dossier__back {
+    align-self: flex-start;
+}
+
+/* The gap above already spaces the title; its own margin would double it. */
+.dossier__title {
+    margin: 0;
+}
