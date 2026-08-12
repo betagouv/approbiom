@@ -7,8 +7,10 @@ import {
 import type { PlanQuery } from '@shared/application/ports/plan-query'
 import type { Plan } from '@shared/application/read-models/plan'
 import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
+import type { Installation } from '@shared/application/domain/installation'
 import type { Instruction } from '@shared/application/domain/instruction'
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
+import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
 import App from './App'
 import type { AccueilPorts } from './load-accueil'
 
@@ -35,6 +37,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         demandesSubvention: { list: rows([]) },
         programmesAide: { list: rows([]) },
         instructions: { list: rows([]) },
+        installations: { list: rows([]) },
         ...overrides,
     }
 }
@@ -55,6 +58,19 @@ const bciat: ProgrammeAide = {
     name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
     shortName: 'BCIAT',
     appelAProjet: 'BCIAT (2023)',
+}
+
+// The chain the header's « Région » follows: the plan points here, and this is
+// what carries the commune the département — and so the région — is read from.
+const chaufferieDeSaintJunien: Installation = {
+    id: saintJunien.installation,
+    nom: 'Chaufferie de Saint-Junien',
+    commune: { com: '87154', libelle: 'Saint-Junien', dep: '87' },
+}
+
+const nouvelleAquitaineInsee: DepartementsByRegion = {
+    region: { reg: '75', libelle: 'Nouvelle-Aquitaine' },
+    departements: [{ dep: '87', libelle: 'Haute-Vienne' }],
 }
 
 const demandeBciat: DemandeSubvention = {
@@ -200,6 +216,45 @@ describe('App', () => {
         ).toBeDefined()
         expect(screen.getByText('5 août 2026')).toBeDefined()
         expect(screen.getByText('Avis favorable')).toBeDefined()
+    })
+
+    it('names the appel à projet and the région under the plan’s title', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planQuery(rows([saintJunien])),
+                    demandesSubvention: { list: rows([demandeBciat]) },
+                    programmesAide: { list: rows([bciat]) },
+                    installations: { list: rows([chaufferieDeSaintJunien]) },
+                    insee: {
+                        listDepartementsByRegion: rows([
+                            nouvelleAquitaineInsee,
+                        ]),
+                    },
+                })}
+            />
+        )
+
+        await openDossier()
+
+        // The « : » after each term is drawn by the stylesheet, so the text
+        // here is the term on its own.
+        expect(screen.getByText('Appel à projet')).toBeDefined()
+        expect(screen.getByText('BCIAT (2023)')).toBeDefined()
+        expect(screen.getByText('Région')).toBeDefined()
+        expect(screen.getByText('Nouvelle-Aquitaine')).toBeDefined()
+    })
+
+    it('says as much when neither can be answered', async () => {
+        // No demande de subvention names an appel, and no installation places
+        // the plan. Both lines stay, so the header keeps its shape.
+        render(
+            <App {...fakePorts({ plans: planQuery(rows([saintJunien])) })} />
+        )
+
+        await openDossier()
+
+        expect(screen.getAllByText('—')).toHaveLength(2)
     })
 
     it('leaves the fil d’instruction empty for a dossier with no demande', async () => {

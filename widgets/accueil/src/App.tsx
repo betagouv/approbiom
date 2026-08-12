@@ -15,7 +15,12 @@ export default function App(ports: AccueilPorts) {
     return (
         <main className="app">
             <AsyncGate state={state} renderError={renderError}>
-                {({ plansApprovisionnement, ressource, filInstruction }) =>
+                {({
+                    plansApprovisionnement,
+                    ressource,
+                    filInstruction,
+                    regionByPlan,
+                }) =>
                     dossier === null ? (
                         <Accueil
                             plansApprovisionnement={plansApprovisionnement}
@@ -26,6 +31,9 @@ export default function App(ports: AccueilPorts) {
                             plan={dossier}
                             ressource={ressource}
                             filInstruction={filInstruction}
+                            regionInstallation={
+                                regionByPlan.get(dossier.id) ?? null
+                            }
                             onClose={() => setDossier(null)}
                         />
                     )

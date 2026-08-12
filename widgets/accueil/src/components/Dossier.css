@@ -22,3 +22,51 @@
 .dossier__title {
     margin: 0;
 }
+
+.dossier__header {
+    display: flex;
+    flex-direction: column;
+}
+
+/* The title and what identifies the plan under it, stacked: the header itself
+   is a row, and without this the two lines would sit beside the title rather
+   than below it. */
+.dossier__heading {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+/* One row of pairs, wrapping to the next line when the panel is too narrow for
+   both — a Grist widget is given whatever width the document's layout leaves
+   it. The row gap is what separates them once they wrap. */
+.dossier__meta {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0.25rem 2rem;
+
+    margin: 0;
+    font-size: 0.875rem;
+}
+
+/* Term and value on one line, as a sentence rather than a column. */
+.dossier__meta-entry {
+    display: flex;
+}
+
+.dossier__meta dt {
+    font-weight: 700;
+}
+
+/* Punctuation, not content: it belongs to the pair, which the `dl` already
+   states, so it is drawn here and left out of the text a screen reader reads.
+   The space before it is the insécable French typography asks for — the colon
+   never begins a line on its own. */
+.dossier__meta dt::after {
+    content: '\00a0:';
+}
+
+/* `dd` carries a browser default indent that would break the pair apart. */
+.dossier__meta dd {
+    margin: 0;
+}

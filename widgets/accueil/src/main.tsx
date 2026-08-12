@@ -10,6 +10,7 @@ import { createGristApprovisionnementQuery } from '@shared/infrastructure/grist/
 import { createGristDemandeSubventionQuery } from '@shared/infrastructure/grist/grist-demande-subvention-query'
 import { createGristEntrepriseQuery } from '@shared/infrastructure/grist/grist-entreprise-query'
 import { createGristInseeQuery } from '@shared/infrastructure/grist/grist-insee-query'
+import { createGristInstallationQuery } from '@shared/infrastructure/grist/grist-installation-query'
 import { createGristInstructionQuery } from '@shared/infrastructure/grist/grist-instruction-query'
 import { createGristPlanQuery } from '@shared/infrastructure/grist/grist-plan-query'
 import { createGristProgrammeAideQuery } from '@shared/infrastructure/grist/grist-programme-aide-query'
@@ -29,6 +30,7 @@ createRoot(rootEl).render(
             demandesSubvention={createGristDemandeSubventionQuery()}
             programmesAide={createGristProgrammeAideQuery()}
             instructions={createGristInstructionQuery()}
+            installations={createGristInstallationQuery()}
         />
     </StrictMode>
 )
