@@ -1,132 +1,67 @@
-import { useGrist } from '@shared/hooks/useGrist'
+import { cleanup, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it } from 'vitest'
+import {
+    AccessDeniedError,
+    DataSourceUnavailableError,
+} from '@shared/application/errors'
+import type { PlanQuery } from '@shared/application/ports/plan-query'
 import App from './App'
-import { render, screen } from '@testing-library/react'
-import { describe, expect, it, vi } from 'vitest'
-import type { ACCUEIL_SPEC } from './grist'
 
-vi.mock('@shared/hooks/useGrist', () => ({
-    useGrist: vi.fn(),
-}))
+const planQuery = (list: PlanQuery['list']): PlanQuery => ({ list })
 
-describe('App Widget Accueil', () => {
-    it('displays Accueil when Grist data is ready', () => {
-        const mockedUseGrist = vi.mocked(
-            useGrist as (
-                spec: typeof ACCUEIL_SPEC
-            ) => ReturnType<typeof useGrist<typeof ACCUEIL_SPEC>>
-        )
+afterEach(() => {
+    cleanup()
+})
 
-        mockedUseGrist.mockReturnValue({
-            status: 'ready',
-            data: {
-                Plan_d_approvisionnement: [],
-                Demande_subvention: [],
-                Instruction_crb: [],
-                Crb: [],
-                Piece_jointe: [],
-            },
-            error: null,
-            accessLevel: 'full',
-            refetch: vi.fn(),
-            refetchTable: vi.fn(),
-        })
-
-        render(<App />)
+describe('App', () => {
+    it('renders the screen once the plans have loaded', async () => {
+        render(<App plans={planQuery(() => Promise.resolve([]))} />)
 
         expect(
-            screen.getByRole('heading', {
+            await screen.findByRole('heading', {
                 level: 1,
                 name: 'Suivi des plans d’approvisionnement',
             })
         ).toBeDefined()
     })
 
-    it('displays the connecting message when connecting to Grist', () => {
-        vi.mocked(useGrist).mockReturnValue({
-            status: 'connecting',
-            data: null,
-            error: null,
-            accessLevel: null,
-            refetch: () => '',
-            refetchTable: async () => Promise.resolve(),
-        })
-
-        render(<App />)
+    it('says so when the page is not running inside Grist', async () => {
+        render(
+            <App
+                plans={planQuery(() =>
+                    Promise.reject(new DataSourceUnavailableError('no grist'))
+                )}
+            />
+        )
 
         expect(
-            screen.getByText('Information : connexion à Grist en cours…')
+            await screen.findByText(/n’est pas ouverte dans Grist/)
         ).toBeDefined()
     })
 
-    it('displays the "not in a Grist iframe" message when not in a Grist custom widget', () => {
-        vi.mocked(useGrist).mockReturnValue({
-            status: 'grist undefined',
-            data: null,
-            error: null,
-            accessLevel: null,
-            refetch: () => '',
-            refetchTable: async () => Promise.resolve(),
-        })
-
-        render(<App />)
+    it('says so when the document refuses to be read', async () => {
+        render(
+            <App
+                plans={planQuery(() =>
+                    Promise.reject(new AccessDeniedError('read only'))
+                )}
+            />
+        )
 
         expect(
-            screen.getByText('Information : connexion à Grist en cours…')
+            await screen.findByText(/besoin d’un accès complet au document/)
         ).toBeDefined()
     })
 
-    it('displays the loading message when Grist data is being fetched', () => {
-        vi.mocked(useGrist).mockReturnValue({
-            status: 'loading',
-            data: null,
-            error: null,
-            accessLevel: 'full',
-            refetch: () => '',
-            refetchTable: async () => Promise.resolve(),
-        })
+    it('shows the message of any other failure', async () => {
+        render(
+            <App
+                plans={planQuery(() =>
+                    Promise.reject(new Error('Table not found'))
+                )}
+            />
+        )
 
-        render(<App />)
-
-        expect(
-            screen.getByText('Information : chargement des données…')
-        ).toBeDefined()
-    })
-
-    it('displays the access denied message when the user does not have the required permissions', () => {
-        vi.mocked(useGrist).mockReturnValue({
-            status: 'denied',
-            data: null,
-            error: null,
-            accessLevel: 'full',
-            refetch: () => '',
-            refetchTable: async () => Promise.resolve(),
-        })
-
-        render(<App />)
-
-        expect(
-            screen.getByText(
-                `Avertissement : ce widget a besoin d’un accès complet au document. Ouvrez le panneau de configuration du widget et choisissez « Accès complet au document ».`
-            )
-        ).toBeDefined()
-    })
-
-    it('displays an error message when the Grist API returns an error', () => {
-        vi.mocked(useGrist).mockReturnValue({
-            status: 'error',
-            data: null,
-            error: { message: 'There was an error', name: 'Grist API Error' },
-            accessLevel: 'full',
-            refetch: vi.fn(),
-            refetchTable: async () => Promise.resolve(),
-        })
-
-        render(<App />)
-
-        expect(
-            screen.getByText(
-                'Erreur : impossible de charger les données : There was an error'
-            )
-        ).toBeDefined()
+        expect(await screen.findByText(/Table not found/)).toBeDefined()
     })
 })

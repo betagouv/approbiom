@@ -1,5 +1,17 @@
 import { describe, expect, it } from 'vitest'
+import type { Plan } from '@shared/application/read-models/plan'
 import { loadRessource, type RessourcePorts } from './load-ressource'
+
+const plan = (overrides: Partial<Plan> = {}): Plan => ({
+    id: 1,
+    nom: 'Plan',
+    installation: 10,
+    typeDePlan: 'création',
+    usage: 'énergie',
+    natureDonnee: 'prévision',
+    statut: 'projet',
+    ...overrides,
+})
 
 /** A port method that just hands back what it was given. */
 const rows =
@@ -58,8 +70,8 @@ describe('loadRessource', () => {
             fakePorts({
                 plans: {
                     list: rows([
-                        { id: 1, nom: 'Plan Nord', installation: 10 },
-                        { id: 2, nom: 'Plan Sans Ressource', installation: 20 },
+                        plan({ id: 1, nom: 'Plan Nord' }),
+                        plan({ id: 2, nom: 'Plan Sans Ressource' }),
                     ]),
                 },
             })
