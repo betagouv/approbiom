@@ -22,6 +22,7 @@ function plan(overrides: Partial<PlanAccueil> = {}): PlanAccueil {
         installationRegion: null,
         demandesSubvention: [],
         fournisseurs: [],
+        attachments: [],
         ...overrides,
     }
 }

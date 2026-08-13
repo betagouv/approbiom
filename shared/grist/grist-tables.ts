@@ -22,6 +22,7 @@ export const TABLE = {
     instruction: 'Instruction_crb',
     crb: 'Crb',
     programmeAide: 'Prog_aides',
+    attachment: 'Piece_jointe',
 } as const
 
 /** The columns every summary is keyed and measured by, whatever it groups on. */
@@ -83,4 +84,5 @@ export const COLUMNS = {
         'Nom_raccourci',
         'Appel_a_projet',
     ],
+    attachment: ['Plan_d_approvisionnement', 'piece_jointe', 'type'],
 } as const satisfies Record<string, readonly string[]>

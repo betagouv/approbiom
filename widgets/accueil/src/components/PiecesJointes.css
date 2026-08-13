@@ -1,0 +1,17 @@
+.pieces-jointes__nom {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.pieces-jointes .fr-table__wrapper caption {
+    position: absolute;
+    clip: rect(0, 0, 0, 0);
+    width: 1px;
+    height: 0;
+    margin: -1px;
+    padding: 0;
+    border: 0;
+    overflow: hidden;
+    white-space: nowrap;
+}

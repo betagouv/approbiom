@@ -1,4 +1,5 @@
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
+import type { AttachmentQuery } from '@shared/application/ports/attachment-query'
 import type { DemandeSubventionQuery } from '@shared/application/ports/demande-subvention-query'
 import type { InstallationQuery } from '@shared/application/ports/installation-query'
 import type { InstructionQuery } from '@shared/application/ports/instruction-query'
@@ -19,6 +20,7 @@ export type AccueilPorts = RessourcePorts & {
     programmesAide: ProgrammeAideQuery
     instructions: InstructionQuery
     installations: InstallationQuery
+    attachments: AttachmentQuery
 }
 
 export type AccueilScreen = {
@@ -38,6 +40,7 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
         installations,
         departementsByRegion,
         entreprises,
+        attachments,
     ] = await Promise.all([
         ports.plans.list(),
         loadRessource(ports),
@@ -47,6 +50,7 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
         ports.installations.list(),
         ports.insee.listDepartementsByRegion(),
         ports.entreprises.list(),
+        ports.attachments.list(),
     ])
 
     return {
@@ -59,6 +63,7 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
             instructions,
             approvisionnementsByFournisseur: ressource.byFournisseur,
             entreprises,
+            attachments,
         }),
         ressource,
         programmesAide,

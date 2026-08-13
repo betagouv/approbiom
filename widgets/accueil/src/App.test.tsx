@@ -38,6 +38,10 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         programmesAide: { list: rows([]) },
         instructions: { list: rows([]) },
         installations: { list: rows([]) },
+        attachments: {
+            list: rows([]),
+            getFileUrl: () => Promise.resolve(''),
+        },
         ...overrides,
     }
 }

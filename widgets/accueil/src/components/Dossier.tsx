@@ -3,12 +3,14 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
 import './Dossier.css'
 import FilInstruction from './FilInstruction'
+import PiecesJointes from './PiecesJointes'
 import TabNav, {
     type TabNavItem,
 } from '@shared/user-interface/component/TabNav'
 import Ressource, {
     type RessourceScreen,
 } from '@shared/user-interface/screen/ressource'
+import type { Attachment } from '@shared/application/domain/attachment'
 import {
     getAppelsAProjet,
     type PlanAccueil,
@@ -18,16 +20,23 @@ import { useState } from 'react'
 const SECTIONS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
     { id: 'ressources', label: 'Ressources' },
+    { id: 'pieces-jointes', label: 'Pièces jointes' },
 ]
 const INCONNU = '—'
 
 export type DossierProps = {
     plan: PlanAccueil
     ressource: RessourceScreen
+    getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void
 }
 
-export default function Dossier({ plan, ressource, onClose }: DossierProps) {
+export default function Dossier({
+    plan,
+    ressource,
+    getFileUrl,
+    onClose,
+}: DossierProps) {
     const [section, setSection] = useState(SECTIONS[0].id)
 
     const appelsAProjet = getAppelsAProjet(plan).join(', ')
@@ -71,6 +80,12 @@ export default function Dossier({ plan, ressource, onClose }: DossierProps) {
 
             {section === 'ressources' && (
                 <Ressource {...ressource} plan={plan.id} />
+            )}
+            {section === 'pieces-jointes' && (
+                <PiecesJointes
+                    attachments={plan.attachments}
+                    getFileUrl={getFileUrl}
+                />
             )}
         </div>
     )

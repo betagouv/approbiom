@@ -7,6 +7,7 @@ import '@gouvfr/dsfr/dist/core/core.main.min.css'
 import './index.css'
 import App from './App'
 import { createGristApprovisionnementQuery } from '@shared/grist/grist-approvisionnement-query'
+import { createGristAttachmentQuery } from '@shared/grist/grist-attachment-query'
 import { createGristDemandeSubventionQuery } from '@shared/grist/grist-demande-subvention-query'
 import { createGristEntrepriseQuery } from '@shared/grist/grist-entreprise-query'
 import { createGristInseeQuery } from '@shared/grist/grist-insee-query'
@@ -31,6 +32,7 @@ createRoot(rootEl).render(
             programmesAide={createGristProgrammeAideQuery()}
             instructions={createGristInstructionQuery()}
             installations={createGristInstallationQuery()}
+            attachments={createGristAttachmentQuery()}
         />
     </StrictMode>
 )

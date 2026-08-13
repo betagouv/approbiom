@@ -1,4 +1,5 @@
 import { describe, expect, it } from 'vitest'
+import type { Attachment } from '@shared/application/domain/attachment'
 import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
 import type { Entreprise } from '@shared/application/domain/entreprise'
 import type { Instruction } from '@shared/application/domain/instruction'
@@ -116,7 +117,25 @@ function sources(
         instructions: [nouvelleAquitaine, occitanie, bretagne, voisine],
         approvisionnementsByFournisseur: [],
         entreprises: [scieriePicard, cooperativeDuBois],
+        attachments: [],
         ...overrides,
+    }
+}
+
+const attachmentsOf = (plans: readonly PlanAccueil[], id: Plan['id']) =>
+    plans.find((plan) => plan.id === id)?.attachments ?? []
+
+function attachment(
+    planDApprovisionnement: Plan['id'],
+    id: number,
+    name = `document-${id}.pdf`
+): Attachment {
+    return {
+        id,
+        planDApprovisionnement,
+        type: 'Formulaire',
+        name,
+        sizeInBytes: 1024,
     }
 }
 
@@ -203,6 +222,29 @@ describe('getPlansAccueil', () => {
                 valFleuri.id
             )[0].instructions
         ).toEqual([])
+    })
+})
+
+describe('getPlansAccueil, on the attachments', () => {
+    it('hangs every document on the plan it is attached to', () => {
+        const formulaire = attachment(valFleuri.id, 1)
+        const plan = attachment(valFleuri.id, 2)
+        const voisin = attachment(clairVillage.id, 3)
+
+        const plans = getPlansAccueil(
+            sources({ attachments: [formulaire, plan, voisin] })
+        )
+
+        expect(attachmentsOf(plans, valFleuri.id)).toEqual([formulaire, plan])
+        expect(attachmentsOf(plans, clairVillage.id)).toEqual([voisin])
+    })
+
+    it('leaves a plan nothing is attached to with nothing', () => {
+        const plans = getPlansAccueil(
+            sources({ attachments: [attachment(clairVillage.id, 1)] })
+        )
+
+        expect(attachmentsOf(plans, valFleuri.id)).toEqual([])
     })
 })
 

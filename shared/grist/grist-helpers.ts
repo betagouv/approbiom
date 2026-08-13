@@ -103,6 +103,16 @@ export const asDate = (value: unknown): Date | null =>
 export const asBoolean = (value: unknown): boolean =>
     value === true || value === 1
 
+/**
+ * A cell holding several rowIds — a Reference List, an Attachments column —
+ * arrives as the list marker followed by the ids. An empty cell is null rather
+ * than an empty list, and reads here as no id at all.
+ */
+export const asIdList = (value: unknown): number[] =>
+    Array.isArray(value) && value[0] === 'L'
+        ? value.slice(1).filter((id): id is number => typeof id === 'number')
+        : []
+
 export function lookup<T>(index: Map<number, T>, id: unknown): T | undefined {
     return typeof id === 'number' && id !== 0 ? index.get(id) : undefined
 }

@@ -32,6 +32,9 @@ export default function App(ports: AccueilPorts) {
                         <Dossier
                             plan={dossier}
                             ressource={ressource}
+                            getFileUrl={(id) =>
+                                ports.attachments.getFileUrl(id)
+                            }
                             onClose={() => setDossier(null)}
                         />
                     )

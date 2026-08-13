@@ -1,3 +1,4 @@
+import type { Attachment } from '@shared/application/domain/attachment'
 import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
 import type { Departement } from '@shared/application/domain/departement'
 import type { Entreprise } from '@shared/application/domain/entreprise'
@@ -20,6 +21,7 @@ export type PlanAccueil = Plan & {
     installationRegion: Region['libelle'] | null
     demandesSubvention: readonly DemandeSubventionAccueil[]
     fournisseurs: readonly Entreprise[]
+    attachments: readonly Attachment[]
 }
 
 export type PlanAccueilSources = {
@@ -31,6 +33,7 @@ export type PlanAccueilSources = {
     instructions: readonly Instruction[]
     approvisionnementsByFournisseur: readonly ApprovisionnementByPlanRessourceAndFournisseur[]
     entreprises: readonly Entreprise[]
+    attachments: readonly Attachment[]
 }
 
 function getInstructionsBySubvention(
@@ -133,6 +136,22 @@ function getFournisseursByPlan({
     return fournisseursByPlan
 }
 
+function getAttachmentsByPlan(
+    attachments: readonly Attachment[]
+): Map<Plan['id'], Attachment[]> {
+    const attachmentsByPlan = new Map<Plan['id'], Attachment[]>()
+
+    for (const attachment of attachments) {
+        const attached =
+            attachmentsByPlan.get(attachment.planDApprovisionnement) ?? []
+        attached.push(attachment)
+
+        attachmentsByPlan.set(attachment.planDApprovisionnement, attached)
+    }
+
+    return attachmentsByPlan
+}
+
 export function getAppelsAProjet(
     plan: PlanAccueil
 ): ProgrammeAide['appelAProjet'][] {
@@ -152,6 +171,7 @@ export function getPlansAccueil({
     instructions,
     approvisionnementsByFournisseur,
     entreprises,
+    attachments,
 }: PlanAccueilSources): PlanAccueil[] {
     const installationById = new Map(
         installations.map((installation) => [installation.id, installation])
@@ -173,6 +193,8 @@ export function getPlansAccueil({
         entreprises,
     })
 
+    const attachmentsByPlan = getAttachmentsByPlan(attachments)
+
     return plans.map((plan) => {
         const departement =
             installationById.get(plan.installation)?.commune.dep || null
@@ -186,6 +208,7 @@ export function getPlansAccueil({
                     : (regionByDepartement.get(departement) ?? null),
             demandesSubvention: demandesByPlan.get(plan.id) ?? [],
             fournisseurs: fournisseursByPlan.get(plan.id) ?? [],
+            attachments: attachmentsByPlan.get(plan.id) ?? [],
         }
     })
 }

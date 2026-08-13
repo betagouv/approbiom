@@ -1,5 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
+    asIdList,
     fetchRows,
     indexByKey,
     toRows,
@@ -84,6 +85,28 @@ describe('fetchRows', () => {
         await expect(
             fetchRows('Plan_d_approvisionnement', ['Nom', 'Usage_principal'])
         ).rejects.toThrow('Nom, Usage_principal')
+    })
+})
+
+describe('asIdList', () => {
+    it('reads the ids a list cell carries, dropping the marker', () => {
+        expect(asIdList(['L', 1, 2])).toEqual([1, 2])
+    })
+
+    it('reads no id at all from an empty cell', () => {
+        // An empty Attachments cell is null, not an empty list.
+        expect(asIdList(null)).toEqual([])
+        expect(asIdList(undefined)).toEqual([])
+    })
+
+    it('reads no id from a cell that holds no list', () => {
+        expect(asIdList(12)).toEqual([])
+        expect(asIdList('L')).toEqual([])
+        expect(asIdList(['R', 'Table', 1])).toEqual([])
+    })
+
+    it('keeps only the ids that are numbers', () => {
+        expect(asIdList(['L', 1, null, 'deux', 3])).toEqual([1, 3])
     })
 })
 
