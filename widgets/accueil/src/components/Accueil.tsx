@@ -3,9 +3,11 @@ import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-user/icons-user.main.min.css'
 
 import './Accueil.css'
-import DataTable, { type Column } from '@shared/components/DataTable'
-import MultiSelect from '@shared/components/MultiSelect'
-import SearchBar from '@shared/components/SearchBar'
+import DataTable, {
+    type Column,
+} from '@shared/user-interface/component/DataTable'
+import MultiSelect from '@shared/user-interface/component/MultiSelect'
+import SearchBar from '@shared/user-interface/component/SearchBar'
 import TagNature from './TagNature'
 import TagStatut from './TagStatut'
 import TagType from './TagType'

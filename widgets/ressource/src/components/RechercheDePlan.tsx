@@ -1,6 +1,8 @@
 import './RechercheDePlan.css'
-import SearchBar from '@shared/components/SearchBar'
-import Ressource, { type RessourceScreen } from '@shared/screens/ressource'
+import SearchBar from '@shared/user-interface/component/SearchBar'
+import Ressource, {
+    type RessourceScreen,
+} from '@shared/user-interface/screen/ressource'
 import type { Plan } from '@shared/application/read-models/plan'
 import { useState } from 'react'
 

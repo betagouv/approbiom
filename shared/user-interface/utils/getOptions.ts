@@ -1,4 +1,4 @@
-import type { MultiSelectOption } from '@shared/components/MultiSelect'
+import type { MultiSelectOption } from '@shared/user-interface/component/MultiSelect'
 
 /**
  * Builds the options of a MultiSelect from the rows it filters: reads one value

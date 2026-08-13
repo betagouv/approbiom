@@ -12,7 +12,7 @@ import {
     loadRessource,
     type RessourcePorts,
     type RessourceScreen,
-} from '@shared/screens/ressource'
+} from '@shared/user-interface/screen/ressource'
 
 export type AccueilPorts = RessourcePorts & {
     demandesSubvention: DemandeSubventionQuery

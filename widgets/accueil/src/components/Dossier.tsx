@@ -3,8 +3,12 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
 import './Dossier.css'
 import FilInstruction from './FilInstruction'
-import TabNav, { type TabNavItem } from '@shared/components/TabNav'
-import Ressource, { type RessourceScreen } from '@shared/screens/ressource'
+import TabNav, {
+    type TabNavItem,
+} from '@shared/user-interface/component/TabNav'
+import Ressource, {
+    type RessourceScreen,
+} from '@shared/user-interface/screen/ressource'
 import {
     getInstructionsByProgrammeAide,
     type FilInstructionData,

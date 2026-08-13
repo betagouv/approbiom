@@ -1,9 +1,11 @@
 import './Concurrence.css'
-import DataTable, { type Column } from '@shared/components/DataTable'
+import DataTable, {
+    type Column,
+} from '@shared/user-interface/component/DataTable'
 import MultiSelect, {
     type MultiSelectGroup,
-} from '@shared/components/MultiSelect'
-import { getOptions } from '@shared/utils/getOptions'
+} from '@shared/user-interface/component/MultiSelect'
+import { getOptions } from '@shared/user-interface/utils/getOptions'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
 import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
 import type { Departement } from '@shared/application/domain/departement'

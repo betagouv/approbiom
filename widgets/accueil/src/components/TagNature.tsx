@@ -1,4 +1,4 @@
-import Tag from '@shared/components/Tag'
+import Tag from '@shared/user-interface/component/Tag'
 
 // A prévision is the ordinary case, so it stays grey; a constat is the one worth
 // spotting — the figure has been measured rather than announced.

@@ -1,4 +1,4 @@
-import Tag from '@shared/components/Tag'
+import Tag from '@shared/user-interface/component/Tag'
 
 const COLOR: Record<string, string> = {
     création: 'yellow-tournesol',

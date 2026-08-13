@@ -8,4 +8,4 @@ pnpm-lock.yaml
 
 # Vendored upstream: keep byte-identical so it can be diffed against the
 # gristlabs/grist-widget copy when it is refreshed.
-shared/infrastructure/grist/grist-plugin-api.d.ts
+shared/grist/grist-plugin-api.d.ts

@@ -1,7 +1,7 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
 import type { Plan } from '@shared/application/read-models/plan'
-import type { RessourceScreen } from '@shared/screens/ressource'
+import type { RessourceScreen } from '@shared/user-interface/screen/ressource'
 import RechercheDePlan from './RechercheDePlan'
 
 const plan = (overrides: Partial<Plan> = {}): Plan => ({

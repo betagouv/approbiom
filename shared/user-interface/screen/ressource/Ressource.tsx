@@ -1,5 +1,7 @@
 import { useState } from 'react'
-import DataTable, { type Column } from '@shared/components/DataTable'
+import DataTable, {
+    type Column,
+} from '@shared/user-interface/component/DataTable'
 import './Ressource.css'
 import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
 import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'

@@ -5,9 +5,9 @@ import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
 import type {
     MultiSelectGroup,
     MultiSelectOption,
-} from '@shared/components/MultiSelect'
-import type { SearchBarOption } from '@shared/components/SearchBar'
-import { getOptions } from '@shared/utils/getOptions'
+} from '@shared/user-interface/component/MultiSelect'
+import type { SearchBarOption } from '@shared/user-interface/component/SearchBar'
+import { getOptions } from '@shared/user-interface/utils/getOptions'
 
 export type PlanFilters = {
     nom?: string
