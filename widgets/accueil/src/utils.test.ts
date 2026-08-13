@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
+import type {
+    DemandeSubventionAccueil,
+    PlanAccueil,
+} from '@shared/application/read-models/plan-accueil'
 import {
     getDepartementOptions,
     getFilteredRows,
@@ -17,7 +20,26 @@ function plan(overrides: Partial<PlanAccueil> = {}): PlanAccueil {
         statut: 'projet',
         departement: null,
         installationRegion: null,
+        demandesSubvention: [],
         ...overrides,
+    }
+}
+
+let demandeId = 0
+
+function demande(appelAProjet: string): DemandeSubventionAccueil {
+    demandeId += 1
+
+    return {
+        id: demandeId,
+        programmeAide: {
+            id: demandeId,
+            year: 2023,
+            name: `Programme ${appelAProjet}`,
+            shortName: appelAProjet,
+            appelAProjet,
+        },
+        instructions: [],
     }
 }
 
@@ -27,6 +49,7 @@ const valFleuri = plan({
     statut: 'projet',
     departement: '87',
     installationRegion: 'Nouvelle-Aquitaine',
+    demandesSubvention: [demande('BCIAT (2023)')],
 })
 const boisDuNord = plan({
     id: 2,
@@ -34,6 +57,7 @@ const boisDuNord = plan({
     statut: 'en fonctionnement',
     departement: '33',
     installationRegion: 'Nouvelle-Aquitaine',
+    demandesSubvention: [demande('BCIAT (2023)'), demande('BCIB (2024)')],
 })
 const clairVillage = plan({
     id: 3,

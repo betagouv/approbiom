@@ -1,7 +1,11 @@
 import type { Departement } from '@shared/application/domain/departement'
+import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
 import type { Plan } from '@shared/application/read-models/plan'
-import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
+import {
+    getAppelsAProjet,
+    type PlanAccueil,
+} from '@shared/application/read-models/plan-accueil'
 import type {
     MultiSelectGroup,
     MultiSelectOption,
@@ -9,10 +13,16 @@ import type {
 import type { SearchBarOption } from '@shared/user-interface/component/SearchBar'
 import { getOptions } from '@shared/user-interface/utils/getOptions'
 
+export const SANS_APPEL_A_PROJET_LABEL =
+    "Aucun appel à projet n'est lié à ce plan"
+
+const SANS_APPEL_A_PROJET_VALUE = ''
+
 export type PlanFilters = {
     nom?: string
     statuts?: readonly string[]
     departements?: readonly Departement['dep'][]
+    appelsAProjet?: readonly ProgrammeAide['appelAProjet'][]
 }
 
 function matchesSelection(
@@ -22,9 +32,25 @@ function matchesSelection(
     return selection.length === 0 || selection.includes(value ?? '')
 }
 
+function matchesAnySelection(
+    selection: readonly string[],
+    values: readonly string[]
+): boolean {
+    if (selection.length === 0) return true
+
+    return values.length === 0
+        ? selection.includes(SANS_APPEL_A_PROJET_VALUE)
+        : values.some((value) => selection.includes(value))
+}
+
 export function getFilteredRows(
     rows: readonly PlanAccueil[],
-    { nom = '', statuts = [], departements = [] }: PlanFilters = {}
+    {
+        nom = '',
+        statuts = [],
+        departements = [],
+        appelsAProjet = [],
+    }: PlanFilters = {}
 ): PlanAccueil[] {
     const query = nom.trim().toLowerCase()
 
@@ -32,7 +58,8 @@ export function getFilteredRows(
         (row) =>
             (query === '' || row.nom.toLowerCase().includes(query)) &&
             matchesSelection(statuts, row.statut) &&
-            matchesSelection(departements, row.departement)
+            matchesSelection(departements, row.departement) &&
+            matchesAnySelection(appelsAProjet, getAppelsAProjet(row))
     )
 }
 
@@ -69,4 +96,20 @@ export function getStatutOptions(
     return getOptions(rows, (row) => row.statut, capitalize).sort((a, b) =>
         a.label.localeCompare(b.label, 'fr')
     )
+}
+
+export function getAppelAProjetOptions(
+    programmesAide: readonly ProgrammeAide[]
+): MultiSelectOption<ProgrammeAide['appelAProjet']>[] {
+    const appels = getOptions(
+        programmesAide,
+        (programme) => programme.appelAProjet
+    ).sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+
+    // Last, under the named appels: it is the answer to « none of them », not
+    // one more of them.
+    return [
+        ...appels,
+        { value: SANS_APPEL_A_PROJET_VALUE, label: SANS_APPEL_A_PROJET_LABEL },
+    ]
 }

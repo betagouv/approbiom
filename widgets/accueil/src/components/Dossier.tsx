@@ -10,11 +10,10 @@ import Ressource, {
     type RessourceScreen,
 } from '@shared/user-interface/screen/ressource'
 import {
-    getInstructionsByProgrammeAide,
-    type FilInstructionData,
-} from '@shared/application/read-models/instructions-by-programme-aide'
-import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
-import { useMemo, useState } from 'react'
+    getAppelsAProjet,
+    type PlanAccueil,
+} from '@shared/application/read-models/plan-accueil'
+import { useState } from 'react'
 
 const SECTIONS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
@@ -25,29 +24,13 @@ const INCONNU = '—'
 export type DossierProps = {
     plan: PlanAccueil
     ressource: RessourceScreen
-    filInstruction: FilInstructionData
     onClose: () => void
 }
 
-export default function Dossier({
-    plan,
-    ressource,
-    filInstruction,
-    onClose,
-}: DossierProps) {
+export default function Dossier({ plan, ressource, onClose }: DossierProps) {
     const [section, setSection] = useState(SECTIONS[0].id)
 
-    // Everything is loaded for every dossier; which chronologies belong to
-    // this one is settled here, once, rather than on every tab change.
-    const programmes = useMemo(
-        () => getInstructionsByProgrammeAide(filInstruction, plan.id),
-        [filInstruction, plan.id]
-    )
-
-    const appelsAProjet = programmes
-        .map(({ programmeAide }) => programmeAide.appelAProjet)
-        .filter((appel) => appel !== '')
-        .join(', ')
+    const appelsAProjet = getAppelsAProjet(plan).join(', ')
 
     return (
         <div className="dossier">
@@ -83,7 +66,7 @@ export default function Dossier({
             />
 
             {section === 'fil-instruction' && (
-                <FilInstruction programmes={programmes} />
+                <FilInstruction demandes={plan.demandesSubvention} />
             )}
 
             {section === 'ressources' && (

@@ -1,0 +1,220 @@
+import { describe, expect, it } from 'vitest'
+import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
+import type { Instruction } from '@shared/application/domain/instruction'
+import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
+import {
+    getAppelsAProjet,
+    getPlansAccueil,
+    type PlanAccueil,
+    type PlanAccueilSources,
+} from './plan-accueil'
+import type { Plan } from './plan'
+
+function plan(overrides: Partial<Plan> = {}): Plan {
+    return {
+        id: 1,
+        nom: 'RCU Val Fleuri',
+        installation: 1,
+        typeDePlan: 'création',
+        usage: 'énergie',
+        natureDonnee: 'prévision',
+        statut: 'projet',
+        ...overrides,
+    }
+}
+
+function programmeAide(overrides: Partial<ProgrammeAide> = {}): ProgrammeAide {
+    return {
+        id: 1,
+        year: 2023,
+        name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
+        shortName: 'BCIAT',
+        appelAProjet: 'BCIAT (2023)',
+        ...overrides,
+    }
+}
+
+function instruction(overrides: Partial<Instruction> = {}): Instruction {
+    return {
+        crb: 'Nouvelle Aquitaine',
+        subvention: 1,
+        name: 'Instruction 1',
+        avisCrbRequis: true,
+        dateSaisineCrb: null,
+        dateAvisCrb: null,
+        avisCRB: 'En attente',
+        dateAvisPrefet: null,
+        avisPrefet: 'En attente',
+        phase: "En cours d'instruction",
+        ...overrides,
+    }
+}
+
+const valFleuri = plan()
+const clairVillage = plan({ id: 2, nom: 'RCU Clair-Village' })
+
+const bciat = programmeAide()
+const bcib = programmeAide({
+    id: 2,
+    shortName: 'BCIB',
+    appelAProjet: 'BCIB (2024)',
+})
+
+const demandeBciat: DemandeSubvention = {
+    id: 1,
+    programmeAide: bciat.id,
+    planDApprovisionnement: valFleuri.id,
+}
+
+const demandeBcib: DemandeSubvention = {
+    id: 2,
+    programmeAide: bcib.id,
+    planDApprovisionnement: valFleuri.id,
+}
+
+// Same programme, another dossier.
+const demandeVoisine: DemandeSubvention = {
+    id: 3,
+    programmeAide: bciat.id,
+    planDApprovisionnement: clairVillage.id,
+}
+
+const nouvelleAquitaine = instruction()
+const occitanie = instruction({ crb: 'Occitanie', name: 'Instruction 2' })
+const bretagne = instruction({
+    crb: 'Bretagne',
+    name: 'Instruction 3',
+    subvention: demandeBcib.id,
+})
+const voisine = instruction({
+    crb: 'Grand Est',
+    name: 'Instruction 4',
+    subvention: demandeVoisine.id,
+})
+
+function sources(
+    overrides: Partial<PlanAccueilSources> = {}
+): PlanAccueilSources {
+    return {
+        plans: [valFleuri, clairVillage],
+        installations: [],
+        departementsByRegion: [],
+        demandesSubvention: [demandeBciat, demandeBcib, demandeVoisine],
+        programmesAide: [bciat, bcib],
+        instructions: [nouvelleAquitaine, occitanie, bretagne, voisine],
+        ...overrides,
+    }
+}
+
+const demandesOf = (plans: readonly PlanAccueil[], id: Plan['id']) =>
+    plans.find((plan) => plan.id === id)?.demandesSubvention ?? []
+
+describe('getPlansAccueil', () => {
+    it('hangs one demande per programme the dossier asked a subvention from', () => {
+        expect(
+            demandesOf(getPlansAccueil(sources()), valFleuri.id).map(
+                ({ programmeAide }) => programmeAide.shortName
+            )
+        ).toEqual(['BCIAT', 'BCIB'])
+    })
+
+    it('gathers the instructions of each demande under it', () => {
+        const [premiere, seconde] = demandesOf(
+            getPlansAccueil(sources()),
+            valFleuri.id
+        )
+
+        expect(premiere.instructions).toEqual([nouvelleAquitaine, occitanie])
+        expect(seconde.instructions).toEqual([bretagne])
+    })
+
+    it('leaves the demandes of every other dossier where they are', () => {
+        expect(
+            demandesOf(getPlansAccueil(sources()), valFleuri.id).flatMap(
+                ({ instructions }) => instructions
+            )
+        ).not.toContain(voisine)
+    })
+
+    it('reads nothing into a dossier that carries no demande', () => {
+        expect(
+            demandesOf(
+                getPlansAccueil(sources({ demandesSubvention: [] })),
+                valFleuri.id
+            )
+        ).toEqual([])
+    })
+
+    it('keeps two demandes filed under the same programme apart', () => {
+        // Each one is instructed on its own, so each one heads a chronology.
+        const secondeDemande: DemandeSubvention = { ...demandeBciat, id: 4 }
+        const occitanieBis = instruction({ crb: 'Occitanie', subvention: 4 })
+
+        const demandes = demandesOf(
+            getPlansAccueil(
+                sources({
+                    demandesSubvention: [demandeBciat, secondeDemande],
+                    instructions: [nouvelleAquitaine, occitanieBis],
+                })
+            ),
+            valFleuri.id
+        )
+
+        expect(demandes).toHaveLength(2)
+        expect(demandes[1].instructions).toEqual([occitanieBis])
+    })
+
+    it('leaves out a demande whose programme cannot be named', () => {
+        expect(
+            demandesOf(
+                getPlansAccueil(sources({ programmesAide: [bcib] })),
+                valFleuri.id
+            )
+        ).toHaveLength(1)
+    })
+
+    it('never hangs instructions on an unresolved demande', () => {
+        // An empty Ref reads as 0 on both sides; matching them would gather
+        // every orphaned instruction under the first such demande.
+        const orpheline = instruction({ crb: 'Corse', subvention: 0 })
+
+        expect(
+            demandesOf(
+                getPlansAccueil(
+                    sources({
+                        demandesSubvention: [{ ...demandeBciat, id: 0 }],
+                        instructions: [orpheline],
+                    })
+                ),
+                valFleuri.id
+            )[0].instructions
+        ).toEqual([])
+    })
+})
+
+describe('getAppelsAProjet', () => {
+    const appelsOf = (id: Plan['id']) => {
+        const plans = getPlansAccueil(sources())
+
+        return getAppelsAProjet(plans.find((plan) => plan.id === id)!)
+    }
+
+    it('names every appel the plan’s demandes were filed under', () => {
+        expect(appelsOf(valFleuri.id)).toEqual(['BCIAT (2023)', 'BCIB (2024)'])
+    })
+
+    it('names an appel once, however many demandes were filed under it', () => {
+        expect(appelsOf(clairVillage.id)).toEqual(['BCIAT (2023)'])
+    })
+
+    it('reads no appel off a programme the document left without one', () => {
+        const plans = getPlansAccueil(
+            sources({
+                demandesSubvention: [demandeBciat],
+                programmesAide: [programmeAide({ appelAProjet: '' })],
+            })
+        )
+
+        expect(getAppelsAProjet(plans[0])).toEqual([])
+    })
+})

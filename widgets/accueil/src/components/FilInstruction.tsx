@@ -1,13 +1,13 @@
 import './FilInstruction.css'
 import Chronologie from './Chronologie'
-import type { InstructionsByProgrammeAide } from '@shared/application/read-models/instructions-by-programme-aide'
+import type { DemandeSubventionAccueil } from '@shared/application/read-models/plan-accueil'
 
 export type FilInstructionProps = {
-    programmes: readonly InstructionsByProgrammeAide[]
+    demandes: readonly DemandeSubventionAccueil[]
 }
 
-export default function FilInstruction({ programmes }: FilInstructionProps) {
-    if (programmes.length === 0) {
+export default function FilInstruction({ demandes }: FilInstructionProps) {
+    if (demandes.length === 0) {
         return (
             <p className="fr-text--sm">
                 Aucune demande de subvention n’est rattachée à ce dossier.
@@ -17,11 +17,8 @@ export default function FilInstruction({ programmes }: FilInstructionProps) {
 
     return (
         <div className="fil-instruction">
-            {programmes.map(({ programmeAide, instructions }) => (
-                <section
-                    key={programmeAide.id}
-                    className="fil-instruction__programme"
-                >
+            {demandes.map(({ id, programmeAide, instructions }) => (
+                <section key={id} className="fil-instruction__programme">
                     <h2 className="fr-h5 fil-instruction__titre">
                         Chronologie de l’instruction - {programmeAide.shortName}
                     </h2>

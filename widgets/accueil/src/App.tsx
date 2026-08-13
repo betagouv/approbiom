@@ -18,20 +18,20 @@ export default function App(ports: AccueilPorts) {
                 {({
                     plansApprovisionnement,
                     ressource,
-                    filInstruction,
+                    programmesAide,
                     departementsByRegion,
                 }) =>
                     dossier === null ? (
                         <Accueil
                             plansApprovisionnement={plansApprovisionnement}
                             departementsByRegion={departementsByRegion}
+                            programmesAide={programmesAide}
                             onOpenDossier={setDossier}
                         />
                     ) : (
                         <Dossier
                             plan={dossier}
                             ressource={ressource}
-                            filInstruction={filInstruction}
                             onClose={() => setDossier(null)}
                         />
                     )

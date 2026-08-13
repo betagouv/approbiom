@@ -1,6 +1,6 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { InstructionsByProgrammeAide } from '@shared/application/read-models/instructions-by-programme-aide'
+import type { DemandeSubventionAccueil } from '@shared/application/read-models/plan-accueil'
 import type { Instruction } from '@shared/application/domain/instruction'
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import FilInstruction from './FilInstruction'
@@ -32,7 +32,8 @@ function instruction(overrides: Partial<Instruction> = {}): Instruction {
     }
 }
 
-const bciat: InstructionsByProgrammeAide = {
+const bciat: DemandeSubventionAccueil = {
+    id: 1,
     programmeAide: programmeAide(),
     instructions: [
         instruction(),
@@ -40,7 +41,8 @@ const bciat: InstructionsByProgrammeAide = {
     ],
 }
 
-const bcib: InstructionsByProgrammeAide = {
+const bcib: DemandeSubventionAccueil = {
+    id: 2,
     programmeAide: programmeAide({ id: 2, shortName: 'BCIB' }),
     instructions: [instruction({ name: 'Instruction 3' })],
 }
@@ -51,7 +53,7 @@ afterEach(() => {
 
 describe('FilInstruction', () => {
     it('opens one chronology per programme d’aide', () => {
-        render(<FilInstruction programmes={[bciat, bcib]} />)
+        render(<FilInstruction demandes={[bciat, bcib]} />)
 
         expect(
             screen.getByRole('heading', {
@@ -66,7 +68,7 @@ describe('FilInstruction', () => {
     })
 
     it('names every CRB the programme was instructed by', () => {
-        render(<FilInstruction programmes={[bciat]} />)
+        render(<FilInstruction demandes={[bciat]} />)
 
         expect(
             screen.getByRole('heading', { name: 'Nouvelle Aquitaine' })
@@ -76,7 +78,7 @@ describe('FilInstruction', () => {
     })
 
     it('reads each step behind us by its date, the one in progress without', () => {
-        render(<FilInstruction programmes={[bcib]} />)
+        render(<FilInstruction demandes={[bcib]} />)
 
         const chronologie = screen.getByRole('list')
 
@@ -89,13 +91,13 @@ describe('FilInstruction', () => {
     })
 
     it('tags the avis a CRB has given', () => {
-        render(<FilInstruction programmes={[bcib]} />)
+        render(<FilInstruction demandes={[bcib]} />)
 
         expect(screen.getByText('Avis favorable')).toBeDefined()
     })
 
     it('says so when the dossier carries no demande de subvention', () => {
-        render(<FilInstruction programmes={[]} />)
+        render(<FilInstruction demandes={[]} />)
 
         expect(
             screen.getByText(

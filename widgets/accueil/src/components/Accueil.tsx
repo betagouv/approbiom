@@ -13,10 +13,12 @@ import TagStatut from './TagStatut'
 import TagType from './TagType'
 import TagUsage from './TagUsage'
 import type { Departement } from '@shared/application/domain/departement'
+import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
 import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
 import { useMemo, useState } from 'react'
 import {
+    getAppelAProjetOptions,
     getDepartementOptions,
     getDossierOptions,
     getFilteredRows,
@@ -74,17 +76,22 @@ function getColumns(
 export type AccueilProps = {
     plansApprovisionnement: readonly PlanAccueil[]
     departementsByRegion: readonly DepartementsByRegion[]
+    programmesAide: readonly ProgrammeAide[]
     onOpenDossier: (plan: PlanAccueil) => void
 }
 
 export default function Accueil({
     plansApprovisionnement,
     departementsByRegion,
+    programmesAide,
     onOpenDossier,
 }: AccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
     const [departements, setDepartements] = useState<Departement['dep'][]>([])
+    const [appelsAProjet, setAppelsAProjet] = useState<
+        ProgrammeAide['appelAProjet'][]
+    >([])
 
     const [searchGeneration, setSearchGeneration] = useState(0)
 
@@ -96,19 +103,26 @@ export default function Accueil({
 
     const departementOptions = getDepartementOptions(departementsByRegion)
 
+    const appelAProjetOptions = getAppelAProjetOptions(programmesAide)
+
     const displayedRows = getFilteredRows(plansApprovisionnement, {
         nom,
         statuts,
         departements,
+        appelsAProjet,
     })
 
     const hasFilters =
-        nom !== '' || statuts.length > 0 || departements.length > 0
+        nom !== '' ||
+        statuts.length > 0 ||
+        departements.length > 0 ||
+        appelsAProjet.length > 0
 
     function resetFilters() {
         setNom('')
         setStatuts([])
         setDepartements([])
+        setAppelsAProjet([])
         setSearchGeneration((generation) => generation + 1)
     }
 
@@ -146,6 +160,16 @@ export default function Accueil({
                         options={departementOptions}
                         selectedValues={departements}
                         onSelectionChange={setDepartements}
+                        showSelectAll
+                    />
+                </div>
+
+                <div className="accueil__filter">
+                    <MultiSelect
+                        label="Appel à projet"
+                        options={appelAProjetOptions}
+                        selectedValues={appelsAProjet}
+                        onSelectionChange={setAppelsAProjet}
                         showSelectAll
                     />
                 </div>
