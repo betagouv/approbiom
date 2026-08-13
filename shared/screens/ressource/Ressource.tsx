@@ -7,6 +7,7 @@ import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/app
 import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-region'
 import type { Plan } from '@shared/application/read-models/plan'
 import type { RessourceScreen } from './load-ressource'
+import type { Ressource } from '@shared/application/domain/ressource'
 
 const REPARTITION = new Intl.NumberFormat('fr-FR', {
     style: 'percent',
@@ -52,17 +53,26 @@ export default function Ressource({
     fournisseurNames,
     departementNames,
 }: RessourceProps) {
-    // The ressource's code, not the row it came from: rows are rebuilt on every
-    // load, so identity is not something a selection can be pinned to.
-    const [selectedRessource, setSelectedRessource] = useState<string | null>(
-        null
-    )
-
     const ressourceTitle = (code: string) => ressourceTitles.get(code) ?? code
 
     const ressourceRows = totals.filter(
         (row) => row.planDApprovisionnement === plan
     )
+
+    // The screen opens on the plan's first ressource rather than on nothing.
+    // The three ventilations under the table are what the screen is for, and
+    // starting empty makes the reader click before it shows any of it — while
+    // the first ressource is a reading that is never wrong to offer.
+    //
+    // Only the opening value. Deselecting still empties the screen, and a plan
+    // with no ressource still opens on nothing.
+    //
+    // Read once, at mount, which is enough: the plan being read cannot change
+    // under this component. `RechercheDePlan` keys it by plan, so picking
+    // another one mounts another component, opening on its own first ressource.
+    const [selectedRessource, setSelectedRessource] = useState<
+        Ressource['code'] | null
+    >(() => ressourceRows[0]?.ressource ?? null)
 
     const ressourceTotal = ressourceRows.reduce(
         (sum, row) => sum + (row.sumTonnageTotal ?? 0),

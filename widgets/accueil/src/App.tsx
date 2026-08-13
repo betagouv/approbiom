@@ -1,7 +1,7 @@
 import AsyncGate from '@shared/react/AsyncGate'
 import { renderError } from '@shared/react/render-error'
 import { useAsyncData } from '@shared/react/useAsyncData'
-import type { Plan } from '@shared/application/read-models/plan'
+import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
 import { useState } from 'react'
 import Accueil from './components/Accueil'
 import Dossier from './components/Dossier'
@@ -10,7 +10,7 @@ import { loadAccueil, type AccueilPorts } from './load-accueil'
 export default function App(ports: AccueilPorts) {
     const state = useAsyncData(() => loadAccueil(ports))
 
-    const [dossier, setDossier] = useState<Plan | null>(null)
+    const [dossier, setDossier] = useState<PlanAccueil | null>(null)
 
     return (
         <main className="app">
@@ -19,11 +19,12 @@ export default function App(ports: AccueilPorts) {
                     plansApprovisionnement,
                     ressource,
                     filInstruction,
-                    regionByPlan,
+                    departementsByRegion,
                 }) =>
                     dossier === null ? (
                         <Accueil
                             plansApprovisionnement={plansApprovisionnement}
+                            departementsByRegion={departementsByRegion}
                             onOpenDossier={setDossier}
                         />
                     ) : (
@@ -31,9 +32,6 @@ export default function App(ports: AccueilPorts) {
                             plan={dossier}
                             ressource={ressource}
                             filInstruction={filInstruction}
-                            regionInstallation={
-                                regionByPlan.get(dossier.id) ?? null
-                            }
                             onClose={() => setDossier(null)}
                         />
                     )

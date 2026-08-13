@@ -1,8 +1,12 @@
 import { describe, expect, it } from 'vitest'
-import type { Plan } from '@shared/application/read-models/plan'
-import { getFilteredRows, getStatutOptions } from './utils'
+import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
+import {
+    getDepartementOptions,
+    getFilteredRows,
+    getStatutOptions,
+} from './utils'
 
-function plan(overrides: Partial<Plan> = {}): Plan {
+function plan(overrides: Partial<PlanAccueil> = {}): PlanAccueil {
     return {
         id: 1,
         nom: 'Plan',
@@ -11,15 +15,25 @@ function plan(overrides: Partial<Plan> = {}): Plan {
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'projet',
+        departement: null,
+        installationRegion: null,
         ...overrides,
     }
 }
 
-const valFleuri = plan({ id: 1, nom: 'RCU Val Fleuri', statut: 'projet' })
+const valFleuri = plan({
+    id: 1,
+    nom: 'RCU Val Fleuri',
+    statut: 'projet',
+    departement: '87',
+    installationRegion: 'Nouvelle-Aquitaine',
+})
 const boisDuNord = plan({
     id: 2,
     nom: 'Chaufferie Bois du Nord',
     statut: 'en fonctionnement',
+    departement: '33',
+    installationRegion: 'Nouvelle-Aquitaine',
 })
 const clairVillage = plan({
     id: 3,
@@ -71,6 +85,28 @@ describe('getFilteredRows', () => {
         expect(plans).toEqual(given)
     })
 
+    it('keeps the plans sitting in a département that was picked', () => {
+        expect(getFilteredRows(plans, { departements: ['87'] })).toEqual([
+            valFleuri,
+        ])
+        expect(getFilteredRows(plans, { departements: ['87', '33'] })).toEqual([
+            valFleuri,
+            boisDuNord,
+        ])
+    })
+
+    it('leaves out a plan that sits nowhere, once a département is picked', () => {
+        // Clair-Village has no département to match, so it is out — the same
+        // answer as for a plan sitting somewhere that was not picked.
+        expect(getFilteredRows(plans, { departements: ['33'] })).toEqual([
+            boisDuNord,
+        ])
+    })
+
+    it('keeps every plan while no département is picked, placed or not', () => {
+        expect(getFilteredRows(plans, {})).toEqual(plans)
+    })
+
     it('narrows on every criterion at once', () => {
         expect(
             getFilteredRows(plans, { nom: 'rcu', statuts: ['projet'] })
@@ -79,6 +115,57 @@ describe('getFilteredRows', () => {
         expect(
             getFilteredRows(plans, { nom: 'bois', statuts: ['projet'] })
         ).toEqual([])
+    })
+})
+
+describe('getDepartementOptions', () => {
+    it('groups the départements under their région, régions sorted in French', () => {
+        expect(
+            getDepartementOptions([
+                {
+                    region: { reg: '75', libelle: 'Nouvelle-Aquitaine' },
+                    departements: [
+                        { dep: '87', libelle: 'Haute-Vienne' },
+                        { dep: '33', libelle: 'Gironde' },
+                    ],
+                },
+                {
+                    // Under I, where a reader looks for it — not after Z.
+                    region: { reg: '11', libelle: 'Île-de-France' },
+                    departements: [{ dep: '75', libelle: 'Paris' }],
+                },
+            ])
+        ).toEqual([
+            {
+                id: '11',
+                label: 'Île-de-France',
+                options: [{ value: '75', label: '75' }],
+            },
+            {
+                id: '75',
+                label: 'Nouvelle-Aquitaine',
+                options: [
+                    { value: '87', label: '87' },
+                    { value: '33', label: '33' },
+                ],
+            },
+        ])
+    })
+
+    it('does not reorder the array it was given', () => {
+        const given = [
+            {
+                region: { reg: '75', libelle: 'Nouvelle-Aquitaine' },
+                departements: [],
+            },
+            {
+                region: { reg: '11', libelle: 'Île-de-France' },
+                departements: [],
+            },
+        ]
+        getDepartementOptions(given)
+
+        expect(given[0].region.libelle).toBe('Nouvelle-Aquitaine')
     })
 })
 

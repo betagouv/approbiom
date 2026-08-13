@@ -5,14 +5,12 @@ import './Dossier.css'
 import FilInstruction from './FilInstruction'
 import TabNav, { type TabNavItem } from '@shared/components/TabNav'
 import Ressource, { type RessourceScreen } from '@shared/screens/ressource'
-import type { Plan } from '@shared/application/read-models/plan'
 import {
     getInstructionsByProgrammeAide,
     type FilInstructionData,
 } from '@shared/application/read-models/instructions-by-programme-aide'
+import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
 import { useMemo, useState } from 'react'
-
-import type { Region } from '@shared/application/domain/region'
 
 const SECTIONS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
@@ -21,10 +19,9 @@ const SECTIONS: readonly TabNavItem[] = [
 const INCONNU = '—'
 
 export type DossierProps = {
-    plan: Plan
+    plan: PlanAccueil
     ressource: RessourceScreen
     filInstruction: FilInstructionData
-    regionInstallation: Region['libelle'] | null
     onClose: () => void
 }
 
@@ -32,7 +29,6 @@ export default function Dossier({
     plan,
     ressource,
     filInstruction,
-    regionInstallation: region,
     onClose,
 }: DossierProps) {
     const [section, setSection] = useState(SECTIONS[0].id)
@@ -69,7 +65,7 @@ export default function Dossier({
                         </div>
                         <div className="dossier__meta-entry">
                             <dt>Région de l&apos;installation</dt>
-                            <dd>{region ?? INCONNU}</dd>
+                            <dd>{plan.installationRegion ?? INCONNU}</dd>
                         </div>
                     </dl>
                 </div>

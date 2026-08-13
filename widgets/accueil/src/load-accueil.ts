@@ -2,10 +2,12 @@ import type { DemandeSubventionQuery } from '@shared/application/ports/demande-s
 import type { InstallationQuery } from '@shared/application/ports/installation-query'
 import type { InstructionQuery } from '@shared/application/ports/instruction-query'
 import type { ProgrammeAideQuery } from '@shared/application/ports/programme-aide-query'
-import type { Region } from '@shared/application/domain/region'
+import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
 import type { FilInstructionData } from '@shared/application/read-models/instructions-by-programme-aide'
-import type { Plan } from '@shared/application/read-models/plan'
-import { getRegionByPlan } from '@shared/application/read-models/region-by-plan'
+import {
+    getPlansAccueil,
+    type PlanAccueil,
+} from '@shared/application/read-models/plan-accueil'
 import {
     loadRessource,
     type RessourcePorts,
@@ -20,15 +22,15 @@ export type AccueilPorts = RessourcePorts & {
 }
 
 export type AccueilScreen = {
-    plansApprovisionnement: readonly Plan[]
+    plansApprovisionnement: readonly PlanAccueil[]
     ressource: RessourceScreen
     filInstruction: FilInstructionData
-    regionByPlan: ReadonlyMap<Plan['id'], Region['libelle']>
+    departementsByRegion: readonly DepartementsByRegion[]
 }
 
 export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
     const [
-        plansApprovisionnement,
+        plans,
         ressource,
         demandesSubvention,
         programmesAide,
@@ -46,13 +48,13 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
     ])
 
     return {
-        plansApprovisionnement,
-        ressource,
-        filInstruction: { demandesSubvention, programmesAide, instructions },
-        regionByPlan: getRegionByPlan(
-            plansApprovisionnement,
+        plansApprovisionnement: getPlansAccueil(
+            plans,
             installations,
             departementsByRegion
         ),
+        ressource,
+        filInstruction: { demandesSubvention, programmesAide, instructions },
+        departementsByRegion,
     }
 }

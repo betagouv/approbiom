@@ -241,7 +241,7 @@ describe('App', () => {
         // here is the term on its own.
         expect(screen.getByText('Appel à projet')).toBeDefined()
         expect(screen.getByText('BCIAT (2023)')).toBeDefined()
-        expect(screen.getByText('Région')).toBeDefined()
+        expect(screen.getByText("Région de l'installation")).toBeDefined()
         expect(screen.getByText('Nouvelle-Aquitaine')).toBeDefined()
     })
 

@@ -99,3 +99,7 @@
     display: block;
     margin-top: 0.25rem;
 }
+
+.accueil__table {
+    min-height: 0;
+}
