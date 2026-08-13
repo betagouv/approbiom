@@ -1,7 +1,9 @@
 import { describe, expect, it } from 'vitest'
 import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
+import type { Entreprise } from '@shared/application/domain/entreprise'
 import type { Instruction } from '@shared/application/domain/instruction'
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
+
 import {
     getAppelsAProjet,
     getPlansAccueil,
@@ -79,6 +81,15 @@ const demandeVoisine: DemandeSubvention = {
     planDApprovisionnement: clairVillage.id,
 }
 
+const scieriePicard: Entreprise = {
+    siret: '11111111111111',
+    denomination: 'Scierie Picard',
+}
+const cooperativeDuBois: Entreprise = {
+    siret: '22222222222222',
+    denomination: 'Coopérative du Bois',
+}
+
 const nouvelleAquitaine = instruction()
 const occitanie = instruction({ crb: 'Occitanie', name: 'Instruction 2' })
 const bretagne = instruction({
@@ -102,6 +113,8 @@ function sources(
         demandesSubvention: [demandeBciat, demandeBcib, demandeVoisine],
         programmesAide: [bciat, bcib],
         instructions: [nouvelleAquitaine, occitanie, bretagne, voisine],
+        approvisionnementsByFournisseur: [],
+        entreprises: [scieriePicard, cooperativeDuBois],
         ...overrides,
     }
 }

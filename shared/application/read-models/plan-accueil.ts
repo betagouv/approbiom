@@ -1,9 +1,11 @@
 import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
 import type { Departement } from '@shared/application/domain/departement'
+import type { Entreprise } from '@shared/application/domain/entreprise'
 import type { Installation } from '@shared/application/domain/installation'
 import type { Instruction } from '@shared/application/domain/instruction'
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import type { Region } from '@shared/application/domain/region'
+import type { ApprovisionnementByPlanRessourceAndFournisseur } from './approvisionnement-by-plan-ressource-and-fournisseur'
 import type { DepartementsByRegion } from './departements-by-region'
 import type { Plan } from './plan'
 
@@ -17,6 +19,7 @@ export type PlanAccueil = Plan & {
     departement: Departement['dep'] | null
     installationRegion: Region['libelle'] | null
     demandesSubvention: readonly DemandeSubventionAccueil[]
+    fournisseurs: readonly Entreprise[]
 }
 
 export type PlanAccueilSources = {
@@ -26,6 +29,8 @@ export type PlanAccueilSources = {
     demandesSubvention: readonly DemandeSubvention[]
     programmesAide: readonly ProgrammeAide[]
     instructions: readonly Instruction[]
+    approvisionnementsByFournisseur: readonly ApprovisionnementByPlanRessourceAndFournisseur[]
+    entreprises: readonly Entreprise[]
 }
 
 function getInstructionsBySubvention(
@@ -86,6 +91,48 @@ function getDemandesByPlan({
     return demandesByPlan
 }
 
+function getFournisseursByPlan({
+    approvisionnementsByFournisseur,
+    entreprises,
+}: Pick<
+    PlanAccueilSources,
+    'approvisionnementsByFournisseur' | 'entreprises'
+>): Map<Plan['id'], Entreprise[]> {
+    const entrepriseBySiret = new Map(
+        entreprises.map((entreprise) => [entreprise.siret, entreprise])
+    )
+
+    const fournisseursByPlan = new Map<Plan['id'], Entreprise[]>()
+
+    for (const {
+        planDApprovisionnement,
+        fournisseur,
+    } of approvisionnementsByFournisseur) {
+        // An approvisionnement whose fournisseur the document left empty names
+        // nobody to filter on.
+        if (fournisseur === '') continue
+
+        const fournisseurs =
+            fournisseursByPlan.get(planDApprovisionnement) ?? []
+        // The summary carries one row per ressource, so a fournisseur comes
+        // back as many times as it supplies the plan with one.
+        if (fournisseurs.some(({ siret }) => siret === fournisseur)) continue
+
+        // A siret the directory does not name is still a fournisseur: it is
+        // read by its siret rather than dropped.
+        fournisseurs.push(
+            entrepriseBySiret.get(fournisseur) ?? {
+                siret: fournisseur,
+                denomination: '',
+            }
+        )
+
+        fournisseursByPlan.set(planDApprovisionnement, fournisseurs)
+    }
+
+    return fournisseursByPlan
+}
+
 export function getAppelsAProjet(
     plan: PlanAccueil
 ): ProgrammeAide['appelAProjet'][] {
@@ -103,6 +150,8 @@ export function getPlansAccueil({
     demandesSubvention,
     programmesAide,
     instructions,
+    approvisionnementsByFournisseur,
+    entreprises,
 }: PlanAccueilSources): PlanAccueil[] {
     const installationById = new Map(
         installations.map((installation) => [installation.id, installation])
@@ -119,6 +168,11 @@ export function getPlansAccueil({
         instructions,
     })
 
+    const fournisseursByPlan = getFournisseursByPlan({
+        approvisionnementsByFournisseur,
+        entreprises,
+    })
+
     return plans.map((plan) => {
         const departement =
             installationById.get(plan.installation)?.commune.dep || null
@@ -131,6 +185,7 @@ export function getPlansAccueil({
                     ? null
                     : (regionByDepartement.get(departement) ?? null),
             demandesSubvention: demandesByPlan.get(plan.id) ?? [],
+            fournisseurs: fournisseursByPlan.get(plan.id) ?? [],
         }
     })
 }

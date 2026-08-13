@@ -37,6 +37,7 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
         instructions,
         installations,
         departementsByRegion,
+        entreprises,
     ] = await Promise.all([
         ports.plans.list(),
         loadRessource(ports),
@@ -45,6 +46,7 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
         ports.instructions.list(),
         ports.installations.list(),
         ports.insee.listDepartementsByRegion(),
+        ports.entreprises.list(),
     ])
 
     return {
@@ -55,6 +57,8 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
             demandesSubvention,
             programmesAide,
             instructions,
+            approvisionnementsByFournisseur: ressource.byFournisseur,
+            entreprises,
         }),
         ressource,
         programmesAide,

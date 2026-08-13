@@ -1,4 +1,5 @@
 import type { Departement } from '@shared/application/domain/departement'
+import type { Entreprise } from '@shared/application/domain/entreprise'
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
 import type { Plan } from '@shared/application/read-models/plan'
@@ -23,6 +24,7 @@ export type PlanFilters = {
     statuts?: readonly string[]
     departements?: readonly Departement['dep'][]
     appelsAProjet?: readonly ProgrammeAide['appelAProjet'][]
+    fournisseurs?: readonly Entreprise['siret'][]
 }
 
 function matchesSelection(
@@ -34,12 +36,13 @@ function matchesSelection(
 
 function matchesAnySelection(
     selection: readonly string[],
-    values: readonly string[]
+    values: readonly string[],
+    emptyValue?: string
 ): boolean {
     if (selection.length === 0) return true
 
     return values.length === 0
-        ? selection.includes(SANS_APPEL_A_PROJET_VALUE)
+        ? emptyValue !== undefined && selection.includes(emptyValue)
         : values.some((value) => selection.includes(value))
 }
 
@@ -50,6 +53,7 @@ export function getFilteredRows(
         statuts = [],
         departements = [],
         appelsAProjet = [],
+        fournisseurs = [],
     }: PlanFilters = {}
 ): PlanAccueil[] {
     const query = nom.trim().toLowerCase()
@@ -59,7 +63,15 @@ export function getFilteredRows(
             (query === '' || row.nom.toLowerCase().includes(query)) &&
             matchesSelection(statuts, row.statut) &&
             matchesSelection(departements, row.departement) &&
-            matchesAnySelection(appelsAProjet, getAppelsAProjet(row))
+            matchesAnySelection(
+                appelsAProjet,
+                getAppelsAProjet(row),
+                SANS_APPEL_A_PROJET_VALUE
+            ) &&
+            matchesAnySelection(
+                fournisseurs,
+                row.fournisseurs.map(({ siret }) => siret)
+            )
     )
 }
 
@@ -112,4 +124,18 @@ export function getAppelAProjetOptions(
         ...appels,
         { value: SANS_APPEL_A_PROJET_VALUE, label: SANS_APPEL_A_PROJET_LABEL },
     ]
+}
+
+export function getFournisseurOptions(
+    rows: readonly PlanAccueil[]
+): MultiSelectOption<Entreprise['siret']>[] {
+    const labelBySiret = new Map<Entreprise['siret'], string>()
+
+    for (const { fournisseurs } of rows)
+        for (const { siret, denomination } of fournisseurs)
+            labelBySiret.set(siret, denomination || siret)
+
+    return [...labelBySiret]
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 }

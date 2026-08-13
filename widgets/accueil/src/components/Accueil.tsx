@@ -13,6 +13,7 @@ import TagStatut from './TagStatut'
 import TagType from './TagType'
 import TagUsage from './TagUsage'
 import type { Departement } from '@shared/application/domain/departement'
+import type { Entreprise } from '@shared/application/domain/entreprise'
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
 import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
@@ -22,6 +23,7 @@ import {
     getDepartementOptions,
     getDossierOptions,
     getFilteredRows,
+    getFournisseurOptions,
     getStatutOptions,
 } from '../utils'
 
@@ -92,6 +94,7 @@ export default function Accueil({
     const [appelsAProjet, setAppelsAProjet] = useState<
         ProgrammeAide['appelAProjet'][]
     >([])
+    const [fournisseurs, setFournisseurs] = useState<Entreprise['siret'][]>([])
 
     const [searchGeneration, setSearchGeneration] = useState(0)
 
@@ -105,24 +108,29 @@ export default function Accueil({
 
     const appelAProjetOptions = getAppelAProjetOptions(programmesAide)
 
+    const fournisseurOptions = getFournisseurOptions(plansApprovisionnement)
+
     const displayedRows = getFilteredRows(plansApprovisionnement, {
         nom,
         statuts,
         departements,
         appelsAProjet,
+        fournisseurs,
     })
 
     const hasFilters =
         nom !== '' ||
         statuts.length > 0 ||
         departements.length > 0 ||
-        appelsAProjet.length > 0
+        appelsAProjet.length > 0 ||
+        fournisseurs.length > 0
 
     function resetFilters() {
         setNom('')
         setStatuts([])
         setDepartements([])
         setAppelsAProjet([])
+        setFournisseurs([])
         setSearchGeneration((generation) => generation + 1)
     }
 
@@ -170,6 +178,16 @@ export default function Accueil({
                         options={appelAProjetOptions}
                         selectedValues={appelsAProjet}
                         onSelectionChange={setAppelsAProjet}
+                        showSelectAll
+                    />
+                </div>
+
+                <div className="accueil__filter">
+                    <MultiSelect
+                        label="Fournisseurs"
+                        options={fournisseurOptions}
+                        selectedValues={fournisseurs}
+                        onSelectionChange={setFournisseurs}
                         showSelectAll
                     />
                 </div>
