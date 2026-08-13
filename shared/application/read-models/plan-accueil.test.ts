@@ -10,7 +10,8 @@ import {
     type PlanAccueil,
     type PlanAccueilSources,
 } from './plan-accueil'
-import type { Plan } from './plan'
+
+import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
 
 function plan(overrides: Partial<Plan> = {}): Plan {
     return {

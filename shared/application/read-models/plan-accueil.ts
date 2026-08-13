@@ -7,7 +7,7 @@ import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import type { Region } from '@shared/application/domain/region'
 import type { ApprovisionnementByPlanRessourceAndFournisseur } from './approvisionnement-by-plan-ressource-and-fournisseur'
 import type { DepartementsByRegion } from './departements-by-region'
-import type { Plan } from './plan'
+import type { PlanDApprovisionnement as Plan } from '../domain/plan-d-approvisionnement'
 
 export type DemandeSubventionAccueil = {
     id: DemandeSubvention['id']

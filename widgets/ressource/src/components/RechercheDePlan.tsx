@@ -3,7 +3,8 @@ import SearchBar from '@shared/user-interface/component/SearchBar'
 import Ressource, {
     type RessourceScreen,
 } from '@shared/user-interface/screen/ressource'
-import type { Plan } from '@shared/application/read-models/plan'
+import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
+
 import { useState } from 'react'
 
 export default function RechercheDePlan(screen: RessourceScreen) {

@@ -2,7 +2,7 @@ import type { Departement } from '@shared/application/domain/departement'
 import type { Entreprise } from '@shared/application/domain/entreprise'
 import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
 import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { Plan } from '@shared/application/read-models/plan'
+import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
 import {
     getAppelsAProjet,
     type PlanAccueil,

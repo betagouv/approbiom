@@ -1,6 +1,6 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { Plan } from '@shared/application/read-models/plan'
+import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
 import type { RessourceScreen } from '@shared/user-interface/screen/ressource'
 import RechercheDePlan from './RechercheDePlan'
 

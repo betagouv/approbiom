@@ -7,7 +7,7 @@ import type { ApprovisionnementByPlanAndRessource } from '@shared/application/re
 import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
 import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
 import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-region'
-import type { Plan } from '@shared/application/read-models/plan'
+import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
 
 export type RessourcePorts = {
     approvisionnements: ApprovisionnementQuery

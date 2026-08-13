@@ -5,7 +5,7 @@ import {
     DataSourceUnavailableError,
 } from '@shared/application/errors'
 import type { PlanQuery } from '@shared/application/ports/plan-query'
-import type { Plan } from '@shared/application/read-models/plan'
+import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
 import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
 import type { Installation } from '@shared/application/domain/installation'
 import type { Instruction } from '@shared/application/domain/instruction'
