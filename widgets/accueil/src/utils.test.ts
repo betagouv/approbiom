@@ -1,15 +1,15 @@
 import { describe, expect, it } from 'vitest'
 import type {
-    DemandeSubventionAccueil,
-    PlanAccueil,
-} from '@shared/core/plan-accueil'
+    DemandeSubventionDetail,
+    PlanDetail,
+} from '@shared/core/application/services/plan-detail'
 import {
     getDepartementOptions,
     getFilteredRows,
     getStatutOptions,
 } from './utils'
 
-function plan(overrides: Partial<PlanAccueil> = {}): PlanAccueil {
+function plan(overrides: Partial<PlanDetail> = {}): PlanDetail {
     return {
         id: 1,
         nom: 'Plan',
@@ -29,7 +29,7 @@ function plan(overrides: Partial<PlanAccueil> = {}): PlanAccueil {
 
 let demandeId = 0
 
-function demande(appelAProjet: string): DemandeSubventionAccueil {
+function demande(appelAProjet: string): DemandeSubventionDetail {
     demandeId += 1
 
     return {

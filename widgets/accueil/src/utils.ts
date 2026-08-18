@@ -1,9 +1,12 @@
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
-import { getAppelsAProjet, type PlanAccueil } from '@shared/core/plan-accueil'
+import {
+    getAppelsAProjet,
+    type PlanDetail,
+} from '@shared/core/application/services/plan-detail'
 import type {
     MultiSelectGroup,
     MultiSelectOption,
@@ -44,7 +47,7 @@ function matchesAnySelection(
 }
 
 export function getFilteredRows(
-    rows: readonly PlanAccueil[],
+    rows: readonly PlanDetail[],
     {
         nom = '',
         statuts = [],
@@ -52,7 +55,7 @@ export function getFilteredRows(
         appelsAProjet = [],
         fournisseurs = [],
     }: PlanFilters = {}
-): PlanAccueil[] {
+): PlanDetail[] {
     const query = nom.trim().toLowerCase()
 
     return rows.filter(
@@ -124,7 +127,7 @@ export function getAppelAProjetOptions(
 }
 
 export function getFournisseurOptions(
-    rows: readonly PlanAccueil[]
+    rows: readonly PlanDetail[]
 ): MultiSelectOption<Entreprise['siret']>[] {
     const labelBySiret = new Map<Entreprise['siret'], string>()
 

@@ -1,4 +1,4 @@
-import type { InstructionQuery } from '@shared/core/application/ports/instruction-query'
+import type { InstructionQuery } from '@shared/core/application/ports/instruction'
 import { isAvisCRB } from '@shared/core/domain/value-objects/avis-crb'
 import { isAvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
 import { isPhaseInstruction } from '@shared/core/domain/value-objects/phase-instruction'

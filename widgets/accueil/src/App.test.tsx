@@ -4,13 +4,13 @@ import {
     AccessDeniedError,
     DataSourceUnavailableError,
 } from '@shared/core/errors'
-import type { PlanQuery } from '@shared/core/application/ports/plan-query'
+import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import App from './App'
 import type { AccueilPorts } from './load-accueil'
 

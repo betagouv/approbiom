@@ -15,8 +15,8 @@ import TagUsage from './TagUsage'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
-import type { PlanAccueil } from '@shared/core/plan-accueil'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useMemo, useState } from 'react'
 import {
     getAppelAProjetOptions,
@@ -28,8 +28,8 @@ import {
 } from '../utils'
 
 function getColumns(
-    onOpenDossier: (plan: PlanAccueil) => void
-): readonly Column<PlanAccueil>[] {
+    onOpenDossier: (plan: PlanDetail) => void
+): readonly Column<PlanDetail>[] {
     return [
         {
             id: 'action',
@@ -76,10 +76,10 @@ function getColumns(
 }
 
 export type AccueilProps = {
-    plansApprovisionnement: readonly PlanAccueil[]
+    plansApprovisionnement: readonly PlanDetail[]
     departementsByRegion: readonly DepartementsByRegion[]
     programmesAide: readonly ProgrammeAide[]
-    onOpenDossier: (plan: PlanAccueil) => void
+    onOpenDossier: (plan: PlanDetail) => void
 }
 
 export default function Accueil({

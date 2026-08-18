@@ -6,7 +6,7 @@ import MultiSelect, {
     type MultiSelectGroup,
 } from '@shared/user-interface/component/MultiSelect'
 import { getOptions } from '@shared/user-interface/utils/getOptions'
-import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 

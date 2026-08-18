@@ -1,5 +1,5 @@
-import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement-query'
-import type { ApprovisionnementByPlanAndRessource } from '@shared/core/application/read-models/approvisionnement-by-plan-and-ressource'
+import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
+import type { ApprovisionnementByPlanAndRessource } from '@shared/core/application/ports/approvisionnement'
 import { gristReady } from './grist-ready'
 import {
     asNumber,

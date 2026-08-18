@@ -1,7 +1,7 @@
 import AsyncGate from '@shared/user-interface/utils/AsyncGate'
 import { renderError } from '@shared/user-interface/utils/render-error'
 import { useAsyncData } from '@shared/user-interface/utils/useAsyncData'
-import type { PlanAccueil } from '@shared/core/plan-accueil'
+import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 import Accueil from './components/Accueil'
 import Dossier from './components/Dossier'
@@ -10,7 +10,7 @@ import { loadAccueil, type AccueilPorts } from './load-accueil'
 export default function App(ports: AccueilPorts) {
     const state = useAsyncData(() => loadAccueil(ports))
 
-    const [dossier, setDossier] = useState<PlanAccueil | null>(null)
+    const [dossier, setDossier] = useState<PlanDetail | null>(null)
 
     return (
         <main className="app">

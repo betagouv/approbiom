@@ -1,4 +1,4 @@
-import type { PlanQuery } from '@shared/core/application/ports/plan-query'
+import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
 import { isUsageType } from '@shared/core/domain/value-objects/usage'
 import { gristReady } from './grist-ready'
 import { asNumber, asString, fetchRowsOnce } from './grist-helpers'

@@ -11,7 +11,10 @@ import Ressource, {
     type RessourceScreen,
 } from '@shared/user-interface/screen/ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import { getAppelsAProjet, type PlanAccueil } from '@shared/core/plan-accueil'
+import {
+    getAppelsAProjet,
+    type PlanDetail,
+} from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 
 const SECTIONS: readonly TabNavItem[] = [
@@ -22,7 +25,7 @@ const SECTIONS: readonly TabNavItem[] = [
 const INCONNU = '—'
 
 export type DossierProps = {
-    plan: PlanAccueil
+    plan: PlanDetail
     ressource: RessourceScreen
     getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void

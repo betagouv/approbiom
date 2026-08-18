@@ -1,4 +1,4 @@
-import type { ProgrammeAideQuery } from '@shared/core/application/ports/programme-aide-query'
+import type { ProgrammeAideQuery } from '@shared/core/application/ports/programme-aide'
 import { gristReady } from './grist-ready'
 import { asNumber, asString, fetchRowsOnce } from './grist-helpers'
 import { COLUMNS, TABLE } from './grist-tables'

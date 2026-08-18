@@ -7,10 +7,10 @@ import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 
 import {
     getAppelsAProjet,
-    getPlansAccueil,
-    type PlanAccueil,
-    type PlanAccueilSources,
-} from '@shared/core/plan-accueil'
+    composePlanDetails,
+    type PlanDetail,
+    type PlanDetailSources,
+} from '@shared/core/application/services/plan-detail'
 
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
@@ -106,8 +106,8 @@ const voisine = instruction({
 })
 
 function sources(
-    overrides: Partial<PlanAccueilSources> = {}
-): PlanAccueilSources {
+    overrides: Partial<PlanDetailSources> = {}
+): PlanDetailSources {
     return {
         plans: [valFleuri, clairVillage],
         installations: [],
@@ -122,7 +122,7 @@ function sources(
     }
 }
 
-const attachmentsOf = (plans: readonly PlanAccueil[], id: Plan['id']) =>
+const attachmentsOf = (plans: readonly PlanDetail[], id: Plan['id']) =>
     plans.find((plan) => plan.id === id)?.attachments ?? []
 
 function attachment(
@@ -139,13 +139,13 @@ function attachment(
     }
 }
 
-const demandesOf = (plans: readonly PlanAccueil[], id: Plan['id']) =>
+const demandesOf = (plans: readonly PlanDetail[], id: Plan['id']) =>
     plans.find((plan) => plan.id === id)?.demandesSubvention ?? []
 
-describe('getPlansAccueil', () => {
+describe('composePlanDetails', () => {
     it('hangs one demande per programme the dossier asked a subvention from', () => {
         expect(
-            demandesOf(getPlansAccueil(sources()), valFleuri.id).map(
+            demandesOf(composePlanDetails(sources()), valFleuri.id).map(
                 ({ programmeAide }) => programmeAide.shortName
             )
         ).toEqual(['BCIAT', 'BCIB'])
@@ -153,7 +153,7 @@ describe('getPlansAccueil', () => {
 
     it('gathers the instructions of each demande under it', () => {
         const [premiere, seconde] = demandesOf(
-            getPlansAccueil(sources()),
+            composePlanDetails(sources()),
             valFleuri.id
         )
 
@@ -163,7 +163,7 @@ describe('getPlansAccueil', () => {
 
     it('leaves the demandes of every other dossier where they are', () => {
         expect(
-            demandesOf(getPlansAccueil(sources()), valFleuri.id).flatMap(
+            demandesOf(composePlanDetails(sources()), valFleuri.id).flatMap(
                 ({ instructions }) => instructions
             )
         ).not.toContain(voisine)
@@ -172,7 +172,7 @@ describe('getPlansAccueil', () => {
     it('reads nothing into a dossier that carries no demande', () => {
         expect(
             demandesOf(
-                getPlansAccueil(sources({ demandesSubvention: [] })),
+                composePlanDetails(sources({ demandesSubvention: [] })),
                 valFleuri.id
             )
         ).toEqual([])
@@ -184,7 +184,7 @@ describe('getPlansAccueil', () => {
         const occitanieBis = instruction({ crb: 'Occitanie', subvention: 4 })
 
         const demandes = demandesOf(
-            getPlansAccueil(
+            composePlanDetails(
                 sources({
                     demandesSubvention: [demandeBciat, secondeDemande],
                     instructions: [nouvelleAquitaine, occitanieBis],
@@ -200,7 +200,7 @@ describe('getPlansAccueil', () => {
     it('leaves out a demande whose programme cannot be named', () => {
         expect(
             demandesOf(
-                getPlansAccueil(sources({ programmesAide: [bcib] })),
+                composePlanDetails(sources({ programmesAide: [bcib] })),
                 valFleuri.id
             )
         ).toHaveLength(1)
@@ -213,7 +213,7 @@ describe('getPlansAccueil', () => {
 
         expect(
             demandesOf(
-                getPlansAccueil(
+                composePlanDetails(
                     sources({
                         demandesSubvention: [{ ...demandeBciat, id: 0 }],
                         instructions: [orpheline],
@@ -225,13 +225,13 @@ describe('getPlansAccueil', () => {
     })
 })
 
-describe('getPlansAccueil, on the attachments', () => {
+describe('composePlanDetails, on the attachments', () => {
     it('hangs every document on the plan it is attached to', () => {
         const formulaire = attachment(valFleuri.id, 1)
         const plan = attachment(valFleuri.id, 2)
         const voisin = attachment(clairVillage.id, 3)
 
-        const plans = getPlansAccueil(
+        const plans = composePlanDetails(
             sources({ attachments: [formulaire, plan, voisin] })
         )
 
@@ -240,7 +240,7 @@ describe('getPlansAccueil, on the attachments', () => {
     })
 
     it('leaves a plan nothing is attached to with nothing', () => {
-        const plans = getPlansAccueil(
+        const plans = composePlanDetails(
             sources({ attachments: [attachment(clairVillage.id, 1)] })
         )
 
@@ -250,7 +250,7 @@ describe('getPlansAccueil, on the attachments', () => {
 
 describe('getAppelsAProjet', () => {
     const appelsOf = (id: Plan['id']) => {
-        const plans = getPlansAccueil(sources())
+        const plans = composePlanDetails(sources())
 
         return getAppelsAProjet(plans.find((plan) => plan.id === id)!)
     }
@@ -264,7 +264,7 @@ describe('getAppelsAProjet', () => {
     })
 
     it('reads no appel off a programme the document left without one', () => {
-        const plans = getPlansAccueil(
+        const plans = composePlanDetails(
             sources({
                 demandesSubvention: [demandeBciat],
                 programmesAide: [programmeAide({ appelAProjet: '' })],

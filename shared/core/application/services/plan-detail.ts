@@ -6,25 +6,34 @@ import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { Region } from '@shared/core/domain/value-objects/region'
-import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/core/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
-import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
+import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/core/application/ports/approvisionnement'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
+import type { AttachmentQuery } from '@shared/core/application/ports/attachment'
+import type { DemandeSubventionQuery } from '@shared/core/application/ports/demande-subvention'
+import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise'
+import type { InseeQuery } from '@shared/core/application/ports/insee'
+import type { InstallationQuery } from '@shared/core/application/ports/installation'
+import type { InstructionQuery } from '@shared/core/application/ports/instruction'
+import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
+import type { ProgrammeAideQuery } from '@shared/core/application/ports/programme-aide'
 
-export type DemandeSubventionAccueil = {
+export type DemandeSubventionDetail = {
     id: DemandeSubvention['id']
     programmeAide: ProgrammeAide
     instructions: readonly Instruction[]
 }
 
-export type PlanAccueil = Plan & {
+export type PlanDetail = Plan & {
     departement: Departement['dep'] | null
     installationRegion: Region['libelle'] | null
-    demandesSubvention: readonly DemandeSubventionAccueil[]
+    demandesSubvention: readonly DemandeSubventionDetail[]
     fournisseurs: readonly Entreprise[]
     attachments: readonly Attachment[]
 }
 
-export type PlanAccueilSources = {
+export type PlanDetailSources = {
     plans: readonly Plan[]
     installations: readonly Installation[]
     departementsByRegion: readonly DepartementsByRegion[]
@@ -62,16 +71,16 @@ function getDemandesByPlan({
     programmesAide,
     instructions,
 }: Pick<
-    PlanAccueilSources,
+    PlanDetailSources,
     'demandesSubvention' | 'programmesAide' | 'instructions'
->): Map<Plan['id'], DemandeSubventionAccueil[]> {
+>): Map<Plan['id'], DemandeSubventionDetail[]> {
     const programmeById = new Map(
         programmesAide.map((programme) => [programme.id, programme])
     )
 
     const instructionsBySubvention = getInstructionsBySubvention(instructions)
 
-    const demandesByPlan = new Map<Plan['id'], DemandeSubventionAccueil[]>()
+    const demandesByPlan = new Map<Plan['id'], DemandeSubventionDetail[]>()
 
     for (const demande of demandesSubvention) {
         // A demande is named by its programme, so one pointing at a programme
@@ -98,7 +107,7 @@ function getFournisseursByPlan({
     approvisionnementsByFournisseur,
     entreprises,
 }: Pick<
-    PlanAccueilSources,
+    PlanDetailSources,
     'approvisionnementsByFournisseur' | 'entreprises'
 >): Map<Plan['id'], Entreprise[]> {
     const entrepriseBySiret = new Map(
@@ -153,7 +162,7 @@ function getAttachmentsByPlan(
 }
 
 export function getAppelsAProjet(
-    plan: PlanAccueil
+    plan: PlanDetail
 ): ProgrammeAide['appelAProjet'][] {
     const appels = plan.demandesSubvention
         .map((demande) => demande.programmeAide.appelAProjet)
@@ -162,7 +171,7 @@ export function getAppelsAProjet(
     return [...new Set(appels)]
 }
 
-export function getPlansAccueil({
+export function composePlanDetails({
     plans,
     installations,
     departementsByRegion,
@@ -172,7 +181,7 @@ export function getPlansAccueil({
     approvisionnementsByFournisseur,
     entreprises,
     attachments,
-}: PlanAccueilSources): PlanAccueil[] {
+}: PlanDetailSources): PlanDetail[] {
     const installationById = new Map(
         installations.map((installation) => [installation.id, installation])
     )
@@ -210,5 +219,63 @@ export function getPlansAccueil({
             fournisseurs: fournisseursByPlan.get(plan.id) ?? [],
             attachments: attachmentsByPlan.get(plan.id) ?? [],
         }
+    })
+}
+
+/** Everything a plan detail is read from. Named so a widget hands over its ports and nothing else. */
+export type PlanDetailPorts = {
+    plans: PlanQuery
+    installations: InstallationQuery
+    insee: InseeQuery
+    demandesSubvention: DemandeSubventionQuery
+    programmesAide: ProgrammeAideQuery
+    instructions: InstructionQuery
+    approvisionnements: ApprovisionnementQuery
+    entreprises: EntrepriseQuery
+    attachments: AttachmentQuery
+}
+
+/**
+ * Reads every source a plan detail is built from, then composes them.
+ *
+ * The reads are fired together rather than in sequence: an adapter is free to
+ * serve two callers asking for the same table from one round trip, and can only
+ * do so while both are still in flight.
+ */
+export async function getPlanDetails(
+    ports: PlanDetailPorts
+): Promise<readonly PlanDetail[]> {
+    const [
+        plans,
+        installations,
+        departementsByRegion,
+        demandesSubvention,
+        programmesAide,
+        instructions,
+        approvisionnementsByFournisseur,
+        entreprises,
+        attachments,
+    ] = await Promise.all([
+        ports.plans.list(),
+        ports.installations.list(),
+        ports.insee.listDepartementsByRegion(),
+        ports.demandesSubvention.list(),
+        ports.programmesAide.list(),
+        ports.instructions.list(),
+        ports.approvisionnements.listByPlanRessourceAndFournisseur(),
+        ports.entreprises.list(),
+        ports.attachments.list(),
+    ])
+
+    return composePlanDetails({
+        plans,
+        installations,
+        departementsByRegion,
+        demandesSubvention,
+        programmesAide,
+        instructions,
+        approvisionnementsByFournisseur,
+        entreprises,
+        attachments,
     })
 }
