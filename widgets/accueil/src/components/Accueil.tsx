@@ -3,20 +3,18 @@ import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-user/icons-user.main.min.css'
 
 import './Accueil.css'
-import DataTable, {
-    type Column,
-} from '@shared/user-interface/component/DataTable'
-import MultiSelect from '@shared/user-interface/component/MultiSelect'
-import SearchBar from '@shared/user-interface/component/SearchBar'
+import DataTable, { type Column } from '@shared/react/components/DataTable'
+import MultiSelect from '@shared/react/components/MultiSelect'
+import SearchBar from '@shared/react/components/SearchBar'
 import TagNature from './TagNature'
 import TagStatut from './TagStatut'
 import TagType from './TagType'
 import TagUsage from './TagUsage'
-import type { Departement } from '@shared/application/domain/departement'
-import type { Entreprise } from '@shared/application/domain/entreprise'
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
+import type { Departement } from '@shared/core/domain/value-objects/departement'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useMemo, useState } from 'react'
 import {
     getAppelAProjetOptions,
@@ -28,8 +26,8 @@ import {
 } from '../utils'
 
 function getColumns(
-    onOpenDossier: (plan: PlanAccueil) => void
-): readonly Column<PlanAccueil>[] {
+    onOpenDossier: (plan: PlanDetail) => void
+): readonly Column<PlanDetail>[] {
     return [
         {
             id: 'action',
@@ -76,10 +74,10 @@ function getColumns(
 }
 
 export type AccueilProps = {
-    plansApprovisionnement: readonly PlanAccueil[]
+    plansApprovisionnement: readonly PlanDetail[]
     departementsByRegion: readonly DepartementsByRegion[]
     programmesAide: readonly ProgrammeAide[]
-    onOpenDossier: (plan: PlanAccueil) => void
+    onOpenDossier: (plan: PlanDetail) => void
 }
 
 export default function Accueil({

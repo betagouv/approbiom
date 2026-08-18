@@ -4,8 +4,8 @@ import {
     getEtapes,
     type EtapeId,
     type EtapeState,
-} from '@shared/application/domain/chronologie-instruction'
-import type { Instruction } from '@shared/application/domain/instruction'
+    type Instruction,
+} from '@shared/core/domain/entities/instruction'
 
 const DATE = new Intl.DateTimeFormat('fr-FR', {
     day: 'numeric',

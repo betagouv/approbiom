@@ -1,8 +1,8 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { DemandeSubventionAccueil } from '@shared/application/read-models/plan-accueil'
-import type { Instruction } from '@shared/application/domain/instruction'
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
+import type { DemandeSubventionDetail } from '@shared/core/application/services/plan-detail'
+import type { Instruction } from '@shared/core/domain/entities/instruction'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import FilInstruction from './FilInstruction'
 
 function programmeAide(overrides: Partial<ProgrammeAide> = {}): ProgrammeAide {
@@ -32,7 +32,7 @@ function instruction(overrides: Partial<Instruction> = {}): Instruction {
     }
 }
 
-const bciat: DemandeSubventionAccueil = {
+const bciat: DemandeSubventionDetail = {
     id: 1,
     programmeAide: programmeAide(),
     instructions: [
@@ -41,7 +41,7 @@ const bciat: DemandeSubventionAccueil = {
     ],
 }
 
-const bcib: DemandeSubventionAccueil = {
+const bcib: DemandeSubventionDetail = {
     id: 2,
     programmeAide: programmeAide({ id: 2, shortName: 'BCIB' }),
     instructions: [instruction({ name: 'Instruction 3' })],

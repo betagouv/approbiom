@@ -3,10 +3,8 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-document/icons-document.main.min.c
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import './PiecesJointes.css'
-import DataTable, {
-    type Column,
-} from '@shared/user-interface/component/DataTable'
-import type { Attachment } from '@shared/application/domain/attachment'
+import DataTable, { type Column } from '@shared/react/components/DataTable'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 
 const TAILLE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 

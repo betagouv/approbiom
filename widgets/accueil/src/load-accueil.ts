@@ -1,71 +1,30 @@
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
-import type { AttachmentQuery } from '@shared/application/ports/attachment-query'
-import type { DemandeSubventionQuery } from '@shared/application/ports/demande-subvention-query'
-import type { InstallationQuery } from '@shared/application/ports/installation-query'
-import type { InstructionQuery } from '@shared/application/ports/instruction-query'
-import type { ProgrammeAideQuery } from '@shared/application/ports/programme-aide-query'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { ApprovisionnementStatsPorts } from '@shared/core/application/services/approvisionnement-stats'
 import {
-    getPlansAccueil,
-    type PlanAccueil,
-} from '@shared/application/read-models/plan-accueil'
-import {
-    loadRessource,
-    type RessourcePorts,
-    type RessourceScreen,
-} from '@shared/user-interface/screen/ressource'
+    getPlanDetails,
+    type PlanDetail,
+    type PlanDetailPorts,
+} from '@shared/core/application/services/plan-detail'
 
-export type AccueilPorts = RessourcePorts & {
-    demandesSubvention: DemandeSubventionQuery
-    programmesAide: ProgrammeAideQuery
-    instructions: InstructionQuery
-    installations: InstallationQuery
-    attachments: AttachmentQuery
-}
+export type AccueilPorts = PlanDetailPorts & ApprovisionnementStatsPorts
 
 export type AccueilScreen = {
-    plansApprovisionnement: readonly PlanAccueil[]
-    ressource: RessourceScreen
+    plansApprovisionnement: readonly PlanDetail[]
     programmesAide: readonly ProgrammeAide[]
     departementsByRegion: readonly DepartementsByRegion[]
 }
 
 export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
-    const [
-        plans,
-        ressource,
-        demandesSubvention,
-        programmesAide,
-        instructions,
-        installations,
-        departementsByRegion,
-        entreprises,
-        attachments,
-    ] = await Promise.all([
-        ports.plans.list(),
-        loadRessource(ports),
-        ports.demandesSubvention.list(),
-        ports.programmesAide.list(),
-        ports.instructions.list(),
-        ports.installations.list(),
-        ports.insee.listDepartementsByRegion(),
-        ports.entreprises.list(),
-        ports.attachments.list(),
-    ])
+    const [plansApprovisionnement, programmesAide, departementsByRegion] =
+        await Promise.all([
+            getPlanDetails(ports),
+            ports.programmesAide.list(),
+            ports.insee.listDepartementsByRegion(),
+        ])
 
     return {
-        plansApprovisionnement: getPlansAccueil({
-            plans,
-            installations,
-            departementsByRegion,
-            demandesSubvention,
-            programmesAide,
-            instructions,
-            approvisionnementsByFournisseur: ressource.byFournisseur,
-            entreprises,
-            attachments,
-        }),
-        ressource,
+        plansApprovisionnement,
         programmesAide,
         departementsByRegion,
     }

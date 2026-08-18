@@ -4,17 +4,20 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import './Dossier.css'
 import FilInstruction from './FilInstruction'
 import PiecesJointes from './PiecesJointes'
-import TabNav, {
-    type TabNavItem,
-} from '@shared/user-interface/component/TabNav'
-import Ressource, {
-    type RessourceScreen,
-} from '@shared/user-interface/screen/ressource'
-import type { Attachment } from '@shared/application/domain/attachment'
+import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
+import Ressource from '@shared/react/components/Ressource'
+import AsyncGate from '@shared/react/AsyncGate'
+import { renderError } from '@shared/react/render-error'
+import { useAsyncData } from '@shared/react/useAsyncData'
+import {
+    getApprovisionnementStats,
+    type ApprovisionnementStatsPorts,
+} from '@shared/core/application/services/approvisionnement-stats'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 import {
     getAppelsAProjet,
-    type PlanAccueil,
-} from '@shared/application/read-models/plan-accueil'
+    type PlanDetail,
+} from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 
 const SECTIONS: readonly TabNavItem[] = [
@@ -24,16 +27,32 @@ const SECTIONS: readonly TabNavItem[] = [
 ]
 const INCONNU = '—'
 
+function Ressources({
+    ports,
+    plan,
+}: {
+    ports: ApprovisionnementStatsPorts
+    plan: PlanDetail['id']
+}) {
+    const state = useAsyncData(() => getApprovisionnementStats(ports, plan))
+
+    return (
+        <AsyncGate state={state} renderError={renderError}>
+            {(stats) => <Ressource {...stats} />}
+        </AsyncGate>
+    )
+}
+
 export type DossierProps = {
-    plan: PlanAccueil
-    ressource: RessourceScreen
+    plan: PlanDetail
+    ports: ApprovisionnementStatsPorts
     getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void
 }
 
 export default function Dossier({
     plan,
-    ressource,
+    ports,
     getFileUrl,
     onClose,
 }: DossierProps) {
@@ -79,7 +98,7 @@ export default function Dossier({
             )}
 
             {section === 'ressources' && (
-                <Ressource {...ressource} plan={plan.id} />
+                <Ressources ports={ports} plan={plan.id} />
             )}
             {section === 'pieces-jointes' && (
                 <PiecesJointes

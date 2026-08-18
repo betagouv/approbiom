@@ -1,15 +1,15 @@
-import type { ApprovisionnementQuery } from '@shared/application/ports/approvisionnement-query'
-import type { EntrepriseQuery } from '@shared/application/ports/entreprise-query'
-import type { InseeQuery } from '@shared/application/ports/insee-query'
-import type { InstallationQuery } from '@shared/application/ports/installation-query'
-import type { PlanQuery } from '@shared/application/ports/plan-query'
-import type { RessourceQuery } from '@shared/application/ports/ressource-query'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
-import type { Departement } from '@shared/application/domain/departement'
-import type { Entreprise } from '@shared/application/domain/entreprise'
-import type { PlanDApprovisionnement } from '@shared/application/domain/plan-d-approvisionnement'
-import type { Ressource } from '@shared/application/domain/ressource'
+import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
+import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise'
+import type { InseeQuery } from '@shared/core/application/ports/insee'
+import type { InstallationQuery } from '@shared/core/application/ports/installation'
+import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
+import type { RessourceQuery } from '@shared/core/application/ports/ressource'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Departement } from '@shared/core/domain/value-objects/departement'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import type { Ressource } from '@shared/core/domain/entities/ressource'
 
 export type ConcurrencePorts = {
     approvisionnements: ApprovisionnementQuery
@@ -30,7 +30,7 @@ export type ConcurrenceRow = {
     ressource: Ressource['title']
     departementDeSituation: Departement['libelle']
     approvisionnements: readonly Approvisionnement[]
-    sumTonnageTotal?: number
+    tonnageTotal: number
 }
 
 export type ConcurrenceScreen = {
@@ -54,8 +54,8 @@ export async function loadConcurrence(
         fournisseurs,
         departementsByRegion,
     ] = await Promise.all([
-        ports.approvisionnements.listByPlanAndRessource(),
-        ports.approvisionnements.listApprovisionnements(),
+        ports.approvisionnements.listGroupedByPlanAndRessource(),
+        ports.approvisionnements.list(),
         ports.plans.list(),
         ports.installations.list(),
         ports.ressources.list(),
@@ -104,7 +104,7 @@ export async function loadConcurrence(
                     byPair.get(
                         pairKey(total.planDApprovisionnement, total.ressource)
                     ) ?? [],
-                sumTonnageTotal: total.sumTonnageTotal,
+                tonnageTotal: total.tonnageTotal,
             }
         }),
         departementsByRegion,

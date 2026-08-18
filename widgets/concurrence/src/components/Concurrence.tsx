@@ -1,17 +1,15 @@
 import './Concurrence.css'
-import DataTable, {
-    type Column,
-} from '@shared/user-interface/component/DataTable'
+import DataTable, { type Column } from '@shared/react/components/DataTable'
 import MultiSelect, {
     type MultiSelectGroup,
-} from '@shared/user-interface/component/MultiSelect'
-import { getOptions } from '@shared/user-interface/utils/getOptions'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
-import type { Departement } from '@shared/application/domain/departement'
+} from '@shared/react/components/MultiSelect'
+import { getOptions } from '@shared/react/getOptions'
+import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Departement } from '@shared/core/domain/value-objects/departement'
 
 import { useCallback, useMemo, useState } from 'react'
-import type { Entreprise } from '@shared/application/domain/entreprise'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ConcurrenceRow } from '../load-concurrence'
 
 type Props = {
@@ -151,8 +149,7 @@ export default function Concurrence({
             {
                 header: 'Tonnage total (en tonne de matière verte par an)',
                 id: 'tonnage_total',
-                render: (item) =>
-                    !item.sumTonnageTotal ? 'N/A' : item.sumTonnageTotal,
+                render: (item) => item.tonnageTotal,
             },
             {
                 header: 'Départements retenus',
