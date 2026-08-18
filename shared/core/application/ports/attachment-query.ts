@@ -1,4 +1,4 @@
-import type { Attachment } from '@shared/application/domain/attachment'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 
 export interface AttachmentQuery {
     list(): Promise<readonly Attachment[]>

@@ -1,13 +1,13 @@
-import type { ApprovisionnementQuery } from '@shared/application/ports/approvisionnement-query'
-import type { EntrepriseQuery } from '@shared/application/ports/entreprise-query'
-import type { InseeQuery } from '@shared/application/ports/insee-query'
-import type { PlanQuery } from '@shared/application/ports/plan-query'
-import type { RessourceQuery } from '@shared/application/ports/ressource-query'
-import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
-import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
-import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
-import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-region'
-import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
+import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement-query'
+import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise-query'
+import type { InseeQuery } from '@shared/core/application/ports/insee-query'
+import type { PlanQuery } from '@shared/core/application/ports/plan-query'
+import type { RessourceQuery } from '@shared/core/application/ports/ressource-query'
+import type { ApprovisionnementByPlanAndRessource } from '@shared/core/application/read-models/approvisionnement-by-plan-and-ressource'
+import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/core/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
+import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/core/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
+import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/core/application/read-models/approvisionnement-by-plan-ressource-and-region'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
 export type RessourcePorts = {
     approvisionnements: ApprovisionnementQuery

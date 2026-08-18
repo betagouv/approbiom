@@ -1,4 +1,4 @@
-import type { InstallationQuery } from '@shared/application/ports/installation-query'
+import type { InstallationQuery } from '@shared/core/application/ports/installation-query'
 import { gristReady } from './grist-ready'
 import {
     asNumber,

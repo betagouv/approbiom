@@ -1,14 +1,11 @@
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
-import type { AttachmentQuery } from '@shared/application/ports/attachment-query'
-import type { DemandeSubventionQuery } from '@shared/application/ports/demande-subvention-query'
-import type { InstallationQuery } from '@shared/application/ports/installation-query'
-import type { InstructionQuery } from '@shared/application/ports/instruction-query'
-import type { ProgrammeAideQuery } from '@shared/application/ports/programme-aide-query'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import {
-    getPlansAccueil,
-    type PlanAccueil,
-} from '@shared/application/read-models/plan-accueil'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
+import type { AttachmentQuery } from '@shared/core/application/ports/attachment-query'
+import type { DemandeSubventionQuery } from '@shared/core/application/ports/demande-subvention-query'
+import type { InstallationQuery } from '@shared/core/application/ports/installation-query'
+import type { InstructionQuery } from '@shared/core/application/ports/instruction-query'
+import type { ProgrammeAideQuery } from '@shared/core/application/ports/programme-aide-query'
+import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
+import { getPlansAccueil, type PlanAccueil } from '@shared/core/plan-accueil'
 import {
     loadRessource,
     type RessourcePorts,

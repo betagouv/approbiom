@@ -1,8 +1,8 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { DemandeSubventionAccueil } from '@shared/application/read-models/plan-accueil'
-import type { Instruction } from '@shared/application/domain/instruction'
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
+import type { DemandeSubventionAccueil } from '@shared/core/plan-accueil'
+import type { Instruction } from '@shared/core/domain/entities/instruction'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import FilInstruction from './FilInstruction'
 
 function programmeAide(overrides: Partial<ProgrammeAide> = {}): ProgrammeAide {

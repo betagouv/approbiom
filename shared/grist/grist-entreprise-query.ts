@@ -1,4 +1,4 @@
-import type { EntrepriseQuery } from '@shared/application/ports/entreprise-query'
+import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise-query'
 import { gristReady } from './grist-ready'
 import { asString, fetchRowsOnce } from './grist-helpers'
 import { COLUMNS, TABLE } from './grist-tables'

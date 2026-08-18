@@ -1,4 +1,4 @@
-import type { Departement } from './departement'
+import type { Departement } from '../value-objects/departement'
 
 export type Commune = {
     com: string

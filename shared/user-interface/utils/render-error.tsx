@@ -3,7 +3,7 @@ import Alert from '@shared/user-interface/component/Alert'
 import {
     AccessDeniedError,
     DataSourceUnavailableError,
-} from '@shared/application/errors'
+} from '@shared/core/errors'
 
 export function renderError(error: Error, retry: () => void): ReactNode {
     if (error instanceof DataSourceUnavailableError) {

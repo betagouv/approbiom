@@ -1,4 +1,4 @@
-import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { ApprovisionnementByPlanAndRessource } from './approvisionnement-by-plan-and-ressource'
 
 /**

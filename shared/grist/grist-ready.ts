@@ -1,7 +1,7 @@
 import {
     AccessDeniedError,
     DataSourceUnavailableError,
-} from '@shared/application/errors'
+} from '@shared/core/errors'
 
 const REQUIRED_ACCESS = 'full'
 

@@ -10,11 +10,8 @@ import TabNav, {
 import Ressource, {
     type RessourceScreen,
 } from '@shared/user-interface/screen/ressource'
-import type { Attachment } from '@shared/application/domain/attachment'
-import {
-    getAppelsAProjet,
-    type PlanAccueil,
-} from '@shared/application/read-models/plan-accueil'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
+import { getAppelsAProjet, type PlanAccueil } from '@shared/core/plan-accueil'
 import { useState } from 'react'
 
 const SECTIONS: readonly TabNavItem[] = [

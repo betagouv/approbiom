@@ -1,4 +1,4 @@
-import type { Departement } from './departement'
+import type { Departement } from '../value-objects/departement'
 import type { Entreprise } from './entreprise'
 import type { PlanDApprovisionnement } from './plan-d-approvisionnement'
 import type { Ressource } from './ressource'

@@ -6,7 +6,7 @@ import './PiecesJointes.css'
 import DataTable, {
     type Column,
 } from '@shared/user-interface/component/DataTable'
-import type { Attachment } from '@shared/application/domain/attachment'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 
 const TAILLE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 

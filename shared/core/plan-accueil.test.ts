@@ -1,9 +1,9 @@
 import { describe, expect, it } from 'vitest'
-import type { Attachment } from '@shared/application/domain/attachment'
-import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
-import type { Entreprise } from '@shared/application/domain/entreprise'
-import type { Instruction } from '@shared/application/domain/instruction'
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Instruction } from '@shared/core/domain/entities/instruction'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 
 import {
     getAppelsAProjet,
@@ -12,7 +12,7 @@ import {
     type PlanAccueilSources,
 } from './plan-accueil'
 
-import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
 function plan(overrides: Partial<Plan> = {}): Plan {
     return {

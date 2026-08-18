@@ -1,7 +1,7 @@
 import AsyncGate from '@shared/user-interface/utils/AsyncGate'
 import { renderError } from '@shared/user-interface/utils/render-error'
 import { useAsyncData } from '@shared/user-interface/utils/useAsyncData'
-import type { PlanAccueil } from '@shared/application/read-models/plan-accueil'
+import type { PlanAccueil } from '@shared/core/plan-accueil'
 import { useState } from 'react'
 import Accueil from './components/Accueil'
 import Dossier from './components/Dossier'

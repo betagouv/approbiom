@@ -3,13 +3,13 @@ import DataTable, {
     type Column,
 } from '@shared/user-interface/component/DataTable'
 import './Ressource.css'
-import type { ApprovisionnementByPlanAndRessource } from '@shared/application/read-models/approvisionnement-by-plan-and-ressource'
-import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
-import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
-import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/application/read-models/approvisionnement-by-plan-ressource-and-region'
-import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
+import type { ApprovisionnementByPlanAndRessource } from '@shared/core/application/read-models/approvisionnement-by-plan-and-ressource'
+import type { ApprovisionnementByPlanRessourceAndDepartementDeProvenance } from '@shared/core/application/read-models/approvisionnement-by-plan-ressource-and-departement-de-provenance'
+import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/core/application/read-models/approvisionnement-by-plan-ressource-and-fournisseur'
+import type { ApprovisionnementByPlanRessourceAndRegion } from '@shared/core/application/read-models/approvisionnement-by-plan-ressource-and-region'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { RessourceScreen } from './load-ressource'
-import type { Ressource } from '@shared/application/domain/ressource'
+import type { Ressource } from '@shared/core/domain/entities/ressource'
 
 const REPARTITION = new Intl.NumberFormat('fr-FR', {
     style: 'percent',

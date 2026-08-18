@@ -1,6 +1,6 @@
 import './FilInstruction.css'
 import Chronologie from './Chronologie'
-import type { DemandeSubventionAccueil } from '@shared/application/read-models/plan-accueil'
+import type { DemandeSubventionAccueil } from '@shared/core/plan-accueil'
 
 export type FilInstructionProps = {
     demandes: readonly DemandeSubventionAccueil[]

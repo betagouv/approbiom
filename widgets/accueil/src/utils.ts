@@ -1,12 +1,9 @@
-import type { Departement } from '@shared/application/domain/departement'
-import type { Entreprise } from '@shared/application/domain/entreprise'
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
-import {
-    getAppelsAProjet,
-    type PlanAccueil,
-} from '@shared/application/read-models/plan-accueil'
+import type { Departement } from '@shared/core/domain/value-objects/departement'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
+import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import { getAppelsAProjet, type PlanAccueil } from '@shared/core/plan-accueil'
 import type {
     MultiSelectGroup,
     MultiSelectOption,

@@ -1,4 +1,4 @@
-import type { DemandeSubventionQuery } from '@shared/application/ports/demande-subvention-query'
+import type { DemandeSubventionQuery } from '@shared/core/application/ports/demande-subvention-query'
 import { gristReady } from './grist-ready'
 import { asNumber, fetchRowsOnce } from './grist-helpers'
 import { COLUMNS, TABLE } from './grist-tables'

@@ -3,7 +3,7 @@ import SearchBar from '@shared/user-interface/component/SearchBar'
 import Ressource, {
     type RessourceScreen,
 } from '@shared/user-interface/screen/ressource'
-import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
 import { useState } from 'react'
 

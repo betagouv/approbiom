@@ -2,7 +2,7 @@ import Badge from '@shared/user-interface/component/Badge'
 import type {
     AvisCRB,
     AvisPrefet,
-} from '@shared/application/domain/instruction'
+} from '@shared/core/domain/entities/instruction'
 
 const COLOR: Record<string, string> = {
     'Avis favorable': 'green-emeraude',

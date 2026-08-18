@@ -3,14 +3,14 @@ import { afterEach, describe, expect, it } from 'vitest'
 import {
     AccessDeniedError,
     DataSourceUnavailableError,
-} from '@shared/application/errors'
-import type { PlanQuery } from '@shared/application/ports/plan-query'
-import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
-import type { DemandeSubvention } from '@shared/application/domain/demande-subvention'
-import type { Installation } from '@shared/application/domain/installation'
-import type { Instruction } from '@shared/application/domain/instruction'
-import type { ProgrammeAide } from '@shared/application/domain/programme-aide'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
+} from '@shared/core/errors'
+import type { PlanQuery } from '@shared/core/application/ports/plan-query'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
+import type { Installation } from '@shared/core/domain/entities/installation'
+import type { Instruction } from '@shared/core/domain/entities/instruction'
+import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
+import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
 import App from './App'
 import type { AccueilPorts } from './load-accueil'
 

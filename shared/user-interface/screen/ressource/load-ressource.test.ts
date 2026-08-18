@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { PlanDApprovisionnement as Plan } from '@shared/application/domain/plan-d-approvisionnement'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import { loadRessource, type RessourcePorts } from './load-ressource'
 
 const plan = (overrides: Partial<Plan> = {}): Plan => ({

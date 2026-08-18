@@ -1,4 +1,4 @@
-import type { RessourceQuery } from '@shared/application/ports/ressource-query'
+import type { RessourceQuery } from '@shared/core/application/ports/ressource-query'
 import { gristReady } from './grist-ready'
 import { asString, fetchRowsOnce } from './grist-helpers'
 import { COLUMNS, TABLE } from './grist-tables'

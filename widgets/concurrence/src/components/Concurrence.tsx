@@ -6,12 +6,12 @@ import MultiSelect, {
     type MultiSelectGroup,
 } from '@shared/user-interface/component/MultiSelect'
 import { getOptions } from '@shared/user-interface/utils/getOptions'
-import type { DepartementsByRegion } from '@shared/application/read-models/departements-by-region'
-import type { Approvisionnement } from '@shared/application/domain/approvisionnement'
-import type { Departement } from '@shared/application/domain/departement'
+import type { DepartementsByRegion } from '@shared/core/application/read-models/departements-by-region'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Departement } from '@shared/core/domain/value-objects/departement'
 
 import { useCallback, useMemo, useState } from 'react'
-import type { Entreprise } from '@shared/application/domain/entreprise'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ConcurrenceRow } from '../load-concurrence'
 
 type Props = {

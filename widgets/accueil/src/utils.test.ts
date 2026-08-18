@@ -2,7 +2,7 @@ import { describe, expect, it } from 'vitest'
 import type {
     DemandeSubventionAccueil,
     PlanAccueil,
-} from '@shared/application/read-models/plan-accueil'
+} from '@shared/core/plan-accueil'
 import {
     getDepartementOptions,
     getFilteredRows,
