@@ -1,7 +1,7 @@
 import type { AttachmentQuery } from '@shared/core/application/ports/attachment'
-import { gristReady } from './grist-ready'
-import { asIdList, asNumber, asString, fetchRowsOnce } from './grist-helpers'
-import { COLUMNS, TABLE } from './grist-tables'
+import { gristReady } from '../grist-ready'
+import { asIdList, asNumber, asString, fetchRowsOnce } from '../grist-helpers'
+import { COLUMNS, TABLE } from '../grist-tables'
 
 type AttachmentMetadata = {
     name: string

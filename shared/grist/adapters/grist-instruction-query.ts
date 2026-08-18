@@ -2,7 +2,7 @@ import type { InstructionQuery } from '@shared/core/application/ports/instructio
 import { isAvisCRB } from '@shared/core/domain/value-objects/avis-crb'
 import { isAvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
 import { isPhaseInstruction } from '@shared/core/domain/value-objects/phase-instruction'
-import { gristReady } from './grist-ready'
+import { gristReady } from '../grist-ready'
 import {
     asBoolean,
     asDate,
@@ -11,8 +11,8 @@ import {
     byRowId,
     fetchRowsOnce,
     lookup,
-} from './grist-helpers'
-import { COLUMNS, TABLE } from './grist-tables'
+} from '../grist-helpers'
+import { COLUMNS, TABLE } from '../grist-tables'
 
 export function createGristInstructionQuery(): InstructionQuery {
     return {

@@ -1,8 +1,8 @@
 import type { InseeQuery } from '@shared/core/application/ports/insee'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
-import { gristReady } from './grist-ready'
-import { asNumber, asString, fetchRowsOnce } from './grist-helpers'
-import { COLUMNS, TABLE } from './grist-tables'
+import { gristReady } from '../grist-ready'
+import { asNumber, asString, fetchRowsOnce } from '../grist-helpers'
+import { COLUMNS, TABLE } from '../grist-tables'
 
 type Departements = DepartementsByRegion['departements'][number][]
 

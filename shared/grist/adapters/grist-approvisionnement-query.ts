@@ -1,6 +1,8 @@
-import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
-import type { ApprovisionnementByPlanAndRessource } from '@shared/core/application/ports/approvisionnement'
-import { gristReady } from './grist-ready'
+import type {
+    ApprovisionnementGroupedByPlanAndRessource,
+    ApprovisionnementQuery,
+} from '@shared/core/application/ports/approvisionnement'
+import { gristReady } from '../grist-ready'
 import {
     asNumber,
     asString,
@@ -8,31 +10,31 @@ import {
     fetchRowsOnce,
     lookup,
     type GristRow,
-} from './grist-helpers'
-import { COLUMNS, TABLE } from './grist-tables'
+} from '../grist-helpers'
+import { COLUMNS, TABLE } from '../grist-tables'
 
-/**
- * Reads a cell that holds a number but means text. `Siret` is stored numeric in
- * the document while it identifies an entreprise, so it crosses into the domain
- * as the string it is.
- */
 const asText = (value: unknown): string =>
     typeof value === 'number' ? String(value) : asString(value)
 
-/** A Ref to `Meta_Ressource`, read as the code the ressource is keyed by. */
 const ressourceCode = (index: Map<number, GristRow>, ref: unknown): string =>
     asString(lookup(index, ref)?.Code_ressource_Approbiom)
 
-/** The fields every summary carries, whichever dimension it adds to them. */
-function toTotal(
+/**
+ * The fields every summary carries, whichever dimension it adds to them.
+ *
+ * A cell the document cannot answer for reads as zero here rather than crossing
+ * the port unknown: left open, every screen would invent its own fallback and
+ * they would not agree.
+ */
+function toGroup(
     row: GristRow,
     ressources: Map<number, GristRow>
-): ApprovisionnementByPlanAndRessource {
+): ApprovisionnementGroupedByPlanAndRessource {
     return {
         planDApprovisionnement: asNumber(row.Plan_d_approvisionnement) ?? 0,
         ressource: ressourceCode(ressources, row.Ressource),
-        sumTonnageTotal: asNumber(row.Total_en_tMv_an_),
-        repartition: asNumber(row.Repartition),
+        tonnageTotal: asNumber(row.Total_en_tMv_an_) ?? 0,
+        repartition: asNumber(row.Repartition) ?? 0,
     }
 }
 
@@ -50,7 +52,7 @@ export function createGristApprovisionnementQuery(): ApprovisionnementQuery {
     }
 
     return {
-        async listApprovisionnements() {
+        async list() {
             await gristReady()
 
             const [rows, ressources, entreprises, departements] =
@@ -82,16 +84,16 @@ export function createGristApprovisionnementQuery(): ApprovisionnementQuery {
             }))
         },
 
-        async listByPlanAndRessource() {
+        async listGroupedByPlanAndRessource() {
             const { rows, ressources } = await readTotals(
                 TABLE.totalByPlanAndRessource,
                 COLUMNS.totalByPlanAndRessource
             )
 
-            return rows.map((row) => toTotal(row, ressources))
+            return rows.map((row) => toGroup(row, ressources))
         },
 
-        async listByPlanRessourceAndRegion() {
+        async listGroupedByPlanRessourceAndRegion() {
             const { rows, ressources } = await readTotals(
                 TABLE.totalByRegion,
                 COLUMNS.totalByRegion
@@ -100,12 +102,12 @@ export function createGristApprovisionnementQuery(): ApprovisionnementQuery {
             // `Region` is a formula, not a Ref: it already reads as a libellé,
             // so there is no code to resolve against a directory.
             return rows.map((row) => ({
-                ...toTotal(row, ressources),
+                ...toGroup(row, ressources),
                 region: asString(row.Region),
             }))
         },
 
-        async listByPlanRessourceAndFournisseur() {
+        async listGroupedByPlanRessourceAndFournisseur() {
             const { rows, ressources } = await readTotals(
                 TABLE.totalByFournisseur,
                 COLUMNS.totalByFournisseur
@@ -115,14 +117,14 @@ export function createGristApprovisionnementQuery(): ApprovisionnementQuery {
             )
 
             return rows.map((row) => ({
-                ...toTotal(row, ressources),
+                ...toGroup(row, ressources),
                 fournisseur: asText(
                     lookup(entrepriseById, row.Fournisseur)?.Siret
                 ),
             }))
         },
 
-        async listByPlanRessourceAndDepartementDeProvenance() {
+        async listGroupedByPlanRessourceAndDepartement() {
             const { rows, ressources } = await readTotals(
                 TABLE.totalByDepartementDeProvenance,
                 COLUMNS.totalByDepartementDeProvenance
@@ -132,8 +134,8 @@ export function createGristApprovisionnementQuery(): ApprovisionnementQuery {
             )
 
             return rows.map((row) => ({
-                ...toTotal(row, ressources),
-                departementDeProvenance: asString(
+                ...toGroup(row, ressources),
+                departement: asString(
                     lookup(departementById, row.Departement_de_provenance)?.DEP
                 ),
             }))

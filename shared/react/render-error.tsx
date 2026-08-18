@@ -1,5 +1,5 @@
 import type { ReactNode } from 'react'
-import Alert from '@shared/user-interface/component/Alert'
+import Alert from '@shared/react/components/Alert'
 import {
     AccessDeniedError,
     DataSourceUnavailableError,

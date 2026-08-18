@@ -1,7 +1,7 @@
 import type { RessourceQuery } from '@shared/core/application/ports/ressource'
-import { gristReady } from './grist-ready'
-import { asString, fetchRowsOnce } from './grist-helpers'
-import { COLUMNS, TABLE } from './grist-tables'
+import { gristReady } from '../grist-ready'
+import { asString, fetchRowsOnce } from '../grist-helpers'
+import { COLUMNS, TABLE } from '../grist-tables'
 
 export function createGristRessourceQuery(): RessourceQuery {
     return {

@@ -1,6 +1,6 @@
-import AsyncGate from '@shared/user-interface/utils/AsyncGate'
-import { renderError } from '@shared/user-interface/utils/render-error'
-import { useAsyncData } from '@shared/user-interface/utils/useAsyncData'
+import AsyncGate from '@shared/react/AsyncGate'
+import { renderError } from '@shared/react/render-error'
+import { useAsyncData } from '@shared/react/useAsyncData'
 import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 import Accueil from './components/Accueil'
@@ -17,7 +17,6 @@ export default function App(ports: AccueilPorts) {
             <AsyncGate state={state} renderError={renderError}>
                 {({
                     plansApprovisionnement,
-                    ressource,
                     programmesAide,
                     departementsByRegion,
                 }) =>
@@ -30,8 +29,11 @@ export default function App(ports: AccueilPorts) {
                         />
                     ) : (
                         <Dossier
+                            // Keyed by plan: opening another dossier mounts
+                            // another one, which reads its own statistics.
+                            key={dossier.id}
                             plan={dossier}
-                            ressource={ressource}
+                            ports={ports}
                             getFileUrl={(id) =>
                                 ports.attachments.getFileUrl(id)
                             }

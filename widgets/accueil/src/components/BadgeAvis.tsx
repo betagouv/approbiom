@@ -1,4 +1,4 @@
-import Badge from '@shared/user-interface/component/Badge'
+import Badge from '@shared/react/components/Badge'
 import type { AvisCRB } from '@shared/core/domain/value-objects/avis-crb'
 import type { AvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
 

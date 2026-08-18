@@ -1,13 +1,13 @@
 import type { InstallationQuery } from '@shared/core/application/ports/installation'
-import { gristReady } from './grist-ready'
+import { gristReady } from '../grist-ready'
 import {
     asNumber,
     asString,
     byRowId,
     fetchRowsOnce,
     lookup,
-} from './grist-helpers'
-import { COLUMNS, TABLE } from './grist-tables'
+} from '../grist-helpers'
+import { COLUMNS, TABLE } from '../grist-tables'
 
 export function createGristInstallationQuery(): InstallationQuery {
     return {

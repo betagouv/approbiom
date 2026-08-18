@@ -1,6 +1,6 @@
-import AsyncGate from '@shared/user-interface/utils/AsyncGate'
-import { renderError } from '@shared/user-interface/utils/render-error'
-import { useAsyncData } from '@shared/user-interface/utils/useAsyncData'
+import AsyncGate from '@shared/react/AsyncGate'
+import { renderError } from '@shared/react/render-error'
+import { useAsyncData } from '@shared/react/useAsyncData'
 import Concurrence from './components/Concurrence'
 import { loadConcurrence, type ConcurrencePorts } from './load-concurrence'
 
