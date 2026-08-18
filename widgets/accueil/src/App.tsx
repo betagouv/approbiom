@@ -17,7 +17,6 @@ export default function App(ports: AccueilPorts) {
             <AsyncGate state={state} renderError={renderError}>
                 {({
                     plansApprovisionnement,
-                    ressource,
                     programmesAide,
                     departementsByRegion,
                 }) =>
@@ -30,8 +29,11 @@ export default function App(ports: AccueilPorts) {
                         />
                     ) : (
                         <Dossier
+                            // Keyed by plan: opening another dossier mounts
+                            // another one, which reads its own statistics.
+                            key={dossier.id}
                             plan={dossier}
-                            ressource={ressource}
+                            ports={ports}
                             getFileUrl={(id) =>
                                 ports.attachments.getFileUrl(id)
                             }

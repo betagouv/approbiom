@@ -151,8 +151,7 @@ export default function Concurrence({
             {
                 header: 'Tonnage total (en tonne de matière verte par an)',
                 id: 'tonnage_total',
-                render: (item) =>
-                    !item.sumTonnageTotal ? 'N/A' : item.sumTonnageTotal,
+                render: (item) => item.tonnageTotal,
             },
             {
                 header: 'Départements retenus',

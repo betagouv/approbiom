@@ -1,46 +1,47 @@
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Departement } from '@shared/core/domain/value-objects/departement'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Region } from '@shared/core/domain/value-objects/region'
 
-export interface ApprovisionnementQuery {
-    listApprovisionnements(): Promise<readonly Approvisionnement[]>
-
-    listByPlanAndRessource(): Promise<
-        readonly ApprovisionnementByPlanAndRessource[]
-    >
-
-    listByPlanRessourceAndRegion(): Promise<
-        readonly ApprovisionnementByPlanRessourceAndRegion[]
-    >
-
-    listByPlanRessourceAndFournisseur(): Promise<
-        readonly ApprovisionnementByPlanRessourceAndFournisseur[]
-    >
-
-    listByPlanRessourceAndDepartementDeProvenance(): Promise<
-        readonly ApprovisionnementByPlanRessourceAndDepartementDeProvenance[]
-    >
-}
-
-export type ApprovisionnementByPlanAndRessource = Pick<
+export type ApprovisionnementGroupedByPlanAndRessource = Pick<
     Approvisionnement,
-    'planDApprovisionnement' | 'ressource'
+    'planDApprovisionnement' | 'ressource' | 'tonnageTotal'
 > & {
-    sumTonnageTotal?: number
-    repartition?: number
+    /** between 0 and 1. */
+    repartition: number
 }
 
-/**
- * The (plan, ressource) total split by département de provenance, identified by
- * its INSEE code. The libellé is read from the département directory.
- */
-export type ApprovisionnementByPlanRessourceAndDepartementDeProvenance =
-    ApprovisionnementByPlanAndRessource &
-        Pick<Approvisionnement, 'departementDeProvenance'>
-
-export type ApprovisionnementByPlanRessourceAndFournisseur =
-    ApprovisionnementByPlanAndRessource & Pick<Approvisionnement, 'fournisseur'>
-
-export type ApprovisionnementByPlanRessourceAndRegion =
-    ApprovisionnementByPlanAndRessource & {
+export type ApprovisionnementGroupedByPlanRessourceAndRegion =
+    ApprovisionnementGroupedByPlanAndRessource & {
         region: Region['libelle']
     }
+
+export type ApprovisionnementGroupedByPlanRessourceAndDepartement =
+    ApprovisionnementGroupedByPlanAndRessource & {
+        departement: Departement['dep']
+    }
+
+export type ApprovisionnementGroupedByPlanRessourceAndFournisseur =
+    ApprovisionnementGroupedByPlanAndRessource & {
+        fournisseur: Entreprise['siret']
+    }
+
+export interface ApprovisionnementQuery {
+    list(): Promise<readonly Approvisionnement[]>
+
+    listGroupedByPlanAndRessource(): Promise<
+        readonly ApprovisionnementGroupedByPlanAndRessource[]
+    >
+
+    listGroupedByPlanRessourceAndRegion(): Promise<
+        readonly ApprovisionnementGroupedByPlanRessourceAndRegion[]
+    >
+
+    listGroupedByPlanRessourceAndDepartement(): Promise<
+        readonly ApprovisionnementGroupedByPlanRessourceAndDepartement[]
+    >
+
+    listGroupedByPlanRessourceAndFournisseur(): Promise<
+        readonly ApprovisionnementGroupedByPlanRessourceAndFournisseur[]
+    >
+}
