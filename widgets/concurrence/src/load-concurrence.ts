@@ -30,7 +30,7 @@ export type ConcurrenceRow = {
     ressource: Ressource['title']
     departementDeSituation: Departement['libelle']
     approvisionnements: readonly Approvisionnement[]
-    tonnageTotal: number
+    sumTonnageTotal?: number
 }
 
 export type ConcurrenceScreen = {
@@ -54,8 +54,8 @@ export async function loadConcurrence(
         fournisseurs,
         departementsByRegion,
     ] = await Promise.all([
-        ports.approvisionnements.listGroupedByPlanAndRessource(),
-        ports.approvisionnements.list(),
+        ports.approvisionnements.listByPlanAndRessource(),
+        ports.approvisionnements.listApprovisionnements(),
         ports.plans.list(),
         ports.installations.list(),
         ports.ressources.list(),
@@ -104,7 +104,7 @@ export async function loadConcurrence(
                     byPair.get(
                         pairKey(total.planDApprovisionnement, total.ressource)
                     ) ?? [],
-                tonnageTotal: total.tonnageTotal,
+                sumTonnageTotal: total.sumTonnageTotal,
             }
         }),
         departementsByRegion,

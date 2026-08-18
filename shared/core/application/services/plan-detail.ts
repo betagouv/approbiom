@@ -6,7 +6,7 @@ import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { Region } from '@shared/core/domain/value-objects/region'
-import type { ApprovisionnementGroupedByPlanRessourceAndFournisseur } from '@shared/core/application/ports/approvisionnement'
+import type { ApprovisionnementByPlanRessourceAndFournisseur } from '@shared/core/application/ports/approvisionnement'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
@@ -40,7 +40,7 @@ export type PlanDetailSources = {
     demandesSubvention: readonly DemandeSubvention[]
     programmesAide: readonly ProgrammeAide[]
     instructions: readonly Instruction[]
-    approvisionnementsByFournisseur: readonly ApprovisionnementGroupedByPlanRessourceAndFournisseur[]
+    approvisionnementsByFournisseur: readonly ApprovisionnementByPlanRessourceAndFournisseur[]
     entreprises: readonly Entreprise[]
     attachments: readonly Attachment[]
 }
@@ -262,7 +262,7 @@ export async function getPlanDetails(
         ports.demandesSubvention.list(),
         ports.programmesAide.list(),
         ports.instructions.list(),
-        ports.approvisionnements.listGroupedByPlanRessourceAndFournisseur(),
+        ports.approvisionnements.listByPlanRessourceAndFournisseur(),
         ports.entreprises.list(),
         ports.attachments.list(),
     ])

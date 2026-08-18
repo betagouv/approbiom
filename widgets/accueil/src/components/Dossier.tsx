@@ -7,14 +7,9 @@ import PiecesJointes from './PiecesJointes'
 import TabNav, {
     type TabNavItem,
 } from '@shared/user-interface/component/TabNav'
-import Ressource from '@shared/user-interface/screen/ressource'
-import AsyncGate from '@shared/user-interface/utils/AsyncGate'
-import { renderError } from '@shared/user-interface/utils/render-error'
-import { useAsyncData } from '@shared/user-interface/utils/useAsyncData'
-import {
-    getApprovisionnementStats,
-    type ApprovisionnementStatsPorts,
-} from '@shared/core/application/services/approvisionnement-stats'
+import Ressource, {
+    type RessourceScreen,
+} from '@shared/user-interface/screen/ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import {
     getAppelsAProjet,
@@ -29,32 +24,16 @@ const SECTIONS: readonly TabNavItem[] = [
 ]
 const INCONNU = '—'
 
-function Ressources({
-    ports,
-    plan,
-}: {
-    ports: ApprovisionnementStatsPorts
-    plan: PlanDetail['id']
-}) {
-    const state = useAsyncData(() => getApprovisionnementStats(ports, plan))
-
-    return (
-        <AsyncGate state={state} renderError={renderError}>
-            {(stats) => <Ressource {...stats} />}
-        </AsyncGate>
-    )
-}
-
 export type DossierProps = {
     plan: PlanDetail
-    ports: ApprovisionnementStatsPorts
+    ressource: RessourceScreen
     getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void
 }
 
 export default function Dossier({
     plan,
-    ports,
+    ressource,
     getFileUrl,
     onClose,
 }: DossierProps) {
@@ -100,7 +79,7 @@ export default function Dossier({
             )}
 
             {section === 'ressources' && (
-                <Ressources ports={ports} plan={plan.id} />
+                <Ressource {...ressource} plan={plan.id} />
             )}
             {section === 'pieces-jointes' && (
                 <PiecesJointes

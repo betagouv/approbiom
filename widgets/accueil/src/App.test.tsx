@@ -25,11 +25,11 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
     return {
         plans: { list: rows([]) },
         approvisionnements: {
-            list: rows([]),
-            listGroupedByPlanAndRessource: rows([]),
-            listGroupedByPlanRessourceAndRegion: rows([]),
-            listGroupedByPlanRessourceAndDepartement: rows([]),
-            listGroupedByPlanRessourceAndFournisseur: rows([]),
+            listApprovisionnements: rows([]),
+            listByPlanAndRessource: rows([]),
+            listByPlanRessourceAndRegion: rows([]),
+            listByPlanRessourceAndFournisseur: rows([]),
+            listByPlanRessourceAndDepartementDeProvenance: rows([]),
         },
         ressources: { list: rows([]) },
         entreprises: { list: rows([]) },
@@ -287,18 +287,17 @@ describe('App', () => {
                 {...fakePorts({
                     plans: planQuery(rows([saintJunien])),
                     approvisionnements: {
-                        list: rows([]),
-                        listGroupedByPlanAndRessource: rows([
+                        listApprovisionnements: rows([]),
+                        listByPlanAndRessource: rows([
                             {
                                 planDApprovisionnement: saintJunien.id,
                                 ressource: 'PF',
-                                tonnageTotal: 120,
-                                repartition: 1,
+                                sumTonnageTotal: 120,
                             },
                         ]),
-                        listGroupedByPlanRessourceAndRegion: rows([]),
-                        listGroupedByPlanRessourceAndDepartement: rows([]),
-                        listGroupedByPlanRessourceAndFournisseur: rows([]),
+                        listByPlanRessourceAndRegion: rows([]),
+                        listByPlanRessourceAndFournisseur: rows([]),
+                        listByPlanRessourceAndDepartementDeProvenance: rows([]),
                     },
                     ressources: {
                         list: rows([
