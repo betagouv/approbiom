@@ -1,5 +1,5 @@
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-import type { ApprovisionnementByPlanAndRessource } from './approvisionnement-by-plan-and-ressource'
+import type { ApprovisionnementByPlanAndRessource } from '@shared/core/application/read-models/approvisionnement-by-plan-and-ressource'
 
 /**
  * The (plan, ressource) total split by département de provenance, identified by

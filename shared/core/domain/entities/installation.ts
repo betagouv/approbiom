@@ -1,4 +1,4 @@
-import type { Commune } from './commune'
+import type { Commune } from '@shared/core/domain/value-objects/commune'
 
 export type Installation = {
     id: number

@@ -1,4 +1,4 @@
-import type { PlanDApprovisionnement } from './plan-d-approvisionnement'
+import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
 export type Attachment = {
     id: number

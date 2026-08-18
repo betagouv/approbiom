@@ -1,9 +1,7 @@
 import type { InstructionQuery } from '@shared/core/application/ports/instruction-query'
-import {
-    isAvisCRB,
-    isAvisPrefet,
-    isPhaseInstruction,
-} from '@shared/core/domain/entities/instruction'
+import { isAvisCRB } from '@shared/core/domain/value-objects/avis-crb'
+import { isAvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
+import { isPhaseInstruction } from '@shared/core/domain/value-objects/phase-instruction'
 import { gristReady } from './grist-ready'
 import {
     asBoolean,

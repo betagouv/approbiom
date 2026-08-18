@@ -10,7 +10,7 @@ import {
     getPlansAccueil,
     type PlanAccueil,
     type PlanAccueilSources,
-} from './plan-accueil'
+} from '@shared/core/plan-accueil'
 
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 

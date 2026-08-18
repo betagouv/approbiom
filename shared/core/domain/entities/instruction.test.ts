@@ -1,6 +1,11 @@
 import { describe, expect, it } from 'vitest'
-import { getEtapes, type Etape, type EtapeId } from './chronologie-instruction'
-import { PHASES_INSTRUCTION, type Instruction } from './instruction'
+import {
+    getEtapes,
+    type Etape,
+    type EtapeId,
+    type Instruction,
+} from '@shared/core/domain/entities/instruction'
+import { PHASES_INSTRUCTION } from '@shared/core/domain/value-objects/phase-instruction'
 
 function instruction(overrides: Partial<Instruction> = {}): Instruction {
     return {
