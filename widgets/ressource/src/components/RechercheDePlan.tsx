@@ -5,8 +5,8 @@ import AsyncGate from '@shared/react/AsyncGate'
 import { renderError } from '@shared/react/render-error'
 import { useAsyncData } from '@shared/react/useAsyncData'
 import {
-    getApprovisionnementStats,
-    type ApprovisionnementStatsPorts,
+    getApprovisionnementByRessourceStats,
+    type ApprovisionnementByRessourceStatsPorts,
 } from '@shared/core/application/services/approvisionnement-stats'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
@@ -17,21 +17,23 @@ function Statistiques({
     ports,
     plan,
 }: {
-    ports: ApprovisionnementStatsPorts
+    ports: ApprovisionnementByRessourceStatsPorts
     plan: Plan['id']
 }) {
-    const state = useAsyncData(() => getApprovisionnementStats(ports, plan))
+    const state = useAsyncData(() =>
+        getApprovisionnementByRessourceStats(ports, plan)
+    )
 
     return (
         <AsyncGate state={state} renderError={renderError}>
-            {(stats) => <Ressource {...stats} />}
+            {(stats) => <Ressource approvisionnementStatsByRessource={stats} />}
         </AsyncGate>
     )
 }
 
 export type RechercheDePlanProps = {
     plans: readonly Plan[]
-    ports: ApprovisionnementStatsPorts
+    ports: ApprovisionnementByRessourceStatsPorts
 }
 
 export default function RechercheDePlan({

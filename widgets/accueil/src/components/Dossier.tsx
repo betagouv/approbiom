@@ -6,19 +6,13 @@ import FilInstruction from './FilInstruction'
 import PiecesJointes from './PiecesJointes'
 import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
 import Ressource from '@shared/react/components/Ressource'
-import AsyncGate from '@shared/react/AsyncGate'
-import { renderError } from '@shared/react/render-error'
-import { useAsyncData } from '@shared/react/useAsyncData'
-import {
-    getApprovisionnementStats,
-    type ApprovisionnementStatsPorts,
-} from '@shared/core/application/services/approvisionnement-stats'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import {
     getAppelsAProjet,
     type PlanDetail,
 } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
+import type { ApprovisionnementByRessourceStats } from '@shared/core/application/services/approvisionnement-stats'
 
 const SECTIONS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
@@ -27,32 +21,16 @@ const SECTIONS: readonly TabNavItem[] = [
 ]
 const INCONNU = '—'
 
-function Ressources({
-    ports,
-    plan,
-}: {
-    ports: ApprovisionnementStatsPorts
-    plan: PlanDetail['id']
-}) {
-    const state = useAsyncData(() => getApprovisionnementStats(ports, plan))
-
-    return (
-        <AsyncGate state={state} renderError={renderError}>
-            {(stats) => <Ressource {...stats} />}
-        </AsyncGate>
-    )
-}
-
 export type DossierProps = {
+    approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
     plan: PlanDetail
-    ports: ApprovisionnementStatsPorts
     getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void
 }
 
 export default function Dossier({
     plan,
-    ports,
+    approvisionnementStatsByRessource,
     getFileUrl,
     onClose,
 }: DossierProps) {
@@ -98,7 +76,11 @@ export default function Dossier({
             )}
 
             {section === 'ressources' && (
-                <Ressources ports={ports} plan={plan.id} />
+                <Ressource
+                    approvisionnementStatsByRessource={
+                        approvisionnementStatsByRessource
+                    }
+                />
             )}
             {section === 'pieces-jointes' && (
                 <PiecesJointes

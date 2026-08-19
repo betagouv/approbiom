@@ -2,10 +2,10 @@ import AsyncGate from '@shared/react/AsyncGate'
 import { renderError } from '@shared/react/render-error'
 import { useAsyncData } from '@shared/react/useAsyncData'
 import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
-import type { ApprovisionnementStatsPorts } from '@shared/core/application/services/approvisionnement-stats'
+import type { ApprovisionnementByRessourceStatsPorts } from '@shared/core/application/services/approvisionnement-stats'
 import RechercheDePlan from './components/RechercheDePlan'
 
-export type RessourcePorts = ApprovisionnementStatsPorts & {
+export type RessourcePorts = ApprovisionnementByRessourceStatsPorts & {
     plans: PlanQuery
 }
 

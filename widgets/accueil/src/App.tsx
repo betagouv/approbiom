@@ -10,7 +10,7 @@ import { loadAccueil, type AccueilPorts } from './load-accueil'
 export default function App(ports: AccueilPorts) {
     const state = useAsyncData(() => loadAccueil(ports))
 
-    const [dossier, setDossier] = useState<PlanDetail | null>(null)
+    const [selectedPlan, setSelectedPlan] = useState<PlanDetail | null>(null)
 
     return (
         <main className="app">
@@ -19,25 +19,30 @@ export default function App(ports: AccueilPorts) {
                     plansApprovisionnement,
                     programmesAide,
                     departementsByRegion,
+                    approvisionnementByRessourceStatsList,
                 }) =>
-                    dossier === null ? (
+                    selectedPlan === null ? (
                         <Accueil
                             plansApprovisionnement={plansApprovisionnement}
                             departementsByRegion={departementsByRegion}
                             programmesAide={programmesAide}
-                            onOpenDossier={setDossier}
+                            onOpenDossier={setSelectedPlan}
                         />
                     ) : (
                         <Dossier
                             // Keyed by plan: opening another dossier mounts
                             // another one, which reads its own statistics.
-                            key={dossier.id}
-                            plan={dossier}
-                            ports={ports}
+                            key={selectedPlan.id}
+                            plan={selectedPlan}
+                            approvisionnementStatsByRessource={
+                                approvisionnementByRessourceStatsList.get(
+                                    selectedPlan.id
+                                ) ?? []
+                            }
                             getFileUrl={(id) =>
                                 ports.attachments.getFileUrl(id)
                             }
-                            onClose={() => setDossier(null)}
+                            onClose={() => setSelectedPlan(null)}
                         />
                     )
                 }

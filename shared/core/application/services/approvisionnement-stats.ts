@@ -37,20 +37,17 @@ export type ApprovisionnementStatsByRessource = {
     byFournisseur: readonly Group[]
 }
 
-export type ApprovisionnementStats = {
-    plan: Plan['id']
-    tonnageTotal: number
-    byRessource: readonly ApprovisionnementStatsByRessource[]
-}
+export type ApprovisionnementByRessourceStats =
+    readonly ApprovisionnementStatsByRessource[]
 
-export type ApprovisionnementStatsPorts = {
+export type ApprovisionnementByRessourceStatsPorts = {
     approvisionnements: ApprovisionnementQuery
     ressources: RessourceQuery
     entreprises: EntrepriseQuery
     insee: InseeQuery
 }
 
-export type ApprovisionnementStatsSources = {
+export type ApprovisionnementByRessourceStatsSources = {
     plan: Plan['id']
     totals: readonly ApprovisionnementGroupedByPlanAndRessource[]
     byRegion: readonly ApprovisionnementGroupedByPlanRessourceAndRegion[]
@@ -60,6 +57,16 @@ export type ApprovisionnementStatsSources = {
     entreprises: readonly Entreprise[]
     departementsByRegion: readonly DepartementsByRegion[]
 }
+
+export type ApprovisionnementByRessourceStatsByPlan = ReadonlyMap<
+    Plan['id'],
+    ApprovisionnementByRessourceStats
+>
+
+export type ApprovisionnementByRessourceStatsByPlanSources = Omit<
+    ApprovisionnementByRessourceStatsSources,
+    'plan'
+>
 
 function groupsByRessource<
     T extends ApprovisionnementGroupedByPlanAndRessource,
@@ -84,6 +91,22 @@ function groupsByRessource<
     return byRessource
 }
 
+function rowsByPlan<T extends ApprovisionnementGroupedByPlanAndRessource>(
+    rows: readonly T[]
+): Map<Plan['id'], T[]> {
+    const byPlan = new Map<Plan['id'], T[]>()
+
+    for (const row of rows) {
+        const planRows = byPlan.get(row.planDApprovisionnement) ?? []
+
+        planRows.push(row)
+
+        byPlan.set(row.planDApprovisionnement, planRows)
+    }
+
+    return byPlan
+}
+
 export function composeApprovisionnementStats({
     plan,
     totals,
@@ -93,7 +116,7 @@ export function composeApprovisionnementStats({
     ressources,
     entreprises,
     departementsByRegion,
-}: ApprovisionnementStatsSources): ApprovisionnementStats {
+}: ApprovisionnementByRessourceStatsSources): ApprovisionnementByRessourceStats {
     const titleByCode = new Map(
         ressources.map(({ code, title }) => [code, title])
     )
@@ -126,31 +149,58 @@ export function composeApprovisionnementStats({
 
     const totalsForPlan = forPlan(totals)
 
-    return {
-        plan,
-        tonnageTotal: totalsForPlan.reduce(
-            (sum, row) => sum + row.tonnageTotal,
-            0
-        ),
-        byRessource: totalsForPlan.map(
-            ({ ressource: code, tonnageTotal, repartition }) => ({
-                // A ressource the directory does not name is still drawn on:
-                // it is read by its code rather than left blank.
-                ressource: { code, title: titleByCode.get(code) || code },
-                tonnageTotal,
-                repartition,
-                byRegion: regions.get(code) ?? [],
-                byDepartement: departements.get(code) ?? [],
-                byFournisseur: fournisseurs.get(code) ?? [],
-            })
-        ),
-    }
+    const approvisionnementStatsByRessource = totalsForPlan.map(
+        ({ ressource: code, tonnageTotal, repartition }) => ({
+            // A ressource the directory does not name is still drawn on:
+            // it is read by its code rather than left blank.
+            ressource: { code, title: titleByCode.get(code) || code },
+            tonnageTotal,
+            repartition,
+            byRegion: regions.get(code) ?? [],
+            byDepartement: departements.get(code) ?? [],
+            byFournisseur: fournisseurs.get(code) ?? [],
+        })
+    )
+
+    return approvisionnementStatsByRessource
 }
 
-export async function getApprovisionnementStats(
-    ports: ApprovisionnementStatsPorts,
-    plan: Plan['id']
-): Promise<ApprovisionnementStats> {
+/**
+ * The same reading as {@link composeApprovisionnementStats}, composed for every
+ * plan the totals speak of, in the order they first name them.
+ */
+export function composeApprovisionnementStatsByPlan({
+    totals,
+    byRegion,
+    byDepartement,
+    byFournisseur,
+    ...directories
+}: ApprovisionnementByRessourceStatsByPlanSources): ApprovisionnementByRessourceStatsByPlan {
+    // Each plan is composed from its own rows alone, so the whole reading costs
+    // one pass over the sources rather than one pass per plan.
+    const totalsByPlan = rowsByPlan(totals)
+    const regionsByPlan = rowsByPlan(byRegion)
+    const departementsByPlan = rowsByPlan(byDepartement)
+    const fournisseursByPlan = rowsByPlan(byFournisseur)
+
+    return new Map(
+        [...totalsByPlan].map(([plan, planTotals]) => [
+            plan,
+            composeApprovisionnementStats({
+                plan,
+                totals: planTotals,
+                byRegion: regionsByPlan.get(plan) ?? [],
+                byDepartement: departementsByPlan.get(plan) ?? [],
+                byFournisseur: fournisseursByPlan.get(plan) ?? [],
+                ...directories,
+            }),
+        ])
+    )
+}
+
+async function loadApprovisionnementStatsSources(
+    ports: ApprovisionnementByRessourceStatsPorts
+): Promise<ApprovisionnementByRessourceStatsByPlanSources> {
     const [
         totals,
         byRegion,
@@ -169,8 +219,7 @@ export async function getApprovisionnementStats(
         ports.insee.listDepartementsByRegion(),
     ])
 
-    return composeApprovisionnementStats({
-        plan,
+    return {
         totals,
         byRegion,
         byDepartement,
@@ -178,5 +227,23 @@ export async function getApprovisionnementStats(
         ressources,
         entreprises,
         departementsByRegion,
+    }
+}
+
+export async function getApprovisionnementByRessourceStats(
+    ports: ApprovisionnementByRessourceStatsPorts,
+    plan: Plan['id']
+): Promise<ApprovisionnementByRessourceStats> {
+    return composeApprovisionnementStats({
+        plan,
+        ...(await loadApprovisionnementStatsSources(ports)),
     })
+}
+
+export async function getApprovisionnementByRessourceStatsByPlan(
+    ports: ApprovisionnementByRessourceStatsPorts
+): Promise<ApprovisionnementByRessourceStatsByPlan> {
+    return composeApprovisionnementStatsByPlan(
+        await loadApprovisionnementStatsSources(ports)
+    )
 }
