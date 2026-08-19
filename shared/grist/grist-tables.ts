@@ -66,6 +66,7 @@ export const COLUMNS = {
     region: ['id', 'REG', 'LIBELLE'],
     demandeSubvention: ['id', 'Programme_d_aide', 'Plan_d_approvisionnement'],
     instruction: [
+        'id',
         'Nom',
         'crb',
         'subvention',
@@ -87,3 +88,5 @@ export const COLUMNS = {
     ],
     attachment: ['Plan_d_approvisionnement', 'piece_jointe', 'type'],
 } as const satisfies Record<string, readonly string[]>
+
+export type InstructionColumn = (typeof COLUMNS)['instruction'][number]

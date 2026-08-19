@@ -8,50 +8,67 @@ import {
     asDate,
     asNumber,
     asString,
-    byRowId,
     fetchRowsOnce,
-    lookup,
+    updateRow,
+    type GristCells,
+    type GristRow,
 } from '../grist-helpers'
-import { COLUMNS, TABLE } from '../grist-tables'
+import { COLUMNS, TABLE, type InstructionColumn } from '../grist-tables'
+import type { Instruction } from '@shared/core/domain/entities/instruction'
+
+const MAPPING_COLUMNS_INSTRUCTION = {
+    avisCRB: 'Avis_CRB',
+} as const satisfies Partial<Record<keyof Instruction, InstructionColumn>>
+
+function mapFromGristToApplication(row: GristRow): Instruction {
+    return {
+        id: asNumber(row.id) ?? 0,
+        crb: asNumber(row.crb) ?? 0,
+        subvention: asNumber(row.subvention) ?? 0,
+        name: asString(row.Nom),
+        avisCrbRequis: asBoolean(row.Avis_CRB_Requis),
+        dateSaisineCrb: asDate(row.Date_saisine_CRB),
+        dateAvisCrb: asDate(row.Date_avis_CRB),
+        avisCRB: isAvisCRB(row.Avis_CRB) ? row.Avis_CRB : 'En attente',
+        dateAvisPrefet: asDate(row.Date_avis_Prefet),
+        avisPrefet: isAvisPrefet(row.Avis_Prefet)
+            ? row.Avis_Prefet
+            : 'En attente',
+        phase: isPhaseInstruction(row.Phase_de_l_instruction)
+            ? row.Phase_de_l_instruction
+            : "En cours d'instruction",
+    }
+}
 
 export function createGristInstructionPort(): InstructionPort {
     return {
         async list() {
             await gristReady()
 
-            const [rows, crbs] = await Promise.all([
-                fetchRowsOnce(TABLE.instruction, COLUMNS.instruction),
-                fetchRowsOnce(TABLE.crb, COLUMNS.crb),
-            ])
+            const rows = await fetchRowsOnce(
+                TABLE.instruction,
+                COLUMNS.instruction
+            )
 
-            // `crb` and `subvention` are both Refs, holding a rowId. The
-            // demande is kept as one — that is how the domain identifies it —
-            // while the CRB is only ever read as a name, so it is resolved
-            // here rather than by every screen that shows one.
-            const crbById = byRowId(crbs)
+            return rows.map(mapFromGristToApplication)
+        },
+        async update(instructionId, updateData) {
+            await gristReady()
 
-            return rows.map((row) => ({
-                crb: asString(lookup(crbById, row.crb)?.Nom),
-                subvention: asNumber(row.subvention) ?? 0,
-                name: asString(row.Nom),
-                avisCrbRequis: asBoolean(row.Avis_CRB_Requis),
-                dateSaisineCrb: asDate(row.Date_saisine_CRB),
-                dateAvisCrb: asDate(row.Date_avis_CRB),
-                // An empty cell means the step has not happened yet, which is
-                // what "En attente" says.
-                avisCRB: isAvisCRB(row.Avis_CRB) ? row.Avis_CRB : 'En attente',
-                dateAvisPrefet: asDate(row.Date_avis_Prefet),
-                avisPrefet: isAvisPrefet(row.Avis_Prefet)
-                    ? row.Avis_Prefet
-                    : 'En attente',
-                // The phase is a formula, so a value we don't know is a
-                // formula that changed. Falling back to the phase every
-                // instruction passes through keeps the chronology readable,
-                // and the dates it also reads put the marker back in place.
-                phase: isPhaseInstruction(row.Phase_de_l_instruction)
-                    ? row.Phase_de_l_instruction
-                    : "En cours d'instruction",
-            }))
+            const gristFieldsToUpdate: GristCells = {}
+
+            if (updateData.avisCRB) {
+                gristFieldsToUpdate[MAPPING_COLUMNS_INSTRUCTION['avisCRB']] =
+                    String(updateData.avisCRB)
+            }
+
+            const updatedInstruction = await updateRow(
+                TABLE.instruction,
+                instructionId,
+                gristFieldsToUpdate
+            )
+
+            return mapFromGristToApplication(updatedInstruction)
         },
     }
 }

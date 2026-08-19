@@ -1,11 +1,11 @@
 import './TabUpdate.css'
 
-import { useState } from 'react'
 import Select from '@shared/react/components/Select'
 
 import Toggle from '@shared/react/components/Toggle'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
-import type { Instruction } from '@shared/core/domain/entities/instruction'
+
+import type { InstructionDetail } from '@shared/core/application/services/plan-detail'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import {
     AVIS_CRB,
@@ -15,6 +15,7 @@ import {
     AVIS_PREFET,
     type AvisPrefet,
 } from '@shared/core/domain/value-objects/avis-prefet'
+import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
 
 const AVIS_CRB_OPTIONS = AVIS_CRB.map((avis) => ({ value: avis, label: avis }))
 const AVIS_PREFET_OPTIONS = AVIS_PREFET.map((avis) => ({
@@ -23,8 +24,8 @@ const AVIS_PREFET_OPTIONS = AVIS_PREFET.map((avis) => ({
 }))
 
 type InstructionUpdate = Pick<
-    Instruction,
-    'avisCRB' | 'avisCrbRequis' | 'avisPrefet' | 'phase' | 'crb'
+    InstructionDetail,
+    'id' | 'avisCRB' | 'avisCrbRequis' | 'avisPrefet' | 'phase' | 'crbName'
 >
 
 type DemandeUpdate = {
@@ -35,75 +36,15 @@ type DemandeUpdate = {
 
 type Props = {
     demandesSubvention: readonly DemandeUpdate[]
+    updateInstruction: UpdateInstruction
+    refresh: () => void
 }
 
-// What the user has changed but not yet saved. It is held apart from the props
-// rather than written over them: the props stay the stored state, which is what
-// the « lauréat » tag keeps reporting while the switch beside it moves.
-type InstructionDraft = Pick<
-    Instruction,
-    'avisCRB' | 'avisCrbRequis' | 'avisPrefet'
->
-
-type Draft = {
-    laureat: Record<string, boolean>
-    instructions: Record<string, InstructionDraft>
-}
-
-// An instruction carries no id of its own, so its position within its demande
-// is what names it. That holds because the list is only ever read, never
-// reordered — and both are scoped by the demande, so two programmes cannot
-// collide.
-function instructionKey(demande: DemandeUpdate['id'], index: number) {
-    return `${demande}-${index}`
-}
-
-function buildDraft(demandesSubvention: readonly DemandeUpdate[]): Draft {
-    const draft: Draft = { laureat: {}, instructions: {} }
-
-    for (const demande of demandesSubvention) {
-        draft.laureat[demande.id] = demande.programmeAide.laureat !== null
-
-        demande.instructions.forEach((instruction, index) => {
-            draft.instructions[instructionKey(demande.id, index)] = {
-                avisCrbRequis: instruction.avisCrbRequis,
-                avisCRB: instruction.avisCRB,
-                avisPrefet: instruction.avisPrefet,
-            }
-        })
-    }
-
-    return draft
-}
-
-const TabUpdate = ({ demandesSubvention }: Props) => {
-    // Seeded once, from the props as they arrive. Nothing resets it afterwards
-    // and nothing has to: `Dossier` is keyed by plan id in App.tsx, so opening
-    // another dossier mounts another tab and seeds another draft.
-    const [draft, setDraft] = useState<Draft>(() =>
-        buildDraft(demandesSubvention)
-    )
-
-    function setLaureat(id: DemandeUpdate['id'], laureat: boolean) {
-        setDraft((current) => ({
-            ...current,
-            laureat: { ...current.laureat, [id]: laureat },
-        }))
-    }
-
-    function updateInstruction(
-        key: string,
-        changes: Partial<InstructionDraft>
-    ) {
-        setDraft((current) => ({
-            ...current,
-            instructions: {
-                ...current.instructions,
-                [key]: { ...current.instructions[key], ...changes },
-            },
-        }))
-    }
-
+const TabUpdate = ({
+    demandesSubvention,
+    updateInstruction,
+    refresh,
+}: Props) => {
     if (demandesSubvention.length === 0) {
         return (
             <p className="fr-text--sm">
@@ -130,10 +71,8 @@ const TabUpdate = ({ demandesSubvention }: Props) => {
                             <Toggle
                                 label="Ce plan est lauréat"
                                 labelLeft
-                                checked={draft.laureat[demande.id]}
-                                onChange={(laureat) =>
-                                    setLaureat(demande.id, laureat)
-                                }
+                                checked={true}
+                                onChange={() => ''}
                             />
                         </div>
                     </header>
@@ -145,17 +84,14 @@ const TabUpdate = ({ demandesSubvention }: Props) => {
                         </p>
                     ) : (
                         demande.instructions.map((instruction, index) => {
-                            const key = instructionKey(demande.id, index)
-                            const edited = draft.instructions[key]
-
                             return (
                                 <article
-                                    key={key}
+                                    key={index}
                                     className="tab-update__instruction"
                                 >
                                     <div className="tab-update__instruction-entete">
                                         <p className="tab-update__instruction-titre">
-                                            Instruit par {instruction.crb}
+                                            Instruit par {instruction.crbName}
                                         </p>
                                         <p className="tab-update__phase">
                                             Phase de
@@ -168,34 +104,48 @@ const TabUpdate = ({ demandesSubvention }: Props) => {
                                         <Toggle
                                             label="Avis CRB requis"
                                             labelLeft
-                                            checked={edited.avisCrbRequis}
-                                            onChange={(avisCrbRequis) =>
-                                                updateInstruction(key, {
-                                                    avisCrbRequis,
-                                                })
-                                            }
+                                            checked={instruction.avisCrbRequis}
+                                            onChange={() => ''}
                                         />
-                                        {edited.avisCrbRequis && (
+                                        {instruction.avisCrbRequis && (
                                             <Select<AvisCRB>
                                                 label="Avis CRB"
                                                 options={AVIS_CRB_OPTIONS}
-                                                value={edited.avisCRB}
-                                                onChange={(avisCRB) =>
-                                                    updateInstruction(key, {
-                                                        avisCRB,
-                                                    })
+                                                value={instruction.avisCRB}
+                                                // The document is what the
+                                                // screen reads from, so the
+                                                // write is followed by a read
+                                                // rather than by a copy held
+                                                // here: the phase Grist
+                                                // recomputes comes back with
+                                                // it.
+                                                onChange={(value) =>
+                                                    void updateInstruction(
+                                                        instruction.id,
+                                                        { avisCRB: value }
+                                                    ).then(
+                                                        refresh,
+                                                        // A refused write
+                                                        // leaves the document
+                                                        // as it was, so there
+                                                        // is nothing to read
+                                                        // back. Refusing it
+                                                        // here rather than
+                                                        // nowhere is what
+                                                        // keeps it from
+                                                        // escaping as an
+                                                        // unhandled
+                                                        // rejection.
+                                                        () => {}
+                                                    )
                                                 }
                                             />
                                         )}
                                         <Select<AvisPrefet>
                                             label="Avis Préfet"
                                             options={AVIS_PREFET_OPTIONS}
-                                            value={edited.avisPrefet}
-                                            onChange={(avisPrefet) =>
-                                                updateInstruction(key, {
-                                                    avisPrefet,
-                                                })
-                                            }
+                                            value={instruction.avisPrefet}
+                                            onChange={() => ''}
                                         />
                                     </div>
                                 </article>

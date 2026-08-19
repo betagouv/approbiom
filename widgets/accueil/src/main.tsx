@@ -8,6 +8,7 @@ import './index.css'
 import App from './App'
 import { createGristApprovisionnementPort } from '@shared/grist/adapters/grist-adapter-approvisionnement'
 import { createGristAttachmentPort } from '@shared/grist/adapters/grist-adapter-attachment'
+import { createGristCrbPort } from '@shared/grist/adapters/grist-adapter-crb'
 import { createGristDemandeSubventionPort } from '@shared/grist/adapters/grist-adapter-demande-subvention'
 import { createGristEntreprisePort } from '@shared/grist/adapters/grist-adapter-entreprise'
 import { createGristInseePort } from '@shared/grist/adapters/grist-adapter-insee'
@@ -31,6 +32,7 @@ createRoot(rootEl).render(
             demandesSubvention={createGristDemandeSubventionPort()}
             programmesAide={createGristProgrammeAidePort()}
             instructions={createGristInstructionPort()}
+            crbs={createGristCrbPort()}
             installations={createGristInstallationPort()}
             attachments={createGristAttachmentPort()}
         />

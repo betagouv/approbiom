@@ -4,8 +4,10 @@ import {
     AccessDeniedError,
     DataSourceUnavailableError,
 } from '@shared/core/errors'
+import type { InstructionPort } from '@shared/core/application/ports/instruction'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
@@ -20,6 +22,17 @@ const rows =
         Promise.resolve(value)
 
 const planPort = (list: PlanPort['list']): PlanPort => ({ list })
+
+// These tests read the accueil; none of them takes a path that writes. A write
+// reaching the port is the test having gone somewhere it did not mean to, so it
+// is refused rather than quietly answered.
+const instructionPort = (
+    list: InstructionPort['list'] = rows([])
+): InstructionPort => ({
+    list,
+    update: () =>
+        Promise.reject(new Error('no instruction is written by these tests')),
+})
 
 function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
     return {
@@ -36,7 +49,8 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         insee: { listDepartementsByRegion: rows([]) },
         demandesSubvention: { list: rows([]) },
         programmesAide: { list: rows([]) },
-        instructions: { list: rows([]) },
+        instructions: instructionPort(),
+        crbs: { list: rows([]) },
         installations: { list: rows([]) },
         attachments: {
             list: rows([]),
@@ -84,8 +98,11 @@ const demandeBciat: DemandeSubvention = {
     planDApprovisionnement: saintJunien.id,
 }
 
+const crbNouvelleAquitaine: Crb = { id: 1, name: 'Nouvelle Aquitaine' }
+
 const nouvelleAquitaine: Instruction = {
-    crb: 'Nouvelle Aquitaine',
+    id: 1,
+    crb: crbNouvelleAquitaine.id,
     subvention: demandeBciat.id,
     name: 'Instruction 1',
     avisCrbRequis: true,
@@ -200,7 +217,8 @@ describe('App', () => {
                     plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: { list: rows([bciat]) },
-                    instructions: { list: rows([nouvelleAquitaine]) },
+                    instructions: instructionPort(rows([nouvelleAquitaine])),
+                    crbs: { list: rows([crbNouvelleAquitaine]) },
                 })}
             />
         )
@@ -262,7 +280,7 @@ describe('App', () => {
                 {...fakePorts({
                     plans: planPort(rows([saintJunien])),
                     programmesAide: { list: rows([bciat]) },
-                    instructions: { list: rows([nouvelleAquitaine]) },
+                    instructions: instructionPort(rows([nouvelleAquitaine])),
                 })}
             />
         )

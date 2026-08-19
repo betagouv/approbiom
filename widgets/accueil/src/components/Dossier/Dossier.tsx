@@ -15,6 +15,7 @@ import { useState } from 'react'
 import type { ApprovisionnementByRessourceStats } from '@shared/core/application/services/approvisionnement-stats'
 import FilInstruction from './tabs/FilInstruction/FilInstruction'
 import TabUpdate from './tabs/TabUpdate/TabUpdate'
+import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
 
 const TABS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
@@ -29,12 +30,16 @@ export type DossierProps = {
     plan: PlanDetail
     getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void
+    updateInstruction: UpdateInstruction
+    refresh: () => void
 }
 
 export default function Dossier({
     plan,
     approvisionnementStatsByRessource,
     getFileUrl,
+    updateInstruction,
+    refresh,
     onClose,
 }: DossierProps) {
     const [tab, setTab] = useState(TABS[0].id)
@@ -92,7 +97,11 @@ export default function Dossier({
                 />
             )}
             {tab === 'update' && (
-                <TabUpdate demandesSubvention={plan.demandesSubvention} />
+                <TabUpdate
+                    demandesSubvention={plan.demandesSubvention}
+                    updateInstruction={updateInstruction}
+                    refresh={refresh}
+                />
             )}
         </div>
     )

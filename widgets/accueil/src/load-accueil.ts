@@ -10,15 +10,22 @@ import {
     type PlanDetail,
     type PlanDetailPorts,
 } from '@shared/core/application/services/plan-detail'
+import {
+    getUpdateInstruction,
+    type UpdateInstruction,
+    type UpdateInstructionPorts,
+} from '@shared/core/application/services/get-update-instruction'
 
 export type AccueilPorts = PlanDetailPorts &
-    ApprovisionnementByRessourceStatsPorts
+    ApprovisionnementByRessourceStatsPorts &
+    UpdateInstructionPorts
 
 export type AccueilScreen = {
     plansApprovisionnement: readonly PlanDetail[]
     programmesAide: readonly ProgrammeAide[]
     departementsByRegion: readonly DepartementsByRegion[]
     approvisionnementByRessourceStatsList: ApprovisionnementByRessourceStatsByPlan
+    updateInstruction: UpdateInstruction
 }
 
 export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
@@ -39,5 +46,6 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
         programmesAide,
         departementsByRegion,
         approvisionnementByRessourceStatsList,
+        updateInstruction: getUpdateInstruction(ports),
     }
 }

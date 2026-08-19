@@ -1,4 +1,4 @@
-//table CRB
 export type Crb = {
-    name: string // Nom
+    id: number
+    name: string
 }
