@@ -71,23 +71,23 @@ describe('TabUpdate', () => {
         ).toBeDefined()
     })
 
-    it('numbers the instructions and names the CRB that instructs them', () => {
+    it('names the CRB that instructs each instruction', () => {
         render(<TabUpdate demandesSubvention={[bciat]} />)
 
         expect(
-            screen.getByText(
-                /Instruction n° 1 · Instruit par Nouvelle Aquitaine/
-            )
+            screen.getByText('Instruit par Nouvelle Aquitaine')
         ).toBeDefined()
-        expect(
-            screen.getByText(/Instruction n° 2 · Instruit par Occitanie/)
-        ).toBeDefined()
+        expect(screen.getByText('Instruit par Occitanie')).toBeDefined()
     })
 
     it('shows the phase as plain text rather than as a tag', () => {
         render(<TabUpdate demandesSubvention={[bciat]} />)
 
-        const phase = screen.getAllByText('Avis préfet en attente')[0]
+        // The phase names itself, so it is read as a sentence rather than as a
+        // bare status word standing on its own.
+        const [phase] = screen.getAllByText(
+            /Phase de l'instruction\s*:\s*Avis préfet en attente/
+        )
         expect(phase.className).not.toContain('fr-tag')
         expect(phase.className).not.toContain('fr-badge')
     })
@@ -156,7 +156,7 @@ describe('TabUpdate', () => {
         ).toBe(true)
     })
 
-    it('disables the avis CRB list when no avis CRB is required', () => {
+    it('leaves the avis CRB list out when no avis CRB is required', () => {
         render(
             <TabUpdate
                 demandesSubvention={[
@@ -168,12 +168,10 @@ describe('TabUpdate', () => {
             />
         )
 
-        expect(
-            screen.getByRole<HTMLSelectElement>('combobox', {
-                name: 'Avis CRB',
-            }).disabled
-        ).toBe(true)
-        // The préfet is asked either way, so its list stays open.
+        // Not disabled but absent: there is no avis to record, so the list has
+        // nothing to say.
+        expect(screen.queryByRole('combobox', { name: 'Avis CRB' })).toBeNull()
+        // The préfet is asked either way, so its list stays.
         expect(
             screen.getByRole<HTMLSelectElement>('combobox', {
                 name: 'Avis Préfet',
@@ -181,7 +179,7 @@ describe('TabUpdate', () => {
         ).toBe(false)
     })
 
-    it('opens the avis CRB list as soon as an avis CRB is required', () => {
+    it('shows the avis CRB list as soon as an avis CRB is required', () => {
         render(
             <TabUpdate
                 demandesSubvention={[
@@ -197,30 +195,45 @@ describe('TabUpdate', () => {
             screen.getByRole('checkbox', { name: 'Avis CRB requis' })
         )
 
-        expect(
-            screen.getByRole<HTMLSelectElement>('combobox', {
-                name: 'Avis CRB',
-            }).disabled
-        ).toBe(false)
+        expect(screen.getByRole('combobox', { name: 'Avis CRB' })).toBeDefined()
     })
 
-    it('reports the stored lauréat state beside the switch that changes it', () => {
+    it('keeps the avis CRB it was given while the list is out of the way', () => {
         render(<TabUpdate demandesSubvention={[bciat]} />)
 
-        const card = getCard('BCIAT')
-        expect(within(card).getByText('Aucun lauréat')).toBeDefined()
+        const avisCrbRequis = screen.getAllByRole('checkbox', {
+            name: 'Avis CRB requis',
+        })[0]
 
-        const toggle = within(card).getByRole<HTMLInputElement>('checkbox', {
-            name: 'Ce plan est lauréat',
+        // Off, then on again: the list is unmounted in between, so the avis
+        // only survives because the draft holds it rather than the `<select>`.
+        fireEvent.click(avisCrbRequis)
+        fireEvent.click(avisCrbRequis)
+
+        const [avisCrb] = screen.getAllByRole<HTMLSelectElement>('combobox', {
+            name: 'Avis CRB',
         })
-        expect(toggle.checked).toBe(false)
+        expect(
+            within(avisCrb).getByRole<HTMLOptionElement>('option', {
+                name: 'Avis favorable',
+            }).selected
+        ).toBe(true)
+    })
 
-        fireEvent.click(toggle)
+    it('moves the lauréat switch of one demande without touching the other', () => {
+        render(<TabUpdate demandesSubvention={[bciat, granule]} />)
 
-        // The switch moves; the tag keeps reporting what is stored, so the user
-        // can see what they are moving away from.
-        expect(toggle.checked).toBe(true)
-        expect(within(card).getByText('Aucun lauréat')).toBeDefined()
+        const getLaureat = (nom: string) =>
+            within(getCard(nom)).getByRole<HTMLInputElement>('checkbox', {
+                name: 'Ce plan est lauréat',
+            })
+
+        expect(getLaureat('BCIAT').checked).toBe(false)
+
+        fireEvent.click(getLaureat('BCIAT'))
+
+        expect(getLaureat('BCIAT').checked).toBe(true)
+        expect(getLaureat('GRANULE').checked).toBe(false)
     })
 
     it('starts the lauréat switch on when the programme already has one', () => {
@@ -237,6 +250,5 @@ describe('TabUpdate', () => {
                 name: 'Ce plan est lauréat',
             }).checked
         ).toBe(true)
-        expect(screen.getByText('Lauréat')).toBeDefined()
     })
 })
