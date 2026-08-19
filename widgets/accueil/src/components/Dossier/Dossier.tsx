@@ -14,11 +14,13 @@ import {
 import { useState } from 'react'
 import type { ApprovisionnementByRessourceStats } from '@shared/core/application/services/approvisionnement-stats'
 import FilInstruction from './tabs/FilInstruction/FilInstruction'
+import TabUpdate from './tabs/TabUpdate/TabUpdate'
 
 const TABS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
     { id: 'ressources', label: 'Ressources' },
     { id: 'pieces-jointes', label: 'Pièces jointes' },
+    { id: 'update', label: 'Mettre à jour le suivi du plan' },
 ]
 const INCONNU = '—'
 
@@ -88,6 +90,9 @@ export default function Dossier({
                     attachments={plan.attachments}
                     getFileUrl={getFileUrl}
                 />
+            )}
+            {tab === 'update' && (
+                <TabUpdate demandesSubvention={plan.demandesSubvention} />
             )}
         </div>
     )

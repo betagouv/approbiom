@@ -34,6 +34,7 @@ function programmeAide(overrides: Partial<ProgrammeAide> = {}): ProgrammeAide {
         name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
         shortName: 'BCIAT',
         appelAProjet: 'BCIAT (2023)',
+        laureat: null,
         ...overrides,
     }
 }

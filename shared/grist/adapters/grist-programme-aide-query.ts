@@ -19,6 +19,7 @@ export function createGristProgrammeAideQuery(): ProgrammeAideQuery {
                 name: asString(row.Nom_complet),
                 shortName: asString(row.Nom_raccourci),
                 appelAProjet: asString(row.Appel_a_projet),
+                laureat: asNumber(row.Laureat) ?? null,
             }))
         },
     }

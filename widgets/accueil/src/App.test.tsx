@@ -62,6 +62,7 @@ const bciat: ProgrammeAide = {
     name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
     shortName: 'BCIAT',
     appelAProjet: 'BCIAT (2023)',
+    laureat: null,
 }
 
 // The chain the header's « Région » follows: the plan points here, and this is

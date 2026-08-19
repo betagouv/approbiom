@@ -56,6 +56,7 @@ export const COLUMNS = {
         'Usage_principal',
         'Nature_Donnee',
         'Statut',
+        'est_Laureat',
     ],
     metaRessource: ['id', 'Code_ressource_Approbiom', 'Description_courte'],
     entreprise: ['id', 'Siret', 'Denomination'],

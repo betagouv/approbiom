@@ -40,6 +40,7 @@ function demande(appelAProjet: string): DemandeSubventionDetail {
             name: `Programme ${appelAProjet}`,
             shortName: appelAProjet,
             appelAProjet,
+            laureat: null,
         },
         instructions: [],
     }
