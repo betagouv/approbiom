@@ -5,6 +5,6 @@ import type { Installation } from '@shared/core/domain/entities/installation'
  * installation is what carries a commune — so this is the hop between a plan
  * and where it sits.
  */
-export interface InstallationQuery {
+export interface InstallationPort {
     list(): Promise<readonly Installation[]>
 }

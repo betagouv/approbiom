@@ -1,4 +1,4 @@
-import type { InseeQuery } from '@shared/core/application/ports/insee'
+import type { InseePort } from '@shared/core/application/ports/insee'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import { gristReady } from '../grist-ready'
 import { asNumber, asString, fetchRowsOnce } from '../grist-helpers'
@@ -6,7 +6,7 @@ import { COLUMNS, TABLE } from '../grist-tables'
 
 type Departements = DepartementsByRegion['departements'][number][]
 
-export function createGristInseeQuery(): InseeQuery {
+export function createGristInseePort(): InseePort {
     return {
         async listDepartementsByRegion() {
             await gristReady()

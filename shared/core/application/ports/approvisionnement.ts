@@ -26,7 +26,7 @@ export type ApprovisionnementGroupedByPlanRessourceAndFournisseur =
         fournisseur: Entreprise['siret']
     }
 
-export interface ApprovisionnementQuery {
+export interface ApprovisionnementPort {
     list(): Promise<readonly Approvisionnement[]>
 
     listGroupedByPlanAndRessource(): Promise<

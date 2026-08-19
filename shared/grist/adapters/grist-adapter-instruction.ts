@@ -1,4 +1,4 @@
-import type { InstructionQuery } from '@shared/core/application/ports/instruction'
+import type { InstructionPort } from '@shared/core/application/ports/instruction'
 import { isAvisCRB } from '@shared/core/domain/value-objects/avis-crb'
 import { isAvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
 import { isPhaseInstruction } from '@shared/core/domain/value-objects/phase-instruction'
@@ -14,7 +14,7 @@ import {
 } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
 
-export function createGristInstructionQuery(): InstructionQuery {
+export function createGristInstructionPort(): InstructionPort {
     return {
         async list() {
             await gristReady()

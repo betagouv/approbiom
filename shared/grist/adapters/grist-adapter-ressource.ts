@@ -1,9 +1,9 @@
-import type { RessourceQuery } from '@shared/core/application/ports/ressource'
+import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import { gristReady } from '../grist-ready'
 import { asString, fetchRowsOnce } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
 
-export function createGristRessourceQuery(): RessourceQuery {
+export function createGristRessourcePort(): RessourcePort {
     return {
         async list() {
             await gristReady()

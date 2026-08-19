@@ -2,11 +2,11 @@ import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@gouvfr/dsfr/dist/core/core.main.min.css'
 import App from './App'
-import { createGristApprovisionnementQuery } from '@shared/grist/adapters/grist-approvisionnement-query'
-import { createGristEntrepriseQuery } from '@shared/grist/adapters/grist-entreprise-query'
-import { createGristInseeQuery } from '@shared/grist/adapters/grist-insee-query'
-import { createGristPlanQuery } from '@shared/grist/adapters/grist-plan-query'
-import { createGristRessourceQuery } from '@shared/grist/adapters/grist-ressource-query'
+import { createGristApprovisionnementPort } from '@shared/grist/adapters/grist-adapter-approvisionnement'
+import { createGristEntreprisePort } from '@shared/grist/adapters/grist-adapter-entreprise'
+import { createGristInseePort } from '@shared/grist/adapters/grist-adapter-insee'
+import { createGristPlanPort } from '@shared/grist/adapters/grist-adapter-plan'
+import { createGristRessourcePort } from '@shared/grist/adapters/grist-adapter-ressource'
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('#no root found in index.html')
@@ -14,11 +14,11 @@ if (!rootEl) throw new Error('#no root found in index.html')
 createRoot(rootEl).render(
     <StrictMode>
         <App
-            approvisionnements={createGristApprovisionnementQuery()}
-            plans={createGristPlanQuery()}
-            ressources={createGristRessourceQuery()}
-            entreprises={createGristEntrepriseQuery()}
-            insee={createGristInseeQuery()}
+            approvisionnements={createGristApprovisionnementPort()}
+            plans={createGristPlanPort()}
+            ressources={createGristRessourcePort()}
+            entreprises={createGristEntreprisePort()}
+            insee={createGristInseePort()}
         />
     </StrictMode>
 )

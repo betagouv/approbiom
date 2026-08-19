@@ -1,7 +1,7 @@
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Region } from '@shared/core/domain/value-objects/region'
 
-export interface InseeQuery {
+export interface InseePort {
     listDepartementsByRegion(): Promise<readonly DepartementsByRegion[]>
 }
 

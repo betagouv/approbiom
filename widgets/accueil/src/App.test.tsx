@@ -4,7 +4,7 @@ import {
     AccessDeniedError,
     DataSourceUnavailableError,
 } from '@shared/core/errors'
-import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
+import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Installation } from '@shared/core/domain/entities/installation'
@@ -19,7 +19,7 @@ const rows =
     () =>
         Promise.resolve(value)
 
-const planQuery = (list: PlanQuery['list']): PlanQuery => ({ list })
+const planPort = (list: PlanPort['list']): PlanPort => ({ list })
 
 function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
     return {
@@ -122,7 +122,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(() =>
+                    plans: planPort(() =>
                         Promise.reject(
                             new DataSourceUnavailableError('no grist')
                         )
@@ -140,7 +140,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(() =>
+                    plans: planPort(() =>
                         Promise.reject(new AccessDeniedError('read only'))
                     ),
                 })}
@@ -156,7 +156,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(() =>
+                    plans: planPort(() =>
                         Promise.reject(new Error('Table not found'))
                     ),
                 })}
@@ -167,9 +167,7 @@ describe('App', () => {
     })
 
     it('opens the dossier of the plan whose button was clicked', async () => {
-        render(
-            <App {...fakePorts({ plans: planQuery(rows([saintJunien])) })} />
-        )
+        render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openDossier()
 
@@ -182,9 +180,7 @@ describe('App', () => {
     })
 
     it('puts the list back when the dossier is closed', async () => {
-        render(
-            <App {...fakePorts({ plans: planQuery(rows([saintJunien])) })} />
-        )
+        render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openDossier()
         fireEvent.click(screen.getByRole('button', { name: 'Accueil' }))
@@ -201,7 +197,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
+                    plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: { list: rows([bciat]) },
                     instructions: { list: rows([nouvelleAquitaine]) },
@@ -227,7 +223,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
+                    plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: { list: rows([bciat]) },
                     installations: { list: rows([chaufferieDeSaintJunien]) },
@@ -253,9 +249,7 @@ describe('App', () => {
     it('says as much when neither can be answered', async () => {
         // No demande de subvention names an appel, and no installation places
         // the plan. Both lines stay, so the header keeps its shape.
-        render(
-            <App {...fakePorts({ plans: planQuery(rows([saintJunien])) })} />
-        )
+        render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openDossier()
 
@@ -266,7 +260,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
+                    plans: planPort(rows([saintJunien])),
                     programmesAide: { list: rows([bciat]) },
                     instructions: { list: rows([nouvelleAquitaine]) },
                 })}
@@ -286,7 +280,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
+                    plans: planPort(rows([saintJunien])),
                     approvisionnements: {
                         list: rows([]),
                         listGroupedByPlanAndRessource: rows([

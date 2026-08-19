@@ -1,9 +1,9 @@
-import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
-import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise'
-import type { InseeQuery } from '@shared/core/application/ports/insee'
-import type { InstallationQuery } from '@shared/core/application/ports/installation'
-import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
-import type { RessourceQuery } from '@shared/core/application/ports/ressource'
+import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
+import type { InseePort } from '@shared/core/application/ports/insee'
+import type { InstallationPort } from '@shared/core/application/ports/installation'
+import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
+import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
@@ -12,12 +12,12 @@ import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d
 import type { Ressource } from '@shared/core/domain/entities/ressource'
 
 export type ConcurrencePorts = {
-    approvisionnements: ApprovisionnementQuery
-    plans: PlanQuery
-    installations: InstallationQuery
-    ressources: RessourceQuery
-    entreprises: EntrepriseQuery
-    insee: InseeQuery
+    approvisionnements: ApprovisionnementPort
+    plans: PlanPort
+    installations: InstallationPort
+    ressources: RessourcePort
+    entreprises: EntreprisePort
+    insee: InseePort
 }
 
 /**

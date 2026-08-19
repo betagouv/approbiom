@@ -1,4 +1,4 @@
-import type { InstallationQuery } from '@shared/core/application/ports/installation'
+import type { InstallationPort } from '@shared/core/application/ports/installation'
 import { gristReady } from '../grist-ready'
 import {
     asNumber,
@@ -9,7 +9,7 @@ import {
 } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
 
-export function createGristInstallationQuery(): InstallationQuery {
+export function createGristInstallationPort(): InstallationPort {
     return {
         async list() {
             await gristReady()

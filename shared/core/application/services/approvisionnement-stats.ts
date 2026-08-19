@@ -3,14 +3,14 @@ import type {
     ApprovisionnementGroupedByPlanRessourceAndDepartement,
     ApprovisionnementGroupedByPlanRessourceAndFournisseur,
     ApprovisionnementGroupedByPlanRessourceAndRegion,
-    ApprovisionnementQuery,
+    ApprovisionnementPort,
 } from '@shared/core/application/ports/approvisionnement'
 import type {
     DepartementsByRegion,
-    InseeQuery,
+    InseePort,
 } from '@shared/core/application/ports/insee'
-import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise'
-import type { RessourceQuery } from '@shared/core/application/ports/ressource'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
+import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
@@ -41,10 +41,10 @@ export type ApprovisionnementByRessourceStats =
     readonly ApprovisionnementStatsByRessource[]
 
 export type ApprovisionnementByRessourceStatsPorts = {
-    approvisionnements: ApprovisionnementQuery
-    ressources: RessourceQuery
-    entreprises: EntrepriseQuery
-    insee: InseeQuery
+    approvisionnements: ApprovisionnementPort
+    ressources: RessourcePort
+    entreprises: EntreprisePort
+    insee: InseePort
 }
 
 export type ApprovisionnementByRessourceStatsSources = {

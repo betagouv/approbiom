@@ -6,16 +6,16 @@ import { createRoot } from 'react-dom/client'
 import '@gouvfr/dsfr/dist/core/core.main.min.css'
 import './index.css'
 import App from './App'
-import { createGristApprovisionnementQuery } from '@shared/grist/adapters/grist-approvisionnement-query'
-import { createGristAttachmentQuery } from '@shared/grist/adapters/grist-attachment-query'
-import { createGristDemandeSubventionQuery } from '@shared/grist/adapters/grist-demande-subvention-query'
-import { createGristEntrepriseQuery } from '@shared/grist/adapters/grist-entreprise-query'
-import { createGristInseeQuery } from '@shared/grist/adapters/grist-insee-query'
-import { createGristInstallationQuery } from '@shared/grist/adapters/grist-installation-query'
-import { createGristInstructionQuery } from '@shared/grist/adapters/grist-instruction-query'
-import { createGristPlanQuery } from '@shared/grist/adapters/grist-plan-query'
-import { createGristProgrammeAideQuery } from '@shared/grist/adapters/grist-programme-aide-query'
-import { createGristRessourceQuery } from '@shared/grist/adapters/grist-ressource-query'
+import { createGristApprovisionnementPort } from '@shared/grist/adapters/grist-adapter-approvisionnement'
+import { createGristAttachmentPort } from '@shared/grist/adapters/grist-adapter-attachment'
+import { createGristDemandeSubventionPort } from '@shared/grist/adapters/grist-adapter-demande-subvention'
+import { createGristEntreprisePort } from '@shared/grist/adapters/grist-adapter-entreprise'
+import { createGristInseePort } from '@shared/grist/adapters/grist-adapter-insee'
+import { createGristInstallationPort } from '@shared/grist/adapters/grist-adapter-installation'
+import { createGristInstructionPort } from '@shared/grist/adapters/grist-adapter-instruction'
+import { createGristPlanPort } from '@shared/grist/adapters/grist-adapter-plan'
+import { createGristProgrammeAidePort } from '@shared/grist/adapters/grist-adapter-programme-aide'
+import { createGristRessourcePort } from '@shared/grist/adapters/grist-adapter-ressource'
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('#no root found in index.html')
@@ -23,16 +23,16 @@ if (!rootEl) throw new Error('#no root found in index.html')
 createRoot(rootEl).render(
     <StrictMode>
         <App
-            plans={createGristPlanQuery()}
-            approvisionnements={createGristApprovisionnementQuery()}
-            ressources={createGristRessourceQuery()}
-            entreprises={createGristEntrepriseQuery()}
-            insee={createGristInseeQuery()}
-            demandesSubvention={createGristDemandeSubventionQuery()}
-            programmesAide={createGristProgrammeAideQuery()}
-            instructions={createGristInstructionQuery()}
-            installations={createGristInstallationQuery()}
-            attachments={createGristAttachmentQuery()}
+            plans={createGristPlanPort()}
+            approvisionnements={createGristApprovisionnementPort()}
+            ressources={createGristRessourcePort()}
+            entreprises={createGristEntreprisePort()}
+            insee={createGristInseePort()}
+            demandesSubvention={createGristDemandeSubventionPort()}
+            programmesAide={createGristProgrammeAidePort()}
+            instructions={createGristInstructionPort()}
+            installations={createGristInstallationPort()}
+            attachments={createGristAttachmentPort()}
         />
     </StrictMode>
 )

@@ -9,15 +9,15 @@ import type { Region } from '@shared/core/domain/value-objects/region'
 import type { ApprovisionnementGroupedByPlanRessourceAndFournisseur } from '@shared/core/application/ports/approvisionnement'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
-import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
-import type { AttachmentQuery } from '@shared/core/application/ports/attachment'
-import type { DemandeSubventionQuery } from '@shared/core/application/ports/demande-subvention'
-import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise'
-import type { InseeQuery } from '@shared/core/application/ports/insee'
-import type { InstallationQuery } from '@shared/core/application/ports/installation'
-import type { InstructionQuery } from '@shared/core/application/ports/instruction'
-import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
-import type { ProgrammeAideQuery } from '@shared/core/application/ports/programme-aide'
+import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
+import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
+import type { InseePort } from '@shared/core/application/ports/insee'
+import type { InstallationPort } from '@shared/core/application/ports/installation'
+import type { InstructionPort } from '@shared/core/application/ports/instruction'
+import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
+import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
 
 export type DemandeSubventionDetail = {
     id: DemandeSubvention['id']
@@ -224,15 +224,15 @@ export function composePlanDetails({
 
 /** Everything a plan detail is read from. Named so a widget hands over its ports and nothing else. */
 export type PlanDetailPorts = {
-    plans: PlanQuery
-    installations: InstallationQuery
-    insee: InseeQuery
-    demandesSubvention: DemandeSubventionQuery
-    programmesAide: ProgrammeAideQuery
-    instructions: InstructionQuery
-    approvisionnements: ApprovisionnementQuery
-    entreprises: EntrepriseQuery
-    attachments: AttachmentQuery
+    plans: PlanPort
+    installations: InstallationPort
+    insee: InseePort
+    demandesSubvention: DemandeSubventionPort
+    programmesAide: ProgrammeAidePort
+    instructions: InstructionPort
+    approvisionnements: ApprovisionnementPort
+    entreprises: EntreprisePort
+    attachments: AttachmentPort
 }
 
 /**
