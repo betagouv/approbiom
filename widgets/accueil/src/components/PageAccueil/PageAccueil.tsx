@@ -2,14 +2,14 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-user/icons-user.main.min.css'
 
-import './Accueil.css'
+import './PageAccueil.css'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import MultiSelect from '@shared/react/components/MultiSelect'
 import SearchBar from '@shared/react/components/SearchBar'
-import TagNature from './TagNature'
-import TagStatut from './TagStatut'
-import TagType from './TagType'
-import TagUsage from './TagUsage'
+import TagNature from '../TagNature'
+import TagStatut from '../TagStatut'
+import TagType from '../TagType'
+import TagUsage from '../TagUsage'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
@@ -23,7 +23,7 @@ import {
     getFilteredRows,
     getFournisseurOptions,
     getStatutOptions,
-} from '../utils'
+} from '../../utils'
 
 function getColumns(
     onOpenDossier: (plan: PlanDetail) => void
@@ -73,19 +73,19 @@ function getColumns(
     ]
 }
 
-export type AccueilProps = {
+export type PageAccueilProps = {
     plansApprovisionnement: readonly PlanDetail[]
     departementsByRegion: readonly DepartementsByRegion[]
     programmesAide: readonly ProgrammeAide[]
     onOpenDossier: (plan: PlanDetail) => void
 }
 
-export default function Accueil({
+export default function PageAccueil({
     plansApprovisionnement,
     departementsByRegion,
     programmesAide,
     onOpenDossier,
-}: AccueilProps) {
+}: PageAccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
     const [departements, setDepartements] = useState<Departement['dep'][]>([])

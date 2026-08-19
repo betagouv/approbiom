@@ -3,8 +3,8 @@ import { renderError } from '@shared/react/render-error'
 import { useAsyncData } from '@shared/react/useAsyncData'
 import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
-import Accueil from './components/Accueil'
-import Dossier from './components/Dossier'
+import PageAccueil from './components/PageAccueil/PageAccueil'
+import Dossier from './components/Dossier/Dossier'
 import { loadAccueil, type AccueilPorts } from './load-accueil'
 
 export default function App(ports: AccueilPorts) {
@@ -22,7 +22,7 @@ export default function App(ports: AccueilPorts) {
                     approvisionnementByRessourceStatsList,
                 }) =>
                     selectedPlan === null ? (
-                        <Accueil
+                        <PageAccueil
                             plansApprovisionnement={plansApprovisionnement}
                             departementsByRegion={departementsByRegion}
                             programmesAide={programmesAide}

@@ -2,8 +2,8 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
 import './Dossier.css'
-import FilInstruction from './FilInstruction'
-import PiecesJointes from './PiecesJointes'
+
+import PiecesJointes from './tabs/PiecesJointes'
 import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
 import Ressource from '@shared/react/components/Ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
@@ -13,8 +13,9 @@ import {
 } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 import type { ApprovisionnementByRessourceStats } from '@shared/core/application/services/approvisionnement-stats'
+import FilInstruction from './tabs/FilInstruction/FilInstruction'
 
-const SECTIONS: readonly TabNavItem[] = [
+const TABS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
     { id: 'ressources', label: 'Ressources' },
     { id: 'pieces-jointes', label: 'Pièces jointes' },
@@ -34,7 +35,7 @@ export default function Dossier({
     getFileUrl,
     onClose,
 }: DossierProps) {
-    const [section, setSection] = useState(SECTIONS[0].id)
+    const [tab, setTab] = useState(TABS[0].id)
 
     const appelsAProjet = getAppelsAProjet(plan).join(', ')
 
@@ -66,23 +67,23 @@ export default function Dossier({
 
             <TabNav
                 label="Sections du dossier"
-                items={SECTIONS}
-                currentId={section}
-                onSelect={setSection}
+                items={TABS}
+                currentId={tab}
+                onSelect={setTab}
             />
 
-            {section === 'fil-instruction' && (
+            {tab === 'fil-instruction' && (
                 <FilInstruction demandes={plan.demandesSubvention} />
             )}
 
-            {section === 'ressources' && (
+            {tab === 'ressources' && (
                 <Ressource
                     approvisionnementStatsByRessource={
                         approvisionnementStatsByRessource
                     }
                 />
             )}
-            {section === 'pieces-jointes' && (
+            {tab === 'pieces-jointes' && (
                 <PiecesJointes
                     attachments={plan.attachments}
                     getFileUrl={getFileUrl}

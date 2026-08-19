@@ -1,5 +1,5 @@
 import './Chronologie.css'
-import BadgeAvis from './BadgeAvis'
+import BadgeAvis from '../../../BadgeAvis'
 import {
     getEtapes,
     type EtapeId,
