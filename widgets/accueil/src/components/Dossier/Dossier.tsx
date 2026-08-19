@@ -20,7 +20,7 @@ const TABS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
     { id: 'ressources', label: 'Ressources' },
     { id: 'pieces-jointes', label: 'Pièces jointes' },
-    { id: 'update', label: 'Mettre à jour le suivi du plan' },
+    { id: 'update', label: "Mettre à jour le fil d'instruction" },
 ]
 const INCONNU = '—'
 
