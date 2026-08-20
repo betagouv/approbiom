@@ -10,7 +10,6 @@ import type { PlanPort } from '@shared/core/application/ports/plan-d-approvision
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
-import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
@@ -62,7 +61,6 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         programmesAide: programmeAidePort(),
         instructions: instructionPort(),
         crbs: { list: rows([]) },
-        installations: { list: rows([]) },
         attachments: {
             list: rows([]),
             getFileUrl: () => Promise.resolve(''),
@@ -75,6 +73,9 @@ const saintJunien: Plan = {
     id: 1,
     nom: 'RC Saint Junien',
     installation: 1,
+    // The département the document computes from the installation's commune —
+    // « 87 » is Saint-Junien's, and the chain the header's « Région » follows.
+    departement: '87',
     typeDePlan: 'création',
     usage: 'énergie',
     natureDonnee: 'prévision',
@@ -88,14 +89,6 @@ const bciat: ProgrammeAide = {
     shortName: 'BCIAT',
     appelAProjet: 'BCIAT (2023)',
     laureat: null,
-}
-
-// The chain the header's « Région » follows: the plan points here, and this is
-// what carries the commune the département — and so the région — is read from.
-const chaufferieDeSaintJunien: Installation = {
-    id: saintJunien.installation,
-    nom: 'Chaufferie de Saint-Junien',
-    commune: { com: '87154', libelle: 'Saint-Junien', dep: '87' },
 }
 
 const nouvelleAquitaineInsee: DepartementsByRegion = {
@@ -255,7 +248,6 @@ describe('App', () => {
                     plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: programmeAidePort(rows([bciat])),
-                    installations: { list: rows([chaufferieDeSaintJunien]) },
                     insee: {
                         listDepartementsByRegion: rows([
                             nouvelleAquitaineInsee,
@@ -276,8 +268,9 @@ describe('App', () => {
     })
 
     it('says as much when neither can be answered', async () => {
-        // No demande de subvention names an appel, and no installation places
-        // the plan. Both lines stay, so the header keeps its shape.
+        // No demande de subvention names an appel, and no référentiel names
+        // the région of the plan's département. Both lines stay, so the header
+        // keeps its shape.
         render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openDossier()

@@ -1,7 +1,6 @@
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { InseePort } from '@shared/core/application/ports/insee'
-import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
@@ -14,7 +13,6 @@ import type { Ressource } from '@shared/core/domain/entities/ressource'
 export type ConcurrencePorts = {
     approvisionnements: ApprovisionnementPort
     plans: PlanPort
-    installations: InstallationPort
     ressources: RessourcePort
     entreprises: EntreprisePort
     insee: InseePort
@@ -49,7 +47,6 @@ export async function loadConcurrence(
         totals,
         approvisionnements,
         plans,
-        installations,
         ressources,
         fournisseurs,
         departementsByRegion,
@@ -57,13 +54,11 @@ export async function loadConcurrence(
         ports.approvisionnements.listGroupedByPlanAndRessource(),
         ports.approvisionnements.list(),
         ports.plans.list(),
-        ports.installations.list(),
         ports.ressources.list(),
         ports.entreprises.list(),
         ports.insee.listDepartementsByRegion(),
     ])
 
-    const installationById = new Map(installations.map((i) => [i.id, i]))
     const planById = new Map(plans.map((plan) => [plan.id, plan]))
     const titleByCode = new Map(ressources.map((r) => [r.code, r.title]))
 
@@ -89,10 +84,9 @@ export async function loadConcurrence(
     return {
         approvisionnementsByPlanAndRessource: totals.map((total) => {
             const plan = planById.get(total.planDApprovisionnement)
-            // Where a plan sits is a property of its installation's commune.
-            const dep = plan
-                ? installationById.get(plan.installation)?.commune.dep
-                : undefined
+            // Where a plan sits is computed by the document, off the
+            // commune of its installation.
+            const dep = plan?.departement ?? undefined
 
             return {
                 planDApprovisionnement: plan?.nom ?? '',

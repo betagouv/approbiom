@@ -14,8 +14,6 @@ export const TABLE = {
     plan: 'Plan_d_approvisionnement',
     metaRessource: 'Meta_Ressource',
     entreprise: 'Entreprise',
-    installation: 'Installation',
-    commune: 'INSEE_Commune',
     departement: 'INSEE_Departement',
     region: 'INSEE_Region',
     demandeSubvention: 'Demande_subvention',
@@ -57,11 +55,13 @@ export const COLUMNS = {
         'Nature_Donnee',
         'Statut',
         'est_Laureat',
+        // Computed by the document out of the installation's commune. Reading
+        // it here is what keeps the 37 000-row INSEE_Commune table, and the
+        // Installation table with it, out of every load.
+        'Departement_de_situation',
     ],
     metaRessource: ['id', 'Code_ressource_Approbiom', 'Description_courte'],
     entreprise: ['id', 'Siret', 'Denomination'],
-    installation: ['id', 'Nom', 'Commune'],
-    commune: ['id', 'COM', 'LIBELLE', 'DEP'],
     departement: ['id', 'DEP', 'LIBELLE', 'REG'],
     region: ['id', 'REG', 'LIBELLE'],
     demandeSubvention: ['id', 'Programme_d_aide', 'Plan_d_approvisionnement'],

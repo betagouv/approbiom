@@ -20,6 +20,7 @@ function plan(overrides: Partial<Plan> = {}): Plan {
         id: 1,
         nom: 'RCU Val Fleuri',
         installation: 1,
+        departement: null,
         typeDePlan: 'création',
         usage: 'énergie',
         natureDonnee: 'prévision',
@@ -123,7 +124,6 @@ function sources(
 ): PlanDetailSources {
     return {
         plans: [valFleuri, clairVillage],
-        installations: [],
         departementsByRegion: [],
         demandesSubvention: [demandeBciat, demandeBcib, demandeVoisine],
         programmesAide: [bciat, bcib],
