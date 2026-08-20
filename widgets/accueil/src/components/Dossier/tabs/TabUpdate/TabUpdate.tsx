@@ -17,6 +17,8 @@ import {
 } from '@shared/core/domain/value-objects/avis-prefet'
 import type { InstructionUpdateData } from '@shared/core/application/ports/instruction'
 import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
+import type { UpdateIsPlanLaureatForProgrammeAide } from '@shared/core/application/services/update-is-plan-laureat-for-programme-aide'
+import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
 const AVIS_CRB_OPTIONS = AVIS_CRB.map((avis) => ({ value: avis, label: avis }))
 const AVIS_PREFET_OPTIONS = AVIS_PREFET.map((avis) => ({
@@ -31,19 +33,23 @@ type InstructionUpdate = Pick<
 
 type DemandeUpdate = {
     id: DemandeSubvention['id']
-    programmeAide: Pick<ProgrammeAide, 'shortName' | 'laureat'>
+    programmeAide: Pick<ProgrammeAide, 'id' | 'shortName' | 'laureat'>
     instructions: readonly InstructionUpdate[]
 }
 
 type Props = {
+    planId: Plan['id']
     demandesSubvention: readonly DemandeUpdate[]
     updateInstruction: UpdateInstruction
+    updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide
     refresh: () => void
 }
 
 const TabUpdate = ({
+    planId,
     demandesSubvention,
     updateInstruction,
+    updateIsPlanLaureatForProgrammeAide,
     refresh,
 }: Props) => {
     const onUpdateInstruction = (
@@ -56,6 +62,16 @@ const TabUpdate = ({
             // nothing to read back.
             () => {}
         )
+
+    const onUpdateIsPlanLaureat = (
+        programmeAideId: DemandeUpdate['programmeAide']['id'],
+        isLaureat: boolean
+    ) =>
+        void updateIsPlanLaureatForProgrammeAide(
+            planId,
+            programmeAideId,
+            isLaureat
+        ).then(refresh, () => {})
 
     if (demandesSubvention.length === 0) {
         return (
@@ -83,8 +99,15 @@ const TabUpdate = ({
                             <Toggle
                                 label="Ce plan est lauréat"
                                 labelLeft
-                                checked={true}
-                                onChange={() => ''}
+                                checked={
+                                    demande.programmeAide.laureat === planId
+                                }
+                                onChange={(isLaureat) =>
+                                    onUpdateIsPlanLaureat(
+                                        demande.programmeAide.id,
+                                        isLaureat
+                                    )
+                                }
                             />
                         </div>
                     </header>
@@ -131,13 +154,6 @@ const TabUpdate = ({
                                                 label="Avis CRB"
                                                 options={AVIS_CRB_OPTIONS}
                                                 value={instruction.avisCRB}
-                                                // The document is what the
-                                                // screen reads from, so the
-                                                // write is followed by a read
-                                                // rather than by a copy held
-                                                // here: the phase Grist
-                                                // recomputes comes back with
-                                                // it.
                                                 onChange={(avisCRB) =>
                                                     onUpdateInstruction(
                                                         instruction.id,

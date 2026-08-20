@@ -23,6 +23,7 @@ export default function App(ports: AccueilPorts) {
                     departementsByRegion,
                     approvisionnementByRessourceStatsList,
                     updateInstruction,
+                    updateIsPlanLaureatForProgrammeAide,
                 }) => {
                     const selectedPlan =
                         plansApprovisionnement.find(
@@ -51,6 +52,9 @@ export default function App(ports: AccueilPorts) {
                                 ports.attachments.getFileUrl(id)
                             }
                             updateInstruction={updateInstruction}
+                            updateIsPlanLaureatForProgrammeAide={
+                                updateIsPlanLaureatForProgrammeAide
+                            }
                             refresh={state.refresh}
                             onClose={() => setSelectedPlanId(null)}
                         />

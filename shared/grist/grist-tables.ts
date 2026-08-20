@@ -85,8 +85,11 @@ export const COLUMNS = {
         'Nom_complet',
         'Nom_raccourci',
         'Appel_a_projet',
+        'Laureat',
     ],
     attachment: ['Plan_d_approvisionnement', 'piece_jointe', 'type'],
 } as const satisfies Record<string, readonly string[]>
 
 export type InstructionColumn = (typeof COLUMNS)['instruction'][number]
+
+export type ProgrammeAideColumn = (typeof COLUMNS)['programmeAide'][number]

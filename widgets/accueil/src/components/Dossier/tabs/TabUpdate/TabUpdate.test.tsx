@@ -11,10 +11,12 @@ import type { InstructionDetail } from '@shared/core/application/services/plan-d
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import TabUpdate from './TabUpdate'
 
+const PLAN_ID = 1
+
 function programmeAide(
     overrides: Partial<ProgrammeAide> = {}
-): Pick<ProgrammeAide, 'shortName' | 'laureat'> {
-    return { shortName: 'BCIAT', laureat: null, ...overrides }
+): Pick<ProgrammeAide, 'id' | 'shortName' | 'laureat'> {
+    return { id: 1, shortName: 'BCIAT', laureat: null, ...overrides }
 }
 
 function instruction(overrides: Partial<InstructionDetail> = {}) {
@@ -40,26 +42,32 @@ const bciat = {
 
 const granule = {
     id: 2,
-    programmeAide: programmeAide({ shortName: 'GRANULE' }),
+    programmeAide: programmeAide({ id: 2, shortName: 'GRANULE' }),
     instructions: [],
 }
 
 type Demandes = ComponentProps<typeof TabUpdate>['demandesSubvention']
 
 const updateInstruction = vi.fn()
+const updateIsPlanLaureatForProgrammeAide = vi.fn()
 const refresh = vi.fn()
 
 const renderTab = (demandesSubvention: Demandes) =>
     render(
         <TabUpdate
+            planId={PLAN_ID}
             demandesSubvention={demandesSubvention}
             updateInstruction={updateInstruction}
+            updateIsPlanLaureatForProgrammeAide={
+                updateIsPlanLaureatForProgrammeAide
+            }
             refresh={refresh}
         />
     )
 
 beforeEach(() => {
     updateInstruction.mockReset().mockResolvedValue(undefined)
+    updateIsPlanLaureatForProgrammeAide.mockReset().mockResolvedValue(undefined)
     refresh.mockReset()
 })
 
@@ -318,17 +326,60 @@ describe('TabUpdate', () => {
         ).toBe(true)
     })
 
-    it.todo(
-        'moves the lauréat switch of one demande without touching the other'
-    )
+    it('names the plan lauréat of the programme whose switch was moved', () => {
+        renderTab([bciat, granule])
 
-    it('starts the lauréat switch on when the programme already has one', () => {
-        renderTab([{ ...bciat, programmeAide: programmeAide({ laureat: 7 }) }])
+        fireEvent.click(
+            within(getCard('BCIAT')).getByRole('checkbox', {
+                name: 'Ce plan est lauréat',
+            })
+        )
+
+        // The plan the tab was opened on, under the programme the switch sits
+        // in — GRANULE, rowId 2, is left as it is.
+        expect(updateIsPlanLaureatForProgrammeAide).toHaveBeenCalledTimes(1)
+        expect(updateIsPlanLaureatForProgrammeAide).toHaveBeenCalledWith(
+            PLAN_ID,
+            1,
+            true
+        )
+    })
+
+    it('takes the plan back off the programme it was lauréat of', () => {
+        renderTab([
+            { ...bciat, programmeAide: programmeAide({ laureat: PLAN_ID }) },
+        ])
+
+        fireEvent.click(
+            screen.getByRole('checkbox', { name: 'Ce plan est lauréat' })
+        )
+
+        expect(updateIsPlanLaureatForProgrammeAide).toHaveBeenCalledWith(
+            PLAN_ID,
+            1,
+            false
+        )
+    })
+
+    it('starts the lauréat switch on when this plan is the one named', () => {
+        renderTab([
+            { ...bciat, programmeAide: programmeAide({ laureat: PLAN_ID }) },
+        ])
 
         expect(
             screen.getByRole<HTMLInputElement>('checkbox', {
                 name: 'Ce plan est lauréat',
             }).checked
         ).toBe(true)
+    })
+
+    it('leaves the lauréat switch off when the programme named another plan', () => {
+        renderTab([{ ...bciat, programmeAide: programmeAide({ laureat: 99 }) }])
+
+        expect(
+            screen.getByRole<HTMLInputElement>('checkbox', {
+                name: 'Ce plan est lauréat',
+            }).checked
+        ).toBe(false)
     })
 })

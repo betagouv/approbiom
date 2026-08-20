@@ -5,6 +5,7 @@ import {
     DataSourceUnavailableError,
 } from '@shared/core/errors'
 import type { InstructionPort } from '@shared/core/application/ports/instruction'
+import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { Crb } from '@shared/core/domain/entities/crb'
@@ -34,6 +35,16 @@ const instructionPort = (
         Promise.reject(new Error('no instruction is written by these tests')),
 })
 
+const programmeAidePort = (
+    list: ProgrammeAidePort['list'] = rows([])
+): ProgrammeAidePort => ({
+    list,
+    update: () =>
+        Promise.reject(
+            new Error("no programme d'aide is written by these tests")
+        ),
+})
+
 function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
     return {
         plans: { list: rows([]) },
@@ -48,7 +59,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         entreprises: { list: rows([]) },
         insee: { listDepartementsByRegion: rows([]) },
         demandesSubvention: { list: rows([]) },
-        programmesAide: { list: rows([]) },
+        programmesAide: programmeAidePort(),
         instructions: instructionPort(),
         crbs: { list: rows([]) },
         installations: { list: rows([]) },
@@ -216,7 +227,7 @@ describe('App', () => {
                 {...fakePorts({
                     plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
-                    programmesAide: { list: rows([bciat]) },
+                    programmesAide: programmeAidePort(rows([bciat])),
                     instructions: instructionPort(rows([nouvelleAquitaine])),
                     crbs: { list: rows([crbNouvelleAquitaine]) },
                 })}
@@ -243,7 +254,7 @@ describe('App', () => {
                 {...fakePorts({
                     plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
-                    programmesAide: { list: rows([bciat]) },
+                    programmesAide: programmeAidePort(rows([bciat])),
                     installations: { list: rows([chaufferieDeSaintJunien]) },
                     insee: {
                         listDepartementsByRegion: rows([
@@ -279,7 +290,7 @@ describe('App', () => {
             <App
                 {...fakePorts({
                     plans: planPort(rows([saintJunien])),
-                    programmesAide: { list: rows([bciat]) },
+                    programmesAide: programmeAidePort(rows([bciat])),
                     instructions: instructionPort(rows([nouvelleAquitaine])),
                 })}
             />

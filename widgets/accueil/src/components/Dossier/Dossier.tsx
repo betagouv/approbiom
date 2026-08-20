@@ -16,6 +16,7 @@ import type { ApprovisionnementByRessourceStats } from '@shared/core/application
 import FilInstruction from './tabs/FilInstruction/FilInstruction'
 import TabUpdate from './tabs/TabUpdate/TabUpdate'
 import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
+import type { UpdateIsPlanLaureatForProgrammeAide } from '@shared/core/application/services/update-is-plan-laureat-for-programme-aide'
 
 const TABS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
@@ -31,6 +32,7 @@ export type DossierProps = {
     getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void
     updateInstruction: UpdateInstruction
+    updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide
     refresh: () => void
 }
 
@@ -39,6 +41,7 @@ export default function Dossier({
     approvisionnementStatsByRessource,
     getFileUrl,
     updateInstruction,
+    updateIsPlanLaureatForProgrammeAide,
     refresh,
     onClose,
 }: DossierProps) {
@@ -98,8 +101,12 @@ export default function Dossier({
             )}
             {tab === 'update' && (
                 <TabUpdate
+                    planId={plan.id}
                     demandesSubvention={plan.demandesSubvention}
                     updateInstruction={updateInstruction}
+                    updateIsPlanLaureatForProgrammeAide={
+                        updateIsPlanLaureatForProgrammeAide
+                    }
                     refresh={refresh}
                 />
             )}
