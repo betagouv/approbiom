@@ -15,6 +15,7 @@ import {
     AVIS_PREFET,
     type AvisPrefet,
 } from '@shared/core/domain/value-objects/avis-prefet'
+import type { InstructionUpdateData } from '@shared/core/application/ports/instruction'
 import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
 
 const AVIS_CRB_OPTIONS = AVIS_CRB.map((avis) => ({ value: avis, label: avis }))
@@ -45,6 +46,17 @@ const TabUpdate = ({
     updateInstruction,
     refresh,
 }: Props) => {
+    const onUpdateInstruction = (
+        instructionId: InstructionUpdate['id'],
+        updateData: InstructionUpdateData
+    ) =>
+        void updateInstruction(instructionId, updateData).then(
+            refresh,
+            // A refused write leaves the document as it was, so there is
+            // nothing to read back.
+            () => {}
+        )
+
     if (demandesSubvention.length === 0) {
         return (
             <p className="fr-text--sm">
@@ -105,7 +117,14 @@ const TabUpdate = ({
                                             label="Avis CRB requis"
                                             labelLeft
                                             checked={instruction.avisCrbRequis}
-                                            onChange={() => ''}
+                                            onChange={(avisCrbRequis) =>
+                                                onUpdateInstruction(
+                                                    instruction.id,
+                                                    {
+                                                        avisCrbRequis,
+                                                    }
+                                                )
+                                            }
                                         />
                                         {instruction.avisCrbRequis && (
                                             <Select<AvisCRB>
@@ -119,24 +138,12 @@ const TabUpdate = ({
                                                 // here: the phase Grist
                                                 // recomputes comes back with
                                                 // it.
-                                                onChange={(value) =>
-                                                    void updateInstruction(
+                                                onChange={(avisCRB) =>
+                                                    onUpdateInstruction(
                                                         instruction.id,
-                                                        { avisCRB: value }
-                                                    ).then(
-                                                        refresh,
-                                                        // A refused write
-                                                        // leaves the document
-                                                        // as it was, so there
-                                                        // is nothing to read
-                                                        // back. Refusing it
-                                                        // here rather than
-                                                        // nowhere is what
-                                                        // keeps it from
-                                                        // escaping as an
-                                                        // unhandled
-                                                        // rejection.
-                                                        () => {}
+                                                        {
+                                                            avisCRB,
+                                                        }
                                                     )
                                                 }
                                             />
@@ -145,7 +152,14 @@ const TabUpdate = ({
                                             label="Avis Préfet"
                                             options={AVIS_PREFET_OPTIONS}
                                             value={instruction.avisPrefet}
-                                            onChange={() => ''}
+                                            onChange={(avisPrefet) =>
+                                                onUpdateInstruction(
+                                                    instruction.id,
+                                                    {
+                                                        avisPrefet,
+                                                    }
+                                                )
+                                            }
                                         />
                                     </div>
                                 </article>

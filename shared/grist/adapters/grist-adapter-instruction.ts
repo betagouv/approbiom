@@ -1,4 +1,7 @@
-import type { InstructionPort } from '@shared/core/application/ports/instruction'
+import type {
+    InstructionPort,
+    InstructionUpdateData,
+} from '@shared/core/application/ports/instruction'
 import { isAvisCRB } from '@shared/core/domain/value-objects/avis-crb'
 import { isAvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
 import { isPhaseInstruction } from '@shared/core/domain/value-objects/phase-instruction'
@@ -18,7 +21,25 @@ import type { Instruction } from '@shared/core/domain/entities/instruction'
 
 const MAPPING_COLUMNS_INSTRUCTION = {
     avisCRB: 'Avis_CRB',
+    avisPrefet: 'Avis_Prefet',
+    avisCrbRequis: 'Avis_CRB_Requis',
 } as const satisfies Partial<Record<keyof Instruction, InstructionColumn>>
+
+function getGristFieldsToUpdate(updateData: InstructionUpdateData): GristCells {
+    const cells: GristCells = {}
+
+    if (updateData.avisCRB !== undefined)
+        cells[MAPPING_COLUMNS_INSTRUCTION.avisCRB] = updateData.avisCRB
+
+    if (updateData.avisPrefet !== undefined)
+        cells[MAPPING_COLUMNS_INSTRUCTION.avisPrefet] = updateData.avisPrefet
+
+    if (updateData.avisCrbRequis !== undefined)
+        cells[MAPPING_COLUMNS_INSTRUCTION.avisCrbRequis] =
+            updateData.avisCrbRequis
+
+    return cells
+}
 
 function mapFromGristToApplication(row: GristRow): Instruction {
     return {
@@ -55,17 +76,10 @@ export function createGristInstructionPort(): InstructionPort {
         async update(instructionId, updateData) {
             await gristReady()
 
-            const gristFieldsToUpdate: GristCells = {}
-
-            if (updateData.avisCRB) {
-                gristFieldsToUpdate[MAPPING_COLUMNS_INSTRUCTION['avisCRB']] =
-                    String(updateData.avisCRB)
-            }
-
             const updatedInstruction = await updateRow(
                 TABLE.instruction,
                 instructionId,
-                gristFieldsToUpdate
+                getGristFieldsToUpdate(updateData)
             )
 
             return mapFromGristToApplication(updatedInstruction)

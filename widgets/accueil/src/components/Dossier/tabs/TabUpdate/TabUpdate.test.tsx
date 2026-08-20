@@ -226,7 +226,75 @@ describe('TabUpdate', () => {
         ).toBe(false)
     })
 
-    it.todo('shows the avis CRB list as soon as an avis CRB is required')
+    it('writes the avis CRB requis switch the user moves', () => {
+        renderTab([bciat])
+
+        // The instruction requires an avis, so moving the switch takes it back
+        // to `false` — a write that is easily lost by reading a field's
+        // truthiness rather than its presence.
+        fireEvent.click(
+            screen.getAllByRole('checkbox', { name: 'Avis CRB requis' })[0]
+        )
+
+        expect(updateInstruction).toHaveBeenCalledWith(1, {
+            avisCrbRequis: false,
+        })
+    })
+
+    it('writes the avis CRB requis switch back on', () => {
+        renderTab([
+            { ...bciat, instructions: [instruction({ avisCrbRequis: false })] },
+        ])
+
+        fireEvent.click(
+            screen.getByRole('checkbox', { name: 'Avis CRB requis' })
+        )
+
+        expect(updateInstruction).toHaveBeenCalledWith(1, {
+            avisCrbRequis: true,
+        })
+    })
+
+    it('writes the avis préfet the user picks', () => {
+        renderTab([bciat])
+
+        const [avisPrefet] = screen.getAllByRole<HTMLSelectElement>(
+            'combobox',
+            { name: 'Avis Préfet' }
+        )
+        fireEvent.change(avisPrefet, {
+            target: {
+                value: within(avisPrefet).getByRole<HTMLOptionElement>(
+                    'option',
+                    { name: 'Avis défavorable' }
+                ).value,
+            },
+        })
+
+        expect(updateInstruction).toHaveBeenCalledWith(1, {
+            avisPrefet: 'Avis défavorable',
+        })
+    })
+
+    it('names the instruction whose avis préfet changed', () => {
+        renderTab([bciat])
+
+        const [, second] = screen.getAllByRole<HTMLSelectElement>('combobox', {
+            name: 'Avis Préfet',
+        })
+        fireEvent.change(second, {
+            target: {
+                value: within(second).getByRole<HTMLOptionElement>('option', {
+                    name: 'Avis défavorable',
+                }).value,
+            },
+        })
+
+        // The second instruction of the demande is rowId 2.
+        expect(updateInstruction).toHaveBeenCalledWith(2, {
+            avisPrefet: 'Avis défavorable',
+        })
+    })
 
     it('keeps the avis CRB it was given while the list is out of the way', () => {
         renderTab([bciat])
