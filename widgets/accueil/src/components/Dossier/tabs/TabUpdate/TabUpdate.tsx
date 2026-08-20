@@ -33,7 +33,7 @@ type InstructionUpdate = Pick<
 
 type DemandeUpdate = {
     id: DemandeSubvention['id']
-    programmeAide: Pick<ProgrammeAide, 'id' | 'shortName' | 'laureat'>
+    programmeAide: Pick<ProgrammeAide, 'id' | 'laureat' | 'appelAProjet'>
     instructions: readonly InstructionUpdate[]
 }
 
@@ -92,7 +92,7 @@ const TabUpdate = ({
                                 Programme d&apos;aide
                             </p>
                             <h2 className="fr-h5 tab-update__titre">
-                                {demande.programmeAide.shortName}
+                                {demande.programmeAide.appelAProjet}
                             </h2>
                         </div>
                         <div className="tab-update__laureat">

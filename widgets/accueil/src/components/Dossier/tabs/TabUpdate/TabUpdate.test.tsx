@@ -15,8 +15,13 @@ const PLAN_ID = 1
 
 function programmeAide(
     overrides: Partial<ProgrammeAide> = {}
-): Pick<ProgrammeAide, 'id' | 'shortName' | 'laureat'> {
-    return { id: 1, shortName: 'BCIAT', laureat: null, ...overrides }
+): Pick<ProgrammeAide, 'id' | 'appelAProjet' | 'laureat'> {
+    return {
+        id: 1,
+        appelAProjet: 'BCIAT (2023)',
+        laureat: null,
+        ...overrides,
+    }
 }
 
 function instruction(overrides: Partial<InstructionDetail> = {}) {
@@ -42,7 +47,7 @@ const bciat = {
 
 const granule = {
     id: 2,
-    programmeAide: programmeAide({ id: 2, shortName: 'GRANULE' }),
+    programmeAide: programmeAide({ id: 2, appelAProjet: 'GRANULE (2023)' }),
     instructions: [],
 }
 
@@ -85,18 +90,22 @@ describe('TabUpdate', () => {
         expect(screen.getByText(/Aucune demande de subvention/)).toBeDefined()
     })
 
-    it('renders one card per demande, named after its programme d’aide', () => {
+    it('renders one card per demande, named after its appel à projet', () => {
         renderTab([bciat, granule])
 
-        expect(screen.getByRole('heading', { name: 'BCIAT' })).toBeDefined()
-        expect(screen.getByRole('heading', { name: 'GRANULE' })).toBeDefined()
+        expect(
+            screen.getByRole('heading', { name: 'BCIAT (2023)' })
+        ).toBeDefined()
+        expect(
+            screen.getByRole('heading', { name: 'GRANULE (2023)' })
+        ).toBeDefined()
     })
 
     it('says so when a demande carries no instruction', () => {
         renderTab([bciat, granule])
 
         expect(
-            within(getCard('GRANULE')).getByText(/Aucune instruction/)
+            within(getCard('GRANULE (2023)')).getByText(/Aucune instruction/)
         ).toBeDefined()
     })
 
@@ -330,13 +339,13 @@ describe('TabUpdate', () => {
         renderTab([bciat, granule])
 
         fireEvent.click(
-            within(getCard('BCIAT')).getByRole('checkbox', {
+            within(getCard('BCIAT (2023)')).getByRole('checkbox', {
                 name: 'Ce plan est lauréat',
             })
         )
 
         // The plan the tab was opened on, under the programme the switch sits
-        // in — GRANULE, rowId 2, is left as it is.
+        // in — GRANULE (2023), rowId 2, is left as it is.
         expect(updateIsPlanLaureatForProgrammeAide).toHaveBeenCalledTimes(1)
         expect(updateIsPlanLaureatForProgrammeAide).toHaveBeenCalledWith(
             PLAN_ID,
