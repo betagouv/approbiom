@@ -45,11 +45,9 @@ function getColumns(
         },
         {
             id: 'nom',
-            header: 'dep du dossier',
-            render: (plan) => plan.departement,
-            // A plan the document places nowhere sorts with the blanks rather
-            // than dropping out of the ordering.
-            sortBy: (plan) => plan.departement ?? '',
+            header: 'Nom',
+            render: (plan) => plan.nom,
+            sortBy: (plan) => plan.nom ?? '',
         },
         {
             id: 'type',
