@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
     asIdList,
+    fetchRow,
     fetchRows,
     indexByKey,
     toRows,
@@ -85,6 +86,26 @@ describe('fetchRows', () => {
         await expect(
             fetchRows('Plan_d_approvisionnement', ['Nom', 'Usage_principal'])
         ).rejects.toThrow('Nom, Usage_principal')
+    })
+})
+
+describe('fetchRow', () => {
+    function mockFetchTable(columns: ColumnMajorTable): void {
+        vi.stubGlobal('grist', {
+            docApi: { fetchTable: vi.fn().mockResolvedValue(columns) },
+        })
+    }
+    const TABLE_ID = 'Plan_d_approvisionnement'
+
+    it("throws when the row with the id provided doesn't exist", async () => {
+        mockFetchTable({
+            id: [1, 2],
+            Statut: ['projet', 'obsolète'],
+        })
+
+        await expect(fetchRow(TABLE_ID, 0)).rejects.toThrow(
+            'Row "0 from table Plan_d_approvisionnement has not been found."'
+        )
     })
 })
 

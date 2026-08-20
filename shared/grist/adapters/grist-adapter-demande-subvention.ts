@@ -1,9 +1,9 @@
-import type { DemandeSubventionQuery } from '@shared/core/application/ports/demande-subvention'
+import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
 import { gristReady } from '../grist-ready'
 import { asNumber, fetchRowsOnce } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
 
-export function createGristDemandeSubventionQuery(): DemandeSubventionQuery {
+export function createGristDemandeSubventionPort(): DemandeSubventionPort {
     return {
         async list() {
             await gristReady()

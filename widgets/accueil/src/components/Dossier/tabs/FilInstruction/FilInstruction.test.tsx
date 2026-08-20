@@ -1,7 +1,9 @@
 import { cleanup, render, screen, within } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { DemandeSubventionDetail } from '@shared/core/application/services/plan-detail'
-import type { Instruction } from '@shared/core/domain/entities/instruction'
+import type {
+    DemandeSubventionDetail,
+    InstructionDetail,
+} from '@shared/core/application/services/plan-detail'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import FilInstruction from './FilInstruction'
 
@@ -12,13 +14,18 @@ function programmeAide(overrides: Partial<ProgrammeAide> = {}): ProgrammeAide {
         name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
         shortName: 'BCIAT',
         appelAProjet: 'BCIAT (2023)',
+        laureat: null,
         ...overrides,
     }
 }
 
-function instruction(overrides: Partial<Instruction> = {}): Instruction {
+function instruction(
+    overrides: Partial<InstructionDetail> = {}
+): InstructionDetail {
     return {
-        crb: 'Nouvelle Aquitaine',
+        id: 1,
+        crb: 1,
+        crbName: 'Nouvelle Aquitaine',
         subvention: 1,
         name: 'Instruction 1',
         avisCrbRequis: true,
@@ -37,14 +44,19 @@ const bciat: DemandeSubventionDetail = {
     programmeAide: programmeAide(),
     instructions: [
         instruction(),
-        instruction({ crb: 'Occitanie', name: 'Instruction 2' }),
+        instruction({
+            id: 2,
+            crb: 2,
+            crbName: 'Occitanie',
+            name: 'Instruction 2',
+        }),
     ],
 }
 
 const bcib: DemandeSubventionDetail = {
     id: 2,
     programmeAide: programmeAide({ id: 2, shortName: 'BCIB' }),
-    instructions: [instruction({ name: 'Instruction 3' })],
+    instructions: [instruction({ id: 3, name: 'Instruction 3' })],
 }
 
 afterEach(() => {

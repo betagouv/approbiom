@@ -14,11 +14,15 @@ import {
 import { useState } from 'react'
 import type { ApprovisionnementByRessourceStats } from '@shared/core/application/services/approvisionnement-stats'
 import FilInstruction from './tabs/FilInstruction/FilInstruction'
+import TabUpdate from './tabs/TabUpdate/TabUpdate'
+import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
+import type { UpdateIsPlanLaureatForProgrammeAide } from '@shared/core/application/services/update-is-plan-laureat-for-programme-aide'
 
 const TABS: readonly TabNavItem[] = [
     { id: 'fil-instruction', label: 'Fil d’instruction' },
     { id: 'ressources', label: 'Ressources' },
     { id: 'pieces-jointes', label: 'Pièces jointes' },
+    { id: 'update', label: "Mettre à jour le fil d'instruction" },
 ]
 const INCONNU = '—'
 
@@ -27,12 +31,18 @@ export type DossierProps = {
     plan: PlanDetail
     getFileUrl: (id: Attachment['id']) => Promise<string>
     onClose: () => void
+    updateInstruction: UpdateInstruction
+    updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide
+    refresh: () => void
 }
 
 export default function Dossier({
     plan,
     approvisionnementStatsByRessource,
     getFileUrl,
+    updateInstruction,
+    updateIsPlanLaureatForProgrammeAide,
+    refresh,
     onClose,
 }: DossierProps) {
     const [tab, setTab] = useState(TABS[0].id)
@@ -87,6 +97,17 @@ export default function Dossier({
                 <PiecesJointes
                     attachments={plan.attachments}
                     getFileUrl={getFileUrl}
+                />
+            )}
+            {tab === 'update' && (
+                <TabUpdate
+                    planId={plan.id}
+                    demandesSubvention={plan.demandesSubvention}
+                    updateInstruction={updateInstruction}
+                    updateIsPlanLaureatForProgrammeAide={
+                        updateIsPlanLaureatForProgrammeAide
+                    }
+                    refresh={refresh}
                 />
             )}
         </div>

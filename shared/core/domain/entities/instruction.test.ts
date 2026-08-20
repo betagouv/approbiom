@@ -9,7 +9,8 @@ import { PHASES_INSTRUCTION } from '@shared/core/domain/value-objects/phase-inst
 
 function instruction(overrides: Partial<Instruction> = {}): Instruction {
     return {
-        crb: 'Nouvelle Aquitaine',
+        id: 1,
+        crb: 1,
         subvention: 1,
         name: 'Instruction 1',
         avisCrbRequis: true,

@@ -5,7 +5,8 @@ import type { AvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
 import type { PhaseInstruction } from '@shared/core/domain/value-objects/phase-instruction'
 
 export type Instruction = {
-    crb: Crb['name']
+    id: number
+    crb: Crb['id']
     subvention: DemandeSubvention['id']
     name: string
     avisCrbRequis: boolean

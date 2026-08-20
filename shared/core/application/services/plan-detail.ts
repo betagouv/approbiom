@@ -1,4 +1,5 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -9,20 +10,29 @@ import type { Region } from '@shared/core/domain/value-objects/region'
 import type { ApprovisionnementGroupedByPlanRessourceAndFournisseur } from '@shared/core/application/ports/approvisionnement'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
-import type { ApprovisionnementQuery } from '@shared/core/application/ports/approvisionnement'
-import type { AttachmentQuery } from '@shared/core/application/ports/attachment'
-import type { DemandeSubventionQuery } from '@shared/core/application/ports/demande-subvention'
-import type { EntrepriseQuery } from '@shared/core/application/ports/entreprise'
-import type { InseeQuery } from '@shared/core/application/ports/insee'
-import type { InstallationQuery } from '@shared/core/application/ports/installation'
-import type { InstructionQuery } from '@shared/core/application/ports/instruction'
-import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
-import type { ProgrammeAideQuery } from '@shared/core/application/ports/programme-aide'
+import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
+import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { CrbPort } from '@shared/core/application/ports/crb'
+import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
+import type { InseePort } from '@shared/core/application/ports/insee'
+import type { InstallationPort } from '@shared/core/application/ports/installation'
+import type { InstructionPort } from '@shared/core/application/ports/instruction'
+import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
+import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
+
+/**
+ * An instruction, with the CRB it points at named. The instruction itself only
+ * holds the rowId, and every screen showing a chronology shows whose it is.
+ */
+export type InstructionDetail = Instruction & {
+    crbName: Crb['name']
+}
 
 export type DemandeSubventionDetail = {
     id: DemandeSubvention['id']
     programmeAide: ProgrammeAide
-    instructions: readonly Instruction[]
+    instructions: readonly InstructionDetail[]
 }
 
 export type PlanDetail = Plan & {
@@ -40,17 +50,21 @@ export type PlanDetailSources = {
     demandesSubvention: readonly DemandeSubvention[]
     programmesAide: readonly ProgrammeAide[]
     instructions: readonly Instruction[]
+    crbs: readonly Crb[]
     approvisionnementsByFournisseur: readonly ApprovisionnementGroupedByPlanRessourceAndFournisseur[]
     entreprises: readonly Entreprise[]
     attachments: readonly Attachment[]
 }
 
 function getInstructionsBySubvention(
-    instructions: readonly Instruction[]
-): Map<DemandeSubvention['id'], Instruction[]> {
+    instructions: readonly Instruction[],
+    crbs: readonly Crb[]
+): Map<DemandeSubvention['id'], InstructionDetail[]> {
+    const crbById = new Map(crbs.map((crb) => [crb.id, crb]))
+
     const instructionsBySubvention = new Map<
         DemandeSubvention['id'],
-        Instruction[]
+        InstructionDetail[]
     >()
 
     for (const instruction of instructions) {
@@ -59,7 +73,12 @@ function getInstructionsBySubvention(
         if (instruction.subvention === 0) continue
 
         const group = instructionsBySubvention.get(instruction.subvention) ?? []
-        group.push(instruction)
+        // A CRB the document cannot name still instructed the demande, so the
+        // chronology is kept and reads with no name rather than disappearing.
+        group.push({
+            ...instruction,
+            crbName: crbById.get(instruction.crb)?.name ?? '',
+        })
         instructionsBySubvention.set(instruction.subvention, group)
     }
 
@@ -70,15 +89,19 @@ function getDemandesByPlan({
     demandesSubvention,
     programmesAide,
     instructions,
+    crbs,
 }: Pick<
     PlanDetailSources,
-    'demandesSubvention' | 'programmesAide' | 'instructions'
+    'demandesSubvention' | 'programmesAide' | 'instructions' | 'crbs'
 >): Map<Plan['id'], DemandeSubventionDetail[]> {
     const programmeById = new Map(
         programmesAide.map((programme) => [programme.id, programme])
     )
 
-    const instructionsBySubvention = getInstructionsBySubvention(instructions)
+    const instructionsBySubvention = getInstructionsBySubvention(
+        instructions,
+        crbs
+    )
 
     const demandesByPlan = new Map<Plan['id'], DemandeSubventionDetail[]>()
 
@@ -178,6 +201,7 @@ export function composePlanDetails({
     demandesSubvention,
     programmesAide,
     instructions,
+    crbs,
     approvisionnementsByFournisseur,
     entreprises,
     attachments,
@@ -195,6 +219,7 @@ export function composePlanDetails({
         demandesSubvention,
         programmesAide,
         instructions,
+        crbs,
     })
 
     const fournisseursByPlan = getFournisseursByPlan({
@@ -224,15 +249,16 @@ export function composePlanDetails({
 
 /** Everything a plan detail is read from. Named so a widget hands over its ports and nothing else. */
 export type PlanDetailPorts = {
-    plans: PlanQuery
-    installations: InstallationQuery
-    insee: InseeQuery
-    demandesSubvention: DemandeSubventionQuery
-    programmesAide: ProgrammeAideQuery
-    instructions: InstructionQuery
-    approvisionnements: ApprovisionnementQuery
-    entreprises: EntrepriseQuery
-    attachments: AttachmentQuery
+    plans: PlanPort
+    installations: InstallationPort
+    insee: InseePort
+    demandesSubvention: DemandeSubventionPort
+    programmesAide: ProgrammeAidePort
+    instructions: InstructionPort
+    crbs: CrbPort
+    approvisionnements: ApprovisionnementPort
+    entreprises: EntreprisePort
+    attachments: AttachmentPort
 }
 
 /**
@@ -252,6 +278,7 @@ export async function getPlanDetails(
         demandesSubvention,
         programmesAide,
         instructions,
+        crbs,
         approvisionnementsByFournisseur,
         entreprises,
         attachments,
@@ -262,6 +289,7 @@ export async function getPlanDetails(
         ports.demandesSubvention.list(),
         ports.programmesAide.list(),
         ports.instructions.list(),
+        ports.crbs.list(),
         ports.approvisionnements.listGroupedByPlanRessourceAndFournisseur(),
         ports.entreprises.list(),
         ports.attachments.list(),
@@ -274,6 +302,7 @@ export async function getPlanDetails(
         demandesSubvention,
         programmesAide,
         instructions,
+        crbs,
         approvisionnementsByFournisseur,
         entreprises,
         attachments,

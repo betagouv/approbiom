@@ -1,8 +1,10 @@
-//table prog_aides
+import type { PlanDApprovisionnement } from './plan-d-approvisionnement'
+
 export type ProgrammeAide = {
-    id: number // id grist
-    year: number //Annee
-    name: string // Nom_complet
-    shortName: string //Nom_raccourci
-    appelAProjet: string // Appel_a_projet
+    id: number
+    year: number
+    name: string
+    shortName: string
+    appelAProjet: string
+    laureat: PlanDApprovisionnement['id'] | null
 }

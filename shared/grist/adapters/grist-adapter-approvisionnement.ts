@@ -1,6 +1,6 @@
 import type {
     ApprovisionnementGroupedByPlanAndRessource,
-    ApprovisionnementQuery,
+    ApprovisionnementPort,
 } from '@shared/core/application/ports/approvisionnement'
 import { gristReady } from '../grist-ready'
 import {
@@ -38,7 +38,7 @@ function toGroup(
     }
 }
 
-export function createGristApprovisionnementQuery(): ApprovisionnementQuery {
+export function createGristApprovisionnementPort(): ApprovisionnementPort {
     /** Every summary needs the ressource directory to resolve its Ref. */
     const readTotals = async (tableId: string, columns: readonly string[]) => {
         await gristReady()

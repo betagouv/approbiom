@@ -1,4 +1,8 @@
+import type { CellValue } from 'grist/GristData'
+
 export type GristRow = Record<string, unknown>
+
+export type GristCells = Record<string, CellValue>
 
 export type ColumnMajorTable = Record<string, unknown[]>
 
@@ -87,6 +91,43 @@ export function fetchRowsOnce(
     inFlight.set(key, reading)
 
     return reading
+}
+
+/**
+ * @remark The Grist Plugin API offers no way to read a single record, so we
+ * fetch the table and search it here.
+ */
+export async function fetchRow(
+    tableId: string,
+    rowId: number
+): Promise<GristRow> {
+    const rows = await fetchRows(tableId)
+
+    const row = rows.find((row) => row.id === rowId)
+
+    if (!row) {
+        throw new Error(
+            `Row "${rowId} from table ${tableId} has not been found."`
+        )
+    }
+    return row
+}
+
+export async function updateRow(
+    tableId: string,
+    rowId: number,
+    fields: GristCells
+): Promise<GristRow> {
+    try {
+        await grist.getTable(tableId).update({ id: rowId, fields })
+        const updatedRow = await fetchRow(tableId, rowId)
+        return updatedRow
+    } catch (cause) {
+        throw new Error(
+            `Grist row ${rowId} of table "${tableId}" could not be updated — check the row and the column(s) ${Object.keys(fields).join(', ')} still exist in the document. `,
+            { cause }
+        )
+    }
 }
 
 export const asString = (value: unknown): string =>

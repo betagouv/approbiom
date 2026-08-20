@@ -34,7 +34,7 @@ export default function FilInstruction({ demandes }: FilInstructionProps) {
                                 className="fil-instruction__instruction"
                             >
                                 <h3 className="fr-h6 fil-instruction__crb">
-                                    {instruction.crb}
+                                    {instruction.crbName}
                                 </h3>
 
                                 <Chronologie instruction={instruction} />

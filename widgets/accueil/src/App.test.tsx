@@ -4,8 +4,11 @@ import {
     AccessDeniedError,
     DataSourceUnavailableError,
 } from '@shared/core/errors'
-import type { PlanQuery } from '@shared/core/application/ports/plan-d-approvisionnement'
+import type { InstructionPort } from '@shared/core/application/ports/instruction'
+import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
+import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
@@ -19,7 +22,28 @@ const rows =
     () =>
         Promise.resolve(value)
 
-const planQuery = (list: PlanQuery['list']): PlanQuery => ({ list })
+const planPort = (list: PlanPort['list']): PlanPort => ({ list })
+
+// These tests read the accueil; none of them takes a path that writes. A write
+// reaching the port is the test having gone somewhere it did not mean to, so it
+// is refused rather than quietly answered.
+const instructionPort = (
+    list: InstructionPort['list'] = rows([])
+): InstructionPort => ({
+    list,
+    update: () =>
+        Promise.reject(new Error('no instruction is written by these tests')),
+})
+
+const programmeAidePort = (
+    list: ProgrammeAidePort['list'] = rows([])
+): ProgrammeAidePort => ({
+    list,
+    update: () =>
+        Promise.reject(
+            new Error("no programme d'aide is written by these tests")
+        ),
+})
 
 function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
     return {
@@ -35,8 +59,9 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         entreprises: { list: rows([]) },
         insee: { listDepartementsByRegion: rows([]) },
         demandesSubvention: { list: rows([]) },
-        programmesAide: { list: rows([]) },
-        instructions: { list: rows([]) },
+        programmesAide: programmeAidePort(),
+        instructions: instructionPort(),
+        crbs: { list: rows([]) },
         installations: { list: rows([]) },
         attachments: {
             list: rows([]),
@@ -62,6 +87,7 @@ const bciat: ProgrammeAide = {
     name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
     shortName: 'BCIAT',
     appelAProjet: 'BCIAT (2023)',
+    laureat: null,
 }
 
 // The chain the header's « Région » follows: the plan points here, and this is
@@ -83,8 +109,11 @@ const demandeBciat: DemandeSubvention = {
     planDApprovisionnement: saintJunien.id,
 }
 
+const crbNouvelleAquitaine: Crb = { id: 1, name: 'Nouvelle Aquitaine' }
+
 const nouvelleAquitaine: Instruction = {
-    crb: 'Nouvelle Aquitaine',
+    id: 1,
+    crb: crbNouvelleAquitaine.id,
     subvention: demandeBciat.id,
     name: 'Instruction 1',
     avisCrbRequis: true,
@@ -121,7 +150,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(() =>
+                    plans: planPort(() =>
                         Promise.reject(
                             new DataSourceUnavailableError('no grist')
                         )
@@ -139,7 +168,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(() =>
+                    plans: planPort(() =>
                         Promise.reject(new AccessDeniedError('read only'))
                     ),
                 })}
@@ -155,7 +184,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(() =>
+                    plans: planPort(() =>
                         Promise.reject(new Error('Table not found'))
                     ),
                 })}
@@ -166,9 +195,7 @@ describe('App', () => {
     })
 
     it('opens the dossier of the plan whose button was clicked', async () => {
-        render(
-            <App {...fakePorts({ plans: planQuery(rows([saintJunien])) })} />
-        )
+        render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openDossier()
 
@@ -181,9 +208,7 @@ describe('App', () => {
     })
 
     it('puts the list back when the dossier is closed', async () => {
-        render(
-            <App {...fakePorts({ plans: planQuery(rows([saintJunien])) })} />
-        )
+        render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openDossier()
         fireEvent.click(screen.getByRole('button', { name: 'Accueil' }))
@@ -200,10 +225,11 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
+                    plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
-                    programmesAide: { list: rows([bciat]) },
-                    instructions: { list: rows([nouvelleAquitaine]) },
+                    programmesAide: programmeAidePort(rows([bciat])),
+                    instructions: instructionPort(rows([nouvelleAquitaine])),
+                    crbs: { list: rows([crbNouvelleAquitaine]) },
                 })}
             />
         )
@@ -226,9 +252,9 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
+                    plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
-                    programmesAide: { list: rows([bciat]) },
+                    programmesAide: programmeAidePort(rows([bciat])),
                     installations: { list: rows([chaufferieDeSaintJunien]) },
                     insee: {
                         listDepartementsByRegion: rows([
@@ -252,9 +278,7 @@ describe('App', () => {
     it('says as much when neither can be answered', async () => {
         // No demande de subvention names an appel, and no installation places
         // the plan. Both lines stay, so the header keeps its shape.
-        render(
-            <App {...fakePorts({ plans: planQuery(rows([saintJunien])) })} />
-        )
+        render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openDossier()
 
@@ -265,9 +289,9 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
-                    programmesAide: { list: rows([bciat]) },
-                    instructions: { list: rows([nouvelleAquitaine]) },
+                    plans: planPort(rows([saintJunien])),
+                    programmesAide: programmeAidePort(rows([bciat])),
+                    instructions: instructionPort(rows([nouvelleAquitaine])),
                 })}
             />
         )
@@ -285,7 +309,7 @@ describe('App', () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planQuery(rows([saintJunien])),
+                    plans: planPort(rows([saintJunien])),
                     approvisionnements: {
                         list: rows([]),
                         listGroupedByPlanAndRessource: rows([

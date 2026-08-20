@@ -56,6 +56,7 @@ export const COLUMNS = {
         'Usage_principal',
         'Nature_Donnee',
         'Statut',
+        'est_Laureat',
     ],
     metaRessource: ['id', 'Code_ressource_Approbiom', 'Description_courte'],
     entreprise: ['id', 'Siret', 'Denomination'],
@@ -65,6 +66,7 @@ export const COLUMNS = {
     region: ['id', 'REG', 'LIBELLE'],
     demandeSubvention: ['id', 'Programme_d_aide', 'Plan_d_approvisionnement'],
     instruction: [
+        'id',
         'Nom',
         'crb',
         'subvention',
@@ -83,6 +85,11 @@ export const COLUMNS = {
         'Nom_complet',
         'Nom_raccourci',
         'Appel_a_projet',
+        'Laureat',
     ],
     attachment: ['Plan_d_approvisionnement', 'piece_jointe', 'type'],
 } as const satisfies Record<string, readonly string[]>
+
+export type InstructionColumn = (typeof COLUMNS)['instruction'][number]
+
+export type ProgrammeAideColumn = (typeof COLUMNS)['programmeAide'][number]

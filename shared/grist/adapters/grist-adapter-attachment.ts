@@ -1,4 +1,4 @@
-import type { AttachmentQuery } from '@shared/core/application/ports/attachment'
+import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import { gristReady } from '../grist-ready'
 import { asIdList, asNumber, asString, fetchRowsOnce } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
@@ -55,7 +55,7 @@ async function fetchMetadata(
     return new Map(files.filter((file) => file !== null))
 }
 
-export function createGristAttachmentQuery(): AttachmentQuery {
+export function createGristAttachmentPort(): AttachmentPort {
     return {
         async list() {
             await gristReady()

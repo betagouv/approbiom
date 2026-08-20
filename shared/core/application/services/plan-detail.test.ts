@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
@@ -34,13 +35,23 @@ function programmeAide(overrides: Partial<ProgrammeAide> = {}): ProgrammeAide {
         name: 'Biomasse Chaleur Industrie Agriculture Tertiaire',
         shortName: 'BCIAT',
         appelAProjet: 'BCIAT (2023)',
+        laureat: null,
         ...overrides,
     }
 }
 
+/** The CRBs the instructions below point at, by the rowId each one holds. */
+const crbs: readonly Crb[] = [
+    { id: 1, name: 'Nouvelle Aquitaine' },
+    { id: 2, name: 'Occitanie' },
+    { id: 3, name: 'Bretagne' },
+    { id: 4, name: 'Grand Est' },
+]
+
 function instruction(overrides: Partial<Instruction> = {}): Instruction {
     return {
-        crb: 'Nouvelle Aquitaine',
+        id: 1,
+        crb: 1,
         subvention: 1,
         name: 'Instruction 1',
         avisCrbRequis: true,
@@ -93,14 +104,16 @@ const cooperativeDuBois: Entreprise = {
 }
 
 const nouvelleAquitaine = instruction()
-const occitanie = instruction({ crb: 'Occitanie', name: 'Instruction 2' })
+const occitanie = instruction({ id: 2, crb: 2, name: 'Instruction 2' })
 const bretagne = instruction({
-    crb: 'Bretagne',
+    id: 3,
+    crb: 3,
     name: 'Instruction 3',
     subvention: demandeBcib.id,
 })
 const voisine = instruction({
-    crb: 'Grand Est',
+    id: 4,
+    crb: 4,
     name: 'Instruction 4',
     subvention: demandeVoisine.id,
 })
@@ -115,6 +128,7 @@ function sources(
         demandesSubvention: [demandeBciat, demandeBcib, demandeVoisine],
         programmesAide: [bciat, bcib],
         instructions: [nouvelleAquitaine, occitanie, bretagne, voisine],
+        crbs,
         approvisionnementsByFournisseur: [],
         entreprises: [scieriePicard, cooperativeDuBois],
         attachments: [],
@@ -157,8 +171,26 @@ describe('composePlanDetails', () => {
             valFleuri.id
         )
 
-        expect(premiere.instructions).toEqual([nouvelleAquitaine, occitanie])
-        expect(seconde.instructions).toEqual([bretagne])
+        expect(premiere.instructions).toEqual([
+            { ...nouvelleAquitaine, crbName: 'Nouvelle Aquitaine' },
+            { ...occitanie, crbName: 'Occitanie' },
+        ])
+        expect(seconde.instructions).toEqual([
+            { ...bretagne, crbName: 'Bretagne' },
+        ])
+    })
+
+    it('reads no name for a CRB the document cannot name', () => {
+        // The instruction still happened, so its chronology is kept — it just
+        // reads with no CRB heading it.
+        const inconnu = instruction({ crb: 99 })
+
+        const [premiere] = demandesOf(
+            composePlanDetails(sources({ instructions: [inconnu] })),
+            valFleuri.id
+        )
+
+        expect(premiere.instructions).toEqual([{ ...inconnu, crbName: '' }])
     })
 
     it('leaves the demandes of every other dossier where they are', () => {
@@ -166,7 +198,7 @@ describe('composePlanDetails', () => {
             demandesOf(composePlanDetails(sources()), valFleuri.id).flatMap(
                 ({ instructions }) => instructions
             )
-        ).not.toContain(voisine)
+        ).not.toContainEqual({ ...voisine, crbName: 'Grand Est' })
     })
 
     it('reads nothing into a dossier that carries no demande', () => {
@@ -181,7 +213,7 @@ describe('composePlanDetails', () => {
     it('keeps two demandes filed under the same programme apart', () => {
         // Each one is instructed on its own, so each one heads a chronology.
         const secondeDemande: DemandeSubvention = { ...demandeBciat, id: 4 }
-        const occitanieBis = instruction({ crb: 'Occitanie', subvention: 4 })
+        const occitanieBis = instruction({ id: 5, crb: 2, subvention: 4 })
 
         const demandes = demandesOf(
             composePlanDetails(
@@ -194,7 +226,9 @@ describe('composePlanDetails', () => {
         )
 
         expect(demandes).toHaveLength(2)
-        expect(demandes[1].instructions).toEqual([occitanieBis])
+        expect(demandes[1].instructions).toEqual([
+            { ...occitanieBis, crbName: 'Occitanie' },
+        ])
     })
 
     it('leaves out a demande whose programme cannot be named', () => {
@@ -209,7 +243,7 @@ describe('composePlanDetails', () => {
     it('never hangs instructions on an unresolved demande', () => {
         // An empty Ref reads as 0 on both sides; matching them would gather
         // every orphaned instruction under the first such demande.
-        const orpheline = instruction({ crb: 'Corse', subvention: 0 })
+        const orpheline = instruction({ id: 6, crb: 5, subvention: 0 })
 
         expect(
             demandesOf(

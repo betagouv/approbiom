@@ -10,7 +10,9 @@ import { loadAccueil, type AccueilPorts } from './load-accueil'
 export default function App(ports: AccueilPorts) {
     const state = useAsyncData(() => loadAccueil(ports))
 
-    const [selectedPlan, setSelectedPlan] = useState<PlanDetail | null>(null)
+    const [selectedPlanId, setSelectedPlanId] = useState<
+        PlanDetail['id'] | null
+    >(null)
 
     return (
         <main className="app">
@@ -20,13 +22,20 @@ export default function App(ports: AccueilPorts) {
                     programmesAide,
                     departementsByRegion,
                     approvisionnementByRessourceStatsList,
-                }) =>
-                    selectedPlan === null ? (
+                    updateInstruction,
+                    updateIsPlanLaureatForProgrammeAide,
+                }) => {
+                    const selectedPlan =
+                        plansApprovisionnement.find(
+                            (plan) => plan.id === selectedPlanId
+                        ) ?? null
+
+                    return selectedPlan === null ? (
                         <PageAccueil
                             plansApprovisionnement={plansApprovisionnement}
                             departementsByRegion={departementsByRegion}
                             programmesAide={programmesAide}
-                            onOpenDossier={setSelectedPlan}
+                            onOpenDossier={(plan) => setSelectedPlanId(plan.id)}
                         />
                     ) : (
                         <Dossier
@@ -42,10 +51,15 @@ export default function App(ports: AccueilPorts) {
                             getFileUrl={(id) =>
                                 ports.attachments.getFileUrl(id)
                             }
-                            onClose={() => setSelectedPlan(null)}
+                            updateInstruction={updateInstruction}
+                            updateIsPlanLaureatForProgrammeAide={
+                                updateIsPlanLaureatForProgrammeAide
+                            }
+                            refresh={state.refresh}
+                            onClose={() => setSelectedPlanId(null)}
                         />
                     )
-                }
+                }}
             </AsyncGate>
         </main>
     )
