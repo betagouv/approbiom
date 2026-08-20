@@ -79,7 +79,7 @@ function capitalize(value: string): string {
     return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
-export function getDossierOptions(
+export function getPlanOptions(
     rows: readonly Plan[]
 ): SearchBarOption<string>[] {
     return getOptions(rows, (row) => row.nom)

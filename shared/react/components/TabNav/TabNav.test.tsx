@@ -14,12 +14,12 @@ afterEach(() => {
 })
 
 const getNav = () =>
-    screen.getByRole('navigation', { name: 'Sections du dossier' })
+    screen.getByRole('navigation', { name: 'Sections du plan' })
 
 function renderTabNav(props: Partial<TabNavProps> = {}) {
     return render(
         <TabNav
-            label="Sections du dossier"
+            label="Sections du plan"
             items={sections}
             currentId="ressources"
             {...props}

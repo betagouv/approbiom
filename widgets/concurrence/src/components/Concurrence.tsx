@@ -206,7 +206,7 @@ export default function Concurrence({
             </div>
             <div className="concurrence__table">
                 <DataTable
-                    caption={'Dossiers concernés'}
+                    caption={'Plans concernés'}
                     description="Cliquez sur un plan d’approvisionnement pour voir sa ressource et ses fournisseurs retenus sans quitter la page."
                     showResultCount
                     expandable={{

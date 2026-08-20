@@ -4,7 +4,7 @@ import { useAsyncData } from '@shared/react/useAsyncData'
 import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 import PageAccueil from './components/PageAccueil/PageAccueil'
-import Dossier from './components/Dossier/Dossier'
+import Plan from './components/Plan/Plan'
 import { loadAccueil, type AccueilPorts } from './load-accueil'
 
 export default function App(ports: AccueilPorts) {
@@ -35,11 +35,11 @@ export default function App(ports: AccueilPorts) {
                             plansApprovisionnement={plansApprovisionnement}
                             departementsByRegion={departementsByRegion}
                             programmesAide={programmesAide}
-                            onOpenDossier={(plan) => setSelectedPlanId(plan.id)}
+                            onOpenPlan={(plan) => setSelectedPlanId(plan.id)}
                         />
                     ) : (
-                        <Dossier
-                            // Keyed by plan: opening another dossier mounts
+                        <Plan
+                            // Keyed by plan: opening another plan mounts
                             // another one, which reads its own statistics.
                             key={selectedPlan.id}
                             plan={selectedPlan}

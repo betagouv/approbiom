@@ -88,7 +88,7 @@ const demandeBcib: DemandeSubvention = {
     planDApprovisionnement: valFleuri.id,
 }
 
-// Same programme, another dossier.
+// Same programme, another plan.
 const demandeVoisine: DemandeSubvention = {
     id: 3,
     programmeAide: bciat.id,
@@ -157,7 +157,7 @@ const demandesOf = (plans: readonly PlanDetail[], id: Plan['id']) =>
     plans.find((plan) => plan.id === id)?.demandesSubvention ?? []
 
 describe('composePlanDetails', () => {
-    it('hangs one demande per programme the dossier asked a subvention from', () => {
+    it('hangs one demande per programme the plan asked a subvention from', () => {
         expect(
             demandesOf(composePlanDetails(sources()), valFleuri.id).map(
                 ({ programmeAide }) => programmeAide.shortName
@@ -193,7 +193,7 @@ describe('composePlanDetails', () => {
         expect(premiere.instructions).toEqual([{ ...inconnu, crbName: '' }])
     })
 
-    it('leaves the demandes of every other dossier where they are', () => {
+    it('leaves the demandes of every other plan where they are', () => {
         expect(
             demandesOf(composePlanDetails(sources()), valFleuri.id).flatMap(
                 ({ instructions }) => instructions
@@ -201,7 +201,7 @@ describe('composePlanDetails', () => {
         ).not.toContainEqual({ ...voisine, crbName: 'Grand Est' })
     })
 
-    it('reads nothing into a dossier that carries no demande', () => {
+    it('reads nothing into a plan that carries no demande', () => {
         expect(
             demandesOf(
                 composePlanDetails(sources({ demandesSubvention: [] })),

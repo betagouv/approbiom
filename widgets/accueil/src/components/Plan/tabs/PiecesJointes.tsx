@@ -85,7 +85,7 @@ export default function PiecesJointes({
     if (attachments.length === 0) {
         return (
             <p className="fr-text--sm">
-                Aucune pièce jointe n’est rattachée à ce dossier.
+                Aucune pièce jointe n’est rattachée à ce plan.
             </p>
         )
     }
@@ -93,7 +93,7 @@ export default function PiecesJointes({
     return (
         <div className="pieces-jointes">
             <DataTable
-                caption="Pièces jointes du dossier"
+                caption="Pièces jointes du plan"
                 rows={attachments}
                 columns={getColumns((attachment) => void download(attachment))}
                 bordered

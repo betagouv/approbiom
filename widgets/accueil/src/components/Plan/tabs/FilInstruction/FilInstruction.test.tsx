@@ -108,12 +108,12 @@ describe('FilInstruction', () => {
         expect(screen.getByText('Avis favorable')).toBeDefined()
     })
 
-    it('says so when the dossier carries no demande de subvention', () => {
+    it('says so when the plan carries no demande de subvention', () => {
         render(<FilInstruction demandes={[]} />)
 
         expect(
             screen.getByText(
-                'Aucune demande de subvention n’est rattachée à ce dossier.'
+                'Aucune demande de subvention n’est rattachée à ce plan.'
             )
         ).toBeDefined()
     })

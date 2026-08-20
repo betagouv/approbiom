@@ -10,7 +10,7 @@ export default function FilInstruction({ demandes }: FilInstructionProps) {
     if (demandes.length === 0) {
         return (
             <p className="fr-text--sm">
-                Aucune demande de subvention n’est rattachée à ce dossier.
+                Aucune demande de subvention n’est rattachée à ce plan.
             </p>
         )
     }

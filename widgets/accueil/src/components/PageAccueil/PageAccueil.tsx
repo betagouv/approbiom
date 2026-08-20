@@ -19,14 +19,14 @@ import { useMemo, useState } from 'react'
 import {
     getAppelAProjetOptions,
     getDepartementOptions,
-    getDossierOptions,
     getFilteredRows,
     getFournisseurOptions,
+    getPlanOptions,
     getStatutOptions,
 } from '../../utils'
 
 function getColumns(
-    onOpenDossier: (plan: PlanDetail) => void
+    onOpenPlan: (plan: PlanDetail) => void
 ): readonly Column<PlanDetail>[] {
     return [
         {
@@ -37,9 +37,9 @@ function getColumns(
                 <button
                     type="button"
                     className="fr-btn fr-btn--secondary fr-btn--sm"
-                    onClick={() => onOpenDossier(plan)}
+                    onClick={() => onOpenPlan(plan)}
                 >
-                    Voir le dossier
+                    Voir le plan
                 </button>
             ),
         },
@@ -77,14 +77,14 @@ export type PageAccueilProps = {
     plansApprovisionnement: readonly PlanDetail[]
     departementsByRegion: readonly DepartementsByRegion[]
     programmesAide: readonly ProgrammeAide[]
-    onOpenDossier: (plan: PlanDetail) => void
+    onOpenPlan: (plan: PlanDetail) => void
 }
 
 export default function PageAccueil({
     plansApprovisionnement,
     departementsByRegion,
     programmesAide,
-    onOpenDossier,
+    onOpenPlan,
 }: PageAccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
@@ -96,11 +96,11 @@ export default function PageAccueil({
 
     const [searchGeneration, setSearchGeneration] = useState(0)
 
-    const columns = useMemo(() => getColumns(onOpenDossier), [onOpenDossier])
+    const columns = useMemo(() => getColumns(onOpenPlan), [onOpenPlan])
 
     const statutOptions = getStatutOptions(plansApprovisionnement)
 
-    const dossierOptions = getDossierOptions(plansApprovisionnement)
+    const planOptions = getPlanOptions(plansApprovisionnement)
 
     const departementOptions = getDepartementOptions(departementsByRegion)
 
@@ -141,9 +141,9 @@ export default function PageAccueil({
             <div className="accueil__search">
                 <SearchBar
                     key={searchGeneration}
-                    label="Rechercher un dossier"
-                    placeholder="Rechercher un dossier"
-                    options={dossierOptions}
+                    label="Rechercher un plan"
+                    placeholder="Rechercher un plan"
+                    options={planOptions}
                     onSearch={setNom}
                     onSelect={setNom}
                 />

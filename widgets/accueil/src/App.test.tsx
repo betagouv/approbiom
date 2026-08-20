@@ -118,10 +118,8 @@ const nouvelleAquitaine: Instruction = {
     phase: 'Avis préfet en attente',
 }
 
-const openDossier = async () =>
-    fireEvent.click(
-        await screen.findByRole('button', { name: 'Voir le dossier' })
-    )
+const openPlan = async () =>
+    fireEvent.click(await screen.findByRole('button', { name: 'Voir le plan' }))
 
 afterEach(() => {
     cleanup()
@@ -187,23 +185,23 @@ describe('App', () => {
         expect(await screen.findByText(/Table not found/)).toBeDefined()
     })
 
-    it('opens the dossier of the plan whose button was clicked', async () => {
+    it('opens the plan whose button was clicked', async () => {
         render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
-        await openDossier()
+        await openPlan()
 
         expect(
             screen.getByRole('heading', { level: 1, name: 'RC Saint Junien' })
         ).toBeDefined()
         expect(
-            screen.getByRole('navigation', { name: 'Sections du dossier' })
+            screen.getByRole('navigation', { name: 'Sections du plan' })
         ).toBeDefined()
     })
 
-    it('puts the list back when the dossier is closed', async () => {
+    it('puts the list back when the plan is closed', async () => {
         render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
-        await openDossier()
+        await openPlan()
         fireEvent.click(screen.getByRole('button', { name: 'Accueil' }))
 
         expect(
@@ -214,7 +212,7 @@ describe('App', () => {
         ).toBeDefined()
     })
 
-    it('opens the dossier on the chronologies of its instructions', async () => {
+    it('opens the plan on the chronologies of its instructions', async () => {
         render(
             <App
                 {...fakePorts({
@@ -227,7 +225,7 @@ describe('App', () => {
             />
         )
 
-        await openDossier()
+        await openPlan()
 
         expect(
             screen.getByRole('heading', {
@@ -257,7 +255,7 @@ describe('App', () => {
             />
         )
 
-        await openDossier()
+        await openPlan()
 
         // The « : » after each term is drawn by the stylesheet, so the text
         // here is the term on its own.
@@ -273,12 +271,12 @@ describe('App', () => {
         // keeps its shape.
         render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
-        await openDossier()
+        await openPlan()
 
         expect(screen.getAllByText('—')).toHaveLength(2)
     })
 
-    it('leaves the fil d’instruction empty for a dossier with no demande', async () => {
+    it('leaves the fil d’instruction empty for a plan with no demande', async () => {
         render(
             <App
                 {...fakePorts({
@@ -289,11 +287,11 @@ describe('App', () => {
             />
         )
 
-        await openDossier()
+        await openPlan()
 
         expect(
             screen.getByText(
-                'Aucune demande de subvention n’est rattachée à ce dossier.'
+                'Aucune demande de subvention n’est rattachée à ce plan.'
             )
         ).toBeDefined()
     })
@@ -326,7 +324,7 @@ describe('App', () => {
             />
         )
 
-        await openDossier()
+        await openPlan()
         fireEvent.click(screen.getByRole('button', { name: 'Ressources' }))
 
         expect(await screen.findByText('Plaquettes forestières')).toBeDefined()

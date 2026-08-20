@@ -1,7 +1,7 @@
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
-import './Dossier.css'
+import './Plan.css'
 
 import PiecesJointes from './tabs/PiecesJointes'
 import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
@@ -26,7 +26,7 @@ const TABS: readonly TabNavItem[] = [
 ]
 const INCONNU = '—'
 
-export type DossierProps = {
+export type PlanProps = {
     approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
     plan: PlanDetail
     getFileUrl: (id: Attachment['id']) => Promise<string>
@@ -36,7 +36,7 @@ export type DossierProps = {
     refresh: () => void
 }
 
-export default function Dossier({
+export default function Plan({
     plan,
     approvisionnementStatsByRessource,
     getFileUrl,
@@ -44,30 +44,30 @@ export default function Dossier({
     updateIsPlanLaureatForProgrammeAide,
     refresh,
     onClose,
-}: DossierProps) {
+}: PlanProps) {
     const [tab, setTab] = useState(TABS[0].id)
 
     const appelsAProjet = getAppelsAProjet(plan).join(', ')
 
     return (
-        <div className="dossier">
-            <div className="dossier__header">
+        <div className="plan">
+            <div className="plan__header">
                 <button
                     type="button"
-                    className="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-arrow-left-line dossier__back"
+                    className="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-arrow-left-line plan__back"
                     onClick={onClose}
                 >
                     Accueil
                 </button>
-                <div className="dossier__heading">
-                    <h1 className="fr-h3 dossier__title">{plan.nom}</h1>
+                <div className="plan__heading">
+                    <h1 className="fr-h3 plan__title">{plan.nom}</h1>
 
-                    <dl className="dossier__meta">
-                        <div className="dossier__meta-entry">
+                    <dl className="plan__meta">
+                        <div className="plan__meta-entry">
                             <dt>Appel à projet</dt>
                             <dd>{appelsAProjet || INCONNU}</dd>
                         </div>
-                        <div className="dossier__meta-entry">
+                        <div className="plan__meta-entry">
                             <dt>Région de l&apos;installation</dt>
                             <dd>{plan.installationRegion ?? INCONNU}</dd>
                         </div>
@@ -76,7 +76,7 @@ export default function Dossier({
             </div>
 
             <TabNav
-                label="Sections du dossier"
+                label="Sections du plan"
                 items={TABS}
                 currentId={tab}
                 onSelect={setTab}
