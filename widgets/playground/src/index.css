@@ -1,0 +1,31 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+/* Layout for the page itself, which is why it is here and not in a component
+   stylesheet: `App.tsx` is this widget's page, it has no component of its own.
+   The components it shows bring their own styles with them.
+
+   The other widgets are laid out by whatever Grist gives their iframe; this one
+   is read in a browser window that can be any width, hence the padding and the
+   measure. */
+.playground {
+    max-width: 60rem;
+    padding: 2rem 1.5rem;
+}
+
+.playground__title {
+    margin-bottom: 2rem;
+}
+
+/* A rule under each section, so two components rendered back to back cannot be
+   mistaken for one. */
+.playground__section {
+    padding-bottom: 1.5rem;
+    margin-bottom: 1.5rem;
+    border-bottom: 1px solid var(--border-default-grey);
+}
