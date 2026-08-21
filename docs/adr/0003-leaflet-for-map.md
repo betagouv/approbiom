@@ -16,4 +16,6 @@ We will use the Javascript Library Leaflet because it's lightweight and intuitiv
 
 ## Consequences
 
+//dont forget to add leaflet css file and javascript file in the head section of the document
+
 It may be not the best library for handling large datasets or highly interactive maps. If it becomes an issue in the future, consider switching to Maplibre.
