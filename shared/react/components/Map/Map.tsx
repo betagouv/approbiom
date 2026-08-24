@@ -8,7 +8,13 @@ export type MapProps = {
      * position of the center of the map
      */
     center: LatLngExpression
+    /**
+     * position of markers if provided
+     */
     markers?: LatLngExpression[]
+    /**
+     * position of polygons
+     */
     polygons?: LatLngExpression[][]
 }
 
@@ -17,10 +23,11 @@ export default function Map({ center, markers, polygons }: MapProps) {
     const mapRef = useRef<L.Map | null>(null)
 
     useEffect(() => {
+        const defaultCenter: LatLngExpression = [51.505, -0.09]
         const container = containerRef.current
         if (container === null) return
 
-        mapRef.current = L.map(container).setView(center, 13)
+        mapRef.current = L.map(container).setView(defaultCenter, 13)
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -37,6 +44,8 @@ export default function Map({ center, markers, polygons }: MapProps) {
         const map = mapRef.current
         if (map === null) return
 
+        map.setView(center, 13)
+
         const layers = L.layerGroup().addTo(map)
 
         markers?.forEach((position) => {
@@ -50,7 +59,7 @@ export default function Map({ center, markers, polygons }: MapProps) {
         return () => {
             layers.remove()
         }
-    }, [markers, polygons])
+    }, [center, markers, polygons])
 
     return <div ref={containerRef} className="map" />
 }
