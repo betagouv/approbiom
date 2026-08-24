@@ -6,7 +6,10 @@ import { COLUMNS, TABLE } from '../grist-tables'
 
 type Departements = DepartementsByRegion['departements'][number][]
 
-export function createGristInseePort(): InseePort {
+export function createGristInseePort(): Pick<
+    InseePort,
+    'listDepartementsByRegion'
+> {
     return {
         async listDepartementsByRegion() {
             await gristReady()

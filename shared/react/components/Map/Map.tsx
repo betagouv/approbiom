@@ -16,9 +16,21 @@ export type MapProps = {
      * position of polygons
      */
     polygons?: LatLngExpression[][]
+    /**
+     * zoom level, from 0 (the whole world) to 19 (a street). A commune sits at
+     * 13, a département at 9.
+     */
+    zoom?: number
 }
 
-export default function Map({ center, markers, polygons }: MapProps) {
+const DEFAULT_ZOOM = 13
+
+export default function Map({
+    center,
+    markers,
+    polygons,
+    zoom = DEFAULT_ZOOM,
+}: MapProps) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const mapRef = useRef<L.Map | null>(null)
 
@@ -27,7 +39,7 @@ export default function Map({ center, markers, polygons }: MapProps) {
         const container = containerRef.current
         if (container === null) return
 
-        mapRef.current = L.map(container).setView(defaultCenter, 13)
+        mapRef.current = L.map(container).setView(defaultCenter, DEFAULT_ZOOM)
 
         L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
             maxZoom: 19,
@@ -44,7 +56,7 @@ export default function Map({ center, markers, polygons }: MapProps) {
         const map = mapRef.current
         if (map === null) return
 
-        map.setView(center, 13)
+        map.setView(center, zoom)
 
         const layers = L.layerGroup().addTo(map)
 
@@ -59,7 +71,7 @@ export default function Map({ center, markers, polygons }: MapProps) {
         return () => {
             layers.remove()
         }
-    }, [center, markers, polygons])
+    }, [center, markers, polygons, zoom])
 
     return <div ref={containerRef} className="map" />
 }
