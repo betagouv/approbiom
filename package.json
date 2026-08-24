@@ -12,6 +12,8 @@
         "dev": "vite",
         "build:staging": "node scripts/build.mjs",
         "build:prod": "node scripts/promote.mjs",
+        "generate:communes": "node --experimental-strip-types shared/infrastructure/insee/generate-communes.ts",
+        "generate:departements-contours": "node --experimental-strip-types shared/infrastructure/insee/generate-departements-contours.ts",
         "typecheck": "tsc --noEmit",
         "lint": "eslint .",
         "lint:fix": "eslint . --fix",
@@ -23,6 +25,7 @@
     },
     "dependencies": {
         "@gouvfr/dsfr": "1.14.4",
+        "leaflet": "^1.9.4",
         "react": "^19.2.7",
         "react-dom": "^19.2.7"
     },
@@ -31,6 +34,8 @@
         "@eslint/markdown": "^8.0.3",
         "@testing-library/dom": "^10.4.1",
         "@testing-library/react": "^16.3.2",
+        "@types/leaflet": "^1.9.22",
+        "@types/node": "^26.2.0",
         "@types/react": "^19.2.17",
         "@types/react-dom": "^19.2.3",
         "@vitejs/plugin-react": "^6.0.3",

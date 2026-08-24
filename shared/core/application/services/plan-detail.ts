@@ -240,7 +240,7 @@ export function composePlanDetails({
 /** Everything a plan detail is read from. Named so a widget hands over its ports and nothing else. */
 export type PlanDetailPorts = {
     plans: PlanPort
-    insee: InseePort
+    insee: Pick<InseePort, 'listDepartementsByRegion'>
     demandesSubvention: DemandeSubventionPort
     programmesAide: ProgrammeAidePort
     instructions: InstructionPort

@@ -44,7 +44,7 @@ export type ApprovisionnementByRessourceStatsPorts = {
     approvisionnements: ApprovisionnementPort
     ressources: RessourcePort
     entreprises: EntreprisePort
-    insee: InseePort
+    insee: Pick<InseePort, 'listDepartementsByRegion'>
 }
 
 export type ApprovisionnementByRessourceStatsSources = {

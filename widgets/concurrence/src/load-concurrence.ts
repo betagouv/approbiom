@@ -15,7 +15,7 @@ export type ConcurrencePorts = {
     plans: PlanPort
     ressources: RessourcePort
     entreprises: EntreprisePort
-    insee: InseePort
+    insee: Pick<InseePort, 'listDepartementsByRegion'>
 }
 
 /**
