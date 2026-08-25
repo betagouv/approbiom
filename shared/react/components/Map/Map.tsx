@@ -1,6 +1,9 @@
 import { useEffect, useRef } from 'react'
 import L, { type LatLngBoundsExpression, type LatLngExpression } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
+import iconUrl from 'leaflet/dist/images/marker-icon.png'
+import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png'
+import shadowUrl from 'leaflet/dist/images/marker-shadow.png'
 import './Map.css'
 
 export type MapProps = {
@@ -30,6 +33,17 @@ export type MapProps = {
 }
 
 const DEFAULT_ZOOM = 13
+
+const markerIcon = L.icon({
+    iconUrl,
+    iconRetinaUrl,
+    shadowUrl,
+    iconSize: [25, 41],
+    iconAnchor: [12, 41],
+    popupAnchor: [1, -34],
+    tooltipAnchor: [16, -28],
+    shadowSize: [41, 41],
+})
 
 export default function Map({
     center,
@@ -72,7 +86,7 @@ export default function Map({
         const layers = L.layerGroup().addTo(map)
 
         markers?.forEach((position) => {
-            L.marker(position).addTo(layers)
+            L.marker(position, { icon: markerIcon }).addTo(layers)
         })
 
         polygons?.forEach((positions) => {
