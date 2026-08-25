@@ -1,7 +1,5 @@
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { Region } from '@shared/core/domain/value-objects/region'
 
 export type ApprovisionnementGroupedByPlanAndRessource = Pick<
     Approvisionnement,
@@ -11,14 +9,14 @@ export type ApprovisionnementGroupedByPlanAndRessource = Pick<
     repartition: number
 }
 
-export type ApprovisionnementGroupedByPlanRessourceAndRegion =
+export type ApprovisionnementGroupedByPlanRessourceAndRegionOuPays =
     ApprovisionnementGroupedByPlanAndRessource & {
-        region: Region['libelle']
+        regionOuPays: string
     }
 
-export type ApprovisionnementGroupedByPlanRessourceAndDepartement =
+export type ApprovisionnementGroupedByPlanRessourceAndProvenance =
     ApprovisionnementGroupedByPlanAndRessource & {
-        departement: Departement['dep']
+        provenance: string
     }
 
 export type ApprovisionnementGroupedByPlanRessourceAndFournisseur =
@@ -33,12 +31,12 @@ export interface ApprovisionnementPort {
         readonly ApprovisionnementGroupedByPlanAndRessource[]
     >
 
-    listGroupedByPlanRessourceAndRegion(): Promise<
-        readonly ApprovisionnementGroupedByPlanRessourceAndRegion[]
+    listGroupedByPlanRessourceAndRegionOuPays(): Promise<
+        readonly ApprovisionnementGroupedByPlanRessourceAndRegionOuPays[]
     >
 
-    listGroupedByPlanRessourceAndDepartement(): Promise<
-        readonly ApprovisionnementGroupedByPlanRessourceAndDepartement[]
+    listGroupedByPlanRessourceAndProvenance(): Promise<
+        readonly ApprovisionnementGroupedByPlanRessourceAndProvenance[]
     >
 
     listGroupedByPlanRessourceAndFournisseur(): Promise<

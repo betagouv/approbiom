@@ -1,6 +1,6 @@
-/* The same frame as the list it replaces — full height, its own scrollbar,
-   2rem of padding — so opening a plan does not shift the page inside the
-   Grist iframe. */
+/* The same frame as the list it replaces — at least the panel's height, 2rem
+   of padding, and the page itself scrolling — so opening a plan does not shift
+   the page inside the Grist iframe. */
 .plan {
     display: flex;
     flex-direction: column;
@@ -8,8 +8,7 @@
     gap: 1.5rem;
     padding: 2rem;
 
-    height: 100vh;
-    overflow: auto;
+    min-height: 100vh;
 }
 
 /* Only as wide as its label: a stretched flex item would leave the whole line

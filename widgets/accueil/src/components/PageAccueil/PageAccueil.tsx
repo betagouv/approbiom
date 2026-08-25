@@ -207,7 +207,6 @@ export default function PageAccueil({
                     columns={columns}
                     showResultCount
                     bordered
-                    stickyHeader
                 />
             </div>
         </div>

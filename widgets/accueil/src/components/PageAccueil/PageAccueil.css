@@ -5,8 +5,7 @@
     gap: 1.5rem;
     padding: 2rem;
 
-    height: 100vh;
-    overflow: auto;
+    min-height: 100vh;
 }
 
 .accueil__header {
@@ -78,28 +77,29 @@
     white-space: nowrap;
 }
 
-.accueil__table .fr-table__container {
-    padding-top: 0;
-}
-
+/* A floor for the table, so a short result set still reads as a table rather
+   than as a strip under the filters. Past it the table takes the height its
+   rows need and carries the page down with it. */
 .accueil__table {
-    flex: 1;
-    min-height: 0;
+    min-height: 30rem;
 }
 
+/* DSFR's own margins are dropped so the flex `gap` above is the only spacing
+   between the filters and the table. Height is left alone: the container keeps
+   the `overflow: auto` DSFR gives it — which is what scrolls a table too wide
+   for the panel sideways — but is bounded by nothing, so its rows extend the
+   page instead of scrolling inside it. */
 .accueil__table .fr-table,
 .accueil__table .fr-table__wrapper,
 .accueil__table .fr-table__container {
-    height: 100%;
-    min-height: 0;
     margin: 0;
+}
+
+.accueil__table .fr-table__container {
+    padding-top: 0;
 }
 
 .accueil__version {
     display: block;
     margin-top: 0.25rem;
-}
-
-.accueil__table {
-    min-height: 0;
 }

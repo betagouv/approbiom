@@ -4,7 +4,7 @@ import {
     PAYS_ETRANGER,
 } from '@shared/core/domain/value-objects/provenance'
 import type { ColumnMajorTable } from '../grist-helpers'
-import { TABLE } from '../grist-tables'
+import { COLUMNS, TABLE } from '../grist-tables'
 import { createGristApprovisionnementPort } from './grist-adapter-approvisionnement'
 
 /** The directories every approvisionnement resolves its Refs against. */
@@ -152,5 +152,70 @@ describe('createGristApprovisionnementPort', () => {
         await expect(createGristApprovisionnementPort().list()).rejects.toThrow(
             /Provenance/
         )
+    })
+
+    describe('the ventilations of the ressource screen', () => {
+        /** One summary row per group, everything measured held still. */
+        const summarised = (
+            column: string,
+            groups: readonly string[]
+        ): ColumnMajorTable => ({
+            Plan_d_approvisionnement: groups.map(() => 1),
+            Ressource: groups.map(() => 1),
+            Total_en_tMv_an_: groups.map(() => 120),
+            Repartition: groups.map(() => 0.5),
+            [column]: [...groups],
+        })
+
+        function mockSummary(tableId: string, columns: ColumnMajorTable) {
+            vi.stubGlobal('grist', {
+                docApi: {
+                    fetchTable: vi.fn((requested: string) =>
+                        Promise.resolve(
+                            requested === tableId
+                                ? columns
+                                : DIRECTORIES[requested]
+                        )
+                    ),
+                },
+                ready: vi.fn(),
+            })
+        }
+
+        // A région and a country arrive in one column, already as libellés.
+        it('reads a région and a pays out of the same column', async () => {
+            mockSummary(
+                TABLE.totalByRegionOuPays,
+                summarised(COLUMNS.totalByRegionOuPays[4], [
+                    'Nouvelle-Aquitaine',
+                    'Allemagne',
+                ])
+            )
+
+            const groups =
+                await createGristApprovisionnementPort().listGroupedByPlanRessourceAndRegionOuPays()
+
+            expect(groups.map((group) => group.regionOuPays)).toEqual([
+                'Nouvelle-Aquitaine',
+                'Allemagne',
+            ])
+        })
+
+        // Same reading as `list`: a département by its code, a country by its
+        // name, side by side under one dimension.
+        it('reads a département and a pays out of the provenance column', async () => {
+            mockSummary(
+                TABLE.totalByProvenance,
+                summarised(COLUMNS.totalByProvenance[4], ['87', 'Allemagne'])
+            )
+
+            const groups =
+                await createGristApprovisionnementPort().listGroupedByPlanRessourceAndProvenance()
+
+            expect(groups.map((group) => group.provenance)).toEqual([
+                '87',
+                'Allemagne',
+            ])
+        })
     })
 })

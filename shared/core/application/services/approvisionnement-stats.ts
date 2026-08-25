@@ -1,8 +1,8 @@
 import type {
     ApprovisionnementGroupedByPlanAndRessource,
-    ApprovisionnementGroupedByPlanRessourceAndDepartement,
     ApprovisionnementGroupedByPlanRessourceAndFournisseur,
-    ApprovisionnementGroupedByPlanRessourceAndRegion,
+    ApprovisionnementGroupedByPlanRessourceAndProvenance,
+    ApprovisionnementGroupedByPlanRessourceAndRegionOuPays,
     ApprovisionnementPort,
 } from '@shared/core/application/ports/approvisionnement'
 import type {
@@ -32,8 +32,8 @@ export type ApprovisionnementStatsByRessource = {
     tonnageTotal: number
     /** Share of the plan's total drawn as this ressource, between 0 and 1. */
     repartition: number
-    byRegion: readonly Group[]
-    byDepartement: readonly Group[]
+    byRegionOuPays: readonly Group[]
+    byProvenance: readonly Group[]
     byFournisseur: readonly Group[]
 }
 
@@ -50,8 +50,8 @@ export type ApprovisionnementByRessourceStatsPorts = {
 export type ApprovisionnementByRessourceStatsSources = {
     plan: Plan['id']
     totals: readonly ApprovisionnementGroupedByPlanAndRessource[]
-    byRegion: readonly ApprovisionnementGroupedByPlanRessourceAndRegion[]
-    byDepartement: readonly ApprovisionnementGroupedByPlanRessourceAndDepartement[]
+    byRegionOuPays: readonly ApprovisionnementGroupedByPlanRessourceAndRegionOuPays[]
+    byProvenance: readonly ApprovisionnementGroupedByPlanRessourceAndProvenance[]
     byFournisseur: readonly ApprovisionnementGroupedByPlanRessourceAndFournisseur[]
     ressources: readonly Ressource[]
     entreprises: readonly Entreprise[]
@@ -110,8 +110,8 @@ function rowsByPlan<T extends ApprovisionnementGroupedByPlanAndRessource>(
 export function composeApprovisionnementStats({
     plan,
     totals,
-    byRegion,
-    byDepartement,
+    byRegionOuPays,
+    byProvenance,
     byFournisseur,
     ressources,
     entreprises,
@@ -135,11 +135,14 @@ export function composeApprovisionnementStats({
         rows: readonly T[]
     ) => rows.filter((row) => row.planDApprovisionnement === plan)
 
-    const regions = groupsByRessource(forPlan(byRegion), (row) => row.region)
+    const regionsOuPays = groupsByRessource(
+        forPlan(byRegionOuPays),
+        (row) => row.regionOuPays
+    )
 
-    const departements = groupsByRessource(
-        forPlan(byDepartement),
-        (row) => labelByDep.get(row.departement) || row.departement
+    const provenances = groupsByRessource(
+        forPlan(byProvenance),
+        (row) => labelByDep.get(row.provenance) || row.provenance
     )
 
     const fournisseurs = groupsByRessource(
@@ -156,8 +159,8 @@ export function composeApprovisionnementStats({
             ressource: { code, title: titleByCode.get(code) || code },
             tonnageTotal,
             repartition,
-            byRegion: regions.get(code) ?? [],
-            byDepartement: departements.get(code) ?? [],
+            byRegionOuPays: regionsOuPays.get(code) ?? [],
+            byProvenance: provenances.get(code) ?? [],
             byFournisseur: fournisseurs.get(code) ?? [],
         })
     )
@@ -171,16 +174,16 @@ export function composeApprovisionnementStats({
  */
 export function composeApprovisionnementStatsByPlan({
     totals,
-    byRegion,
-    byDepartement,
+    byRegionOuPays,
+    byProvenance,
     byFournisseur,
     ...directories
 }: ApprovisionnementByRessourceStatsByPlanSources): ApprovisionnementByRessourceStatsByPlan {
     // Each plan is composed from its own rows alone, so the whole reading costs
     // one pass over the sources rather than one pass per plan.
     const totalsByPlan = rowsByPlan(totals)
-    const regionsByPlan = rowsByPlan(byRegion)
-    const departementsByPlan = rowsByPlan(byDepartement)
+    const regionsOuPaysByPlan = rowsByPlan(byRegionOuPays)
+    const provenancesByPlan = rowsByPlan(byProvenance)
     const fournisseursByPlan = rowsByPlan(byFournisseur)
 
     return new Map(
@@ -189,8 +192,8 @@ export function composeApprovisionnementStatsByPlan({
             composeApprovisionnementStats({
                 plan,
                 totals: planTotals,
-                byRegion: regionsByPlan.get(plan) ?? [],
-                byDepartement: departementsByPlan.get(plan) ?? [],
+                byRegionOuPays: regionsOuPaysByPlan.get(plan) ?? [],
+                byProvenance: provenancesByPlan.get(plan) ?? [],
                 byFournisseur: fournisseursByPlan.get(plan) ?? [],
                 ...directories,
             }),
@@ -203,16 +206,16 @@ async function loadApprovisionnementStatsSources(
 ): Promise<ApprovisionnementByRessourceStatsByPlanSources> {
     const [
         totals,
-        byRegion,
-        byDepartement,
+        byRegionOuPays,
+        byProvenance,
         byFournisseur,
         ressources,
         entreprises,
         departementsByRegion,
     ] = await Promise.all([
         ports.approvisionnements.listGroupedByPlanAndRessource(),
-        ports.approvisionnements.listGroupedByPlanRessourceAndRegion(),
-        ports.approvisionnements.listGroupedByPlanRessourceAndDepartement(),
+        ports.approvisionnements.listGroupedByPlanRessourceAndRegionOuPays(),
+        ports.approvisionnements.listGroupedByPlanRessourceAndProvenance(),
         ports.approvisionnements.listGroupedByPlanRessourceAndFournisseur(),
         ports.ressources.list(),
         ports.entreprises.list(),
@@ -221,8 +224,8 @@ async function loadApprovisionnementStatsSources(
 
     return {
         totals,
-        byRegion,
-        byDepartement,
+        byRegionOuPays,
+        byProvenance,
         byFournisseur,
         ressources,
         entreprises,

@@ -117,16 +117,16 @@ export default function Ressource({
             {selected !== null && (
                 <>
                     <DataTable
-                        caption="Ventilation par région"
-                        rows={selected.byRegion}
-                        columns={groupColumns('Région')}
+                        caption="Ventilation par région ou pays"
+                        rows={selected.byRegionOuPays}
+                        columns={groupColumns('Région ou pays')}
                         bordered
                     />
 
                     <DataTable
-                        caption="Ventilation par département"
-                        rows={selected.byDepartement}
-                        columns={groupColumns('Département de provenance')}
+                        caption="Ventilation par provenance"
+                        rows={selected.byProvenance}
+                        columns={groupColumns('Provenance')}
                         bordered
                     />
 

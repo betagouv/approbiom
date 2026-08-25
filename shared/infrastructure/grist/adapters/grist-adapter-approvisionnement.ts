@@ -113,17 +113,15 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
             return rows.map((row) => toGroup(row, ressources))
         },
 
-        async listGroupedByPlanRessourceAndRegion() {
+        async listGroupedByPlanRessourceAndRegionOuPays() {
             const { rows, ressources } = await readTotals(
-                TABLE.totalByRegion,
-                COLUMNS.totalByRegion
+                TABLE.totalByRegionOuPays,
+                COLUMNS.totalByRegionOuPays
             )
 
-            // `Region` is a formula, not a Ref: it already reads as a libellé,
-            // so there is no code to resolve against a directory.
             return rows.map((row) => ({
                 ...toGroup(row, ressources),
-                region: asString(row.Region),
+                regionOuPays: asString(row.Region_francaise_ou_Pays_etranger),
             }))
         },
 
@@ -144,20 +142,18 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
             }))
         },
 
-        async listGroupedByPlanRessourceAndDepartement() {
+        async listGroupedByPlanRessourceAndProvenance() {
             const { rows, ressources } = await readTotals(
-                TABLE.totalByDepartementDeProvenance,
-                COLUMNS.totalByDepartementDeProvenance
-            )
-            const departementById = byRowId(
-                await fetchRowsOnce(TABLE.departement, COLUMNS.departement)
+                TABLE.totalByProvenance,
+                COLUMNS.totalByProvenance
             )
 
+            // The same text column the entity is built from, so the summary
+            // names a provenance exactly the way `list` does — a département
+            // code, or a country's libellé — and needs no directory either.
             return rows.map((row) => ({
                 ...toGroup(row, ressources),
-                departement: asString(
-                    lookup(departementById, row.Departement_de_provenance)?.DEP
-                ),
+                provenance: asText(row.Provenance),
             }))
         },
     }

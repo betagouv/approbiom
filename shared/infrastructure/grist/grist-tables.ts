@@ -5,12 +5,12 @@ export const TABLE = {
     approvisionnement: 'Approvisionnement',
     totalByPlanAndRessource:
         'Approvisionnement_summary_Plan_d_approvisionnement_Ressource',
-    totalByRegion:
-        'Approvisionnement_summary_Plan_d_approvisionnement_Region_Ressource',
+    totalByRegionOuPays:
+        'Approvisionnement_summary_Plan_d_approvisionnement_Region_francaise_ou_Pays_etranger_Ressource',
     totalByFournisseur:
         'Approvisionnement_summary_Fournisseur_Plan_d_approvisionnement_Ressource',
-    totalByDepartementDeProvenance:
-        'Approvisionnement_summary_Departement_de_provenance_Plan_d_approvisionnement_Ressource',
+    totalByProvenance:
+        'Approvisionnement_summary_Plan_d_approvisionnement_Provenance_Ressource',
     plan: 'Plan_d_approvisionnement',
     metaRessource: 'Meta_Ressource',
     entreprise: 'Entreprise',
@@ -41,12 +41,12 @@ export const COLUMNS = {
         'Total_en_tMv_an_',
     ],
     totalByPlanAndRessource: TOTAL_COLUMNS,
-    totalByRegion: [...TOTAL_COLUMNS, 'Region'],
-    totalByFournisseur: [...TOTAL_COLUMNS, 'Fournisseur'],
-    totalByDepartementDeProvenance: [
+    totalByRegionOuPays: [
         ...TOTAL_COLUMNS,
-        'Departement_de_provenance',
+        'Region_francaise_ou_Pays_etranger',
     ],
+    totalByFournisseur: [...TOTAL_COLUMNS, 'Fournisseur'],
+    totalByProvenance: [...TOTAL_COLUMNS, 'Provenance'],
     plan: [
         'id',
         'Nom',

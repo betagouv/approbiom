@@ -50,8 +50,8 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         approvisionnements: {
             list: rows([]),
             listGroupedByPlanAndRessource: rows([]),
-            listGroupedByPlanRessourceAndRegion: rows([]),
-            listGroupedByPlanRessourceAndDepartement: rows([]),
+            listGroupedByPlanRessourceAndRegionOuPays: rows([]),
+            listGroupedByPlanRessourceAndProvenance: rows([]),
             listGroupedByPlanRessourceAndFournisseur: rows([]),
         },
         ressources: { list: rows([]) },
@@ -311,8 +311,8 @@ describe('App', () => {
                                 repartition: 1,
                             },
                         ]),
-                        listGroupedByPlanRessourceAndRegion: rows([]),
-                        listGroupedByPlanRessourceAndDepartement: rows([]),
+                        listGroupedByPlanRessourceAndRegionOuPays: rows([]),
+                        listGroupedByPlanRessourceAndProvenance: rows([]),
                         listGroupedByPlanRessourceAndFournisseur: rows([]),
                     },
                     ressources: {
