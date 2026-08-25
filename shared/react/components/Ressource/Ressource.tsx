@@ -152,8 +152,10 @@ export default function Ressource({
                     </div>
 
                     <ProvenanceMap
-                        provenances={selected.byProvenance}
-                        commune={commune}
+                        provenances={selected.byProvenance.map(
+                            ({ provenance }) => provenance
+                        )}
+                        communes={commune === null ? [] : [commune]}
                         getCommuneCenterPosition={getCommuneCenterPosition}
                         getDepartementContour={getDepartementContour}
                         getCountryContour={getCountryContour}

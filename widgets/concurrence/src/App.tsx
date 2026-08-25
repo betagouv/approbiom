@@ -10,7 +10,18 @@ export default function App(ports: ConcurrencePorts) {
     return (
         <main className="app">
             <AsyncGate state={state} renderError={renderError}>
-                {(screen) => <Concurrence {...screen} />}
+                {(screen) => (
+                    <Concurrence
+                        {...screen}
+                        getCommuneCenterPosition={
+                            ports.localization.getCommuneCenterPosition
+                        }
+                        getDepartementContour={
+                            ports.localization.getDepartementContour
+                        }
+                        getCountryContour={ports.localization.getCountryContour}
+                    />
+                )}
             </AsyncGate>
         </main>
     )

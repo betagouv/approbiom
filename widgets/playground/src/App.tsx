@@ -107,8 +107,10 @@ export default function App() {
                     ProvenanceMap — plusieurs départements
                 </h2>
                 <ProvenanceMap
-                    provenances={PROVENANCES}
-                    commune={COMMUNE_INSTALLATION}
+                    provenances={PROVENANCES.map(
+                        ({ provenance }) => provenance
+                    )}
+                    communes={[COMMUNE_INSTALLATION]}
                     getCommuneCenterPosition={
                         localization.getCommuneCenterPosition
                     }
@@ -134,7 +136,7 @@ export default function App() {
                 <h2 className="fr-h5">ProvenanceMap — aucun département</h2>
                 <ProvenanceMap
                     provenances={[]}
-                    commune={COMMUNE_INSTALLATION}
+                    communes={[COMMUNE_INSTALLATION]}
                     getCommuneCenterPosition={
                         localization.getCommuneCenterPosition
                     }

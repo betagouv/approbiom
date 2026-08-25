@@ -51,12 +51,36 @@ const dAllemagne: Approvisionnement = {
 }
 
 const saintJunien: ConcurrenceRow = {
-    planDApprovisionnement: 'RC Saint Junien',
+    plan: {
+        nom: 'RC Saint Junien',
+        departementDeSituation: 'Haute-Vienne',
+        installationCommune: '87154',
+    },
     ressource: 'Plaquettes forestières',
-    departementDeSituation: 'Haute-Vienne',
     approvisionnements: [deHauteVienne, dAllemagne],
     tonnageTotal: 200,
 }
+
+/** The same plan, moved or renamed, as another row of the table. */
+const planLike = (
+    overrides: Partial<ConcurrenceRow['plan']>
+): ConcurrenceRow['plan'] => ({ ...saintJunien.plan, ...overrides })
+
+/** Saint-Junien, standing in for whatever the référentiel holds. */
+const getCommuneCenterPosition = () => ({
+    latitude: 45.88,
+    longitude: 0.9,
+})
+
+/** A square around Saint-Junien, standing in for a real contour. */
+const getContour = () => [
+    [
+        { latitude: 45.8, longitude: 0.8 },
+        { latitude: 45.8, longitude: 1.0 },
+        { latitude: 45.9, longitude: 1.0 },
+        { latitude: 45.9, longitude: 0.8 },
+    ],
+]
 
 function renderConcurrence(rows: readonly ConcurrenceRow[] = [saintJunien]) {
     return render(
@@ -64,6 +88,9 @@ function renderConcurrence(rows: readonly ConcurrenceRow[] = [saintJunien]) {
             approvisionnementsByPlanAndRessource={rows}
             departementsByRegion={[nouvelleAquitaine]}
             fournisseurs={[scieriePicard, forstGmbh]}
+            getCommuneCenterPosition={getCommuneCenterPosition}
+            getDepartementContour={getContour}
+            getCountryContour={getContour}
         />
     )
 }
@@ -73,6 +100,13 @@ const planRow = () =>
     within(screen.getByRole('table')).getByRole('row', {
         name: /RC Saint Junien/,
     })
+
+/** Leaflet draws a marker as an image in its own pane, a polygon as a path. */
+const markers = (container: HTMLElement) =>
+    container.querySelectorAll('.leaflet-marker-pane img')
+
+const polygons = (container: HTMLElement) =>
+    container.querySelectorAll('.leaflet-overlay-pane path')
 
 const openProvenanceFilter = () =>
     fireEvent.click(screen.getByRole('button', { name: /Provenance/ }))
@@ -184,7 +218,7 @@ describe('Concurrence', () => {
             saintJunien,
             {
                 ...saintJunien,
-                planDApprovisionnement: 'RCU Clair-Village',
+                plan: planLike({ nom: 'RCU Clair-Village' }),
                 approvisionnements: [deHauteVienne],
             },
         ])
@@ -193,6 +227,65 @@ describe('Concurrence', () => {
 
         expect(screen.getByText('RC Saint Junien')).toBeDefined()
         expect(screen.queryByText('RCU Clair-Village')).toBeNull()
+    })
+
+    // 87085 is Limoges, 87154 Saint-Junien: two plans, two markers. The rows
+    // are per ressource, so one plan can hold several of them and must still
+    // be marked once.
+    it('marks each commune the retained plans sit at, once', () => {
+        const { container } = renderConcurrence([
+            saintJunien,
+            { ...saintJunien, ressource: 'Bois bûche' },
+            {
+                ...saintJunien,
+                plan: planLike({
+                    nom: 'RCU Limoges',
+                    installationCommune: '87085',
+                }),
+            },
+        ])
+
+        expect(markers(container)).toHaveLength(2)
+    })
+
+    // The map sits beside the table and answers for what the table shows, so
+    // a plan the filters dropped is a marker gone with it.
+    it('marks only the plans the filters leave', () => {
+        const { container } = renderConcurrence([
+            saintJunien,
+            {
+                ...saintJunien,
+                plan: planLike({
+                    nom: 'RCU Limoges',
+                    installationCommune: '87085',
+                }),
+                approvisionnements: [deHauteVienne],
+            },
+        ])
+
+        expect(markers(container)).toHaveLength(2)
+
+        openProvenanceFilter()
+        check('Allemagne')
+
+        expect(markers(container)).toHaveLength(1)
+    })
+
+    // The map still answers « where is this drawn from » for a plan it cannot
+    // answer « where does it go » for.
+    it('draws the provenances of a plan it cannot situate', () => {
+        const { container } = renderConcurrence([
+            { ...saintJunien, plan: planLike({ installationCommune: null }) },
+        ])
+
+        expect(markers(container)).toHaveLength(0)
+        expect(polygons(container)).toHaveLength(2)
+    })
+
+    it('says as much when the filters leave nothing to place', () => {
+        renderConcurrence([])
+
+        expect(screen.getByText(/Aucun lieu n'a pu être situé/)).toBeDefined()
     })
 
     // Nothing outside France has been drawn on, so there is no group to open.

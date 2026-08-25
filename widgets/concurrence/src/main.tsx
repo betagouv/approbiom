@@ -9,6 +9,13 @@ import { createGristInstallationPort } from '@shared/infrastructure/grist/adapte
 import { createGristLocalizationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-localization'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
+import { createLocalizationAdapter } from '@shared/infrastructure/localization/localization-adapter'
+import type { LocalizationPort } from '@shared/core/application/ports/localization'
+
+const localization: LocalizationPort = {
+    ...createGristLocalizationPort(),
+    ...createLocalizationAdapter(),
+}
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('#no root found in index.html')
@@ -21,7 +28,7 @@ createRoot(rootEl).render(
             installations={createGristInstallationPort()}
             ressources={createGristRessourcePort()}
             entreprises={createGristEntreprisePort()}
-            localization={createGristLocalizationPort()}
+            localization={localization}
         />
     </StrictMode>
 )

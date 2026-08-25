@@ -3,13 +3,14 @@ import { latLngBounds, type LatLngTuple } from 'leaflet'
 import Alert from '@shared/react/components/Alert'
 import Map from '@shared/react/components/Map'
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
-import type { ProvenanceGroup } from '@shared/core/application/services/approvisionnement-stats'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
 import { isCodeDepartement } from '@shared/core/domain/value-objects/departement'
 
 export type ProvenanceMapProps = {
-    provenances: readonly ProvenanceGroup[]
-    commune: Commune['codeInsee'] | null
+    /** Départements by their code, countries by the libellé they are written under. */
+    provenances: readonly string[]
+    /** Communes to mark: where the installations drawing on them sit. */
+    communes: readonly Commune['codeInsee'][]
     getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
     getDepartementContour: LocalizationPort['getDepartementContour']
     getCountryContour: LocalizationPort['getCountryContour']
@@ -27,7 +28,7 @@ function span(ring: readonly LatLngTuple[]): number {
 
 export default function ProvenanceMap({
     provenances,
-    commune,
+    communes,
     getCommuneCenterPosition,
     getDepartementContour,
     getCountryContour,
@@ -50,40 +51,49 @@ export default function ProvenanceMap({
                     : getCountryContour(provenance)
             )
 
-        const drawn = [
-            ...new Set(provenances.map(({ provenance }) => provenance)),
-        ].map(outline)
+        const drawn = [...new Set(provenances)].map(outline)
 
         const polygons = drawn.flat()
-        if (polygons.length === 0) return null
 
-        const bounds = latLngBounds(
-            drawn.flatMap((rings) =>
-                rings.reduce((widest, ring) =>
-                    span(ring) > span(widest) ? ring : widest
-                )
-            )
+        const markers = [...new Set(communes)].map(
+            (codeCommune): LatLngTuple => {
+                const { latitude, longitude } =
+                    getCommuneCenterPosition(codeCommune)
+
+                return [latitude, longitude]
+            }
         )
 
-        const installation = ((): LatLngTuple | null => {
-            if (commune === null) return null
+        // One point per outline — the widest ring of each, which is the shape
+        // itself rather than an island of it. A provenance the référentiel
+        // does not hold draws nothing and frames nothing.
+        const framed = drawn.flatMap((rings) =>
+            rings.length === 0
+                ? []
+                : rings.reduce((widest, ring) =>
+                      span(ring) > span(widest) ? ring : widest
+                  )
+        )
 
-            const { latitude, longitude } = getCommuneCenterPosition(commune)
+        if (polygons.length === 0 && markers.length === 0) return null
 
-            return [latitude, longitude]
-        })()
+        // A lone marker encloses no area, and fitting bounds to one point
+        // zooms to the street. It is centred at the commune zoom instead.
+        if (framed.length === 0 && markers.length === 1) {
+            return { polygons, markers, center: markers[0], bounds: undefined }
+        }
 
-        if (installation !== null) bounds.extend(installation)
+        const bounds = latLngBounds([...framed, ...markers])
 
         return {
             polygons,
-            markers: installation === null ? undefined : [installation],
-            bounds,
+            markers,
             center: bounds.getCenter(),
+            bounds,
         }
     }, [
         provenances,
-        commune,
+        communes,
         getCommuneCenterPosition,
         getDepartementContour,
         getCountryContour,
@@ -92,8 +102,7 @@ export default function ProvenanceMap({
     if (view === null) {
         return (
             <Alert severity="info">
-                Aucune provenance n&apos;a pu être située sur une carte pour
-                cette ressource.
+                Aucun lieu n&apos;a pu être situé sur une carte.
             </Alert>
         )
     }

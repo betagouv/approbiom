@@ -1,10 +1,14 @@
 import './Concurrence.css'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
+import ProvenanceMap from '@shared/react/components/Ressource/ProvenanceMap'
 import MultiSelect, {
     type MultiSelectGroup,
 } from '@shared/react/components/MultiSelect'
 import { getOptions } from '@shared/react/getOptions'
-import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
+import type {
+    DepartementsByRegion,
+    LocalizationPort,
+} from '@shared/core/application/ports/localization'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import {
     getProvenanceLabel,
@@ -19,6 +23,9 @@ type Props = {
     approvisionnementsByPlanAndRessource: readonly ConcurrenceRow[]
     departementsByRegion: readonly DepartementsByRegion[]
     fournisseurs: readonly Entreprise[]
+    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
+    getDepartementContour: LocalizationPort['getDepartementContour']
+    getCountryContour: LocalizationPort['getCountryContour']
 }
 
 const byLabel = (a: string, b: string) => a.localeCompare(b, 'fr')
@@ -27,6 +34,9 @@ export default function Concurrence({
     approvisionnementsByPlanAndRessource,
     departementsByRegion,
     fournisseurs: entreprises,
+    getCommuneCenterPosition,
+    getDepartementContour,
+    getCountryContour,
 }: Props) {
     const [ressource, setRessource] = useState<string[]>([])
     const [provenances, setProvenances] = useState<string[]>([])
@@ -122,6 +132,24 @@ export default function Concurrence({
         ]
     )
 
+    const communes = useMemo(
+        () =>
+            filteredRows
+                .map(({ plan }) => plan.installationCommune)
+                .filter((commune) => commune !== null),
+        [filteredRows]
+    )
+
+    const provenancesRetenues = useMemo(
+        () =>
+            filteredRows.flatMap((item) =>
+                item.approvisionnements
+                    .filter(isSelected)
+                    .map(({ provenance }) => getProvenanceLabel(provenance))
+            ),
+        [filteredRows, isSelected]
+    )
+
     const getSelectedApprovisionnements = useCallback(
         (item: ConcurrenceRow) => {
             const selectedApprovisionnements =
@@ -160,13 +188,13 @@ export default function Concurrence({
             {
                 header: 'Plan d’approvisionnement',
                 id: 'plan_d_approvisionnement',
-                render: (item) => item.planDApprovisionnement,
-                sortBy: (item) => item.planDApprovisionnement,
+                render: (item) => item.plan.nom,
+                sortBy: (item) => item.plan.nom,
             },
             {
                 header: 'Département de situation',
                 id: 'departement_de_situation',
-                render: (item) => item.departementDeSituation,
+                render: (item) => item.plan.departementDeSituation,
             },
             {
                 header: 'Provenances',
@@ -238,34 +266,46 @@ export default function Concurrence({
                     />
                 </div>
             </div>
-            <div className="concurrence__table">
-                <DataTable
-                    caption={'Plans concernés'}
-                    description="Cliquez sur un plan d’approvisionnement pour voir sa ressource et ses fournisseurs retenus sans quitter la page."
-                    showResultCount
-                    expandable={{
-                        columnId: 'plan_d_approvisionnement',
-                        render: (item) => (
-                            <dl className="concurrence__detail">
-                                <div>
-                                    <dt>Ressource</dt>
-                                    <dd>{item.ressource}</dd>
-                                </div>
-                                <div>
-                                    <dt>Fournisseurs retenus</dt>
-                                    <dd>
-                                        {getSelectedApprovisionnements(item)
-                                            .fournisseurs || 'Inconnu'}
-                                    </dd>
-                                </div>
-                            </dl>
-                        ),
-                    }}
-                    rows={filteredRows}
-                    columns={columns}
-                    bordered
-                    multiLine
-                />
+            <div className="concurrence__results">
+                <div className="concurrence__table">
+                    <DataTable
+                        caption={'Plans concernés'}
+                        description="Cliquez sur un plan d’approvisionnement pour voir sa ressource et ses fournisseurs retenus sans quitter la page."
+                        showResultCount
+                        expandable={{
+                            columnId: 'plan_d_approvisionnement',
+                            render: (item) => (
+                                <dl className="concurrence__detail">
+                                    <div>
+                                        <dt>Ressource</dt>
+                                        <dd>{item.ressource}</dd>
+                                    </div>
+                                    <div>
+                                        <dt>Fournisseurs retenus</dt>
+                                        <dd>
+                                            {getSelectedApprovisionnements(item)
+                                                .fournisseurs || 'Inconnu'}
+                                        </dd>
+                                    </div>
+                                </dl>
+                            ),
+                        }}
+                        rows={filteredRows}
+                        columns={columns}
+                        bordered
+                        multiLine
+                    />
+                </div>
+
+                <div className="concurrence__map">
+                    <ProvenanceMap
+                        provenances={provenancesRetenues}
+                        communes={communes}
+                        getCommuneCenterPosition={getCommuneCenterPosition}
+                        getDepartementContour={getDepartementContour}
+                        getCountryContour={getCountryContour}
+                    />
+                </div>
             </div>
         </div>
     )

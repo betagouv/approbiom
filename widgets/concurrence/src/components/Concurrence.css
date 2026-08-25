@@ -35,8 +35,27 @@
     margin-bottom: 0;
 }
 
+.concurrence__results {
+    display: flex;
+    flex-wrap: wrap;
+
+    align-items: flex-start;
+    gap: 1.5rem;
+}
+
 .concurrence__table {
+    flex: 1 1 40rem;
+    min-width: 0;
     min-height: 30rem;
+}
+
+.concurrence__map {
+    flex: 1 1 22rem;
+    min-width: 0;
+}
+
+.concurrence__map .map {
+    height: 30rem;
 }
 
 .concurrence__table .fr-table {

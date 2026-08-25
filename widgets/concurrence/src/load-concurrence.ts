@@ -8,7 +8,10 @@ import type {
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-import { codeDepartementOf } from '@shared/core/domain/value-objects/commune'
+import {
+    codeDepartementOf,
+    type Commune,
+} from '@shared/core/domain/value-objects/commune'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
@@ -20,7 +23,19 @@ export type ConcurrencePorts = {
     installations: InstallationPort
     ressources: RessourcePort
     entreprises: EntreprisePort
-    localization: Pick<LocalizationPort, 'listDepartementsByRegion'>
+    localization: Pick<
+        LocalizationPort,
+        | 'listDepartementsByRegion'
+        | 'getCommuneCenterPosition'
+        | 'getDepartementContour'
+        | 'getCountryContour'
+    >
+}
+
+export type PlanConcurrence = {
+    nom: PlanDApprovisionnement['nom']
+    departementDeSituation: Departement['libelle']
+    installationCommune: Commune['codeInsee'] | null
 }
 
 /**
@@ -29,9 +44,8 @@ export type ConcurrencePorts = {
  * the screen can narrow on provenance and fournisseur at once.
  */
 export type ConcurrenceRow = {
-    planDApprovisionnement: PlanDApprovisionnement['nom']
+    plan: PlanConcurrence
     ressource: Ressource['title']
-    departementDeSituation: Departement['libelle']
     approvisionnements: readonly Approvisionnement[]
     tonnageTotal: number
 }
@@ -80,6 +94,20 @@ export async function loadConcurrence(
         )
     )
 
+    const getPlanConcurrence = (
+        plan: PlanDApprovisionnement | undefined
+    ): PlanConcurrence => {
+        const commune =
+            (plan && communeByInstallation.get(plan.installation)) || null
+        const dep = commune === null ? undefined : codeDepartementOf(commune)
+
+        return {
+            nom: plan?.nom ?? '',
+            departementDeSituation: dep ? (libelleByDep.get(dep) ?? dep) : '',
+            installationCommune: commune,
+        }
+    }
+
     const byPair = new Map<string, Approvisionnement[]>()
     for (const approvisionnement of approvisionnements) {
         const key = pairKey(
@@ -93,20 +121,11 @@ export async function loadConcurrence(
 
     return {
         approvisionnementsByPlanAndRessource: totals.map((total) => {
-            const plan = planById.get(total.planDApprovisionnement)
-
-            const dep =
-                plan &&
-                codeDepartementOf(
-                    communeByInstallation.get(plan.installation) ?? ''
-                )
-
             return {
-                planDApprovisionnement: plan?.nom ?? '',
+                plan: getPlanConcurrence(
+                    planById.get(total.planDApprovisionnement)
+                ),
                 ressource: titleByCode.get(total.ressource) ?? total.ressource,
-                departementDeSituation: dep
-                    ? (libelleByDep.get(dep) ?? dep)
-                    : '',
                 approvisionnements:
                     byPair.get(
                         pairKey(total.planDApprovisionnement, total.ressource)

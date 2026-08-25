@@ -1,7 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
-import type { ProvenanceGroup } from '@shared/core/application/services/approvisionnement-stats'
 import ProvenanceMap from './ProvenanceMap'
 
 afterEach(() => {
@@ -36,16 +35,6 @@ function contours() {
     }
 }
 
-function provenance(overrides: Partial<ProvenanceGroup> = {}): ProvenanceGroup {
-    return {
-        provenance: '33',
-        label: 'Gironde',
-        tonnageTotal: 1000,
-        repartition: 1,
-        ...overrides,
-    }
-}
-
 /**
  * Leaflet draws a polygon as an SVG path in the overlay pane. Scoped to that
  * pane rather than the whole container: the attribution control draws paths of
@@ -61,7 +50,7 @@ function markers(container: HTMLElement): NodeListOf<HTMLImageElement> {
     return container.querySelectorAll('.leaflet-marker-pane img')
 }
 
-const NOTHING_DRAWN = /Aucune provenance n'a pu être située/
+const NOTHING_DRAWN = /Aucun lieu n'a pu être situé/
 
 describe('ProvenanceMap', () => {
     it('draws one outline per département of provenance', () => {
@@ -73,11 +62,8 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={[
-                    provenance({ provenance: '33' }),
-                    provenance({ provenance: '64' }),
-                ]}
-                commune={null}
+                provenances={['33', '64']}
+                communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={getCountryContour}
@@ -101,10 +87,8 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={[
-                    provenance({ provenance: 'Espagne', label: 'Espagne' }),
-                ]}
-                commune={null}
+                provenances={['Espagne']}
+                communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={getCountryContour}
@@ -125,11 +109,8 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={[
-                    provenance({ provenance: '64' }),
-                    provenance({ provenance: 'Espagne', label: 'Espagne' }),
-                ]}
-                commune={null}
+                provenances={['64', 'Espagne']}
+                communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={getCountryContour}
@@ -148,8 +129,8 @@ describe('ProvenanceMap', () => {
 
         render(
             <ProvenanceMap
-                provenances={[provenance(), provenance()]}
-                commune={null}
+                provenances={['33', '33']}
+                communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={getCountryContour}
@@ -159,7 +140,25 @@ describe('ProvenanceMap', () => {
         expect(getDepartementContour).toHaveBeenCalledTimes(1)
     })
 
-    it('marks the commune the plan’s installation sits at', () => {
+    // The view is framed on the shapes it drew. A provenance the référentiel
+    // does not hold draws none, and framing on it would be framing on nothing.
+    it('draws what it can when a provenance is not held', () => {
+        const { getCommuneCenterPosition, getDepartementContour } = contours()
+
+        const { container } = render(
+            <ProvenanceMap
+                provenances={['64', 'Sylvanie']}
+                communes={[]}
+                getCommuneCenterPosition={getCommuneCenterPosition}
+                getDepartementContour={getDepartementContour}
+                getCountryContour={() => []}
+            />
+        )
+
+        expect(polygons(container)).toHaveLength(1)
+    })
+
+    it('marks the commune an installation sits at', () => {
         const {
             getCommuneCenterPosition,
             getDepartementContour,
@@ -168,8 +167,8 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={[provenance()]}
-                commune="33063"
+                provenances={['33']}
+                communes={['33063']}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={getCountryContour}
@@ -180,9 +179,7 @@ describe('ProvenanceMap', () => {
         expect(markers(container)).toHaveLength(1)
     })
 
-    // An installation the document places nowhere has no position to read, and
-    // asking for one would throw on a code that is not there.
-    it('marks nothing when no commune is given', () => {
+    it('reads a commune once, however many rows name it', () => {
         const {
             getCommuneCenterPosition,
             getDepartementContour,
@@ -191,19 +188,43 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={[provenance()]}
-                commune={null}
+                provenances={['33']}
+                communes={['33063', '33063', '33281']}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={getCountryContour}
             />
         )
 
-        expect(getCommuneCenterPosition).not.toHaveBeenCalled()
-        expect(markers(container)).toHaveLength(0)
+        expect(getCommuneCenterPosition).toHaveBeenCalledTimes(2)
+        expect(markers(container)).toHaveLength(2)
     })
 
-    it('says as much when there is no provenance at all', () => {
+    // What the concurrence screen asks for: where these plans are, with no
+    // territory drawn under them.
+    it('draws a map of markers alone', () => {
+        const {
+            getCommuneCenterPosition,
+            getDepartementContour,
+            getCountryContour,
+        } = contours()
+
+        const { container } = render(
+            <ProvenanceMap
+                provenances={[]}
+                communes={['33063', '33281']}
+                getCommuneCenterPosition={getCommuneCenterPosition}
+                getDepartementContour={getDepartementContour}
+                getCountryContour={getCountryContour}
+            />
+        )
+
+        expect(polygons(container)).toHaveLength(0)
+        expect(markers(container)).toHaveLength(2)
+        expect(screen.queryByText(NOTHING_DRAWN)).toBeNull()
+    })
+
+    it('says as much when there is nothing to place at all', () => {
         const {
             getCommuneCenterPosition,
             getDepartementContour,
@@ -213,7 +234,7 @@ describe('ProvenanceMap', () => {
         render(
             <ProvenanceMap
                 provenances={[]}
-                commune={null}
+                communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={getCountryContour}
@@ -229,10 +250,8 @@ describe('ProvenanceMap', () => {
 
         render(
             <ProvenanceMap
-                provenances={[
-                    provenance({ provenance: 'Sylvanie', label: 'Sylvanie' }),
-                ]}
-                commune={null}
+                provenances={['Sylvanie']}
+                communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
                 getCountryContour={() => []}
