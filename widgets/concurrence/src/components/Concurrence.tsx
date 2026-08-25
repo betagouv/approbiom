@@ -6,7 +6,10 @@ import MultiSelect, {
 import { getOptions } from '@shared/react/getOptions'
 import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-import type { Departement } from '@shared/core/domain/value-objects/departement'
+import {
+    getProvenanceLabel,
+    PAYS_ETRANGER,
+} from '@shared/core/domain/value-objects/provenance'
 
 import { useCallback, useMemo, useState } from 'react'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -18,13 +21,15 @@ type Props = {
     fournisseurs: readonly Entreprise[]
 }
 
+const byLabel = (a: string, b: string) => a.localeCompare(b, 'fr')
+
 export default function Concurrence({
     approvisionnementsByPlanAndRessource,
     departementsByRegion,
     fournisseurs: entreprises,
 }: Props) {
     const [ressource, setRessource] = useState<string[]>([])
-    const [departements, setDepartements] = useState<Departement['dep'][]>([])
+    const [provenances, setProvenances] = useState<string[]>([])
     const [fournisseurs, setFournisseurs] = useState<Entreprise['siret'][]>([])
 
     const ressourceOptions = getOptions(
@@ -42,32 +47,61 @@ export default function Concurrence({
         [entreprises]
     )
 
-    const departementOptions: readonly MultiSelectGroup<Departement['dep']>[] =
-        departementsByRegion
-            // Compared in French so accents sort where a reader looks for them:
-            // "Île-de-France" belongs under I, not after Z. `toSorted` rather
-            // than `sort`, which would reorder the caller's own array.
-            .toSorted((a, b) =>
-                a.region.libelle.localeCompare(b.region.libelle, 'fr')
-            )
-            .map(({ region, departements }) => ({
-                id: region.reg,
-                label: region.libelle,
-                options: departements.map(({ dep }) => ({
-                    value: dep,
-                    label: dep,
-                })),
-            }))
+    const paysOptions = useMemo(
+        () =>
+            [
+                ...new Set(
+                    approvisionnementsByPlanAndRessource.flatMap((item) =>
+                        item.approvisionnements
+                            .map(({ provenance }) => provenance)
+                            .filter(
+                                (provenance) =>
+                                    provenance.source === PAYS_ETRANGER
+                            )
+                            .map(getProvenanceLabel)
+                    )
+                ),
+            ]
+                .filter((libelle) => libelle !== '')
+                .toSorted(byLabel)
+                .map((libelle) => ({ value: libelle, label: libelle })),
+        [approvisionnementsByPlanAndRessource]
+    )
+
+    const provenanceOptions: readonly MultiSelectGroup<string>[] =
+        useMemo(() => {
+            const regions = departementsByRegion
+                .toSorted((a, b) => byLabel(a.region.libelle, b.region.libelle))
+                .map(({ region, departements }) => ({
+                    id: region.reg,
+                    label: region.libelle,
+                    options: departements.map(({ dep }) => ({
+                        value: dep,
+                        label: dep,
+                    })),
+                }))
+
+            if (paysOptions.length === 0) return regions
+
+            return [
+                ...regions,
+                {
+                    id: 'pays-etrangers',
+                    label: 'Pays étrangers',
+                    options: paysOptions,
+                },
+            ]
+        }, [departementsByRegion, paysOptions])
 
     const isSelected = useCallback(
         (approvisionnement: Approvisionnement) =>
-            (departements.length === 0 ||
-                departements.includes(
-                    approvisionnement.departementDeProvenance
+            (provenances.length === 0 ||
+                provenances.includes(
+                    getProvenanceLabel(approvisionnement.provenance)
                 )) &&
             (fournisseurs.length === 0 ||
                 fournisseurs.includes(approvisionnement.fournisseur)),
-        [departements, fournisseurs]
+        [provenances, fournisseurs]
     )
 
     const filteredRows = useMemo(
@@ -76,13 +110,13 @@ export default function Concurrence({
                 (item) =>
                     (ressource.length === 0 ||
                         ressource.includes(item.ressource)) &&
-                    ((departements.length === 0 && fournisseurs.length === 0) ||
+                    ((provenances.length === 0 && fournisseurs.length === 0) ||
                         item.approvisionnements.some(isSelected))
             ),
         [
             approvisionnementsByPlanAndRessource,
             ressource,
-            departements,
+            provenances,
             fournisseurs,
             isSelected,
         ]
@@ -94,11 +128,10 @@ export default function Concurrence({
                 item.approvisionnements.filter(isSelected)
 
             return {
-                departements: [
+                provenances: [
                     ...new Set(
-                        selectedApprovisionnements.map(
-                            (approvisionnement) =>
-                                approvisionnement.departementDeProvenance
+                        selectedApprovisionnements.map((approvisionnement) =>
+                            getProvenanceLabel(approvisionnement.provenance)
                         )
                     ),
                 ].join(', '),
@@ -136,15 +169,16 @@ export default function Concurrence({
                 render: (item) => item.departementDeSituation,
             },
             {
-                header: 'Départements de provenance',
-                id: 'departements_de_provenance',
+                header: 'Provenances',
+                id: 'provenances',
                 render: (item) =>
-                    item.approvisionnements
-                        .map(
-                            (approvisionnement) =>
-                                approvisionnement.departementDeProvenance
-                        )
-                        .join(', '),
+                    [
+                        ...new Set(
+                            item.approvisionnements.map((approvisionnement) =>
+                                getProvenanceLabel(approvisionnement.provenance)
+                            )
+                        ),
+                    ].join(', '),
             },
             {
                 header: 'Tonnage total (en tonne de matière verte par an)',
@@ -152,10 +186,10 @@ export default function Concurrence({
                 render: (item) => item.tonnageTotal,
             },
             {
-                header: 'Départements retenus',
-                id: 'departements_retenus',
+                header: 'Provenances retenues',
+                id: 'provenances_retenues',
                 render: (item) =>
-                    getSelectedApprovisionnements(item).departements,
+                    getSelectedApprovisionnements(item).provenances,
             },
             {
                 header: 'Tonnage retenu (en tonne de matière verte par an)',
@@ -187,10 +221,10 @@ export default function Concurrence({
                 </div>
                 <div className="concurrence__filter">
                     <MultiSelect
-                        label="Régions et départements"
-                        options={departementOptions}
-                        selectedValues={departements}
-                        onSelectionChange={setDepartements}
+                        label="Provenance"
+                        options={provenanceOptions}
+                        selectedValues={provenances}
+                        onSelectionChange={setProvenances}
                         showSelectAll
                     />
                 </div>
@@ -229,7 +263,6 @@ export default function Concurrence({
                     }}
                     rows={filteredRows}
                     columns={columns}
-                    stickyHeader
                     bordered
                     multiLine
                 />

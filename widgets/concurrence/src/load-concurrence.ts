@@ -21,7 +21,7 @@ export type ConcurrencePorts = {
 /**
  * One line of the concurrence table: a (plan, ressource) total with everything
  * it is read by already resolved, and the approvisionnements behind it kept so
- * the screen can narrow on département and fournisseur at once.
+ * the screen can narrow on provenance and fournisseur at once.
  */
 export type ConcurrenceRow = {
     planDApprovisionnement: PlanDApprovisionnement['nom']

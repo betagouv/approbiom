@@ -7,8 +7,7 @@
     gap: 1.5rem;
     padding: 2rem;
 
-    height: 100vh;
-    overflow: auto;
+    min-height: 100vh;
 }
 
 .concurrence__title {
@@ -37,31 +36,19 @@
 }
 
 .concurrence__table {
-    flex: 1;
-    min-height: 0;
+    min-height: 30rem;
 }
 
-/* The title block takes the height it needs, the wrapper takes whatever is
-   left, and the container inside it is the only thing that scrolls — so the
-   scrollbar runs alongside the rows rather than the whole table. */
 .concurrence__table .fr-table {
-    display: flex;
-    flex-direction: column;
-    height: 100%;
     margin: 0;
-    min-height: 0;
 }
 
 .concurrence__table .fr-table__wrapper {
-    flex: 1;
     margin: 0;
-    min-height: 0;
 }
 
 .concurrence__table .fr-table__container {
-    height: 100%;
     margin: 0;
-    min-height: 0;
     padding-top: 0;
 }
 

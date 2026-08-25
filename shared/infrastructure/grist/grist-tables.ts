@@ -35,7 +35,8 @@ export const COLUMNS = {
     approvisionnement: [
         'Plan_d_approvisionnement',
         'Ressource',
-        'Departement_de_provenance',
+        'Departement_de_provenance', // ref, est null si la provenance est un pays
+        'Provenance', // type texte, soit le code du département, soit le libellé du pays
         'Fournisseur',
         'Total_en_tMv_an_',
     ],

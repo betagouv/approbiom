@@ -12,12 +12,34 @@ import {
     type GristRow,
 } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
+import {
+    DEPARTEMENT_FRANCAIS,
+    PAYS_ETRANGER,
+    type Provenance,
+} from '@shared/core/domain/value-objects/provenance'
 
 const asText = (value: unknown): string =>
     typeof value === 'number' ? String(value) : asString(value)
 
 const ressourceCode = (index: Map<number, GristRow>, ref: unknown): string =>
     asString(lookup(index, ref)?.Code_ressource_Approbiom)
+
+function toProvenance(
+    row: GristRow,
+    departements: Map<number, GristRow>
+): Provenance {
+    const departement = lookup(departements, row.Departement_de_provenance)
+
+    if (departement !== undefined) {
+        return { source: DEPARTEMENT_FRANCAIS, code: asString(departement.DEP) }
+    }
+
+    const libelle = asText(row.Provenance)
+
+    return libelle === ''
+        ? { source: DEPARTEMENT_FRANCAIS, code: '' }
+        : { source: PAYS_ETRANGER, libelle }
+}
 
 /**
  * The fields every summary carries, whichever dimension it adds to them.
@@ -74,9 +96,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                 planDApprovisionnement:
                     asNumber(row.Plan_d_approvisionnement) ?? 0,
                 ressource: ressourceCode(ressourceById, row.Ressource),
-                departementDeProvenance: asString(
-                    lookup(departementById, row.Departement_de_provenance)?.DEP
-                ),
+                provenance: toProvenance(row, departementById),
                 fournisseur: asText(
                     lookup(entrepriseById, row.Fournisseur)?.Siret
                 ),
