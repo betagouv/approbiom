@@ -6,3 +6,35 @@
 .ressource__total {
     text-align: right;
 }
+
+/* The breakdowns read down one column and the map sits beside them, the way the
+   screen is drawn: the map answers the same question as the provenance table,
+   so the two are read together rather than one after the other.
+
+   `auto-fit` rather than a media query: a widget is given whatever width its
+   Grist page has, which is not the width of the window the query would measure.
+   The columns fold to one as soon as two of them no longer fit, whoever is
+   doing the sizing. */
+.ressource__ventilations {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(min(100%, 22rem), 1fr));
+    gap: 1.5rem 2rem;
+    /* Without this the map stretches to the height of the three tables next to
+       it, which is a lot of empty France. */
+    align-items: start;
+}
+
+.ressource__breakdowns {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    /* A grid item is `min-width: auto` by default, so a wide table would push
+       the column past its share instead of scrolling inside itself. */
+    min-width: 0;
+}
+
+/* The map fills its viewport by default, which is right for a page that is a
+   map and wrong for one panel of a breakdown. */
+.ressource__map .map {
+    height: 30rem;
+}

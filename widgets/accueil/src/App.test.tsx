@@ -12,7 +12,7 @@ import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
 import App from './App'
 import type { AccueilPorts } from './load-accueil'
 
@@ -56,7 +56,9 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         },
         ressources: { list: rows([]) },
         entreprises: { list: rows([]) },
-        insee: { listDepartementsByRegion: rows([]) },
+        listDepartementsByRegion: rows([]),
+        getDepartementContour: () => [],
+        getCountryContour: () => [],
         demandesSubvention: { list: rows([]) },
         programmesAide: programmeAidePort(),
         instructions: instructionPort(),
@@ -246,11 +248,7 @@ describe('App', () => {
                     plans: planPort(rows([saintJunien])),
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: programmeAidePort(rows([bciat])),
-                    insee: {
-                        listDepartementsByRegion: rows([
-                            nouvelleAquitaineInsee,
-                        ]),
-                    },
+                    listDepartementsByRegion: rows([nouvelleAquitaineInsee]),
                 })}
             />
         )

@@ -7,14 +7,14 @@ import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { Region } from '@shared/core/domain/value-objects/region'
 import type { ApprovisionnementGroupedByPlanRessourceAndFournisseur } from '@shared/core/application/ports/approvisionnement'
-import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { CrbPort } from '@shared/core/application/ports/crb'
 import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
-import type { InseePort } from '@shared/core/application/ports/insee'
+import type { LocalizationPort } from '@shared/core/application/ports/localization'
 import type { InstructionPort } from '@shared/core/application/ports/instruction'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
@@ -240,7 +240,7 @@ export function composePlanDetails({
 /** Everything a plan detail is read from. Named so a widget hands over its ports and nothing else. */
 export type PlanDetailPorts = {
     plans: PlanPort
-    insee: Pick<InseePort, 'listDepartementsByRegion'>
+    listDepartementsByRegion: LocalizationPort['listDepartementsByRegion']
     demandesSubvention: DemandeSubventionPort
     programmesAide: ProgrammeAidePort
     instructions: InstructionPort
@@ -272,7 +272,7 @@ export async function getPlanDetails(
         attachments,
     ] = await Promise.all([
         ports.plans.list(),
-        ports.insee.listDepartementsByRegion(),
+        ports.listDepartementsByRegion(),
         ports.demandesSubvention.list(),
         ports.programmesAide.list(),
         ports.instructions.list(),

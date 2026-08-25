@@ -1,9 +1,11 @@
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
-import type { InseePort } from '@shared/core/application/ports/insee'
+import type {
+    DepartementsByRegion,
+    LocalizationPort,
+} from '@shared/core/application/ports/localization'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
-import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -15,7 +17,7 @@ export type ConcurrencePorts = {
     plans: PlanPort
     ressources: RessourcePort
     entreprises: EntreprisePort
-    insee: Pick<InseePort, 'listDepartementsByRegion'>
+    localization: Pick<LocalizationPort, 'listDepartementsByRegion'>
 }
 
 /**
@@ -56,7 +58,7 @@ export async function loadConcurrence(
         ports.plans.list(),
         ports.ressources.list(),
         ports.entreprises.list(),
-        ports.insee.listDepartementsByRegion(),
+        ports.localization.listDepartementsByRegion(),
     ])
 
     const planById = new Map(plans.map((plan) => [plan.id, plan]))

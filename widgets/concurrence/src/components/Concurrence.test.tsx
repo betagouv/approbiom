@@ -6,7 +6,7 @@ import {
     within,
 } from '@testing-library/react'
 import { afterEach, describe, expect, it } from 'vitest'
-import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import {

@@ -1,5 +1,8 @@
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type {
+    DepartementsByRegion,
+    LocalizationPort,
+} from '@shared/core/application/ports/localization'
 import {
     getApprovisionnementByRessourceStatsByPlan,
     type ApprovisionnementByRessourceStatsByPlan,
@@ -24,7 +27,10 @@ import {
 export type AccueilPorts = PlanDetailPorts &
     ApprovisionnementByRessourceStatsPorts &
     UpdateInstructionPorts &
-    UpdateIsPlanLaureatForProgrammeAidePorts
+    UpdateIsPlanLaureatForProgrammeAidePorts & {
+        getDepartementContour: LocalizationPort['getDepartementContour']
+        getCountryContour: LocalizationPort['getCountryContour']
+    }
 
 export type AccueilScreen = {
     plansApprovisionnement: readonly PlanDetail[]
@@ -44,7 +50,7 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
     ] = await Promise.all([
         getPlanDetails(ports),
         ports.programmesAide.list(),
-        ports.insee.listDepartementsByRegion(),
+        ports.listDepartementsByRegion(),
         getApprovisionnementByRessourceStatsByPlan(ports),
     ])
 

@@ -1,5 +1,5 @@
 import { useEffect, useRef } from 'react'
-import L, { type LatLngExpression } from 'leaflet'
+import L, { type LatLngBoundsExpression, type LatLngExpression } from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import './Map.css'
 
@@ -18,9 +18,15 @@ export type MapProps = {
     polygons?: LatLngExpression[][]
     /**
      * zoom level, from 0 (the whole world) to 19 (a street). A commune sits at
-     * 13, a département at 9.
+     * 13, a département at 9. Ignored when `bounds` is given.
      */
     zoom?: number
+    /**
+     * the area the view is fitted to, taking `center` and `zoom` over when it
+     * is given: a set of shapes spread over a country has no single zoom that
+     * shows all of them.
+     */
+    bounds?: LatLngBoundsExpression
 }
 
 const DEFAULT_ZOOM = 13
@@ -30,6 +36,7 @@ export default function Map({
     markers,
     polygons,
     zoom = DEFAULT_ZOOM,
+    bounds,
 }: MapProps) {
     const containerRef = useRef<HTMLDivElement | null>(null)
     const mapRef = useRef<L.Map | null>(null)
@@ -56,7 +63,11 @@ export default function Map({
         const map = mapRef.current
         if (map === null) return
 
-        map.setView(center, zoom)
+        if (bounds === undefined) {
+            map.setView(center, zoom)
+        } else {
+            map.fitBounds(bounds)
+        }
 
         const layers = L.layerGroup().addTo(map)
 
@@ -71,7 +82,7 @@ export default function Map({
         return () => {
             layers.remove()
         }
-    }, [center, markers, polygons, zoom])
+    }, [bounds, center, markers, polygons, zoom])
 
     return <div ref={containerRef} className="map" />
 }

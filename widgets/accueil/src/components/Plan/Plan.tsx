@@ -7,6 +7,7 @@ import PiecesJointes from './tabs/PiecesJointes'
 import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
 import Ressource from '@shared/react/components/Ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { LocalizationPort } from '@shared/core/application/ports/localization'
 import {
     getAppelsAProjet,
     type PlanDetail,
@@ -30,6 +31,8 @@ export type PlanProps = {
     approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
     plan: PlanDetail
     getFileUrl: (id: Attachment['id']) => Promise<string>
+    getDepartementContour: LocalizationPort['getDepartementContour']
+    getCountryContour: LocalizationPort['getCountryContour']
     onClose: () => void
     updateInstruction: UpdateInstruction
     updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide
@@ -40,6 +43,8 @@ export default function Plan({
     plan,
     approvisionnementStatsByRessource,
     getFileUrl,
+    getDepartementContour,
+    getCountryContour,
     updateInstruction,
     updateIsPlanLaureatForProgrammeAide,
     refresh,
@@ -91,6 +96,8 @@ export default function Plan({
                     approvisionnementStatsByRessource={
                         approvisionnementStatsByRessource
                     }
+                    getDepartementContour={getDepartementContour}
+                    getCountryContour={getCountryContour}
                 />
             )}
             {tab === 'pieces-jointes' && (

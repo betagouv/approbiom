@@ -1,13 +1,13 @@
-import type { InseePort } from '@shared/core/application/ports/insee'
-import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
 import { gristReady } from '../grist-ready'
 import { asNumber, asString, fetchRowsOnce } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
 
 type Departements = DepartementsByRegion['departements'][number][]
 
-export function createGristInseePort(): Pick<
-    InseePort,
+export function createGristLocalizationPort(): Pick<
+    LocalizationPort,
     'listDepartementsByRegion'
 > {
     return {

@@ -18,7 +18,7 @@ const ENDPOINT =
     'https://geo.api.gouv.fr/communes?fields=code,nom,centre&format=json&geometry=centre'
 
 const OUTPUT_URL = new URL('./communes.json', import.meta.url)
-const OUTPUT_PATH = 'shared/infrastructure/insee/communes.json'
+const OUTPUT_PATH = 'shared/infrastructure/localization/communes.json'
 
 /** One entry of the `GET /communes` array, as documented by geo.api.gouv.fr. */
 type ApiCommune = {

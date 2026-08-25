@@ -7,8 +7,8 @@ import type {
 } from '@shared/core/application/ports/approvisionnement'
 import type {
     DepartementsByRegion,
-    InseePort,
-} from '@shared/core/application/ports/insee'
+    LocalizationPort,
+} from '@shared/core/application/ports/localization'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -27,13 +27,23 @@ export type Group = {
     repartition: number
 }
 
+/**
+ * A provenance group, keeping the code it was read under next to its label: a
+ * map draws a département by its code, where the label is only a name — and a
+ * provenance the référentiel does not name reads the same in both.
+ */
+export type ProvenanceGroup = Group & {
+    /** A département code, or a foreign country's libellé. */
+    provenance: string
+}
+
 export type ApprovisionnementStatsByRessource = {
     ressource: Ressource
     tonnageTotal: number
     /** Share of the plan's total drawn as this ressource, between 0 and 1. */
     repartition: number
     byRegionOuPays: readonly Group[]
-    byProvenance: readonly Group[]
+    byProvenance: readonly ProvenanceGroup[]
     byFournisseur: readonly Group[]
 }
 
@@ -44,7 +54,7 @@ export type ApprovisionnementByRessourceStatsPorts = {
     approvisionnements: ApprovisionnementPort
     ressources: RessourcePort
     entreprises: EntreprisePort
-    insee: Pick<InseePort, 'listDepartementsByRegion'>
+    listDepartementsByRegion: LocalizationPort['listDepartementsByRegion']
 }
 
 export type ApprovisionnementByRessourceStatsSources = {
@@ -68,22 +78,28 @@ export type ApprovisionnementByRessourceStatsByPlanSources = Omit<
     'plan'
 >
 
+/** The measures every group carries, whichever dimension names it. */
+function measures(
+    row: ApprovisionnementGroupedByPlanAndRessource,
+    label: string
+): Group {
+    return {
+        label: label || UNKNOWN,
+        tonnageTotal: row.tonnageTotal,
+        repartition: row.repartition,
+    }
+}
+
 function groupsByRessource<
     T extends ApprovisionnementGroupedByPlanAndRessource,
->(
-    rows: readonly T[],
-    label: (row: T) => string
-): Map<Ressource['code'], Group[]> {
-    const byRessource = new Map<Ressource['code'], Group[]>()
+    G extends Group,
+>(rows: readonly T[], toGroup: (row: T) => G): Map<Ressource['code'], G[]> {
+    const byRessource = new Map<Ressource['code'], G[]>()
 
     for (const row of rows) {
         const groups = byRessource.get(row.ressource) ?? []
 
-        groups.push({
-            label: label(row) || UNKNOWN,
-            tonnageTotal: row.tonnageTotal,
-            repartition: row.repartition,
-        })
+        groups.push(toGroup(row))
 
         byRessource.set(row.ressource, groups)
     }
@@ -135,19 +151,17 @@ export function composeApprovisionnementStats({
         rows: readonly T[]
     ) => rows.filter((row) => row.planDApprovisionnement === plan)
 
-    const regionsOuPays = groupsByRessource(
-        forPlan(byRegionOuPays),
-        (row) => row.regionOuPays
+    const regionsOuPays = groupsByRessource(forPlan(byRegionOuPays), (row) =>
+        measures(row, row.regionOuPays)
     )
 
-    const provenances = groupsByRessource(
-        forPlan(byProvenance),
-        (row) => labelByDep.get(row.provenance) || row.provenance
-    )
+    const provenances = groupsByRessource(forPlan(byProvenance), (row) => ({
+        ...measures(row, labelByDep.get(row.provenance) || row.provenance),
+        provenance: row.provenance,
+    }))
 
-    const fournisseurs = groupsByRessource(
-        forPlan(byFournisseur),
-        (row) => nameBySiret.get(row.fournisseur) || row.fournisseur
+    const fournisseurs = groupsByRessource(forPlan(byFournisseur), (row) =>
+        measures(row, nameBySiret.get(row.fournisseur) || row.fournisseur)
     )
 
     const totalsForPlan = forPlan(totals)
@@ -219,7 +233,7 @@ async function loadApprovisionnementStatsSources(
         ports.approvisionnements.listGroupedByPlanRessourceAndFournisseur(),
         ports.ressources.list(),
         ports.entreprises.list(),
-        ports.insee.listDepartementsByRegion(),
+        ports.listDepartementsByRegion(),
     ])
 
     return {

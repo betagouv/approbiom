@@ -6,39 +6,52 @@ import { renderError } from '@shared/react/render-error'
 import { useAsyncData } from '@shared/react/useAsyncData'
 import {
     getApprovisionnementByRessourceStats,
+    type ApprovisionnementByRessourceStats,
     type ApprovisionnementByRessourceStatsPorts,
 } from '@shared/core/application/services/approvisionnement-stats'
+import type { LocalizationPort } from '@shared/core/application/ports/localization'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
 import { useState } from 'react'
 
-/** The statistics of the picked plan, read once it is picked. */
 function Statistiques({
-    ports,
-    plan,
+    readStats,
+    getDepartementContour,
+    getCountryContour,
 }: {
-    ports: ApprovisionnementByRessourceStatsPorts
-    plan: Plan['id']
+    readStats: () => Promise<ApprovisionnementByRessourceStats>
+    getDepartementContour: LocalizationPort['getDepartementContour']
+    getCountryContour: LocalizationPort['getCountryContour']
 }) {
-    const state = useAsyncData(() =>
-        getApprovisionnementByRessourceStats(ports, plan)
-    )
+    const state = useAsyncData(readStats)
 
     return (
         <AsyncGate state={state} renderError={renderError}>
-            {(stats) => <Ressource approvisionnementStatsByRessource={stats} />}
+            {(stats) => (
+                <Ressource
+                    approvisionnementStatsByRessource={stats}
+                    getDepartementContour={getDepartementContour}
+                    getCountryContour={getCountryContour}
+                />
+            )}
         </AsyncGate>
     )
 }
 
-export type RechercheDePlanProps = {
+export type RechercheDePlanProps = ApprovisionnementByRessourceStatsPorts & {
     plans: readonly Plan[]
-    ports: ApprovisionnementByRessourceStatsPorts
+    getDepartementContour: LocalizationPort['getDepartementContour']
+    getCountryContour: LocalizationPort['getCountryContour']
 }
 
 export default function RechercheDePlan({
     plans,
-    ports,
+    approvisionnements,
+    ressources,
+    entreprises,
+    listDepartementsByRegion,
+    getDepartementContour,
+    getCountryContour,
 }: RechercheDePlanProps) {
     const [plan, setPlan] = useState<Plan['id'] | null>(null)
 
@@ -57,7 +70,22 @@ export default function RechercheDePlan({
             />
 
             {plan !== null && (
-                <Statistiques key={plan} ports={ports} plan={plan} />
+                <Statistiques
+                    key={plan}
+                    readStats={() =>
+                        getApprovisionnementByRessourceStats(
+                            {
+                                approvisionnements,
+                                ressources,
+                                entreprises,
+                                listDepartementsByRegion,
+                            },
+                            plan
+                        )
+                    }
+                    getDepartementContour={getDepartementContour}
+                    getCountryContour={getCountryContour}
+                />
             )}
         </div>
     )

@@ -11,11 +11,18 @@ import { createGristAttachmentPort } from '@shared/infrastructure/grist/adapters
 import { createGristCrbPort } from '@shared/infrastructure/grist/adapters/grist-adapter-crb'
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
-import { createGristInseePort } from '@shared/infrastructure/grist/adapters/grist-adapter-insee'
+import { createGristLocalizationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-localization'
 import { createGristInstructionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-instruction'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
 import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
+import { createLocalizationAdapter } from '@shared/infrastructure/localization/localization-adapter'
+import type { LocalizationPort } from '@shared/core/application/ports/localization'
+
+const localization: LocalizationPort = {
+    ...createGristLocalizationPort(),
+    ...createLocalizationAdapter(),
+}
 
 const rootEl = document.getElementById('root')
 if (!rootEl) throw new Error('#no root found in index.html')
@@ -27,7 +34,9 @@ createRoot(rootEl).render(
             approvisionnements={createGristApprovisionnementPort()}
             ressources={createGristRessourcePort()}
             entreprises={createGristEntreprisePort()}
-            insee={createGristInseePort()}
+            listDepartementsByRegion={localization.listDepartementsByRegion}
+            getDepartementContour={localization.getDepartementContour}
+            getCountryContour={localization.getCountryContour}
             demandesSubvention={createGristDemandeSubventionPort()}
             programmesAide={createGristProgrammeAidePort()}
             instructions={createGristInstructionPort()}

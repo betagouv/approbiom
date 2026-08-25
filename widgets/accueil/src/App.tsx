@@ -51,6 +51,8 @@ export default function App(ports: AccueilPorts) {
                             getFileUrl={(id) =>
                                 ports.attachments.getFileUrl(id)
                             }
+                            getDepartementContour={ports.getDepartementContour}
+                            getCountryContour={ports.getCountryContour}
                             updateInstruction={updateInstruction}
                             updateIsPlanLaureatForProgrammeAide={
                                 updateIsPlanLaureatForProgrammeAide

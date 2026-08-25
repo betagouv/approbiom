@@ -4,7 +4,7 @@ import MultiSelect, {
     type MultiSelectGroup,
 } from '@shared/react/components/MultiSelect'
 import { getOptions } from '@shared/react/getOptions'
-import type { DepartementsByRegion } from '@shared/core/application/ports/insee'
+import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import {
     getProvenanceLabel,

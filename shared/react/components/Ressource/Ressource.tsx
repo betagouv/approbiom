@@ -6,8 +6,10 @@ import type {
     ApprovisionnementByRessourceStats,
     ApprovisionnementStatsByRessource,
 } from '@shared/core/application/services/approvisionnement-stats'
+import type { LocalizationPort } from '@shared/core/application/ports/localization'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
 import Alert from '../Alert'
+import ProvenanceMap from './ProvenanceMap'
 
 const REPARTITION = new Intl.NumberFormat('fr-FR', {
     style: 'percent',
@@ -42,11 +44,17 @@ function groupColumns(header: string): readonly Column<Group>[] {
     ]
 }
 
+export type RessourceProps = {
+    approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
+    getDepartementContour: LocalizationPort['getDepartementContour']
+    getCountryContour: LocalizationPort['getCountryContour']
+}
+
 export default function Ressource({
     approvisionnementStatsByRessource,
-}: {
-    approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
-}) {
+    getDepartementContour,
+    getCountryContour,
+}: RessourceProps) {
     const [selectedCode, setSelectedCode] = useState<Ressource['code'] | null>(
         () => approvisionnementStatsByRessource[0]?.ressource.code ?? null
     )
@@ -115,28 +123,35 @@ export default function Ressource({
             </div>
 
             {selected !== null && (
-                <>
-                    <DataTable
-                        caption="Ventilation par région ou pays"
-                        rows={selected.byRegionOuPays}
-                        columns={groupColumns('Région ou pays')}
-                        bordered
-                    />
+                <div className="ressource__ventilations">
+                    <div className="ressource__breakdowns">
+                        <DataTable
+                            caption="Ventilation par provenance"
+                            rows={selected.byProvenance}
+                            columns={groupColumns('Provenance')}
+                            bordered
+                        />
+                        <DataTable
+                            caption="Ventilation par région ou pays"
+                            rows={selected.byRegionOuPays}
+                            columns={groupColumns('Région ou pays')}
+                            bordered
+                        />
 
-                    <DataTable
-                        caption="Ventilation par provenance"
-                        rows={selected.byProvenance}
-                        columns={groupColumns('Provenance')}
-                        bordered
-                    />
+                        <DataTable
+                            caption="Ventilation par fournisseur"
+                            rows={selected.byFournisseur}
+                            columns={groupColumns('Fournisseur')}
+                            bordered
+                        />
+                    </div>
 
-                    <DataTable
-                        caption="Ventilation par fournisseur"
-                        rows={selected.byFournisseur}
-                        columns={groupColumns('Fournisseur')}
-                        bordered
+                    <ProvenanceMap
+                        provenances={selected.byProvenance}
+                        getDepartementContour={getDepartementContour}
+                        getCountryContour={getCountryContour}
                     />
-                </>
+                </div>
             )}
         </div>
     )
