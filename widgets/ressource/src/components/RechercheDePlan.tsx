@@ -10,16 +10,22 @@ import {
     type ApprovisionnementByRessourceStatsPorts,
 } from '@shared/core/application/services/approvisionnement-stats'
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { Commune } from '@shared/core/domain/value-objects/commune'
+import type { Installation } from '@shared/core/domain/entities/installation'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
 import { useState } from 'react'
 
 function Statistiques({
     readStats,
+    commune,
+    getCommuneCenterPosition,
     getDepartementContour,
     getCountryContour,
 }: {
     readStats: () => Promise<ApprovisionnementByRessourceStats>
+    commune: Commune['codeInsee'] | null
+    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
     getDepartementContour: LocalizationPort['getDepartementContour']
     getCountryContour: LocalizationPort['getCountryContour']
 }) {
@@ -30,6 +36,8 @@ function Statistiques({
             {(stats) => (
                 <Ressource
                     approvisionnementStatsByRessource={stats}
+                    commune={commune}
+                    getCommuneCenterPosition={getCommuneCenterPosition}
                     getDepartementContour={getDepartementContour}
                     getCountryContour={getCountryContour}
                 />
@@ -40,16 +48,20 @@ function Statistiques({
 
 export type RechercheDePlanProps = ApprovisionnementByRessourceStatsPorts & {
     plans: readonly Plan[]
+    installations: readonly Installation[]
+    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
     getDepartementContour: LocalizationPort['getDepartementContour']
     getCountryContour: LocalizationPort['getCountryContour']
 }
 
 export default function RechercheDePlan({
     plans,
+    installations,
     approvisionnements,
     ressources,
     entreprises,
     listDepartementsByRegion,
+    getCommuneCenterPosition,
     getDepartementContour,
     getCountryContour,
 }: RechercheDePlanProps) {
@@ -59,6 +71,13 @@ export default function RechercheDePlan({
         value: plan.id,
         label: plan.nom || `Plan ${plan.id}`,
     }))
+
+    const communeByInstallation = new Map(
+        installations.map(({ id, commune }) => [id, commune] as const)
+    )
+    const selected = plans.find(({ id }) => id === plan)
+    const commune =
+        communeByInstallation.get(selected?.installation ?? 0) || null
 
     return (
         <div className="recherche-de-plan fr-p-2w">
@@ -83,6 +102,8 @@ export default function RechercheDePlan({
                             plan
                         )
                     }
+                    commune={commune}
+                    getCommuneCenterPosition={getCommuneCenterPosition}
                     getDepartementContour={getDepartementContour}
                     getCountryContour={getCountryContour}
                 />

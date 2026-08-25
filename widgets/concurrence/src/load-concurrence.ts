@@ -1,5 +1,6 @@
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
+import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type {
     DepartementsByRegion,
     LocalizationPort,
@@ -7,6 +8,7 @@ import type {
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import { codeDepartementOf } from '@shared/core/domain/value-objects/commune'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
@@ -15,6 +17,7 @@ import type { Ressource } from '@shared/core/domain/entities/ressource'
 export type ConcurrencePorts = {
     approvisionnements: ApprovisionnementPort
     plans: PlanPort
+    installations: InstallationPort
     ressources: RessourcePort
     entreprises: EntreprisePort
     localization: Pick<LocalizationPort, 'listDepartementsByRegion'>
@@ -49,6 +52,7 @@ export async function loadConcurrence(
         totals,
         approvisionnements,
         plans,
+        installations,
         ressources,
         fournisseurs,
         departementsByRegion,
@@ -56,12 +60,16 @@ export async function loadConcurrence(
         ports.approvisionnements.listGroupedByPlanAndRessource(),
         ports.approvisionnements.list(),
         ports.plans.list(),
+        ports.installations.list(),
         ports.ressources.list(),
         ports.entreprises.list(),
         ports.localization.listDepartementsByRegion(),
     ])
 
     const planById = new Map(plans.map((plan) => [plan.id, plan]))
+    const communeByInstallation = new Map(
+        installations.map(({ id, commune }) => [id, commune] as const)
+    )
     const titleByCode = new Map(ressources.map((r) => [r.code, r.title]))
 
     // The référentiel doubles as the département directory, so a code coming off
@@ -86,9 +94,12 @@ export async function loadConcurrence(
     return {
         approvisionnementsByPlanAndRessource: totals.map((total) => {
             const plan = planById.get(total.planDApprovisionnement)
-            // Where a plan sits is computed by the document, off the
-            // commune of its installation.
-            const dep = plan?.departement ?? undefined
+
+            const dep =
+                plan &&
+                codeDepartementOf(
+                    communeByInstallation.get(plan.installation) ?? ''
+                )
 
             return {
                 planDApprovisionnement: plan?.nom ?? '',

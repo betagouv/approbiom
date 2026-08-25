@@ -28,6 +28,7 @@ export type AccueilPorts = PlanDetailPorts &
     ApprovisionnementByRessourceStatsPorts &
     UpdateInstructionPorts &
     UpdateIsPlanLaureatForProgrammeAidePorts & {
+        getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
         getDepartementContour: LocalizationPort['getDepartementContour']
         getCountryContour: LocalizationPort['getCountryContour']
     }

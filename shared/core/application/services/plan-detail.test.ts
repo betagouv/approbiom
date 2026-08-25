@@ -20,7 +20,6 @@ function plan(overrides: Partial<Plan> = {}): Plan {
         id: 1,
         nom: 'RCU Val Fleuri',
         installation: 1,
-        departement: null,
         typeDePlan: 'création',
         usage: 'énergie',
         natureDonnee: 'prévision',
@@ -124,6 +123,7 @@ function sources(
 ): PlanDetailSources {
     return {
         plans: [valFleuri, clairVillage],
+        installations: [],
         departementsByRegion: [],
         demandesSubvention: [demandeBciat, demandeBcib, demandeVoisine],
         programmesAide: [bciat, bcib],
@@ -156,7 +156,58 @@ function attachment(
 const demandesOf = (plans: readonly PlanDetail[], id: Plan['id']) =>
     plans.find((plan) => plan.id === id)?.demandesSubvention ?? []
 
+const nouvelleAquitaineInsee = {
+    region: { reg: '75', libelle: 'Nouvelle-Aquitaine' },
+    departements: [{ dep: '87', libelle: 'Haute-Vienne' }],
+}
+
 describe('composePlanDetails', () => {
+    // 87085 is Saint-Junien. Nothing but that code is stored: the département
+    // it opens with, and the région gathering it, are read out of it here.
+    it('places a plan at the commune of its installation', () => {
+        const [premier] = composePlanDetails(
+            sources({
+                installations: [{ id: 1, commune: '87085' }],
+                departementsByRegion: [nouvelleAquitaineInsee],
+            })
+        )
+
+        expect(premier).toMatchObject({
+            communeDeSituation: '87085',
+            departementDeSituation: '87',
+            installationRegion: 'Nouvelle-Aquitaine',
+        })
+    })
+
+    // A plan whose installation the document names nowhere is placed nowhere,
+    // rather than at whatever the first installation happens to be.
+    it('places a plan nowhere when no installation answers for it', () => {
+        const [premier] = composePlanDetails(sources({ installations: [] }))
+
+        expect(premier).toMatchObject({
+            communeDeSituation: null,
+            departementDeSituation: null,
+            installationRegion: null,
+        })
+    })
+
+    // The référentiel is read from the document and can be short of a
+    // département. The plan still sits where it sits — only the région is
+    // unanswered.
+    it('names no région when the référentiel gathers no département', () => {
+        const [premier] = composePlanDetails(
+            sources({
+                installations: [{ id: 1, commune: '87085' }],
+                departementsByRegion: [],
+            })
+        )
+
+        expect(premier).toMatchObject({
+            departementDeSituation: '87',
+            installationRegion: null,
+        })
+    })
+
     it('hangs one demande per programme the plan asked a subvention from', () => {
         expect(
             demandesOf(composePlanDetails(sources()), valFleuri.id).map(

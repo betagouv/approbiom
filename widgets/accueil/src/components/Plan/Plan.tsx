@@ -31,6 +31,7 @@ export type PlanProps = {
     approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
     plan: PlanDetail
     getFileUrl: (id: Attachment['id']) => Promise<string>
+    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
     getDepartementContour: LocalizationPort['getDepartementContour']
     getCountryContour: LocalizationPort['getCountryContour']
     onClose: () => void
@@ -43,6 +44,7 @@ export default function Plan({
     plan,
     approvisionnementStatsByRessource,
     getFileUrl,
+    getCommuneCenterPosition,
     getDepartementContour,
     getCountryContour,
     updateInstruction,
@@ -96,6 +98,8 @@ export default function Plan({
                     approvisionnementStatsByRessource={
                         approvisionnementStatsByRessource
                     }
+                    commune={plan.communeDeSituation}
+                    getCommuneCenterPosition={getCommuneCenterPosition}
                     getDepartementContour={getDepartementContour}
                     getCountryContour={getCountryContour}
                 />

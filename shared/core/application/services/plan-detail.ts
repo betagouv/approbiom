@@ -1,8 +1,13 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
+import {
+    codeDepartementOf,
+    type Commune,
+} from '@shared/core/domain/value-objects/commune'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { Region } from '@shared/core/domain/value-objects/region'
@@ -15,6 +20,7 @@ import type { CrbPort } from '@shared/core/application/ports/crb'
 import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type { InstructionPort } from '@shared/core/application/ports/instruction'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
@@ -34,7 +40,8 @@ export type DemandeSubventionDetail = {
 }
 
 export type PlanDetail = Plan & {
-    /** The région the plan's département belongs to, named. */
+    communeDeSituation: Commune['codeInsee'] | null
+    departementDeSituation: Departement['dep'] | null
     installationRegion: Region['libelle'] | null
     demandesSubvention: readonly DemandeSubventionDetail[]
     fournisseurs: readonly Entreprise[]
@@ -43,6 +50,7 @@ export type PlanDetail = Plan & {
 
 export type PlanDetailSources = {
     plans: readonly Plan[]
+    installations: readonly Installation[]
     departementsByRegion: readonly DepartementsByRegion[]
     demandesSubvention: readonly DemandeSubvention[]
     programmesAide: readonly ProgrammeAide[]
@@ -193,6 +201,7 @@ export function getAppelsAProjet(
 
 export function composePlanDetails({
     plans,
+    installations,
     departementsByRegion,
     demandesSubvention,
     programmesAide,
@@ -202,6 +211,10 @@ export function composePlanDetails({
     entreprises,
     attachments,
 }: PlanDetailSources): PlanDetail[] {
+    const communeByInstallation = new Map(
+        installations.map(({ id, commune }) => [id, commune] as const)
+    )
+
     const regionByDepartement = new Map<Departement['dep'], Region['libelle']>()
     for (const { region, departements } of departementsByRegion)
         for (const departement of departements)
@@ -222,14 +235,17 @@ export function composePlanDetails({
     const attachmentsByPlan = getAttachmentsByPlan(attachments)
 
     return plans.map((plan) => {
-        const { departement } = plan
+        const commune = communeByInstallation.get(plan.installation) ?? ''
+        const departementDeSituation = codeDepartementOf(commune) ?? null
 
         return {
             ...plan,
+            communeDeSituation: commune === '' ? null : commune,
+            departementDeSituation,
             installationRegion:
-                departement === null
+                departementDeSituation === null
                     ? null
-                    : (regionByDepartement.get(departement) ?? null),
+                    : (regionByDepartement.get(departementDeSituation) ?? null),
             demandesSubvention: demandesByPlan.get(plan.id) ?? [],
             fournisseurs: fournisseursByPlan.get(plan.id) ?? [],
             attachments: attachmentsByPlan.get(plan.id) ?? [],
@@ -240,6 +256,7 @@ export function composePlanDetails({
 /** Everything a plan detail is read from. Named so a widget hands over its ports and nothing else. */
 export type PlanDetailPorts = {
     plans: PlanPort
+    installations: InstallationPort
     listDepartementsByRegion: LocalizationPort['listDepartementsByRegion']
     demandesSubvention: DemandeSubventionPort
     programmesAide: ProgrammeAidePort
@@ -262,6 +279,7 @@ export async function getPlanDetails(
 ): Promise<readonly PlanDetail[]> {
     const [
         plans,
+        installations,
         departementsByRegion,
         demandesSubvention,
         programmesAide,
@@ -272,6 +290,7 @@ export async function getPlanDetails(
         attachments,
     ] = await Promise.all([
         ports.plans.list(),
+        ports.installations.list(),
         ports.listDepartementsByRegion(),
         ports.demandesSubvention.list(),
         ports.programmesAide.list(),
@@ -284,6 +303,7 @@ export async function getPlanDetails(
 
     return composePlanDetails({
         plans,
+        installations,
         departementsByRegion,
         demandesSubvention,
         programmesAide,

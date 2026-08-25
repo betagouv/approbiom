@@ -7,6 +7,7 @@ import type {
     ApprovisionnementStatsByRessource,
 } from '@shared/core/application/services/approvisionnement-stats'
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { Commune } from '@shared/core/domain/value-objects/commune'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
 import Alert from '../Alert'
 import ProvenanceMap from './ProvenanceMap'
@@ -46,12 +47,16 @@ function groupColumns(header: string): readonly Column<Group>[] {
 
 export type RessourceProps = {
     approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
+    commune: Commune['codeInsee'] | null
+    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
     getDepartementContour: LocalizationPort['getDepartementContour']
     getCountryContour: LocalizationPort['getCountryContour']
 }
 
 export default function Ressource({
     approvisionnementStatsByRessource,
+    commune,
+    getCommuneCenterPosition,
     getDepartementContour,
     getCountryContour,
 }: RessourceProps) {
@@ -148,6 +153,8 @@ export default function Ressource({
 
                     <ProvenanceMap
                         provenances={selected.byProvenance}
+                        commune={commune}
+                        getCommuneCenterPosition={getCommuneCenterPosition}
                         getDepartementContour={getDepartementContour}
                         getCountryContour={getCountryContour}
                     />

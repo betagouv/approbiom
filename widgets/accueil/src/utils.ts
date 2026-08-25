@@ -62,7 +62,7 @@ export function getFilteredRows(
         (row) =>
             (query === '' || row.nom.toLowerCase().includes(query)) &&
             matchesSelection(statuts, row.statut) &&
-            matchesSelection(departements, row.departement) &&
+            matchesSelection(departements, row.departementDeSituation) &&
             matchesAnySelection(
                 appelsAProjet,
                 getAppelsAProjet(row),

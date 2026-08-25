@@ -12,6 +12,7 @@ import { createGristCrbPort } from '@shared/infrastructure/grist/adapters/grist-
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
 import { createGristLocalizationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-localization'
+import { createGristInstallationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-installation'
 import { createGristInstructionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-instruction'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
@@ -31,10 +32,12 @@ createRoot(rootEl).render(
     <StrictMode>
         <App
             plans={createGristPlanPort()}
+            installations={createGristInstallationPort()}
             approvisionnements={createGristApprovisionnementPort()}
             ressources={createGristRessourcePort()}
             entreprises={createGristEntreprisePort()}
             listDepartementsByRegion={localization.listDepartementsByRegion}
+            getCommuneCenterPosition={localization.getCommuneCenterPosition}
             getDepartementContour={localization.getDepartementContour}
             getCountryContour={localization.getCountryContour}
             demandesSubvention={createGristDemandeSubventionPort()}

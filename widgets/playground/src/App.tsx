@@ -9,6 +9,9 @@ import { createLocalizationAdapter } from '@shared/infrastructure/localization/l
 const CODES_INSEE = ['64024', '64122', '64102']
 const CODE_DEPARTEMENT = '64'
 
+/** Where the plan's installation sits: Anglet, marked among the provenances. */
+const COMMUNE_INSTALLATION = CODES_INSEE[0]
+
 const localization = createLocalizationAdapter()
 
 const MARKERS: LatLngTuple[] = CODES_INSEE.map((codeInsee) => {
@@ -105,6 +108,10 @@ export default function App() {
                 </h2>
                 <ProvenanceMap
                     provenances={PROVENANCES}
+                    commune={COMMUNE_INSTALLATION}
+                    getCommuneCenterPosition={
+                        localization.getCommuneCenterPosition
+                    }
                     getDepartementContour={localization.getDepartementContour}
                     getCountryContour={localization.getCountryContour}
                 />
@@ -114,6 +121,10 @@ export default function App() {
                 <h2 className="fr-h5">Ressource — ventilations et carte</h2>
                 <Ressource
                     approvisionnementStatsByRessource={STATS}
+                    commune={COMMUNE_INSTALLATION}
+                    getCommuneCenterPosition={
+                        localization.getCommuneCenterPosition
+                    }
                     getDepartementContour={localization.getDepartementContour}
                     getCountryContour={localization.getCountryContour}
                 />
@@ -123,6 +134,10 @@ export default function App() {
                 <h2 className="fr-h5">ProvenanceMap — aucun département</h2>
                 <ProvenanceMap
                     provenances={[]}
+                    commune={COMMUNE_INSTALLATION}
+                    getCommuneCenterPosition={
+                        localization.getCommuneCenterPosition
+                    }
                     getDepartementContour={localization.getDepartementContour}
                     getCountryContour={localization.getCountryContour}
                 />

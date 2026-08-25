@@ -10,6 +10,7 @@ import type { PlanPort } from '@shared/core/application/ports/plan-d-approvision
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
+import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
@@ -47,6 +48,7 @@ const programmeAidePort = (
 function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
     return {
         plans: { list: rows([]) },
+        installations: { list: rows([]) },
         approvisionnements: {
             list: rows([]),
             listGroupedByPlanAndRessource: rows([]),
@@ -57,6 +59,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         ressources: { list: rows([]) },
         entreprises: { list: rows([]) },
         listDepartementsByRegion: rows([]),
+        getCommuneCenterPosition: () => ({ latitude: 0, longitude: 0 }),
         getDepartementContour: () => [],
         getCountryContour: () => [],
         demandesSubvention: { list: rows([]) },
@@ -75,14 +78,15 @@ const saintJunien: Plan = {
     id: 1,
     nom: 'RC Saint Junien',
     installation: 1,
-    // The département the document computes from the installation's commune —
-    // « 87 » is Saint-Junien's, and the chain the header's « Région » follows.
-    departement: '87',
     typeDePlan: 'création',
     usage: 'énergie',
     natureDonnee: 'prévision',
     statut: 'en fonctionnement',
 }
+
+// 87154 is Saint-Junien's commune code. The « 87 » the header's « Région » is
+// followed from is read out of it, not stored on the plan.
+const saintJunienInstallation: Installation = { id: 1, commune: '87154' }
 
 const bciat: ProgrammeAide = {
     id: 1,
@@ -246,6 +250,9 @@ describe('App', () => {
             <App
                 {...fakePorts({
                     plans: planPort(rows([saintJunien])),
+                    installations: {
+                        list: rows([saintJunienInstallation]),
+                    },
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: programmeAidePort(rows([bciat])),
                     listDepartementsByRegion: rows([nouvelleAquitaineInsee]),

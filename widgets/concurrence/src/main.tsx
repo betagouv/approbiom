@@ -5,6 +5,7 @@ import './index.css'
 import App from './App'
 import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/adapters/grist-adapter-approvisionnement'
 import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
+import { createGristInstallationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-installation'
 import { createGristLocalizationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-localization'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
@@ -17,6 +18,7 @@ createRoot(rootEl).render(
         <App
             approvisionnements={createGristApprovisionnementPort()}
             plans={createGristPlanPort()}
+            installations={createGristInstallationPort()}
             ressources={createGristRessourcePort()}
             entreprises={createGristEntreprisePort()}
             localization={createGristLocalizationPort()}

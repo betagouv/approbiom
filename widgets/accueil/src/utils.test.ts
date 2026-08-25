@@ -18,7 +18,8 @@ function plan(overrides: Partial<PlanDetail> = {}): PlanDetail {
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'projet',
-        departement: null,
+        communeDeSituation: null,
+        departementDeSituation: null,
         installationRegion: null,
         demandesSubvention: [],
         fournisseurs: [],
@@ -50,7 +51,7 @@ const valFleuri = plan({
     id: 1,
     nom: 'RCU Val Fleuri',
     statut: 'projet',
-    departement: '87',
+    departementDeSituation: '87',
     installationRegion: 'Nouvelle-Aquitaine',
     demandesSubvention: [demande('BCIAT (2023)')],
 })
@@ -58,7 +59,7 @@ const boisDuNord = plan({
     id: 2,
     nom: 'Chaufferie Bois du Nord',
     statut: 'en fonctionnement',
-    departement: '33',
+    departementDeSituation: '33',
     installationRegion: 'Nouvelle-Aquitaine',
     demandesSubvention: [demande('BCIAT (2023)'), demande('BCIB (2024)')],
 })

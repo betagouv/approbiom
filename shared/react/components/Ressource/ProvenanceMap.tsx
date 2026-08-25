@@ -4,10 +4,13 @@ import Alert from '@shared/react/components/Alert'
 import Map from '@shared/react/components/Map'
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
 import type { ProvenanceGroup } from '@shared/core/application/services/approvisionnement-stats'
+import type { Commune } from '@shared/core/domain/value-objects/commune'
 import { isCodeDepartement } from '@shared/core/domain/value-objects/departement'
 
 export type ProvenanceMapProps = {
     provenances: readonly ProvenanceGroup[]
+    commune: Commune['codeInsee'] | null
+    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
     getDepartementContour: LocalizationPort['getDepartementContour']
     getCountryContour: LocalizationPort['getCountryContour']
 }
@@ -24,6 +27,8 @@ function span(ring: readonly LatLngTuple[]): number {
 
 export default function ProvenanceMap({
     provenances,
+    commune,
+    getCommuneCenterPosition,
     getDepartementContour,
     getCountryContour,
 }: ProvenanceMapProps) {
@@ -60,8 +65,29 @@ export default function ProvenanceMap({
             )
         )
 
-        return { polygons, bounds, center: bounds.getCenter() }
-    }, [provenances, getDepartementContour, getCountryContour])
+        const installation = ((): LatLngTuple | null => {
+            if (commune === null) return null
+
+            const { latitude, longitude } = getCommuneCenterPosition(commune)
+
+            return [latitude, longitude]
+        })()
+
+        if (installation !== null) bounds.extend(installation)
+
+        return {
+            polygons,
+            markers: installation === null ? undefined : [installation],
+            bounds,
+            center: bounds.getCenter(),
+        }
+    }, [
+        provenances,
+        commune,
+        getCommuneCenterPosition,
+        getDepartementContour,
+        getCountryContour,
+    ])
 
     if (view === null) {
         return (
@@ -78,6 +104,7 @@ export default function ProvenanceMap({
                 center={view.center}
                 bounds={view.bounds}
                 polygons={view.polygons}
+                markers={view.markers}
             />
         </div>
     )

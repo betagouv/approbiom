@@ -56,10 +56,7 @@ export const COLUMNS = {
         'Nature_Donnee',
         'Statut',
         'est_Laureat',
-        // Computed by the document out of the installation's commune. Reading
-        // it here is what keeps the 37 000-row INSEE_Commune table, and the
-        // Installation table with it, out of every load.
-        'Departement_de_situation',
+        'Code_Insee_Installation',
     ],
     metaRessource: ['id', 'Code_ressource_Approbiom', 'Description_courte'],
     entreprise: ['id', 'Siret', 'Denomination'],
