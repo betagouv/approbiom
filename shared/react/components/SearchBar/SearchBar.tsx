@@ -71,11 +71,8 @@ export default function SearchBar<T>({
             ref={rootRef}
             onKeyDown={closeOnEscape}
         >
-            {/* A `<form>` rather than a `<div>`, so `type="submit"` on the
-                button means something: pressing Enter in the field and clicking
-                the button then arrive at the same handler, for free. */}
             <form
-                className="fr-search-bar fr-search-bar--sm"
+                className="fr-search-bar"
                 role="search"
                 onSubmit={(event) => {
                     // Nothing to post to — the search happens in the page.

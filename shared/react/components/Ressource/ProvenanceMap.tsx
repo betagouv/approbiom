@@ -7,9 +7,7 @@ import type { Commune } from '@shared/core/domain/value-objects/commune'
 import { isCodeDepartement } from '@shared/core/domain/value-objects/departement'
 
 export type ProvenanceMapProps = {
-    /** Départements by their code, countries by the libellé they are written under. */
     provenances: readonly string[]
-    /** Communes to mark: where the installations drawing on them sit. */
     communes: readonly Commune['codeInsee'][]
     getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
     getDepartementContour: LocalizationPort['getDepartementContour']
@@ -64,9 +62,6 @@ export default function ProvenanceMap({
             }
         )
 
-        // One point per outline — the widest ring of each, which is the shape
-        // itself rather than an island of it. A provenance the référentiel
-        // does not hold draws nothing and frames nothing.
         const framed = drawn.flatMap((rings) =>
             rings.length === 0
                 ? []
@@ -77,8 +72,6 @@ export default function ProvenanceMap({
 
         if (polygons.length === 0 && markers.length === 0) return null
 
-        // A lone marker encloses no area, and fitting bounds to one point
-        // zooms to the street. It is centred at the commune zoom instead.
         if (framed.length === 0 && markers.length === 1) {
             return { polygons, markers, center: markers[0], bounds: undefined }
         }

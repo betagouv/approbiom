@@ -1,0 +1,36 @@
+/* Two rules, both of them repairs to what the DSFR stylesheet leaves to the
+   DSFR script — which a Grist widget does not load. They are scoped to
+   `shared-tabs`, our own class, so nothing here reaches onglets drawn by
+   anything else, and written with both classes so they win against the DSFR
+   rules they override whichever order the two stylesheets end up bundled in. */
+
+/* DSFR closes a panel with `visibility: hidden`, which still takes up its
+   height. That is deliberate on their side: their script measures the open
+   panel and writes the total into `--tabs-height`, so the box is sized to the
+   panel being read and the ones behind it are simply covered. With no script
+   the height falls back to `auto` — the tallest panel of the set — and a short
+   table would then sit above a screenful of nothing. Taking the closed panels
+   out of the layout gives the same result the measuring does, without
+   measuring: the box is as tall as the panel that is open. */
+.fr-tabs.shared-tabs .fr-tabs__panel[hidden] {
+    display: none;
+}
+
+/* The frame around the panel — its background and its left, right and top
+   borders — is painted by `.fr-tabs::before`, a flex item sitting on the same
+   flex line as the panels at `height: 100%`. That percentage is measured
+   against the height of `.fr-tabs`, which is `--tabs-height`: definite while
+   the script is running, `auto` here, and a percentage of an indefinite height
+   is no height at all. The frame would be zero pixels tall and the panel would
+   be left bare.
+
+   `stretch` sizes it from the flex line instead, and the line is as tall as its
+   tallest item — the open panel, the closed ones having been dropped by the
+   rule above. So the frame ends up exactly the height the script would have
+   given it. `height: auto` because stretching only applies to an item whose
+   cross size is auto, and `height: 100%` is not that in every browser's
+   reading. */
+.fr-tabs.shared-tabs::before {
+    height: auto;
+    align-self: stretch;
+}
