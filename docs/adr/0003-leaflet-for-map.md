@@ -1,4 +1,4 @@
-# 1. Record architecture decisions
+# 1. Using Leaflet JS library for display maps.
 
 Date: 2026-08-21
 
