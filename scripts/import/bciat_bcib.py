@@ -3,8 +3,13 @@
 
 import sys
 import os
+import json
+from pathlib import Path
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
+
+from provenance.transform_provenance_data import transform_provenance_data
+
 
 ### Configurations
 
@@ -24,7 +29,28 @@ NAME_COL_FOURNISSEUR = "Fournisseur"
 NAME_COL_RESSOURCE = "Ressource"
 NAME_COL_TONNAGE = "Tonnage"
 NAME_COL_PROVENANCE = "Provenance"
-NAME_COL_PROVENANCE_BRUT = 'Valeur brute de la colonne "Répartition approximative du combustible par département"'
+NAME_COL_RAW_PROVENANCE = 'Valeur brute de la colonne "Répartition approximative du combustible par département"'
+
+
+## Reference data
+DEPARTEMENTS_PATH = (
+    Path(__file__).resolve().parents[2]
+    / "shared"
+    / "infrastructure"
+    / "localization"
+    / "departements-contours.json"
+)
+
+
+def load_departements(path: Path = DEPARTEMENTS_PATH) -> dict[str, str]:
+    """Renvoie {code: nom}, par exemple {"01": "Ain", "2A": "Corse-du-Sud"}."""
+    with path.open(encoding="utf-8") as f:
+        data = json.load(f)
+
+    return {code: departement["nom"] for code, departement in data["departements"].items()}
+
+
+DEPARTEMENTS = load_departements()
 
 
 class MyError(Exception):
@@ -86,11 +112,14 @@ def extract_data_from_worksheet(ws: Worksheet) -> list[dict[str, str]]:
                 NAME_COL_RESSOURCE: row[INDEX_COL_RESSOURCE],
                 NAME_COL_TONNAGE: row[INDEX_COL_TONNAGE],
                 NAME_COL_PROVENANCE: row[INDEX_COL_PROVENANCE],
-                NAME_COL_PROVENANCE_BRUT: row[INDEX_COL_PROVENANCE],
+                NAME_COL_RAW_PROVENANCE: row[INDEX_COL_PROVENANCE],
             }
         )
 
     return extract_data
+
+
+    
 
 
 def main(argv: list[str]) -> int:
