@@ -6,7 +6,9 @@ import os
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-# Workbook structure
+### Configurations
+
+## Workbook structure
 SHEET_NAME = "Fournisseurs"
 INDEX_ROW_HEADERS = 18
 POSITION_HEADER_COLUMN_FOURNISSEURS = "A18"
@@ -17,11 +19,12 @@ INDEX_COL_RESSOURCE = 2
 INDEX_COL_TONNAGE = 3
 INDEX_COL_PROVENANCE = 10
 
-# Result format
+## Result format
 NAME_COL_FOURNISSEUR = "Fournisseur"
 NAME_COL_RESSOURCE = "Ressource"
 NAME_COL_TONNAGE = "Tonnage"
 NAME_COL_PROVENANCE = "Provenance"
+NAME_COL_PROVENANCE_BRUT = 'Valeur brute de la colonne "Répartition approximative du combustible par département"'
 
 
 class MyError(Exception):
@@ -83,6 +86,7 @@ def extract_data_from_worksheet(ws: Worksheet) -> list[dict[str, str]]:
                 NAME_COL_RESSOURCE: row[INDEX_COL_RESSOURCE],
                 NAME_COL_TONNAGE: row[INDEX_COL_TONNAGE],
                 NAME_COL_PROVENANCE: row[INDEX_COL_PROVENANCE],
+                NAME_COL_PROVENANCE_BRUT: row[INDEX_COL_PROVENANCE],
             }
         )
 
@@ -99,7 +103,7 @@ def main(argv: list[str]) -> int:
     try:
         check_path_exists(path)
         check_file_is_xlsx(path)
-        wb = load_workbook(path, read_only=True)
+        wb = load_workbook(path, read_only=True, data_only=True)
         check_workbook_structure(wb)
         ws = wb[SHEET_NAME]
         data = extract_data_from_worksheet(ws)
