@@ -8,3 +8,10 @@ def test_main_explains_how_to_call_it_when_no_argument(capsys):
 
     sortie = capsys.readouterr().out
     assert 'Missing argument' in sortie
+
+
+### TODO: it should extract the correct number of data lines
+
+### TODO: it should throw if the workbook structure is incorrect
+
+### TODO: Les données de sorties sont correctes, par exemple ce qui est appelé Fournisseur correspond bien à la donnée du fournisseur, etc.
