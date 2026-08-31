@@ -10,8 +10,11 @@
     },
     "scripts": {
         "dev": "vite",
-        "build:staging": "node scripts/build.mjs",
-        "build:prod": "node scripts/promote.mjs",
+        "build:staging": "node scripts/deploy/build.mjs",
+        "build:prod": "node scripts/deploy/promote.mjs",
+        "py:setup": "python3 -m venv .venv && .venv/bin/pip install -r scripts/import/requirements-dev.txt",
+        "import:bciat": ".venv/bin/python scripts/import/bciat_bcib.py",
+        "py:test": ".venv/bin/pytest",
         "generate:communes": "node --experimental-strip-types shared/infrastructure/localization/generate-communes.ts",
         "generate:departements-contours": "node --experimental-strip-types shared/infrastructure/localization/generate-departements-contours.ts",
         "generate:countries-contours": "node --experimental-strip-types shared/infrastructure/localization/generate-countries-contours.ts",
