@@ -1,5 +1,5 @@
 import re
-from typing import NamedTuple, TypedDict
+from typing import NamedTuple, NotRequired, TypedDict
 
 from provenance.reference_data import (
     Provenance,
@@ -305,7 +305,17 @@ MEASUREMENT_PATTERN = re.compile(
 WORD_PATTERN = re.compile(r"[a-z0-9.]+")
 
 
-DistributionEntry = dict[str, str | float]
+class DistributionEntry(TypedDict):
+    """A Provenance, plus the share of the tonnage it accounts for.
+
+    "code" and "libelle" are the two halves of the domain's union: an entry
+    carries one or the other, never both.
+    """
+
+    source: str
+    code: NotRequired[str]
+    libelle: NotRequired[str]
+    percentage: float
 
 
 class ProvenanceResult(TypedDict):
@@ -342,6 +352,21 @@ def group_mentions_by_place(mentions: list[Mention], pairing: Pairing) -> list[P
         )
 
     return list(places.values())
+
+
+def as_distribution_entry(place: Place) -> DistributionEntry:
+    source = place.provenance["source"]
+    share = place.share or 0.0
+    code = place.provenance.get("code")
+
+    if code is not None:
+        return {"source": source, "code": code, "percentage": share}
+
+    return {
+        "source": source,
+        "libelle": place.provenance["libelle"],
+        "percentage": share,
+    }
 
 
 def find_unread_words(text: str, covered: list[tuple[int, int]]) -> list[tuple[int, str]]:
@@ -437,23 +462,24 @@ def build_distribution(
         status = NEEDS_REVIEW
 
     return ProvenanceResult(
-        distribution=[
-            {**place.provenance, "percentage": place.share or 0.0} for place in places
-        ],
+        distribution=[as_distribution_entry(place) for place in places],
         status=status,
         unrecognized=[word for _, word in sorted(unread)],
     )
 
 
 def transform_provenance_data(
-    raw_provenance: str | None, reference_data: ReferenceData
+    raw_provenance: object, reference_data: ReferenceData
 ) -> ProvenanceResult:
     """Read a "répartition par département" cell into shares of the tonnage.
 
     Applying those shares to an actual tonnage is somebody else's job: this only
     says where the fuel comes from, and how much of the cell it had to guess at.
+
+    The cell is taken as it comes out of the workbook rather than as a string: a
+    cell naming one département is stored as the number 88, not as "88".
     """
-    text = normalize(raw_provenance or "")
+    text = normalize("" if raw_provenance is None else str(raw_provenance))
     mentions = find_location_mentions(text, reference_data)
     percentages = find_percentages(text)
 
@@ -462,19 +488,5 @@ def transform_provenance_data(
     )
 
 
-def check_is_french_deparment_postcode(raw_value: str, departements: dict[str, str]) -> bool:
-    department = raw_value[:2]
-    return department in departements
-
-
-def get_french_departments_from_string(text: str, departements: dict[str, str]) -> list[str]:
-    result = []
-    values = text.split(",")
-
-    for value in values:
-        if check_is_french_deparment_postcode(value, departements):
-            result.append(value)
-
-    return result
 
 

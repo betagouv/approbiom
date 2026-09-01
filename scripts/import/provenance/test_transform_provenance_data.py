@@ -249,7 +249,7 @@ def test_it_reports_where_each_place_was_named():
 
 def distribution_of(raw: str | None) -> dict[str, float]:
     return {
-        entry.get("code") or entry["libelle"]: entry["percentage"]
+        entry.get("code") or entry.get("libelle", ""): entry["percentage"]
         for entry in transform_provenance_data(raw, REFERENCE_DATA)["distribution"]
     }
 
