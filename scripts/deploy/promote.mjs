@@ -11,7 +11,7 @@
 import { cpSync, rmSync, existsSync } from 'node:fs'
 import { resolve } from 'node:path'
 
-const projectRoot = resolve(import.meta.dirname, '..')
+const projectRoot = resolve(import.meta.dirname, '../..')
 const staging = resolve(projectRoot, 'dist/staging')
 const prod = resolve(projectRoot, 'dist/prod')
 

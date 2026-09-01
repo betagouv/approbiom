@@ -11,7 +11,7 @@ import { readdirSync, rmSync, copyFileSync, mkdirSync } from 'node:fs'
 import { resolve } from 'node:path'
 import { build } from 'vite'
 
-const projectRoot = resolve(import.meta.dirname, '..')
+const projectRoot = resolve(import.meta.dirname, '../..')
 const widgetsDir = resolve(projectRoot, 'widgets')
 const outputDir = resolve(projectRoot, 'dist/staging')
 
