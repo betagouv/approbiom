@@ -4,10 +4,10 @@
 import sys
 import os
 import json
-from pathlib import Path
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
+from provenance.reference_data import ReferenceData, load_reference_data
 from provenance.transform_provenance_data import transform_provenance_data
 
 
@@ -30,27 +30,6 @@ NAME_COL_RESSOURCE = "Ressource"
 NAME_COL_TONNAGE = "Tonnage"
 NAME_COL_PROVENANCE = "Provenance"
 NAME_COL_RAW_PROVENANCE = 'Valeur brute de la colonne "Répartition approximative du combustible par département"'
-
-
-## Reference data
-DEPARTEMENTS_PATH = (
-    Path(__file__).resolve().parents[2]
-    / "shared"
-    / "infrastructure"
-    / "localization"
-    / "departements-contours.json"
-)
-
-
-def load_departements(path: Path = DEPARTEMENTS_PATH) -> dict[str, str]:
-    """Renvoie {code: nom}, par exemple {"01": "Ain", "2A": "Corse-du-Sud"}."""
-    with path.open(encoding="utf-8") as f:
-        data = json.load(f)
-
-    return {code: departement["nom"] for code, departement in data["departements"].items()}
-
-
-DEPARTEMENTS = load_departements()
 
 
 class MyError(Exception):
@@ -93,7 +72,9 @@ def find_index_last_row_data(ws: Worksheet) -> int:
     return ws.max_row
 
 
-def extract_data_from_worksheet(ws: Worksheet) -> list[dict[str, str]]:
+def extract_data_from_worksheet(
+    ws: Worksheet, reference_data: ReferenceData
+) -> list[dict[str, str]]:
     extract_data = []
 
     index_last_row = find_index_last_row_data(ws)
@@ -111,7 +92,9 @@ def extract_data_from_worksheet(ws: Worksheet) -> list[dict[str, str]]:
                 NAME_COL_FOURNISSEUR: row[INDEX_COL_FOURNISSEURS],
                 NAME_COL_RESSOURCE: row[INDEX_COL_RESSOURCE],
                 NAME_COL_TONNAGE: row[INDEX_COL_TONNAGE],
-                NAME_COL_PROVENANCE: row[INDEX_COL_PROVENANCE],
+                NAME_COL_PROVENANCE: transform_provenance_data(
+                    row[INDEX_COL_PROVENANCE], reference_data
+                ),
                 NAME_COL_RAW_PROVENANCE: row[INDEX_COL_PROVENANCE],
             }
         )
@@ -135,11 +118,11 @@ def main(argv: list[str]) -> int:
         wb = load_workbook(path, read_only=True, data_only=True)
         check_workbook_structure(wb)
         ws = wb[SHEET_NAME]
-        data = extract_data_from_worksheet(ws)
-        print(data)
+        data = extract_data_from_worksheet(ws, load_reference_data())
+        print(json.dumps(data, indent=2, ensure_ascii=False))
 
     except MyError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return 2
 
     return 0
