@@ -1,10 +1,11 @@
 import re
-from typing import NamedTuple
+from typing import NamedTuple, TypedDict
 
 from provenance.reference_data import (
     Provenance,
     ReferenceData,
     departement_provenance,
+    normalize,
 )
 
 
@@ -253,6 +254,214 @@ def pair_percentages_with_mentions(
     )
 
 
+### Turning what was read into a distribution
+
+# The cell was read whole and its shares add up.
+EXPLICIT = "EXPLICIT"
+
+# The cell named places but no shares, so they were given one each.
+EVEN_SPLIT = "EVEN_SPLIT"
+
+# Something was read, but not all of it, or not to 100. Needs a human.
+NEEDS_REVIEW = "NEEDS_REVIEW"
+
+# Nothing in the cell named a place the domain can hold.
+UNRESOLVED = "UNRESOLVED"
+
+# How far the shares a cell writes may sit from 100 and still be read as
+# rounding rather than as a mistake: "33% / 33% / 33%" lands on 99 and means
+# the same thing as "34% / 33% / 33%".
+ROUNDING_TOLERANCE = 1.0
+
+# Words that carry no provenance. Left out of "unrecognized" so that a cell is
+# only flagged for something a reader would also puzzle over. This is source
+# data, not code, hence French.
+NOISE_WORDS = {
+    "a", "au", "aux", "autour", "avec",
+    "cellule", "chaufferie", "combustible",
+    "dans", "de", "dep", "dept", "departement", "departements", "des", "dont",
+    "dpt", "du",
+    "en", "environ", "est", "et", "ex", "exemple",
+    "info", "infos", "installation",
+    "la", "le", "les",
+    "nom", "nomenclature",
+    "ou",
+    "par", "possible", "pour", "pourcentage", "pourcentages", "provenance",
+    "provenances",
+    "rayon", "repartition",
+    "site", "soit", "sur",
+    "total",
+    "usine",
+}
+
+# A number and what it measures, taken together so that the "100" of "100 km"
+# is not reported as an unread fragment.
+MEASUREMENT_PATTERN = re.compile(
+    r"\d+(?:\.\d+)?\s*(?:km|kwh|mwh|tonnes|tonne|ans|an|t|h)(?![a-z])"
+)
+
+# "%" is deliberately not part of a word: "50%France" is written without a
+# space, and one token would let the share swallow the place next to it.
+WORD_PATTERN = re.compile(r"[a-z0-9.]+")
+
+
+DistributionEntry = dict[str, str | float]
+
+
+class ProvenanceResult(TypedDict):
+    distribution: list[DistributionEntry]
+    status: str
+    unrecognized: list[str]
+
+
+class Place(NamedTuple):
+    """One place, gathering every mention of it in the cell."""
+
+    provenance: Provenance
+    share: float | None
+    spans: list[tuple[int, int]]
+
+
+def group_mentions_by_place(mentions: list[Mention], pairing: Pairing) -> list[Place]:
+    """A cell naming the same place twice describes one provenance, not two, so
+    its mentions are gathered and their shares added."""
+    places: dict[tuple[tuple[str, str], ...], Place] = {}
+
+    for index, mention in enumerate(mentions):
+        key = tuple(sorted(mention.provenance.items()))
+        found = places.get(key)
+        share = pairing.shares.get(index)
+
+        if found is None:
+            places[key] = Place(mention.provenance, share, [(mention.start, mention.end)])
+            continue
+
+        places[key] = found._replace(
+            share=found.share if share is None else (found.share or 0.0) + share,
+            spans=found.spans + [(mention.start, mention.end)],
+        )
+
+    return list(places.values())
+
+
+def find_unread_words(text: str, covered: list[tuple[int, int]]) -> list[tuple[int, str]]:
+    """The words the reading never accounted for, minus the ones that carry no
+    provenance anyway."""
+    unread = []
+
+    for match in WORD_PATTERN.finditer(text):
+        word = match.group()
+        is_noise = word in NOISE_WORDS or (len(word) == 1 and word.isalpha())
+
+        if is_noise or overlaps(match.start(), match.end(), covered):
+            continue
+
+        unread.append((match.start(), word))
+
+    return unread
+
+
+def scale_to_one_hundred(places: list[Place]) -> list[Place]:
+    total = sum(place.share or 0.0 for place in places)
+
+    return [
+        place._replace(share=(place.share or 0.0) * 100.0 / total) for place in places
+    ]
+
+
+def build_distribution(
+    text: str,
+    mentions: list[Mention],
+    percentages: list[Percentage],
+    pairing: Pairing,
+) -> ProvenanceResult:
+    """Weigh what was read against what was left over, and say which it is.
+
+    The shares always come out summing to 100, because a distribution that does
+    not is a tonnage silently gained or lost downstream. What varies is the
+    status, which says how much of that 100 the cell actually justified.
+    """
+    places = group_mentions_by_place(mentions, pairing)
+    left_over = [
+        (percentage.start, percentage.end) for percentage in pairing.unpaired
+    ]
+
+    if not places:
+        status = UNRESOLVED
+    elif all(place.share is None for place in places):
+        share_each = 100.0 / len(places)
+        places = [place._replace(share=share_each) for place in places]
+        status = EVEN_SPLIT
+    else:
+        written_total = sum(place.share for place in places if place.share is not None)
+        without_share = [place for place in places if place.share is None]
+        remainder = 100.0 - written_total
+
+        if without_share and remainder > ROUNDING_TOLERANCE:
+            # The cell wrote some shares and left places bare: the shares it did
+            # not write are what is missing from 100.
+            share_each = remainder / len(without_share)
+            places = [
+                place._replace(share=share_each) if place.share is None else place
+                for place in places
+            ]
+            status = NEEDS_REVIEW
+        elif without_share:
+            # Nothing left to give them — "dpt 54 100% Vosges" is the shape of
+            # this. They are dropped, and reported as unread.
+            left_over += [span for place in without_share for span in place.spans]
+            places = [place for place in places if place.share is not None]
+            status = NEEDS_REVIEW
+        else:
+            status = (
+                EXPLICIT
+                if abs(written_total - 100.0) <= ROUNDING_TOLERANCE
+                else NEEDS_REVIEW
+            )
+
+        if not places or sum(place.share or 0.0 for place in places) <= 0.0:
+            places, status = [], UNRESOLVED
+
+    if places:
+        places = scale_to_one_hundred(places)
+
+    covered = (
+        [span for place in places for span in place.spans]
+        + [(percentage.start, percentage.end) for percentage in percentages]
+        + [(match.start(), match.end()) for match in MEASUREMENT_PATTERN.finditer(text)]
+    )
+    unread = [(start, text[start:end]) for start, end in left_over]
+    unread += find_unread_words(text, covered + left_over)
+
+    if unread and status in (EXPLICIT, EVEN_SPLIT):
+        status = NEEDS_REVIEW
+
+    return ProvenanceResult(
+        distribution=[
+            {**place.provenance, "percentage": place.share or 0.0} for place in places
+        ],
+        status=status,
+        unrecognized=[word for _, word in sorted(unread)],
+    )
+
+
+def transform_provenance_data(
+    raw_provenance: str | None, reference_data: ReferenceData
+) -> ProvenanceResult:
+    """Read a "répartition par département" cell into shares of the tonnage.
+
+    Applying those shares to an actual tonnage is somebody else's job: this only
+    says where the fuel comes from, and how much of the cell it had to guess at.
+    """
+    text = normalize(raw_provenance or "")
+    mentions = find_location_mentions(text, reference_data)
+    percentages = find_percentages(text)
+
+    return build_distribution(
+        text, mentions, percentages, pair_percentages_with_mentions(mentions, percentages)
+    )
+
+
 def check_is_french_deparment_postcode(raw_value: str, departements: dict[str, str]) -> bool:
     department = raw_value[:2]
     return department in departements
@@ -269,13 +478,3 @@ def get_french_departments_from_string(text: str, departements: dict[str, str]) 
     return result
 
 
-def transform_provenance_data(raw_provenance: str, departements: dict[str, str]) -> str | None:
-    if raw_provenance == "":
-        return None
-
-    # Détecter les départements
-    # Détecter les pays
-    # Détecter les répartitions
-    # Noter le niveau de confiance du tonnage
-    # Vérifier que la somme totale des tonnages calculées est bien égale au Tonnage donné.
-    return "coucou"
