@@ -18,3 +18,4 @@ def test_numbers_with_comma():
     assert get_french_departments_from_string(
         "88,68,67,69,52,54,55,57,90,70", DEPARTEMENTS_DE_TEST
     ) == ["88", "68", "67", "69", "52", "54", "55", "57", "90", "70"]
+    assert get_french_departments_from_string('88, 68, 55', DEPARTEMENTS_DE_TEST) == ["88", "68", "66"]

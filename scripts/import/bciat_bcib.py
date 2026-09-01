@@ -8,8 +8,6 @@ from pathlib import Path
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from provenance.transform_provenance_data import transform_provenance_data
-
 
 ### Configurations
 
@@ -139,7 +137,7 @@ def main(argv: list[str]) -> int:
         print(data)
 
     except MyError as e:
-        print(e)
+        print(e, file=sys.stderr)
         return 2
 
     return 0
