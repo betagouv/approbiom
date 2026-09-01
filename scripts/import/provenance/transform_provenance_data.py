@@ -135,6 +135,124 @@ def find_location_mentions(text: str, reference_data: ReferenceData) -> list[Men
     return merge_adjacent_mentions(by_name + by_code, text)
 
 
+### Finding the shares, and deciding which place each one belongs to
+
+ORIENTATION_FOLLOWS = "follows"
+ORIENTATION_PRECEDES = "precedes"
+
+PERCENTAGE_PATTERN = re.compile(r"(\d+(?:\.\d+)?)\s*%")
+
+
+class Percentage(NamedTuple):
+    start: int
+    end: int
+    value: float
+
+
+class Pairing(NamedTuple):
+    """Which place each share was given to, once the reading order is settled."""
+
+    orientation: str # Follow or preceed
+
+    # Index into the mentions -> the share it was given.
+    shares: dict[int, float]
+
+    # Shares that found no place to belong to. One of these means something in
+    # the cell was not understood, however well the rest was read.
+    unpaired: list[Percentage]
+
+
+def find_percentages(text: str) -> list[Percentage]:
+    """`text` is expected to have been through `normalize` already."""
+    return [
+        Percentage(match.start(), match.end(), float(match.group(1)))
+        for match in PERCENTAGE_PATTERN.finditer(text)
+    ]
+
+
+def pair_looking_forward(
+    mentions: list[Mention], percentages: list[Percentage]
+) -> dict[int, int]:
+    """Read as "70% Vosges": each share names the place that comes after it."""
+    pairs: dict[int, int] = {}
+
+    for percentage_index, percentage in enumerate(percentages):
+        for mention_index, mention in enumerate(mentions):
+            if mention.start < percentage.end or mention_index in pairs:
+                continue
+
+            # Another share standing in between means that place belongs to it,
+            # not to this one.
+            if any(
+                percentage.end <= other.start < mention.start for other in percentages
+            ):
+                break
+
+            pairs[mention_index] = percentage_index
+            break
+
+    return pairs
+
+
+def pair_looking_backward(
+    mentions: list[Mention], percentages: list[Percentage]
+) -> dict[int, int]:
+    """Read as "88-34%": each share names the place that comes before it."""
+    pairs: dict[int, int] = {}
+
+    for percentage_index, percentage in enumerate(percentages):
+        for mention_index in reversed(range(len(mentions))):
+            mention = mentions[mention_index]
+            if mention.end > percentage.start or mention_index in pairs:
+                continue
+
+            if any(
+                other is not percentage
+                and mention.end <= other.start
+                and other.end <= percentage.start
+                for other in percentages
+            ):
+                break
+
+            pairs[mention_index] = percentage_index
+            break
+
+    return pairs
+
+
+def pair_percentages_with_mentions(
+    mentions: list[Mention], percentages: list[Percentage]
+) -> Pairing:
+    """Settle whether the cell writes the share before or after the place.
+
+    The choice is made once for the whole string rather than mention by
+    mention: "Ex : 88-34%, 67-33%, 68-33%" only reads correctly if all three
+    shares are taken the same way round. Whichever reading accounts for more of
+    them wins, and a tie goes to "70% Vosges", by far the more common form.
+    """
+    forward = pair_looking_forward(mentions, percentages)
+    backward = pair_looking_backward(mentions, percentages)
+
+    orientation, pairs = (
+        (ORIENTATION_PRECEDES, backward)
+        if len(backward) > len(forward)
+        else (ORIENTATION_FOLLOWS, forward)
+    )
+
+    return Pairing(
+        orientation=orientation,
+        shares={
+            mention_index: percentages[percentage_index].value
+            for mention_index, percentage_index in pairs.items()
+        },
+        unpaired=[
+            percentage
+            for index, percentage in enumerate(percentages)
+            if index not in pairs.values()
+        ],
+    )
+
+
 def check_is_french_deparment_postcode(raw_value: str, departements: dict[str, str]) -> bool:
     department = raw_value[:2]
     return department in departements
