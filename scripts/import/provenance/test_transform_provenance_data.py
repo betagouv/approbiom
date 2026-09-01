@@ -299,8 +299,26 @@ def test_a_region_names_no_department():
     assert distribution_of("GRAND EST") == {}
     assert status_of("GRAND EST") == UNRESOLVED
     assert transform_provenance_data("GRAND EST", REFERENCE_DATA)["unrecognized"] == [
-        "grand"
+        "grand est"
     ]
+
+
+def test_a_distribution_written_by_region_is_reported_whole():
+    raw = "60% Grand Est, 20% Hauts de France, 10% Ile de France, 10% Bourgogne Franch-Comté"
+    result = transform_provenance_data(raw, REFERENCE_DATA)
+
+    assert result["distribution"] == []
+    assert result["status"] == UNRESOLVED
+    assert "grand est" in result["unrecognized"]
+    assert "hauts de france" in result["unrecognized"]
+    assert "ile de france" in result["unrecognized"]
+
+
+def test_a_former_region_is_a_region_too():
+    # "100% Alsace (68)" — plans still name the régions of before 2016.
+    result = transform_provenance_data("100% Alsace (68)", REFERENCE_DATA)
+
+    assert result["unrecognized"] == ["alsace"]
 
 
 def test_a_radius_names_no_department():

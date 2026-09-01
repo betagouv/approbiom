@@ -7,7 +7,7 @@ import json
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 
-from provenance.reference_data import ReferenceData, load_reference_data
+from provenance.reference_data import ReferenceData, load_reference_data, normalize
 from provenance.transform_provenance_data import transform_provenance_data
 
 
@@ -15,14 +15,11 @@ from provenance.transform_provenance_data import transform_provenance_data
 
 ## Workbook structure
 SHEET_NAME = "Fournisseurs"
-INDEX_ROW_HEADERS = 18
-POSITION_HEADER_COLUMN_FOURNISSEURS = "A18"
 HEADER_COLUMN_FOURNISSEURS = "Fournisseur"
 
-INDEX_COL_FOURNISSEURS = 0
-INDEX_COL_RESSOURCE = 2
-INDEX_COL_TONNAGE = 3
-INDEX_COL_PROVENANCE = 10
+# How far down to look for the header row. It sits on row 11, 16 or 18
+# depending on which year's template the plan was written on.
+MAX_ROW_HEADER_SEARCH = 40
 
 ## Result format
 NAME_COL_FOURNISSEUR = "Fournisseur"
@@ -30,6 +27,18 @@ NAME_COL_RESSOURCE = "Ressource"
 NAME_COL_TONNAGE = "Tonnage"
 NAME_COL_PROVENANCE = "Provenance"
 NAME_COL_RAW_PROVENANCE = 'Valeur brute de la colonne "Répartition approximative du combustible par département"'
+
+# How each column we need announces itself, as a prefix of its normalized
+# header. Columns are found by name rather than by index because the templates
+# do not agree on either: the tonnage sits on column 3, 4 or 6, and the
+# provenance on column 10, 14 or 21. The wording drifts too, hence a prefix —
+# "Tonnage / an" in 2021, "Tonnage (t/an)" from 2023 on.
+COLUMN_HEADER_PREFIXES = {
+    NAME_COL_FOURNISSEUR: "fournisseur",
+    NAME_COL_RESSOURCE: "sous categorie",
+    NAME_COL_TONNAGE: "tonnage",
+    NAME_COL_PROVENANCE: "repartition approximative",
+}
 
 
 class MyError(Exception):
@@ -49,25 +58,74 @@ def check_file_is_xlsx(file_path: str) -> None:
         raise MyError(f"The file is not a xlsx file: {file_path}")
 
 
-def check_workbook_structure(wb: Workbook) -> None:
-    sheetnames = wb.sheetnames
+def find_index_row_headers(ws: Worksheet) -> int:
+    """The row carrying "Fournisseur" in column A.
 
-    if SHEET_NAME not in sheetnames:
-        raise MyError(f'The sheet "{SHEET_NAME}" does not exist in the file.')
-    ws = wb[SHEET_NAME]
+    Only an exact match counts: the sheet is titled "Fournisseurs" on row 1 and
+    talks about a "Vérification tonnage Fournisseur" above the table, and
+    neither of those is the header.
+    """
+    rows = ws.iter_rows(
+        min_row=1, max_row=MAX_ROW_HEADER_SEARCH, min_col=1, max_col=1, values_only=True
+    )
 
-    if (ws[POSITION_HEADER_COLUMN_FOURNISSEURS].value) != HEADER_COLUMN_FOURNISSEURS:
+    for index, (value,) in enumerate(rows, start=1):
+        if isinstance(value, str) and value.strip() == HEADER_COLUMN_FOURNISSEURS:
+            return index
+
+    raise MyError(
+        f'No row in the first {MAX_ROW_HEADER_SEARCH} of the sheet "{SHEET_NAME}" '
+        f'carries the header "{HEADER_COLUMN_FOURNISSEURS}" in column A.'
+    )
+
+
+def find_columns(ws: Worksheet, index_row_headers: int) -> dict[str, int]:
+    """Where each column we need sits, read off the header row.
+
+    The leftmost match wins, which is what tells the "Fournisseur" column from
+    the "Fournisseur certifié PEFC/FSC" one that some templates add later on.
+    """
+    headers = next(
+        ws.iter_rows(
+            min_row=index_row_headers, max_row=index_row_headers, values_only=True
+        )
+    )
+    normalized = [normalize(str(header)) if header is not None else "" for header in headers]
+
+    columns = {}
+    for name, prefix in COLUMN_HEADER_PREFIXES.items():
+        for index, header in enumerate(normalized):
+            if header.startswith(prefix):
+                columns[name] = index
+                break
+
+    missing = [name for name in COLUMN_HEADER_PREFIXES if name not in columns]
+    if missing:
         raise MyError(
-            f'The cell {POSITION_HEADER_COLUMN_FOURNISSEURS} of the sheet "{SHEET_NAME}" '
-            f'should be the header "{HEADER_COLUMN_FOURNISSEURS}".'
+            f'The header row {index_row_headers} of the sheet "{SHEET_NAME}" has no '
+            f"column for: {', '.join(missing)}."
         )
 
+    return columns
 
-def find_index_last_row_data(ws: Worksheet) -> int:
+
+def check_workbook_structure(wb: Workbook) -> None:
+    if SHEET_NAME not in wb.sheetnames:
+        raise MyError(f'The sheet "{SHEET_NAME}" does not exist in the file.')
+
+    ws = wb[SHEET_NAME]
+    find_columns(ws, find_index_row_headers(ws))
+
+
+def find_index_last_row_data(ws: Worksheet, index_row_headers: int) -> int:
     # The last row of data is the row where the first Column ("Fournisseur") is None
-    for row in range(INDEX_ROW_HEADERS + 1, ws.max_row + 1):
-        if ws.cell(row=row, column=1).value is None:
-            return row - 1
+    rows = ws.iter_rows(
+        min_row=index_row_headers + 1, min_col=1, max_col=1, values_only=True
+    )
+
+    for offset, (value,) in enumerate(rows):
+        if value is None:
+            return index_row_headers + offset
 
     return ws.max_row
 
@@ -77,25 +135,24 @@ def extract_data_from_worksheet(
 ) -> list[dict[str, str]]:
     extract_data = []
 
-    index_last_row = find_index_last_row_data(ws)
-    rows = list(
-        ws.iter_rows(
-            min_row=INDEX_ROW_HEADERS + 1,
-            max_row=index_last_row,
-            min_col=INDEX_COL_FOURNISSEURS,
-            values_only=True,
-        )
+    index_row_headers = find_index_row_headers(ws)
+    columns = find_columns(ws, index_row_headers)
+    index_last_row = find_index_last_row_data(ws, index_row_headers)
+
+    rows = ws.iter_rows(
+        min_row=index_row_headers + 1, max_row=index_last_row, values_only=True
     )
     for row in rows:
+        raw_provenance = row[columns[NAME_COL_PROVENANCE]]
         extract_data.append(
             {
-                NAME_COL_FOURNISSEUR: row[INDEX_COL_FOURNISSEURS],
-                NAME_COL_RESSOURCE: row[INDEX_COL_RESSOURCE],
-                NAME_COL_TONNAGE: row[INDEX_COL_TONNAGE],
+                NAME_COL_FOURNISSEUR: row[columns[NAME_COL_FOURNISSEUR]],
+                NAME_COL_RESSOURCE: row[columns[NAME_COL_RESSOURCE]],
+                NAME_COL_TONNAGE: row[columns[NAME_COL_TONNAGE]],
                 NAME_COL_PROVENANCE: transform_provenance_data(
-                    row[INDEX_COL_PROVENANCE], reference_data
+                    raw_provenance, reference_data
                 ),
-                NAME_COL_RAW_PROVENANCE: row[INDEX_COL_PROVENANCE],
+                NAME_COL_RAW_PROVENANCE: raw_provenance,
             }
         )
 

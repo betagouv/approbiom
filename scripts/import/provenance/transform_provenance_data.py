@@ -56,7 +56,10 @@ def find_name_mentions(text: str, reference_data: ReferenceData) -> list[Mention
     taken: list[tuple[int, int]] = []
 
     for name, provenance in reference_data.names:
-        pattern = rf"(?<![a-z0-9]){re.escape(name)}(?![a-z0-9])"
+        # Only a letter either side disqualifies a match: a digit glued to a
+        # name is a share or a code, as in "Aube25%" or "Vosges88", and both
+        # halves are wanted. A letter is another word — "Aube" in "Aubergiste".
+        pattern = rf"(?<![a-z]){re.escape(name)}(?![a-z])"
 
         for match in re.finditer(pattern, text):
             if overlaps(match.start(), match.end(), taken):
@@ -281,7 +284,7 @@ NOISE_WORDS = {
     "cellule", "chaufferie", "combustible",
     "dans", "de", "dep", "dept", "departement", "departements", "des", "dont",
     "dpt", "du",
-    "en", "environ", "est", "et", "ex", "exemple",
+    "en", "environ", "et", "ex", "exemple",
     "info", "infos", "installation",
     "la", "le", "les",
     "nom", "nomenclature",
@@ -303,6 +306,29 @@ MEASUREMENT_PATTERN = re.compile(
 # "%" is deliberately not part of a word: "50%France" is written without a
 # space, and one token would let the share swallow the place next to it.
 WORD_PATTERN = re.compile(r"[a-z0-9.]+")
+
+# Régions, and the ones they replaced in 2016, which plans still write. None of
+# them is a provenance the domain can hold — which départements a région
+# gathers is held in Grist, and splitting a tonnage across ten of them would
+# invent a precision the document never had. They are listed here so that
+# "60% Grand Est" is reported as the région it names rather than as the loose
+# words "grand" and "est", and a reviewer can see what was set aside.
+REGION_NAMES = [
+    "auvergne rhone alpes", "bourgogne franche comte", "bretagne",
+    "centre val de loire", "corse", "grand est", "hauts de france",
+    "ile de france", "normandie", "nouvelle aquitaine", "occitanie",
+    "pays de la loire", "provence alpes cote d azur",
+    "alsace", "aquitaine", "auvergne", "basse normandie", "bourgogne",
+    "champagne ardenne", "franche comte", "haute normandie", "languedoc",
+    "languedoc roussillon", "limousin", "lorraine", "midi pyrenees",
+    "nord pas de calais", "picardie", "poitou charentes", "rhone alpes",
+]
+
+REGION_PATTERN = re.compile(
+    r"(?<![a-z])(?:"
+    + "|".join(sorted((name.replace(" ", r"\s+") for name in REGION_NAMES), key=len, reverse=True))
+    + r")(?![a-z])"
+)
 
 
 class DistributionEntry(TypedDict):
@@ -373,6 +399,12 @@ def find_unread_words(text: str, covered: list[tuple[int, int]]) -> list[tuple[i
     """The words the reading never accounted for, minus the ones that carry no
     provenance anyway."""
     unread = []
+
+    # Régions first, so that a name spanning several words is reported whole.
+    for match in REGION_PATTERN.finditer(text):
+        if not overlaps(match.start(), match.end(), covered):
+            unread.append((match.start(), match.group()))
+            covered = covered + [(match.start(), match.end())]
 
     for match in WORD_PATTERN.finditer(text):
         word = match.group()
