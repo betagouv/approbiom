@@ -22,6 +22,7 @@ HEADER_COLUMN_FOURNISSEURS = "Fournisseur"
 MAX_ROW_HEADER_SEARCH = 40
 
 ## Result format
+NAME_COL_DOCUMENT= "Excele Ademe"
 NAME_COL_FOURNISSEUR = "Fournisseur"
 NAME_COL_RESSOURCE = "Ressource"
 NAME_COL_TONNAGE = "Tonnage"
@@ -131,14 +132,13 @@ def find_index_last_row_data(ws: Worksheet, index_row_headers: int) -> int:
 
 
 def extract_data_from_worksheet(
-    ws: Worksheet, reference_data: ReferenceData
+    wb_name: str, ws: Worksheet, reference_data: ReferenceData
 ) -> list[dict[str, str]]:
     extract_data = []
 
     index_row_headers = find_index_row_headers(ws)
     columns = find_columns(ws, index_row_headers)
     index_last_row = find_index_last_row_data(ws, index_row_headers)
-
     rows = ws.iter_rows(
         min_row=index_row_headers + 1, max_row=index_last_row, values_only=True
     )
@@ -146,6 +146,7 @@ def extract_data_from_worksheet(
         raw_provenance = row[columns[NAME_COL_PROVENANCE]]
         extract_data.append(
             {
+                NAME_COL_DOCUMENT: wb_name,
                 NAME_COL_FOURNISSEUR: row[columns[NAME_COL_FOURNISSEUR]],
                 NAME_COL_RESSOURCE: row[columns[NAME_COL_RESSOURCE]],
                 NAME_COL_TONNAGE: row[columns[NAME_COL_TONNAGE]],
@@ -175,7 +176,8 @@ def main(argv: list[str]) -> int:
         wb = load_workbook(path, read_only=True, data_only=True)
         check_workbook_structure(wb)
         ws = wb[SHEET_NAME]
-        data = extract_data_from_worksheet(ws, load_reference_data())
+        wb_name = os.path.basename(path)
+        data = extract_data_from_worksheet(wb_name, ws, load_reference_data())
         print(json.dumps(data, indent=2, ensure_ascii=False))
 
     except MyError as e:
