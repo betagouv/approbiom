@@ -6,6 +6,7 @@ import os
 import json
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
+import csv
 
 from provenance.reference_data import ReferenceData, load_reference_data, normalize
 from provenance.transform_provenance_data import transform_provenance_data
@@ -171,15 +172,28 @@ def main(argv: list[str]) -> int:
     path = argv[0]
 
     try:
+        print('Checking document...')
         check_path_exists(path)
         check_file_is_xlsx(path)
         wb = load_workbook(path, read_only=True, data_only=True)
         check_workbook_structure(wb)
         ws = wb[SHEET_NAME]
+        print("✅ Document's structure is correct.")
         wb_name = os.path.basename(path)
+        print('Extract and transform data...')
         data = extract_data_from_worksheet(wb_name, ws, load_reference_data())
-        print(json.dumps(data, indent=2, ensure_ascii=False))
-
+        print('✅ Data extracted and transformed.')
+        
+        print('Writing results in csv file...')
+        header = list(data[0].keys())
+        rows = [list(row.values()) for row in data]
+        header_and_rows = [header]+rows
+        ouputFilePath = 'import_' + wb_name + '.csv'
+        with open(ouputFilePath, 'w', newline='') as f:
+            writer = csv.writer(f)
+            writer.writerows(header_and_rows)
+        print('✅ Results are written in some.csv.')
+        
     except MyError as e:
         print(e, file=sys.stderr)
         return 2
