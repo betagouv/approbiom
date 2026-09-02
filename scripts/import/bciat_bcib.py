@@ -11,7 +11,6 @@ import csv
 from provenance.reference_data import ReferenceData, load_reference_data, normalize
 from provenance.transform_provenance_data import transform_provenance_data
 
-
 ### Configurations
 
 ## Workbook structure
@@ -23,11 +22,14 @@ HEADER_COLUMN_FOURNISSEURS = "Fournisseur"
 MAX_ROW_HEADER_SEARCH = 40
 
 ## Result format
-NAME_COL_DOCUMENT= "Excele Ademe"
+NAME_COL_DOCUMENT = "Excel Ademe"
+
+NAME_COL_ROW = "Ligne Excel"
 NAME_COL_FOURNISSEUR = "Fournisseur"
 NAME_COL_RESSOURCE = "Ressource"
 NAME_COL_TONNAGE = "Tonnage"
 NAME_COL_PROVENANCE = "Provenance"
+NAME_COL_DATA_CONFIDENCE = "Niveau de confiance"
 NAME_COL_RAW_PROVENANCE = 'Valeur brute de la colonne "Répartition approximative du combustible par département"'
 
 # How each column we need announces itself, as a prefix of its normalized
@@ -92,7 +94,9 @@ def find_columns(ws: Worksheet, index_row_headers: int) -> dict[str, int]:
             min_row=index_row_headers, max_row=index_row_headers, values_only=True
         )
     )
-    normalized = [normalize(str(header)) if header is not None else "" for header in headers]
+    normalized = [
+        normalize(str(header)) if header is not None else "" for header in headers
+    ]
 
     columns = {}
     for name, prefix in COLUMN_HEADER_PREFIXES.items():
@@ -140,28 +144,30 @@ def extract_data_from_worksheet(
     index_row_headers = find_index_row_headers(ws)
     columns = find_columns(ws, index_row_headers)
     index_last_row = find_index_last_row_data(ws, index_row_headers)
+    index_first_row = index_row_headers + 1
     rows = ws.iter_rows(
-        min_row=index_row_headers + 1, max_row=index_last_row, values_only=True
+        min_row=index_first_row, max_row=index_last_row, values_only=True
     )
-    for row in rows:
+    for offset, row in enumerate(rows):
         raw_provenance = row[columns[NAME_COL_PROVENANCE]]
+        provenance = transform_provenance_data(raw_provenance, reference_data)
         extract_data.append(
             {
                 NAME_COL_DOCUMENT: wb_name,
+                NAME_COL_ROW: index_first_row + offset,
                 NAME_COL_FOURNISSEUR: row[columns[NAME_COL_FOURNISSEUR]],
                 NAME_COL_RESSOURCE: row[columns[NAME_COL_RESSOURCE]],
                 NAME_COL_TONNAGE: row[columns[NAME_COL_TONNAGE]],
-                NAME_COL_PROVENANCE: transform_provenance_data(
-                    raw_provenance, reference_data
-                ),
+                NAME_COL_PROVENANCE: {
+                    "distribution": provenance["distribution"],
+                    "unrecognized": provenance["unrecognized"],
+                },
+                NAME_COL_DATA_CONFIDENCE: provenance["status"],
                 NAME_COL_RAW_PROVENANCE: raw_provenance,
             }
         )
 
     return extract_data
-
-
-    
 
 
 def main(argv: list[str]) -> int:
@@ -172,7 +178,7 @@ def main(argv: list[str]) -> int:
     path = argv[0]
 
     try:
-        print('Checking document...')
+        print("Checking document...")
         check_path_exists(path)
         check_file_is_xlsx(path)
         wb = load_workbook(path, read_only=True, data_only=True)
@@ -180,20 +186,20 @@ def main(argv: list[str]) -> int:
         ws = wb[SHEET_NAME]
         print("✅ Document's structure is correct.")
         wb_name = os.path.basename(path)
-        print('Extract and transform data...')
+        print("Extract and transform data...")
         data = extract_data_from_worksheet(wb_name, ws, load_reference_data())
-        print('✅ Data extracted and transformed.')
-        
-        print('Writing results in csv file...')
+        print("✅ Data extracted and transformed.")
+
+        print("Writing results in csv file...")
         header = list(data[0].keys())
         rows = [list(row.values()) for row in data]
-        header_and_rows = [header]+rows
-        ouputFilePath = 'import_' + wb_name + '.csv'
-        with open(ouputFilePath, 'w', newline='') as f:
+        header_and_rows = [header] + rows
+        ouputFilePath = "import_" + wb_name + ".csv"
+        with open(ouputFilePath, "w", newline="") as f:
             writer = csv.writer(f)
             writer.writerows(header_and_rows)
-        print('✅ Results are written in some.csv.')
-        
+        print("✅ Results are written in some.csv.")
+
     except MyError as e:
         print(e, file=sys.stderr)
         return 2

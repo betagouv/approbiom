@@ -3,11 +3,13 @@ from pathlib import Path
 from openpyxl import load_workbook
 
 from bciat_bcib import (
+    NAME_COL_DATA_CONFIDENCE,
     NAME_COL_DOCUMENT,
     NAME_COL_FOURNISSEUR,
     NAME_COL_PROVENANCE,
     NAME_COL_RAW_PROVENANCE,
     NAME_COL_RESSOURCE,
+    NAME_COL_ROW,
     NAME_COL_TONNAGE,
     SHEET_NAME,
     extract_data_from_worksheet,
@@ -22,14 +24,12 @@ TEST_WORKBOOK = Path(__file__).parent / "BCIAT_test_Plan_dapprovisionnement.xlsx
 def test_main_returns_2_when_no_argument():
     assert main([]) == 2
 
+
 def test_main_explains_how_to_call_it_when_no_argument(capsys):
     main([])
 
     sortie = capsys.readouterr().out
-    assert 'Missing argument' in sortie
-
-
-
+    assert "Missing argument" in sortie
 
 
 def test_it_extracts_one_row_per_line_with_every_column_in_its_place():
@@ -49,14 +49,15 @@ def test_it_extracts_one_row_per_line_with_every_column_in_its_place():
 
     assert data[0] == {
         NAME_COL_DOCUMENT: TEST_WORKBOOK.name,
+        NAME_COL_ROW: 19,
         NAME_COL_FOURNISSEUR: "SANGUINET BOIS",
         NAME_COL_RESSOURCE: "Plaquettes forestières (référentiel 2017 - 1A - PFA)",
         NAME_COL_TONNAGE: 20762,
         NAME_COL_PROVENANCE: {
             "distribution": [],
-            "status": UNRESOLVED,
             "unrecognized": [],
         },
+        NAME_COL_DATA_CONFIDENCE: "UNRESOLVED",
         NAME_COL_RAW_PROVENANCE: "100 km autour de l'installation",
     }
 
@@ -64,9 +65,11 @@ def test_it_extracts_one_row_per_line_with_every_column_in_its_place():
     # not one row short or one row into the blanks below.
     assert data[-1][NAME_COL_FOURNISSEUR] == "GBF SERVICES"
     assert data[-1][NAME_COL_TONNAGE] == 3585
+    assert data[-1][NAME_COL_ROW] == 24
+
 
 def test_it_reads_nothing_out_of_an_empty_value():
-    result = transform_provenance_data('', build_reference_data({}, {}))
+    result = transform_provenance_data("", build_reference_data({}, {}))
 
-    assert result['distribution'] == []
-    assert result['status'] == UNRESOLVED
+    assert result["distribution"] == []
+    assert result["status"] == UNRESOLVED
