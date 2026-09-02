@@ -2,6 +2,7 @@ import re
 from typing import NamedTuple, NotRequired, TypedDict
 
 from provenance.reference_data import (
+    PAYS_ETRANGER,
     Provenance,
     ReferenceData,
     departement_provenance,
@@ -260,16 +261,16 @@ def pair_percentages_with_mentions(
 ### Turning what was read into a distribution
 
 # The cell was read whole and its shares add up.
-EXPLICIT = "EXPLICIT"
+EXPLICIT = "Explicite"
 
 # The cell named places but no shares, so they were given one each.
-EVEN_SPLIT = "EVEN_SPLIT"
+EVEN_SPLIT = "Répartition égale"
 
 # Something was read, but not all of it, or not to 100. Needs a human.
-NEEDS_REVIEW = "NEEDS_REVIEW"
+NEEDS_REVIEW = "À vérifier"
 
 # Nothing in the cell named a place the domain can hold.
-UNRESOLVED = "UNRESOLVED"
+UNRESOLVED = "Non résolu"
 
 # How far the shares a cell writes may sit from 100 and still be read as
 # rounding rather than as a mistake: "33% / 33% / 33%" lands on 99 and means
@@ -348,6 +349,18 @@ class ProvenanceResult(TypedDict):
     distribution: list[DistributionEntry]
     status: str
     unrecognized: list[str]
+
+
+def distribution_entry_label(entry: DistributionEntry) -> str:
+    """How an entry names its place: a département code, or a country label.
+
+    The Python side of getProvenanceLabel in
+    shared/core/domain/value-objects/provenance.ts.
+    """
+    if entry["source"] == PAYS_ETRANGER:
+        return entry.get("libelle", "")
+
+    return entry.get("code", "")
 
 
 class Place(NamedTuple):

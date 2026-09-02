@@ -8,6 +8,7 @@ import pytest
 
 from provenance.transform_provenance_data import (
     EVEN_SPLIT,
+    distribution_entry_label,
     EXPLICIT,
     NEEDS_REVIEW,
     ORIENTATION_FOLLOWS,
@@ -401,3 +402,20 @@ def test_a_place_named_twice_keeps_one_share():
 def test_an_unread_word_downgrades_an_otherwise_clean_reading():
     assert status_of("50% 88 / 50% 68") == EXPLICIT
     assert status_of("50% 88 / 50% 68 / le reste ailleurs") == NEEDS_REVIEW
+
+
+def test_an_entry_names_itself_by_its_code_or_its_country():
+    # Which of the two a row carries is what "source" says, so the label alone
+    # is never ambiguous back at the reader.
+    distribution = transform_provenance_data(
+        "70% Vosges (88) + 30% Espagne", REFERENCE_DATA
+    )["distribution"]
+
+    assert [distribution_entry_label(entry) for entry in distribution] == [
+        "88",
+        "Espagne",
+    ]
+    assert [entry["source"] for entry in distribution] == [
+        DEPARTEMENT_FRANCAIS,
+        PAYS_ETRANGER,
+    ]

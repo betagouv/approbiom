@@ -53,11 +53,8 @@ def test_it_extracts_one_row_per_line_with_every_column_in_its_place():
         NAME_COL_FOURNISSEUR: "SANGUINET BOIS",
         NAME_COL_RESSOURCE: "Plaquettes forestières (référentiel 2017 - 1A - PFA)",
         NAME_COL_TONNAGE: 20762,
-        NAME_COL_PROVENANCE: {
-            "distribution": [],
-            "unrecognized": [],
-        },
-        NAME_COL_DATA_CONFIDENCE: "UNRESOLVED",
+        NAME_COL_PROVENANCE: [],
+        NAME_COL_DATA_CONFIDENCE: UNRESOLVED,
         NAME_COL_RAW_PROVENANCE: "100 km autour de l'installation",
     }
 

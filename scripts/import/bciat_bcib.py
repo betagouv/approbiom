@@ -1,15 +1,31 @@
-# Le but de ce script est d'extraire les informations d'un document BCIAT
-# Pour remplir la table Approvisionnement.
+"""
+Import BCIAT/BCIB Ademe Excel
+===========================
+
+Purpose
+-------
+Extract and transform data from Ademe Excel document related to BCIAT/BCIB calls for project.
+
+Input
+-------
+An Ademe Excel document containing BCIAT/BCIB project data.
+
+Output
+-------
+A CSV file containing the cleaned and transformed data.
+"""
 
 import sys
 import os
-import json
 from openpyxl import load_workbook, Workbook
 from openpyxl.worksheet.worksheet import Worksheet
 import csv
 
 from provenance.reference_data import ReferenceData, load_reference_data, normalize
-from provenance.transform_provenance_data import transform_provenance_data
+from provenance.transform_provenance_data import (
+    distribution_entry_label,
+    transform_provenance_data,
+)
 
 ### Configurations
 
@@ -30,13 +46,13 @@ NAME_COL_RESSOURCE = "Ressource"
 NAME_COL_TONNAGE = "Tonnage"
 NAME_COL_PROVENANCE = "Provenance"
 NAME_COL_DATA_CONFIDENCE = "Niveau de confiance"
+NAME_COL_UNRECOGNIZED = "Éléments non reconnus"
+KEY_SOURCE = "source"
+KEY_PROVENANCE = "provenance"
+KEY_PERCENTAGE = "pourcentage"
 NAME_COL_RAW_PROVENANCE = 'Valeur brute de la colonne "Répartition approximative du combustible par département"'
 
-# How each column we need announces itself, as a prefix of its normalized
-# header. Columns are found by name rather than by index because the templates
-# do not agree on either: the tonnage sits on column 3, 4 or 6, and the
-# provenance on column 10, 14 or 21. The wording drifts too, hence a prefix —
-# "Tonnage / an" in 2021, "Tonnage (t/an)" from 2023 on.
+
 COLUMN_HEADER_PREFIXES = {
     NAME_COL_FOURNISSEUR: "fournisseur",
     NAME_COL_RESSOURCE: "sous categorie",
@@ -158,10 +174,14 @@ def extract_data_from_worksheet(
                 NAME_COL_FOURNISSEUR: row[columns[NAME_COL_FOURNISSEUR]],
                 NAME_COL_RESSOURCE: row[columns[NAME_COL_RESSOURCE]],
                 NAME_COL_TONNAGE: row[columns[NAME_COL_TONNAGE]],
-                NAME_COL_PROVENANCE: {
-                    "distribution": provenance["distribution"],
-                    "unrecognized": provenance["unrecognized"],
-                },
+                NAME_COL_PROVENANCE: [
+                    {
+                        KEY_SOURCE: entry["source"],
+                        KEY_PROVENANCE: distribution_entry_label(entry),
+                        KEY_PERCENTAGE: entry["percentage"],
+                    }
+                    for entry in provenance["distribution"]
+                ],
                 NAME_COL_DATA_CONFIDENCE: provenance["status"],
                 NAME_COL_RAW_PROVENANCE: raw_provenance,
             }
