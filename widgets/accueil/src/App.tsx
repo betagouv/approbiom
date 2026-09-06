@@ -1,6 +1,5 @@
 import AsyncGate from '@shared/react/AsyncGate'
-import { renderError } from '@shared/react/render-error'
-import { useAsyncData } from '@shared/react/useAsyncData'
+import { useAsyncState } from '@shared/react/UseAsyncState'
 import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 import PageAccueil from './components/PageAccueil/PageAccueil'
@@ -8,7 +7,7 @@ import Plan from './components/Plan/Plan'
 import { loadAccueil, type AccueilPorts } from './load-accueil'
 
 export default function App(ports: AccueilPorts) {
-    const state = useAsyncData(() => loadAccueil(ports))
+    const state = useAsyncState(() => loadAccueil(ports))
 
     const [selectedPlanId, setSelectedPlanId] = useState<
         PlanDetail['id'] | null
@@ -16,7 +15,7 @@ export default function App(ports: AccueilPorts) {
 
     return (
         <main className="app">
-            <AsyncGate state={state} renderError={renderError}>
+            <AsyncGate state={state}>
                 {({
                     plansApprovisionnement,
                     programmesAide,

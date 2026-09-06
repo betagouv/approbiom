@@ -26,7 +26,9 @@ pnpm install
 
 ## Guide de développement
 
-Pré-requis : pour tester les widgets, installer Grist Desktop.
+### Mise en place de l'environnement de développement
+
+Pré-requis : installer Grist Desktop.
 
 Voir : https://github.com/gristlabs/grist-desktop/releases
 
@@ -34,6 +36,20 @@ Puis lancer :
 
 ```bash
 pnpm run dev
+```
+
+### Création d'un nouveau widget
+
+Pour créer un nouveau widget "mon-widget" :
+
+1. Créer le dossier "mon-widget" dans le dossier `widgets`
+2. Dans le dossier `mon-widget`, créer un fichier `index.html`. Mettre le script de l'API Plugin de Grist.
+3. Rajouter le widget à la liste des widgets disponibles : à la racine du projet, dans le fichier `index.html`, ajouter le lien vers le nouveau widget "mon-widget".
+4. Initialiser le widget : dans le dossier `mon-widget/src`, créer les fichiers `main.tsx` qui appelle le composant `App.tsx`. Dans `App.tsx`, importer le composant `AsyncGate.tsx` et le hook `UseAsyncState` permettant de gérer la communication avec l'API Plugin de Grist.
+5. Importer la couche de style du DSFR : dans le fichier `mon-wdiget/src/App.tsx`, rajouter la ligne d'import
+
+```tsx
+import '@gouvfr/dsfr/dist/core/core.main.min.css'
 ```
 
 ## Guide de déploiement

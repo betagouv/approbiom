@@ -1,15 +1,15 @@
 import { act, renderHook, waitFor } from '@testing-library/react'
 import { describe, expect, it, vi } from 'vitest'
-import { useAsyncData } from './useAsyncData'
+import { useAsyncState } from './UseAsyncState'
 
-describe('useAsyncData', () => {
+describe('useAsyncState', () => {
     it('reads again on a refresh', async () => {
         const load = vi
             .fn()
             .mockResolvedValueOnce('En attente')
             .mockResolvedValueOnce('Avis favorable')
 
-        const { result } = renderHook(() => useAsyncData(load))
+        const { result } = renderHook(() => useAsyncState(load))
 
         await waitFor(() => expect(result.current.data).toBe('En attente'))
 
@@ -32,7 +32,7 @@ describe('useAsyncData', () => {
                 })
             )
 
-        const { result } = renderHook(() => useAsyncData(load))
+        const { result } = renderHook(() => useAsyncState(load))
         await waitFor(() => expect(result.current.status).toBe('ready'))
 
         act(() => result.current.refresh())
@@ -51,7 +51,7 @@ describe('useAsyncData', () => {
         // A retry follows a failure, so there is nothing worth keeping.
         const load = vi.fn().mockResolvedValue('En attente')
 
-        const { result } = renderHook(() => useAsyncData(load))
+        const { result } = renderHook(() => useAsyncState(load))
         await waitFor(() => expect(result.current.status).toBe('ready'))
 
         act(() => result.current.retry())
