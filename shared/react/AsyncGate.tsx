@@ -13,7 +13,7 @@ export default function AsyncGate<T>({ state, children }: AsyncGateProps<T>) {
         case 'loading':
             return (
                 <Alert severity="info" title="Chargement">
-                    Information : chargement des données…
+                    Information : chargement…
                 </Alert>
             )
 
