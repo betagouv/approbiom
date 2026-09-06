@@ -1,21 +1,14 @@
 import type { ReactNode } from 'react'
 import Alert from '@shared/react/components/Alert'
-import type { UseAsyncDataResult } from './useAsyncData'
+import type { UseAsyncState } from './UseAsyncState'
+import { renderGristError } from './grist-render-error'
 
 export type AsyncGateProps<T> = {
-    state: UseAsyncDataResult<T>
-    // Lets the composition root explain failures in the terms of whichever
-    // adapter it wired in — a missing Grist handshake reads nothing like a
-    // dropped HTTP request. Left out, the message alone is shown.
-    renderError?: (error: Error, retry: () => void) => ReactNode
+    state: UseAsyncState<T>
     children: (data: T) => ReactNode
 }
 
-export default function AsyncGate<T>({
-    state,
-    renderError,
-    children,
-}: AsyncGateProps<T>) {
+export default function AsyncGate<T>({ state, children }: AsyncGateProps<T>) {
     switch (state.status) {
         case 'loading':
             return (
@@ -25,17 +18,7 @@ export default function AsyncGate<T>({
             )
 
         case 'error':
-            if (renderError) return <>{renderError(state.error, state.retry)}</>
-
-            return (
-                <>
-                    <Alert severity="error" title="Erreur">
-                        Erreur : impossible de charger les données :{' '}
-                        {state.error.message}
-                    </Alert>
-                    <button onClick={state.retry}>Réessayer</button>
-                </>
-            )
+            return <>{renderGristError(state.error, state.retry)}</>
 
         case 'ready':
             return <>{children(state.data)}</>
