@@ -1,5 +1,6 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
+import '@gouvfr/dsfr/dist/core/core.main.min.css'
 import App from './App'
 
 const rootEl = document.getElementById('root')

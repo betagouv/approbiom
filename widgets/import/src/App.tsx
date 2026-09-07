@@ -1,4 +1,3 @@
-import '@gouvfr/dsfr/dist/core/core.main.min.css'
 import AsyncGate from '@shared/react/AsyncGate'
 import { useGristSubscription } from '@shared/react/UseGristSubscription'
 import { toSelectedAttachment } from '@shared/infrastructure/grist/grist-selected-attachment'
