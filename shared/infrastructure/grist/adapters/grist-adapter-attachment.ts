@@ -1,59 +1,9 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import { gristReady } from '../grist-ready'
 import { asIdList, asNumber, asString, fetchRowsOnce } from '../grist-helpers'
+import { getAttachmentsMetadata } from '../grist-attachments'
+import { getAccessToken } from '../grist-get-access-token'
 import { COLUMNS, TABLE } from '../grist-tables'
-
-type AttachmentMetadata = {
-    name: string
-    sizeInBytes: number
-}
-
-async function getAccessToken() {
-    await gristReady()
-
-    return grist.docApi.getAccessToken({ readOnly: true })
-}
-
-async function fetchMetadata(
-    ids: readonly number[]
-): Promise<Map<number, AttachmentMetadata>> {
-    if (ids.length === 0) return new Map()
-
-    const { baseUrl, token } = await getAccessToken()
-
-    const files = await Promise.all(
-        ids.map(async (id) => {
-            const response = await fetch(
-                `${baseUrl}/attachments/${id}?auth=${token}`
-            )
-
-            // A cell still naming a file the document no longer stores. There
-            // is nothing to show for it and nothing to hand over.
-            if (response.status === 404) return null
-
-            if (!response.ok) {
-                throw new Error(
-                    `Grist attachment ${id} could not be read — ${response.status} ${response.statusText}. `
-                )
-            }
-
-            const { fileName, fileSize } = (await response.json()) as {
-                fileName?: unknown
-                fileSize?: unknown
-            }
-
-            return [
-                id,
-                {
-                    name: asString(fileName),
-                    sizeInBytes: asNumber(fileSize) ?? 0,
-                },
-            ] as const
-        })
-    )
-
-    return new Map(files.filter((file) => file !== null))
-}
 
 export function createGristAttachmentPort(): AttachmentPort {
     return {
@@ -77,7 +27,7 @@ export function createGristAttachmentPort(): AttachmentPort {
                 }))
             )
 
-            const metadata = await fetchMetadata([
+            const metadata = await getAttachmentsMetadata([
                 ...new Set(attached.map(({ id }) => id)),
             ])
 
