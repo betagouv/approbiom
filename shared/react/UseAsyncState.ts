@@ -15,7 +15,7 @@ type Read = {
     keepData: boolean
 }
 
-const LOADING = { status: 'loading', data: null, error: null } as const
+export const LOADING = { status: 'loading', data: null, error: null } as const
 
 export function useAsyncState<T>(load: () => Promise<T>): UseAsyncState<T> {
     const [state, setState] = useState<AsyncState<T>>(LOADING)
