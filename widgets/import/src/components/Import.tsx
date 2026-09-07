@@ -8,8 +8,8 @@ export type ImportProps = {
         Attachment,
         'id' | 'planDApprovisionnement' | 'type' | 'name'
     >
-    downloadAttachmentFile: (id: Attachment['id']) => Promise<any>
-    getTransformedImportDataFromFile: (file: any) => Promise<string[]>
+    downloadAttachmentFile?: (id: Attachment['id']) => Promise<any>
+    getTransformedImportDataFromFile?: (file: any) => Promise<string[]>
 }
 
 const ATTACHMENT_TYPE_IMPORT = 'Excel Ademe'
@@ -36,6 +36,7 @@ function Import({
 
     const handleImportAction = useCallback(async () => {
         if (!selectedAttachment?.id) return
+        if (!downloadAttachmentFile || !getTransformedImportDataFromFile) return
         try {
             const file = await downloadAttachmentFile(selectedAttachment.id)
             const result = await getTransformedImportDataFromFile(file)
