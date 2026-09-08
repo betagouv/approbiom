@@ -1,10 +1,11 @@
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import { ATTACHMENT_TYPE_IMPORT } from '@shared/core/domain/value-objects/attachment-type'
 import Alert from '@shared/react/components/Alert'
 import { useCallback, useMemo, useState } from 'react'
 
 export type ImportProps = {
-    selectedAttachment?: Pick<
+    selectedAttachment: Pick<
         Attachment,
         'id' | 'planDApprovisionnement' | 'type' | 'name'
     >
@@ -12,8 +13,6 @@ export type ImportProps = {
         id: Attachment['id']
     ) => Promise<string[]>
 }
-
-const ATTACHMENT_TYPE_IMPORT = 'Excel Ademe'
 
 function Import({
     selectedAttachment,
@@ -24,14 +23,11 @@ function Import({
     >()
     const [error, setError] = useState<Error | undefined>()
 
-    const isAttachmentSelected = selectedAttachment !== undefined
-
     const isCorrectAttachmentType: boolean =
-        selectedAttachment?.type === ATTACHMENT_TYPE_IMPORT ||
-        !isAttachmentSelected
+        selectedAttachment?.type === ATTACHMENT_TYPE_IMPORT
     const isDisabledImportButton: boolean = useMemo(
-        () => !(isAttachmentSelected && isCorrectAttachmentType),
-        [isAttachmentSelected, isCorrectAttachmentType]
+        () => !isCorrectAttachmentType,
+        [isCorrectAttachmentType]
     )
 
     const handleImportAction = useCallback(async () => {
@@ -48,30 +44,22 @@ function Import({
 
     return (
         <>
-            <button
-                className="fr-btn"
-                type="button"
-                onClick={() => void handleImportAction()}
-                disabled={isDisabledImportButton}
-            >
-                Importer la pièce jointe {selectedAttachment?.name}
-            </button>
+            <p>
+                Pièce jointe sélectionnée&nbsp;:{' '}
+                <strong>{selectedAttachment.name}</strong> (
+                {selectedAttachment.type})
+            </p>
             {error !== undefined && (
                 <Alert severity="error">
                     Une erreur est survenue pendant l&apos;import du fichier
                     {selectedAttachment?.name}&nbsp;:&nbsp;{error.message}.
                 </Alert>
             )}
-            {isAttachmentSelected === false && (
-                <Alert severity="warning">
-                    Aucune pièce jointe n&apos;a été sélectionnée.
-                </Alert>
-            )}
             {isCorrectAttachmentType === false && (
                 <Alert severity="warning">
                     Le type de la pièce jointe sélectionnée est incorrect.
-                    Veuillez sélectionner une pièce jointe de type{' '}
-                    {ATTACHMENT_TYPE_IMPORT}.
+                    Veuillez sélectionner une pièce jointe de type &quot;
+                    {ATTACHMENT_TYPE_IMPORT}&quot;.
                 </Alert>
             )}
             {transformedDataResult !== undefined && (
@@ -80,6 +68,14 @@ function Import({
                     {JSON.stringify(transformedDataResult)}
                 </>
             )}
+            <button
+                className="fr-btn"
+                type="button"
+                onClick={() => void handleImportAction()}
+                disabled={isDisabledImportButton}
+            >
+                Importer la pièce jointe
+            </button>
         </>
     )
 }

@@ -1,7 +1,10 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import { gristReady } from '../grist-ready'
 import { asIdList, asNumber, asString, fetchRowsOnce } from '../grist-helpers'
-import { getAttachmentsMetadata } from '../grist-attachments'
+import {
+    getAttachmentMetadata,
+    getAttachmentsMetadata,
+} from '../grist-attachments'
 import { getAccessToken } from '../grist-get-access-token'
 import { COLUMNS, TABLE } from '../grist-tables'
 
@@ -36,6 +39,41 @@ export function createGristAttachmentPort(): AttachmentPort {
 
                 return file === undefined ? [] : { ...attachment, ...file }
             })
+        },
+
+        async findOne(id) {
+            await gristReady()
+
+            const rows = await fetchRowsOnce(
+                TABLE.attachment,
+                COLUMNS.attachment
+            )
+
+            const row = rows.find((row) =>
+                asIdList(row.piece_jointe).includes(id)
+            )
+
+            if (row === undefined) {
+                throw new Error(
+                    `Grist attachment ${id} is named by no "${TABLE.attachment}" row — check it still exists in the document. `
+                )
+            }
+
+            const file = await getAttachmentMetadata(id)
+
+            if (file === null) {
+                throw new Error(
+                    `Grist attachment ${id} is named by a row but the document no longer stores the file. `
+                )
+            }
+
+            return {
+                id,
+                planDApprovisionnement:
+                    asNumber(row.Plan_d_approvisionnement) ?? 0,
+                type: asString(row.type),
+                ...file,
+            }
         },
 
         async getFileUrl(id) {
