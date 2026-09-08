@@ -8,64 +8,61 @@ export type ImportProps = {
         Attachment,
         'id' | 'planDApprovisionnement' | 'type' | 'name'
     >
-    downloadAttachmentFile?: (id: Attachment['id']) => Promise<any>
-    getTransformedImportDataFromFile?: (file: any) => Promise<string[]>
+    getTransformedImportDataFromFile: (
+        id: Attachment['id']
+    ) => Promise<string[]>
 }
 
 const ATTACHMENT_TYPE_IMPORT = 'Excel Ademe'
 
 function Import({
     selectedAttachment,
-    downloadAttachmentFile,
     getTransformedImportDataFromFile,
 }: ImportProps) {
     const [transformedDataResult, setTransformedDataResult] = useState<
         string[] | undefined
     >()
-    const [error, setError] = useState()
+    const [error, setError] = useState<Error | undefined>()
 
-    const isAttachementSelected = selectedAttachment !== undefined
+    const isAttachmentSelected = selectedAttachment !== undefined
 
     const isCorrectAttachmentType: boolean =
-        selectedAttachment?.type == ATTACHMENT_TYPE_IMPORT ||
-        !isAttachementSelected
+        selectedAttachment?.type === ATTACHMENT_TYPE_IMPORT ||
+        !isAttachmentSelected
     const isDisabledImportButton: boolean = useMemo(
-        () => !(isAttachementSelected && isCorrectAttachmentType),
-        [isAttachementSelected, isCorrectAttachmentType]
+        () => !(isAttachmentSelected && isCorrectAttachmentType),
+        [isAttachmentSelected, isCorrectAttachmentType]
     )
 
     const handleImportAction = useCallback(async () => {
         if (!selectedAttachment?.id) return
-        if (!downloadAttachmentFile || !getTransformedImportDataFromFile) return
         try {
-            const file = await downloadAttachmentFile(selectedAttachment.id)
-            const result = await getTransformedImportDataFromFile(file)
+            const result = await getTransformedImportDataFromFile(
+                selectedAttachment.id
+            )
             setTransformedDataResult(result)
-        } catch (e) {
-            setError(e)
+        } catch (cause) {
+            setError(cause instanceof Error ? cause : new Error(String(cause)))
         }
-    }, [
-        downloadAttachmentFile,
-        getTransformedImportDataFromFile,
-        selectedAttachment,
-    ])
+    }, [getTransformedImportDataFromFile, selectedAttachment])
+
     return (
         <>
             <button
                 className="fr-btn"
                 type="button"
-                onClick={() => void handleImportAction}
+                onClick={() => void handleImportAction()}
                 disabled={isDisabledImportButton}
             >
-                Importer la pièce jointe {selectedAttachment?.id}
+                Importer la pièce jointe {selectedAttachment?.name}
             </button>
             {error !== undefined && (
                 <Alert severity="error">
                     Une erreur est survenue pendant l&apos;import du fichier
-                    {selectedAttachment?.name}&nbsp;:&nbsp;{error}.
+                    {selectedAttachment?.name}&nbsp;:&nbsp;{error.message}.
                 </Alert>
             )}
-            {isAttachementSelected === false && (
+            {isAttachmentSelected === false && (
                 <Alert severity="warning">
                     Aucune pièce jointe n&apos;a été sélectionnée.
                 </Alert>
@@ -79,7 +76,7 @@ function Import({
             )}
             {transformedDataResult !== undefined && (
                 <>
-                    <p>Données transformées trouvées&nbsp;:&nbsbp;</p>
+                    <p>Données transformées trouvées&nbsp;:&nbsp;</p>
                     {JSON.stringify(transformedDataResult)}
                 </>
             )}
