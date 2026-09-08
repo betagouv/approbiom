@@ -71,8 +71,8 @@ afterEach(() => {
     vi.unstubAllGlobals()
 })
 
-describe("App du widget d'import", () => {
-    it('signale une table dont les colonnes ne sont pas celles attendues', async () => {
+describe('Import widget', () => {
+    it('reports a table whose columns are not the expected ones', async () => {
         const { moveCursorTo } = mockGrist()
         await renderApp(neverRead)
 
@@ -83,7 +83,7 @@ describe("App du widget d'import", () => {
         )
     })
 
-    it('signale une ligne qui ne porte aucune pièce jointe', async () => {
+    it('reports a row that carries no attachment', async () => {
         const { moveCursorTo } = mockGrist()
         await renderApp(neverRead)
 
@@ -94,7 +94,7 @@ describe("App du widget d'import", () => {
         )
     })
 
-    it('signale une pièce jointe que le document ne peut pas rendre', async () => {
+    it('reports an attachment the document cannot hand over', async () => {
         const { moveCursorTo } = mockGrist()
         await renderApp(() =>
             Promise.reject(new Error('Grist attachment 12 could not be read'))
@@ -107,7 +107,7 @@ describe("App du widget d'import", () => {
         )
     })
 
-    it('remplace l’erreur par la pièce jointe une fois celle-ci lue', async () => {
+    it('replaces the error with the attachment once it is read', async () => {
         const { moveCursorTo } = mockGrist()
         await renderApp(() => Promise.resolve(excelAdeme))
 
