@@ -2,7 +2,6 @@ import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { GristAttachmentRecord } from '@shared/infrastructure/grist/grist-on-record-attachment'
-import { ATTACHMENT_TYPE_IMPORT } from '@shared/core/domain/value-objects/attachment-type'
 
 type OnRecord = (record: unknown) => void
 
@@ -11,7 +10,7 @@ const NAME_FILE = 'BCIAT_2024.xlsx'
 const excelAdeme: Attachment = {
     id: 12,
     planDApprovisionnement: 3,
-    type: ATTACHMENT_TYPE_IMPORT,
+    type: 'excel ademe',
     name: NAME_FILE,
     sizeInBytes: 4096,
 }
@@ -21,7 +20,7 @@ const PIECE_JOINTE: Partial<GristAttachmentRecord> = {
     id: 1,
     Plan_d_approvisionnement: NOM_PLAN_D_APPROVISIONNEMENT,
     piece_jointe: [excelAdeme.id],
-    type: ATTACHMENT_TYPE_IMPORT,
+    type: 'excel ademe',
 }
 
 const pieceJointeRow = (overrides: Record<string, unknown> = {}) => ({
