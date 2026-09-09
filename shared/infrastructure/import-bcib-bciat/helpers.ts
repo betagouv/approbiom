@@ -1,4 +1,13 @@
 import * as XLSX from 'xlsx'
+import {
+    loadReferenceData,
+    normalize,
+} from './transform-provenance/reference-data'
+import {
+    transformProvenance,
+    type Confidence,
+    type ProvenanceShare,
+} from './transform-provenance/transform-provenance'
 
 // - - - - - Configurations - - - - - - //
 
@@ -26,29 +35,20 @@ export type CellValue = string | number | boolean | null
 
 export type ExtractedLines = {
     document: string
-    ligneExcel: number
-    fournisseur: CellValue
-    ressource: CellValue
+    excelRow: number
+    supplier: CellValue
+    resource: CellValue
     tonnage: CellValue
-    provenanceBrute: CellValue
+    rawProvenance: CellValue
+}
+
+export type ImportedLines = ExtractedLines & {
+    provenance: ProvenanceShare[]
+    confidence: Confidence
+    unrecognized: string[]
 }
 
 // - - - - - utils - - - - - - //
-
-function normalize(text: string): string {
-    // Decimal percentages first, while the comma is still there to tell them
-    // apart: without this "33,5%" would become "33 5%", which reads as "5%".
-    const withDecimals = text.replace(/(\d+)[.,](\d+)(\s*%)/g, '$1.$2$3')
-
-    const withoutAccents = withDecimals.normalize('NFD').replace(/\p{M}/gu, '')
-
-    const kept = withoutAccents.toLowerCase().replace(/[^a-z0-9%.]/g, ' ')
-
-    // A dot only ever meant something between two digits.
-    const withoutStrayDots = kept.replace(/(?<![0-9])\.|\.(?![0-9])/g, ' ')
-
-    return withoutStrayDots.split(/\s+/).filter(Boolean).join(' ')
-}
 
 function toText(value: unknown): string {
     if (value === null || value === undefined) return ''
@@ -150,10 +150,31 @@ export async function extractRows(
     return table.map((row, offset) => ({
         document,
         // Excel numbers rows from 1, and the first data row follows the header.
-        ligneExcel: headerRow + 2 + offset,
-        fournisseur: row[columns.Fournisseur] ?? null,
-        ressource: row[columns.Ressource] ?? null,
+        excelRow: headerRow + 2 + offset,
+        supplier: row[columns.Fournisseur] ?? null,
+        resource: row[columns.Ressource] ?? null,
         tonnage: row[columns.Tonnage] ?? null,
-        provenanceBrute: row[columns.Provenance] ?? null,
+        rawProvenance: row[columns.Provenance] ?? null,
     }))
+}
+
+export async function importRows(
+    file: Blob,
+    document: string
+): Promise<ImportedLines[]> {
+    const reference = loadReferenceData()
+
+    return (await extractRows(file, document)).map((line) => {
+        const { distribution, confidence, unrecognized } = transformProvenance(
+            toText(line.rawProvenance),
+            reference
+        )
+
+        return {
+            ...line,
+            provenance: distribution,
+            confidence,
+            unrecognized,
+        }
+    })
 }

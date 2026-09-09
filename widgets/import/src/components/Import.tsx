@@ -1,6 +1,6 @@
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ExtractedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import Alert from '@shared/react/components/Alert'
 
 import { useCallback, useState } from 'react'
@@ -12,12 +12,12 @@ export type ImportProps = {
     >
     getTransformedImportData: (
         selectedAttachment: Pick<Attachment, 'id' | 'name'>
-    ) => Promise<readonly ExtractedLines[]>
+    ) => Promise<readonly ImportedLines[]>
 }
 
 function Import({ selectedAttachment, getTransformedImportData }: ImportProps) {
     const [importedData, setImportedData] = useState<
-        readonly ExtractedLines[] | undefined
+        readonly ImportedLines[] | undefined
     >()
     const [error, setError] = useState<Error | undefined>()
 

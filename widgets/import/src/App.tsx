@@ -13,9 +13,9 @@ import {
 
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import {
-    extractRows,
+    importRows,
     getHasExpectedTemplate,
-    type ExtractedLines,
+    type ImportedLines,
 } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 type WidgetImportProps = {
@@ -31,7 +31,7 @@ export default function App({ attachments }: WidgetImportProps) {
     const getTransformedImportData = useCallback(
         async (
             selected: Pick<Attachment, 'id' | 'name'>
-        ): Promise<readonly ExtractedLines[]> => {
+        ): Promise<readonly ImportedLines[]> => {
             const url = await attachments.getFileUrl(selected.id)
             const response = await fetch(url)
 
@@ -53,7 +53,7 @@ export default function App({ attachments }: WidgetImportProps) {
                 )
             }
 
-            return extractRows(blob, selected.name)
+            return importRows(blob, selected.name)
         },
         [attachments]
     )
