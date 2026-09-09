@@ -12,6 +12,11 @@ import {
 } from '@shared/infrastructure/grist/grist-on-record-attachment'
 
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import {
+    importRows,
+    getHasExpectedTemplate,
+    type ImportedLines,
+} from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 type WidgetImportProps = {
     attachments: Pick<AttachmentPort, 'findOne' | 'getFileUrl'>
@@ -23,9 +28,11 @@ export default function App({ attachments }: WidgetImportProps) {
     const [attachment, setAttachment] = useState<Attachment | undefined>()
     const [error, setError] = useState<Error | undefined>()
 
-    const getTransformedImportDataFromFile = useCallback(
-        async (id: Attachment['id']): Promise<string[]> => {
-            const url = await attachments.getFileUrl(id)
+    const getTransformedImportData = useCallback(
+        async (
+            selected: Pick<Attachment, 'id' | 'name'>
+        ): Promise<readonly ImportedLines[]> => {
+            const url = await attachments.getFileUrl(selected.id)
             const response = await fetch(url)
 
             if (!response.ok) {
@@ -36,7 +43,17 @@ export default function App({ attachments }: WidgetImportProps) {
 
             const blob = await response.blob()
 
-            return [String(blob.size), blob.type]
+            try {
+                await getHasExpectedTemplate(blob)
+            } catch (cause) {
+                throw new Error(
+                    `le fichier n'a pas la forme attendue : ${
+                        cause instanceof Error ? cause.message : String(cause)
+                    }`
+                )
+            }
+
+            return importRows(blob, selected.name)
         },
         [attachments]
     )
@@ -93,8 +110,8 @@ export default function App({ attachments }: WidgetImportProps) {
                         {attachment !== undefined && (
                             <Import
                                 selectedAttachment={attachment}
-                                getTransformedImportDataFromFile={
-                                    getTransformedImportDataFromFile
+                                getTransformedImportData={
+                                    getTransformedImportData
                                 }
                             />
                         )}

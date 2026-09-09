@@ -1,6 +1,8 @@
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import Alert from '@shared/react/components/Alert'
+
 import { useCallback, useState } from 'react'
 
 export type ImportProps = {
@@ -8,31 +10,27 @@ export type ImportProps = {
         Attachment,
         'id' | 'planDApprovisionnement' | 'type' | 'name'
     >
-    getTransformedImportDataFromFile: (
-        id: Attachment['id']
-    ) => Promise<string[]>
+    getTransformedImportData: (
+        selectedAttachment: Pick<Attachment, 'id' | 'name'>
+    ) => Promise<readonly ImportedLines[]>
 }
 
-function Import({
-    selectedAttachment,
-    getTransformedImportDataFromFile,
-}: ImportProps) {
-    const [transformedDataResult, setTransformedDataResult] = useState<
-        string[] | undefined
+function Import({ selectedAttachment, getTransformedImportData }: ImportProps) {
+    const [importedData, setImportedData] = useState<
+        readonly ImportedLines[] | undefined
     >()
     const [error, setError] = useState<Error | undefined>()
 
     const handleImportAction = useCallback(async () => {
-        if (!selectedAttachment?.id) return
+        setError(undefined)
+        setImportedData(undefined)
+
         try {
-            const result = await getTransformedImportDataFromFile(
-                selectedAttachment.id
-            )
-            setTransformedDataResult(result)
+            setImportedData(await getTransformedImportData(selectedAttachment))
         } catch (cause) {
             setError(cause instanceof Error ? cause : new Error(String(cause)))
         }
-    }, [getTransformedImportDataFromFile, selectedAttachment])
+    }, [getTransformedImportData, selectedAttachment])
 
     return (
         <>
@@ -47,12 +45,6 @@ function Import({
                     a échoué&nbsp;: {error.message}
                 </Alert>
             )}
-            {transformedDataResult !== undefined && (
-                <>
-                    <p>Données transformées trouvées&nbsp;:&nbsp;</p>
-                    {JSON.stringify(transformedDataResult)}
-                </>
-            )}
             <button
                 className="fr-btn"
                 type="button"
@@ -60,6 +52,15 @@ function Import({
             >
                 Importer la pièce jointe
             </button>
+            {importedData !== undefined &&
+                (importedData.length === 0 ? (
+                    <Alert severity="warning">
+                        Aucune ligne n&apos;a été trouvée dans la feuille
+                        «&nbsp;Fournisseurs&nbsp;».
+                    </Alert>
+                ) : (
+                    <p>{JSON.stringify(importedData)}</p>
+                ))}
         </>
     )
 }
