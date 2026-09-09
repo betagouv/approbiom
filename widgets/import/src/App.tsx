@@ -4,7 +4,7 @@ import { gristReady } from '@shared/infrastructure/grist/grist-ready'
 import AsyncGate from '@shared/react/AsyncGate'
 import Alert from '@shared/react/components/Alert'
 import { useAsyncState } from '@shared/react/UseAsyncState'
-import { useEffect, useState } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 import Import from './components/Import'
 import {
     isGristAttachmentRecord,
@@ -13,13 +13,8 @@ import {
 
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 
-const getTransformedImportDataFromFile = () =>
-    Promise.reject(
-        new Error("la transformation des données n'est pas encore implémentée")
-    )
-
 type WidgetImportProps = {
-    attachments: Pick<AttachmentPort, 'findOne'>
+    attachments: Pick<AttachmentPort, 'findOne' | 'getFileUrl'>
 }
 
 export default function App({ attachments }: WidgetImportProps) {
@@ -27,6 +22,24 @@ export default function App({ attachments }: WidgetImportProps) {
 
     const [attachment, setAttachment] = useState<Attachment | undefined>()
     const [error, setError] = useState<Error | undefined>()
+
+    const getTransformedImportDataFromFile = useCallback(
+        async (id: Attachment['id']): Promise<string[]> => {
+            const url = await attachments.getFileUrl(id)
+            const response = await fetch(url)
+
+            if (!response.ok) {
+                throw new Error(
+                    `le téléchargement du fichier a échoué (${response.status} ${response.statusText})`
+                )
+            }
+
+            const blob = await response.blob()
+
+            return [String(blob.size), blob.type]
+        },
+        [attachments]
+    )
 
     useEffect(() => {
         grist.onRecord((record) => {

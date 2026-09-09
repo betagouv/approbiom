@@ -51,8 +51,8 @@ function Import({
             </p>
             {error !== undefined && (
                 <Alert severity="error">
-                    Une erreur est survenue pendant l&apos;import du fichier
-                    {selectedAttachment?.name}&nbsp;:&nbsp;{error.message}.
+                    L&apos;import de <strong>{selectedAttachment.name}</strong>{' '}
+                    a échoué&nbsp;: {error.message}
                 </Alert>
             )}
             {isCorrectAttachmentType === false && (

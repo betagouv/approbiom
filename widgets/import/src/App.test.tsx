@@ -58,7 +58,17 @@ async function renderApp(findOne: (id: number) => Promise<Attachment>) {
 
     const { default: App } = await import('./App')
 
-    render(<App attachments={{ findOne }} />)
+    render(
+        <App
+            attachments={{
+                findOne,
+                getFileUrl: () =>
+                    Promise.reject(
+                        new Error('no file is downloaded by these tests')
+                    ),
+            }}
+        />
+    )
 
     await screen.findByRole('alert')
 }
