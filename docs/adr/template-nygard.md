@@ -10,6 +10,8 @@ Accepted
 
 We need to record the architectural decisions made on this project.
 
+## Problem (optional)
+
 ## Decision
 
 We will use Architecture Decision Records, as described by Michael Nygard.
@@ -17,3 +19,5 @@ We will use Architecture Decision Records, as described by Michael Nygard.
 ## Consequences
 
 See Michael Nygard's article.
+
+## Ressources (optional)
