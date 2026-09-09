@@ -69,6 +69,10 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         attachments: {
             list: rows([]),
             getFileUrl: () => Promise.resolve(''),
+            findOne: () =>
+                Promise.reject(
+                    new Error('no attachment is read one by one by these tests')
+                ),
         },
         ...overrides,
     }

@@ -5,7 +5,7 @@ import {
     DataSourceUnavailableError,
 } from '@shared/core/errors'
 
-export function renderError(error: Error, retry: () => void): ReactNode {
+export function renderGristError(error: Error, retry: () => void): ReactNode {
     if (error instanceof DataSourceUnavailableError) {
         return (
             <Alert severity="warning" title="Hors Grist">

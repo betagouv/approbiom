@@ -5,7 +5,7 @@ export type AsyncState<T> =
     | { status: 'ready'; data: T; error: null }
     | { status: 'error'; data: null; error: Error }
 
-export type UseAsyncDataResult<T> = AsyncState<T> & {
+export type UseAsyncState<T> = AsyncState<T> & {
     retry: () => void
     refresh: () => void
 }
@@ -15,9 +15,9 @@ type Read = {
     keepData: boolean
 }
 
-const LOADING = { status: 'loading', data: null, error: null } as const
+export const LOADING = { status: 'loading', data: null, error: null } as const
 
-export function useAsyncData<T>(load: () => Promise<T>): UseAsyncDataResult<T> {
+export function useAsyncState<T>(load: () => Promise<T>): UseAsyncState<T> {
     const [state, setState] = useState<AsyncState<T>>(LOADING)
     const [read, setRead] = useState<Read>({ attempt: 0, keepData: false })
 

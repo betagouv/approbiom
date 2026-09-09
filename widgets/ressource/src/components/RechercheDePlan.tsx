@@ -2,8 +2,7 @@ import './RechercheDePlan.css'
 import SearchBar from '@shared/react/components/SearchBar'
 import Ressource from '@shared/react/components/Ressource'
 import AsyncGate from '@shared/react/AsyncGate'
-import { renderError } from '@shared/react/render-error'
-import { useAsyncData } from '@shared/react/useAsyncData'
+import { useAsyncState } from '@shared/react/UseAsyncState'
 import {
     getApprovisionnementByRessourceStats,
     type ApprovisionnementByRessourceStats,
@@ -29,10 +28,10 @@ function Statistiques({
     getDepartementContour: LocalizationPort['getDepartementContour']
     getCountryContour: LocalizationPort['getCountryContour']
 }) {
-    const state = useAsyncData(readStats)
+    const state = useAsyncState(readStats)
 
     return (
-        <AsyncGate state={state} renderError={renderError}>
+        <AsyncGate state={state}>
             {(stats) => (
                 <Ressource
                     approvisionnementStatsByRessource={stats}

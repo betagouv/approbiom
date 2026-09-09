@@ -5,6 +5,8 @@ import {
 
 const REQUIRED_ACCESS = 'full'
 
+const HANDSHAKE_TIMEOUT_MS = 2000
+
 let handshake: Promise<void> | undefined
 let grantedAccess = ''
 
@@ -15,8 +17,19 @@ export async function gristReady(): Promise<void> {
         )
     }
 
-    handshake ??= new Promise<void>((resolve) => {
+    handshake ??= new Promise<void>((resolve, reject) => {
+        const givingUp = setTimeout(
+            () =>
+                reject(
+                    new DataSourceUnavailableError(
+                        `Grist did not answer within ${HANDSHAKE_TIMEOUT_MS}ms — this page is probably not open in Grist.`
+                    )
+                ),
+            HANDSHAKE_TIMEOUT_MS
+        )
+
         grist.onOptions((_options, settings) => {
+            clearTimeout(givingUp)
             grantedAccess = settings.accessLevel
             resolve()
         })

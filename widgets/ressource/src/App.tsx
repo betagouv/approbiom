@@ -1,6 +1,5 @@
 import AsyncGate from '@shared/react/AsyncGate'
-import { renderError } from '@shared/react/render-error'
-import { useAsyncData } from '@shared/react/useAsyncData'
+import { useAsyncState } from '@shared/react/UseAsyncState'
 import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import RechercheDePlan, {
@@ -20,13 +19,13 @@ export default function App({
     installations,
     ...sources
 }: RessourceProps) {
-    const state = useAsyncData(() =>
+    const state = useAsyncState(() =>
         Promise.all([plans.list(), installations.list()])
     )
 
     return (
         <main className="app">
-            <AsyncGate state={state} renderError={renderError}>
+            <AsyncGate state={state}>
                 {([plans, installations]) => (
                     <RechercheDePlan
                         plans={plans}
