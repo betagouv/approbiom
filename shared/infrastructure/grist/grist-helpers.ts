@@ -130,6 +130,28 @@ export async function updateRow(
     }
 }
 
+export async function createRows(
+    tableId: string,
+    rows: readonly GristCells[]
+): Promise<void> {
+    try {
+        const records = rows.map((fields) => ({
+            fields,
+        }))
+        const table = grist.getTable(tableId)
+
+        await table.create(records)
+        return
+    } catch (cause) {
+        const message = cause instanceof Error ? cause.message : String(cause)
+
+        throw new Error(
+            `Grist rows of table "${tableId}" could not be created: ${message}`,
+            { cause }
+        )
+    }
+}
+
 export const asString = (value: unknown): string =>
     typeof value === 'string' ? value : ''
 

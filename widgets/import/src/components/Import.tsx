@@ -1,36 +1,33 @@
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import Alert from '@shared/react/components/Alert'
 
 import { useCallback, useState } from 'react'
+
+export type ImportAttachment = (
+    attachment: Pick<Attachment, 'id' | 'name' | 'planDApprovisionnement'>
+) => Promise<void>
 
 export type ImportProps = {
     selectedAttachment: Pick<
         Attachment,
         'id' | 'planDApprovisionnement' | 'type' | 'name'
     >
-    getTransformedImportData: (
-        selectedAttachment: Pick<Attachment, 'id' | 'name'>
-    ) => Promise<readonly ImportedLines[]>
+    importAttachment: ImportAttachment
 }
 
-function Import({ selectedAttachment, getTransformedImportData }: ImportProps) {
-    const [importedData, setImportedData] = useState<
-        readonly ImportedLines[] | undefined
-    >()
+function Import({ selectedAttachment, importAttachment }: ImportProps) {
     const [error, setError] = useState<Error | undefined>()
 
     const handleImportAction = useCallback(async () => {
         setError(undefined)
-        setImportedData(undefined)
 
         try {
-            setImportedData(await getTransformedImportData(selectedAttachment))
+            await importAttachment(selectedAttachment)
         } catch (cause) {
             setError(cause instanceof Error ? cause : new Error(String(cause)))
         }
-    }, [getTransformedImportData, selectedAttachment])
+    }, [importAttachment, selectedAttachment])
 
     return (
         <>
@@ -52,15 +49,6 @@ function Import({ selectedAttachment, getTransformedImportData }: ImportProps) {
             >
                 Importer la pièce jointe
             </button>
-            {importedData !== undefined &&
-                (importedData.length === 0 ? (
-                    <Alert severity="warning">
-                        Aucune ligne n&apos;a été trouvée dans la feuille
-                        «&nbsp;Fournisseurs&nbsp;».
-                    </Alert>
-                ) : (
-                    <p>{JSON.stringify(importedData)}</p>
-                ))}
         </>
     )
 }

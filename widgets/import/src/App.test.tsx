@@ -66,6 +66,12 @@ async function renderApp(findOne: (id: number) => Promise<Attachment>) {
                         new Error('no file is downloaded by these tests')
                     ),
             }}
+            approvisionnementsAImporter={{
+                create: () =>
+                    Promise.reject(
+                        new Error('no line is created by these tests')
+                    ),
+            }}
         />
     )
 

@@ -21,6 +21,7 @@ export const TABLE = {
     crb: 'Crb',
     programmeAide: 'Prog_aides',
     attachment: 'Piece_jointe',
+    aImporterApprovisionnement: 'A_importer_Approvisionnement',
 } as const
 
 /** The columns every summary is keyed and measured by, whatever it groups on. */
@@ -91,3 +92,15 @@ export const COLUMNS = {
 export type InstructionColumn = (typeof COLUMNS)['instruction'][number]
 
 export type ProgrammeAideColumn = (typeof COLUMNS)['programmeAide'][number]
+
+export type AImporterApprovisionnementColumn = {
+    Plan_d_approvisionnement: number
+    Excel_Ademe: string
+    Ligne_Excel: number
+    Fournisseur_valeur_brute: string
+    Ressource_valeur_brute: string
+    Tonnage_total: number
+    Repartition_valeur_brute: string
+    Repartition_calculee_par_le_script: string
+    Niveau_de_confiance: string
+}
