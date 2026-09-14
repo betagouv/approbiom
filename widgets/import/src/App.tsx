@@ -5,35 +5,43 @@ import AsyncGate from '@shared/react/AsyncGate'
 import Alert from '@shared/react/components/Alert'
 import { useAsyncState } from '@shared/react/UseAsyncState'
 import { useCallback, useEffect, useState } from 'react'
-import Import from './components/Import'
+import Import, { type ImportAttachment } from './components/Import'
 import {
     isGristAttachmentRecord,
     type GristAttachmentRecord,
 } from '@shared/infrastructure/grist/grist-on-record-attachment'
 
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { ApprovisionnementAImporterAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-a-importer-approvisionnement'
 import {
-    importRows,
     getHasExpectedTemplate,
-    type ImportedLines,
+    importRows,
 } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 type WidgetImportProps = {
     attachments: Pick<AttachmentPort, 'findOne' | 'getFileUrl'>
+    approvisionnementsAImporter: ApprovisionnementAImporterAdapter
 }
 
-export default function App({ attachments }: WidgetImportProps) {
+export default function App({
+    attachments,
+    approvisionnementsAImporter,
+}: WidgetImportProps) {
     const state = useAsyncState(() => gristReady())
 
     const [attachment, setAttachment] = useState<Attachment | undefined>()
     const [error, setError] = useState<Error | undefined>()
 
-    const getTransformedImportData = useCallback(
-        async (
-            selected: Pick<Attachment, 'id' | 'name'>
-        ): Promise<readonly ImportedLines[]> => {
-            const url = await attachments.getFileUrl(selected.id)
-            const response = await fetch(url)
+    const importAttachment: ImportAttachment = useCallback(
+        async ({ id, name, planDApprovisionnement }) => {
+            // The attachment adapter reads an empty plan Ref as 0.
+            if (!planDApprovisionnement) {
+                throw new Error(
+                    "aucun plan d'approvisionnement n'est lié à cette pièce jointe"
+                )
+            }
+
+            const response = await fetch(await attachments.getFileUrl(id))
 
             if (!response.ok) {
                 throw new Error(
@@ -41,21 +49,26 @@ export default function App({ attachments }: WidgetImportProps) {
                 )
             }
 
-            const blob = await response.blob()
+            const file = await response.blob()
 
             try {
-                await getHasExpectedTemplate(blob)
+                await getHasExpectedTemplate(file)
             } catch (cause) {
                 throw new Error(
                     `le fichier n'a pas la forme attendue : ${
                         cause instanceof Error ? cause.message : String(cause)
-                    }`
+                    }`,
+                    { cause }
                 )
             }
 
-            return importRows(blob, selected.name)
+            const lines = await importRows(file, name)
+
+            await approvisionnementsAImporter.create(
+                lines.map((line) => ({ ...line, planDApprovisionnement }))
+            )
         },
-        [attachments]
+        [attachments, approvisionnementsAImporter]
     )
 
     useEffect(() => {
@@ -110,9 +123,7 @@ export default function App({ attachments }: WidgetImportProps) {
                         {attachment !== undefined && (
                             <Import
                                 selectedAttachment={attachment}
-                                getTransformedImportData={
-                                    getTransformedImportData
-                                }
+                                importAttachment={importAttachment}
                             />
                         )}
                     </>

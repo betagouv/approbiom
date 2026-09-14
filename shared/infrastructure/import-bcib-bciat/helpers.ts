@@ -8,6 +8,7 @@ import {
     type Confidence,
     type ProvenanceShare,
 } from './transform-provenance/transform-provenance'
+import type { CellValue } from 'grist/GristData'
 
 // - - - - - Configurations - - - - - - //
 
@@ -31,15 +32,13 @@ const MAX_ROW_HEADER_SEARCH = 40
 
 type ColumnName = keyof typeof COLUMN_HEADER_PREFIXES
 
-export type CellValue = string | number | boolean | null
-
 export type ExtractedLines = {
     document: string
     excelRow: number
-    supplier: CellValue
-    resource: CellValue
-    tonnage: CellValue
-    rawProvenance: CellValue
+    supplier: string
+    resource: string
+    tonnage: number
+    rawProvenance: string
 }
 
 export type ImportedLines = ExtractedLines & {
@@ -61,6 +60,10 @@ function toText(value: unknown): string {
     }
 
     return ''
+}
+
+function isTonnage(value: CellValue): value is number {
+    return typeof value === 'number' && Number.isFinite(value)
 }
 
 function readSheet(file: ArrayBuffer): CellValue[][] {
@@ -147,15 +150,38 @@ export async function extractRows(
     const endsAt = dataRows.findIndex((row) => (row[0] ?? null) === null)
     const table = endsAt === -1 ? dataRows : dataRows.slice(0, endsAt)
 
-    return table.map((row, offset) => ({
-        document,
+    const lines: ExtractedLines[] = []
+    const invalidTonnages: string[] = []
+
+    table.forEach((row, offset) => {
         // Excel numbers rows from 1, and the first data row follows the header.
-        excelRow: headerRow + 2 + offset,
-        supplier: row[columns.Fournisseur] ?? null,
-        resource: row[columns.Ressource] ?? null,
-        tonnage: row[columns.Tonnage] ?? null,
-        rawProvenance: row[columns.Provenance] ?? null,
-    }))
+        const excelRow = headerRow + 2 + offset
+        const tonnage = row[columns.Tonnage] ?? null
+
+        if (!isTonnage(tonnage)) {
+            invalidTonnages.push(
+                `ligne ${excelRow} (${tonnage === null ? 'vide' : `« ${toText(tonnage)} »`})`
+            )
+            return
+        }
+
+        lines.push({
+            document,
+            excelRow,
+            supplier: toText(row[columns.Fournisseur]),
+            resource: toText(row[columns.Ressource]),
+            tonnage,
+            rawProvenance: toText(row[columns.Provenance]),
+        })
+    })
+
+    if (invalidTonnages.length > 0) {
+        throw new Error(
+            `la colonne « Tonnage » de la feuille « ${SHEET_NAME} » doit contenir un nombre : ${invalidTonnages.join(', ')}`
+        )
+    }
+
+    return lines
 }
 
 export async function importRows(
@@ -166,7 +192,7 @@ export async function importRows(
 
     return (await extractRows(file, document)).map((line) => {
         const { distribution, confidence, unrecognized } = transformProvenance(
-            toText(line.rawProvenance),
+            line.rawProvenance,
             reference
         )
 
