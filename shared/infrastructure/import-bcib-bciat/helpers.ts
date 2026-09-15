@@ -118,7 +118,7 @@ function findColumns(
     const missing = found.filter(([, at]) => at === -1).map(([name]) => name)
 
     if (missing.length > 0) {
-        // Python numbers rows from 1; the array is indexed from 0.
+        // Spreadsheet rows are numbered from 1; the array is indexed from 0.
         throw new Error(
             `la ligne d'en-tête ${headerRow + 1} de la feuille « ${SHEET_NAME} » n'a pas de colonne pour : ${missing.join(', ')}`
         )

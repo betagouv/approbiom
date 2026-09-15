@@ -18,12 +18,9 @@ const reactFiles = ['widgets/**/*.{jsx,tsx}', 'shared/**/*.{jsx,tsx}']
 
 export default defineConfig([
     // The Grist types are vendored from upstream, so linting them only produces
-    // findings we cannot act on. `.venv/` is the Python virtualenv created by
-    // `pnpm run py:setup`: its packages ship bundled JS (pyright) that is not
-    // ours to lint.
+    // findings we cannot act on.
     globalIgnores([
         'dist/',
-        '.venv/',
         'shared/infrastructure/grist/grist-plugin-api.d.ts',
     ]),
 
