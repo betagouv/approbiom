@@ -24,6 +24,12 @@ const COLUMN_HEADER_PREFIXES = {
     Provenance: 'repartition approximative',
 } as const
 
+const ADDITIONAL_COLUMN_HEADER_PREFIXES = {
+    PCI: 'pci',
+    'Fournisseur certifié': 'fournisseur certifie',
+    'Taux PEFC': 'taux',
+} as const
+
 // How far down to look for the header row. It sits on row 11, 16 or 18
 // depending on which year's template the plan was written on.
 const MAX_ROW_HEADER_SEARCH = 40
@@ -39,10 +45,11 @@ export type ExtractedLines = {
     resource: string
     tonnage: number
     rawProvenance: string
+    additionalData: string
 }
 
 export type ImportedLines = ExtractedLines & {
-    provenance: ProvenanceShare[]
+    provenance: (ProvenanceShare & { additionalData?: string })[]
     confidence: Confidence
     unrecognized: string[]
 }
@@ -127,6 +134,20 @@ function findColumns(
     return Object.fromEntries(found) as Record<ColumnName, number>
 }
 
+function findAdditionalColumns(
+    rows: CellValue[][],
+    headerRow: number
+): [label: string, at: number][] {
+    const headers = rows[headerRow].map((header) => normalize(toText(header)))
+
+    return Object.entries(ADDITIONAL_COLUMN_HEADER_PREFIXES)
+        .map(([label, prefix]): [string, number] => [
+            label,
+            headers.findIndex((header) => header.startsWith(prefix)),
+        ])
+        .filter(([, at]) => at !== -1)
+}
+
 // - - - - - exported functions - - - - - - //
 
 export async function getHasExpectedTemplate(file: Blob): Promise<boolean> {
@@ -145,6 +166,7 @@ export async function extractRows(
 
     const headerRow = findHeaderRow(rows)
     const columns = findColumns(rows, headerRow)
+    const additionalColumns = findAdditionalColumns(rows, headerRow)
 
     const dataRows = rows.slice(headerRow + 1)
     const endsAt = dataRows.findIndex((row) => (row[0] ?? null) === null)
@@ -172,6 +194,9 @@ export async function extractRows(
             resource: toText(row[columns.Ressource]),
             tonnage,
             rawProvenance: toText(row[columns.Provenance]),
+            additionalData: additionalColumns
+                .map(([label, at]) => `${label}: ${toText(row[at])}`)
+                .join(', '),
         })
     })
 
@@ -198,7 +223,10 @@ export async function importRows(
 
         return {
             ...line,
-            provenance: distribution,
+            provenance: distribution.map((share) => ({
+                ...share,
+                additionalData: line.additionalData,
+            })),
             confidence,
             unrecognized,
         }

@@ -24,11 +24,14 @@ function mapFromApplicationToGrist(
         Tonnage_total: line.tonnage,
         Repartition_valeur_brute: line.rawProvenance,
         Repartition_calculee_par_le_script: JSON.stringify(
-            line.provenance.map(({ source, provenance, percentage }) => ({
-                source,
-                provenance,
-                pourcentage: percentage,
-            }))
+            line.provenance.map(
+                ({ source, provenance, percentage, additionalData }) => ({
+                    source,
+                    provenance,
+                    pourcentage: percentage,
+                    donnees_additionnelles: additionalData,
+                })
+            )
         ),
         Niveau_de_confiance: line.confidence,
     }
