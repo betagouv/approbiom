@@ -51,7 +51,7 @@ export default function ProvenanceMap({
 
         const drawn = [...new Set(provenances)].map(outline)
 
-        const polygons = drawn.flat()
+        const polygons = drawn.flat().map((ring) => ({ latlngs: ring }))
 
         const markers = [...new Set(communes)].map(
             (codeCommune): LatLngTuple => {

@@ -89,7 +89,11 @@ export default function App() {
 
             <section className="playground__section">
                 <h2 className="fr-h5">Map — communes</h2>
-                <Map center={CENTER} markers={MARKERS} polygons={[MARKERS]} />
+                <Map
+                    center={CENTER}
+                    markers={MARKERS}
+                    polygons={[{ latlngs: MARKERS }]}
+                />
             </section>
 
             <section className="playground__section">
@@ -97,7 +101,7 @@ export default function App() {
                 <Map
                     center={CONTOUR_CENTER}
                     markers={MARKERS}
-                    polygons={CONTOUR}
+                    polygons={CONTOUR.map((ring) => ({ latlngs: ring }))}
                     zoom={9}
                 />
             </section>

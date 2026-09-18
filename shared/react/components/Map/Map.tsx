@@ -1,5 +1,9 @@
 import { useEffect, useRef } from 'react'
-import L, { type LatLngBoundsExpression, type LatLngExpression } from 'leaflet'
+import L, {
+    type LatLngBoundsExpression,
+    type LatLngExpression,
+    type PolylineOptions,
+} from 'leaflet'
 import 'leaflet/dist/leaflet.css'
 import iconUrl from 'leaflet/dist/images/marker-icon.png'
 import iconRetinaUrl from 'leaflet/dist/images/marker-icon-2x.png'
@@ -16,9 +20,13 @@ export type MapProps = {
      */
     markers?: LatLngExpression[]
     /**
-     * position of polygons
+     * polygons' configuration
      */
-    polygons?: LatLngExpression[][]
+    polygons?: {
+        latlngs:
+            LatLngExpression[] | LatLngExpression[][] | LatLngExpression[][][]
+        options?: PolylineOptions
+    }[]
     /**
      * zoom level, from 0 (the whole world) to 19 (a street). A commune sits at
      * 13, a département at 9. Ignored when `bounds` is given.
@@ -89,8 +97,8 @@ export default function Map({
             L.marker(position, { icon: markerIcon }).addTo(layers)
         })
 
-        polygons?.forEach((positions) => {
-            L.polygon(positions).addTo(layers)
+        polygons?.forEach(({ latlngs, options }) => {
+            L.polygon(latlngs, options).addTo(layers)
         })
 
         return () => {
