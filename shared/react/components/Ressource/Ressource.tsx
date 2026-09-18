@@ -9,6 +9,7 @@ import type {
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
+import { toProvenance } from '@shared/core/domain/value-objects/provenance'
 import Alert from '../Alert'
 import Tabs from '../Tabs'
 import ProvenanceMap from './ProvenanceMap'
@@ -135,8 +136,11 @@ export default function Ressource({
 
                 {selected && (
                     <ProvenanceMap
-                        provenances={selected.byProvenance.map(
-                            ({ provenance }) => provenance
+                        approvisionnements={selected.byProvenance.map(
+                            ({ provenance, tonnageTotal }) => ({
+                                provenance: toProvenance(provenance),
+                                tonnageTotal,
+                            })
                         )}
                         communes={commune === null ? [] : [commune]}
                         getCommuneCenterPosition={getCommuneCenterPosition}

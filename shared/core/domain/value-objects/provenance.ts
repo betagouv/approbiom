@@ -1,4 +1,7 @@
-import type { Departement } from '@shared/core/domain/value-objects/departement'
+import {
+    isCodeDepartement,
+    type Departement,
+} from '@shared/core/domain/value-objects/departement'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 
 export const DEPARTEMENT_FRANCAIS = 'Département français'
@@ -24,4 +27,10 @@ export function getProvenanceLabel(provenance: Provenance): string {
     return provenance.source === PAYS_ETRANGER
         ? provenance.libelle
         : provenance.code
+}
+
+export function toProvenance(label: string): Provenance {
+    return isCodeDepartement(label)
+        ? { source: DEPARTEMENT_FRANCAIS, code: label }
+        : { source: PAYS_ETRANGER, libelle: label }
 }

@@ -1,7 +1,8 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { LocalizationPort } from '@shared/core/application/ports/localization'
-import ProvenanceMap from './ProvenanceMap'
+import { toProvenance } from '@shared/core/domain/value-objects/provenance'
+import ProvenanceMap, { type ProvenanceMapProps } from './ProvenanceMap'
 
 afterEach(() => {
     cleanup()
@@ -52,6 +53,20 @@ function markers(container: HTMLElement): NodeListOf<HTMLImageElement> {
 
 const NOTHING_DRAWN = /Aucun lieu n'a pu être situé/
 
+/**
+ * The rows a screen hands the map, written as the places they are drawn from,
+ * each drawing the same tonnage as the next — what a test that is not about
+ * shading says when it says nothing about tonnage.
+ */
+function drawnFrom(
+    ...places: string[]
+): ProvenanceMapProps['approvisionnements'] {
+    return places.map((place) => ({
+        provenance: toProvenance(place),
+        tonnageTotal: 1000,
+    }))
+}
+
 describe('ProvenanceMap', () => {
     it('draws one outline per département of provenance', () => {
         const {
@@ -62,7 +77,7 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={['33', '64']}
+                approvisionnements={drawnFrom('33', '64')}
                 communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -87,7 +102,7 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={['Espagne']}
+                approvisionnements={drawnFrom('Espagne')}
                 communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -109,7 +124,7 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={['64', 'Espagne']}
+                approvisionnements={drawnFrom('64', 'Espagne')}
                 communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -129,7 +144,7 @@ describe('ProvenanceMap', () => {
 
         render(
             <ProvenanceMap
-                provenances={['33', '33']}
+                approvisionnements={drawnFrom('33', '33')}
                 communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -147,7 +162,7 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={['64', 'Sylvanie']}
+                approvisionnements={drawnFrom('64', 'Sylvanie')}
                 communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -167,7 +182,7 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={['33']}
+                approvisionnements={drawnFrom('33')}
                 communes={['33063']}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -188,7 +203,7 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={['33']}
+                approvisionnements={drawnFrom('33')}
                 communes={['33063', '33063', '33281']}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -211,7 +226,7 @@ describe('ProvenanceMap', () => {
 
         const { container } = render(
             <ProvenanceMap
-                provenances={[]}
+                approvisionnements={[]}
                 communes={['33063', '33281']}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -233,7 +248,7 @@ describe('ProvenanceMap', () => {
 
         render(
             <ProvenanceMap
-                provenances={[]}
+                approvisionnements={[]}
                 communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}
@@ -250,7 +265,7 @@ describe('ProvenanceMap', () => {
 
         render(
             <ProvenanceMap
-                provenances={['Sylvanie']}
+                approvisionnements={drawnFrom('Sylvanie')}
                 communes={[]}
                 getCommuneCenterPosition={getCommuneCenterPosition}
                 getDepartementContour={getDepartementContour}

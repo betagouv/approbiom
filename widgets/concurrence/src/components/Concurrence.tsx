@@ -140,12 +140,10 @@ export default function Concurrence({
         [filteredRows]
     )
 
-    const provenancesRetenues = useMemo(
+    const approvisionnementsRetenus = useMemo(
         () =>
             filteredRows.flatMap((item) =>
-                item.approvisionnements
-                    .filter(isSelected)
-                    .map(({ provenance }) => getProvenanceLabel(provenance))
+                item.approvisionnements.filter(isSelected)
             ),
         [filteredRows, isSelected]
     )
@@ -299,7 +297,7 @@ export default function Concurrence({
 
                 <div className="concurrence__map">
                     <ProvenanceMap
-                        provenances={provenancesRetenues}
+                        approvisionnements={approvisionnementsRetenus}
                         communes={communes}
                         getCommuneCenterPosition={getCommuneCenterPosition}
                         getDepartementContour={getDepartementContour}
