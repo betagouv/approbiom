@@ -70,11 +70,24 @@ export default function Map({
 
         mapRef.current = L.map(container).setView(defaultCenter, DEFAULT_ZOOM)
 
-        L.tileLayer('https://tile.openstreetmap.org/{z}/{x}/{y}.png', {
-            maxZoom: 19,
-            attribution:
-                '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a>',
-        }).addTo(mapRef.current)
+        // cf https://cartes.gouv.fr/aide/fr/guides-utilisateur/utiliser-les-services-de-la-geoplateforme/diffusion/wmts/
+        const fondTopo = L.tileLayer(
+            'https://data.geopf.fr/wmts?' +
+                'SERVICE=WMTS&REQUEST=GetTile&VERSION=1.0.0' +
+                '&LAYER=GEOGRAPHICALGRIDSYSTEMS.PLANIGNV2' +
+                '&STYLE=normal' +
+                '&FORMAT=image/png' +
+                '&TILEMATRIXSET=PM' +
+                '&TILEMATRIX={z}' +
+                '&TILEROW={y}' +
+                '&TILECOL={x}',
+            {
+                attribution: '© IGN – Géoplateforme',
+                maxZoom: 19,
+            }
+        )
+
+        fondTopo.addTo(mapRef.current)
 
         return () => {
             mapRef.current?.remove()
