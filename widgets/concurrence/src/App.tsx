@@ -1,7 +1,8 @@
 import AsyncGate from '@shared/react/components/AsyncGate'
-import { useAsyncState } from '@shared/react/UseAsyncState'
+
 import Concurrence from './components/Concurrence'
 import { loadConcurrence, type ConcurrencePorts } from './load-concurrence'
+import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 
 export default function App(ports: ConcurrencePorts) {
     const state = useAsyncState(() => loadConcurrence(ports))

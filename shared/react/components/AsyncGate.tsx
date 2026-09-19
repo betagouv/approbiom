@@ -1,7 +1,8 @@
 import type { ReactNode } from 'react'
 import Alert from '@shared/react/components/Alert'
-import type { UseAsyncState } from '../UseAsyncState'
+
 import { renderGristError } from './grist-render-error'
+import type { UseAsyncState } from '../hooks/UseAsyncState'
 
 export type AsyncGateProps<T> = {
     state: UseAsyncState<T>

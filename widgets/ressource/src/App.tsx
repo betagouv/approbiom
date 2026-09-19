@@ -1,5 +1,5 @@
 import AsyncGate from '@shared/react/components/AsyncGate'
-import { useAsyncState } from '@shared/react/UseAsyncState'
+import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import RechercheDePlan, {
