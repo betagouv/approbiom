@@ -1,7 +1,7 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 
 import { gristReady } from '@shared/infrastructure/grist/grist-ready'
-import AsyncGate from '@shared/react/AsyncGate'
+import AsyncGate from '@shared/react/components/AsyncGate'
 import Alert from '@shared/react/components/Alert'
 import { useAsyncState } from '@shared/react/UseAsyncState'
 import { useCallback, useEffect, useState } from 'react'

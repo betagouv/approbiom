@@ -1,4 +1,4 @@
-import AsyncGate from '@shared/react/AsyncGate'
+import AsyncGate from '@shared/react/components/AsyncGate'
 import { useAsyncState } from '@shared/react/UseAsyncState'
 import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'

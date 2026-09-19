@@ -1,7 +1,7 @@
 import './RechercheDePlan.css'
 import SearchBar from '@shared/react/components/SearchBar'
 import Ressource from '@shared/react/components/Ressource'
-import AsyncGate from '@shared/react/AsyncGate'
+import AsyncGate from '@shared/react/components/AsyncGate'
 import { useAsyncState } from '@shared/react/UseAsyncState'
 import {
     getApprovisionnementByRessourceStats,
