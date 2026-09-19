@@ -9,8 +9,7 @@ import type { CellValue } from 'grist/GristData'
 // - - - - - Configurations - - - - - - //
 
 // Input - Workbook structure
-
-const SHEET_NAME = 'Fournisseurs'
+const EXPECTED_WORD_CONTAINED_IN_SHEETNAME = 'Fournisseurs'
 const HEADER_COLUMN_FOURNISSEURS = 'Fournisseur'
 
 const COLUMN_HEADER_PREFIXES = {
@@ -69,21 +68,41 @@ function isTonnage(value: CellValue): value is number {
     return typeof value === 'number' && Number.isFinite(value)
 }
 
-function readSheet(file: ArrayBuffer): CellValue[][] {
+export function findSheetName(
+    sheetNames: string[],
+    expectedSheetName: string
+): string | undefined {
+    const expected = normalize(expectedSheetName)
+    const foundSheetName = sheetNames.find((sheetName) =>
+        normalize(sheetName).includes(expected)
+    )
+
+    return foundSheetName
+}
+
+function readFournisseurSheet(file: ArrayBuffer): CellValue[][] {
     const workbook = XLSX.read(file, { cellDates: false })
 
-    if (!workbook.SheetNames.includes(SHEET_NAME)) {
+    const foundSheetName = findSheetName(
+        workbook.SheetNames,
+        EXPECTED_WORD_CONTAINED_IN_SHEETNAME
+    )
+
+    if (foundSheetName == undefined) {
         throw new Error(
-            `la feuille « ${SHEET_NAME} » n'existe pas dans le fichier`
+            `la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » n'existe pas dans le fichier`
         )
     }
 
-    return XLSX.utils.sheet_to_json<CellValue[]>(workbook.Sheets[SHEET_NAME], {
-        header: 1,
-        raw: true,
-        defval: null,
-        blankrows: true,
-    })
+    return XLSX.utils.sheet_to_json<CellValue[]>(
+        workbook.Sheets[foundSheetName],
+        {
+            header: 1,
+            raw: true,
+            defval: null,
+            blankrows: true,
+        }
+    )
 }
 
 function findHeaderRow(rows: CellValue[][]): number {
@@ -97,7 +116,7 @@ function findHeaderRow(rows: CellValue[][]): number {
 
     if (at === -1) {
         throw new Error(
-            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${SHEET_NAME} » ne porte l'en-tête « ${HEADER_COLUMN_FOURNISSEURS} » dans la colonne A`
+            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » ne porte l'en-tête « ${HEADER_COLUMN_FOURNISSEURS} » dans la colonne A`
         )
     }
 
@@ -123,7 +142,7 @@ function findColumns(
     if (missing.length > 0) {
         // Spreadsheet rows are numbered from 1; the array is indexed from 0.
         throw new Error(
-            `la ligne d'en-tête ${headerRow + 1} de la feuille « ${SHEET_NAME} » n'a pas de colonne pour : ${missing.join(', ')}`
+            `la ligne d'en-tête ${headerRow + 1} de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » n'a pas de colonne pour : ${missing.join(', ')}`
         )
     }
 
@@ -148,7 +167,7 @@ export async function extractRows(
     file: Blob,
     document: string
 ): Promise<ExtractedLines[]> {
-    const rows = readSheet(await file.arrayBuffer())
+    const rows = readFournisseurSheet(await file.arrayBuffer())
 
     const headerRow = findHeaderRow(rows)
     const columns = findColumns(rows, headerRow)
@@ -188,7 +207,7 @@ export async function extractRows(
 
     if (invalidTonnages.length > 0) {
         throw new Error(
-            `la colonne « Tonnage » de la feuille « ${SHEET_NAME} » doit contenir un nombre : ${invalidTonnages.join(', ')}`
+            `la colonne « Tonnage » de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » doit contenir un nombre : ${invalidTonnages.join(', ')}`
         )
     }
 
