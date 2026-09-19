@@ -1,10 +1,6 @@
 import * as XLSX from 'xlsx'
+import { normalize } from './transform-provenance/reference-data'
 import {
-    loadReferenceData,
-    normalize,
-} from './transform-provenance/reference-data'
-import {
-    transformProvenance,
     type Confidence,
     type ProvenanceShare,
 } from './transform-provenance/transform-provenance'
@@ -148,16 +144,6 @@ function findAdditionalColumns(
         .filter(([, at]) => at !== -1)
 }
 
-// - - - - - exported functions - - - - - - //
-
-export async function getHasExpectedTemplate(file: Blob): Promise<boolean> {
-    const rows = readSheet(await file.arrayBuffer())
-
-    findColumns(rows, findHeaderRow(rows))
-
-    return true
-}
-
 export async function extractRows(
     file: Blob,
     document: string
@@ -207,28 +193,4 @@ export async function extractRows(
     }
 
     return lines
-}
-
-export async function importRows(
-    file: Blob,
-    document: string
-): Promise<ImportedLines[]> {
-    const reference = loadReferenceData()
-
-    return (await extractRows(file, document)).map((line) => {
-        const { distribution, confidence, unrecognized } = transformProvenance(
-            line.rawProvenance,
-            reference
-        )
-
-        return {
-            ...line,
-            provenance: distribution.map((share) => ({
-                ...share,
-                additionalData: line.additionalData,
-            })),
-            confidence,
-            unrecognized,
-        }
-    })
 }

@@ -13,10 +13,8 @@ import {
 
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { ApprovisionnementAImporterAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-a-importer-approvisionnement'
-import {
-    getHasExpectedTemplate,
-    importRows,
-} from '@shared/infrastructure/import-bcib-bciat/helpers'
+
+import { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
 
 type WidgetImportProps = {
     attachments: Pick<AttachmentPort, 'findOne' | 'getFileUrl'>
@@ -52,21 +50,19 @@ export default function App({
             const file = await response.blob()
 
             try {
-                await getHasExpectedTemplate(file)
+                const lines = await importRows(file, name)
+
+                await approvisionnementsAImporter.create(
+                    lines.map((line) => ({ ...line, planDApprovisionnement }))
+                )
             } catch (cause) {
                 throw new Error(
-                    `le fichier n'a pas la forme attendue : ${
+                    `Un problème est survenu : ${
                         cause instanceof Error ? cause.message : String(cause)
                     }`,
                     { cause }
                 )
             }
-
-            const lines = await importRows(file, name)
-
-            await approvisionnementsAImporter.create(
-                lines.map((line) => ({ ...line, planDApprovisionnement }))
-            )
         },
         [attachments, approvisionnementsAImporter]
     )
