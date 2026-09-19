@@ -4,7 +4,7 @@ import ProvenanceMap from '@shared/react/components/Ressource/ProvenanceMap'
 import MultiSelect, {
     type MultiSelectGroup,
 } from '@shared/react/components/MultiSelect'
-import { getOptions } from '@shared/react/getOptions'
+import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
 import type {
     DepartementsByRegion,
     LocalizationPort,

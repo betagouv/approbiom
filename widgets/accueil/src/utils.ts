@@ -12,7 +12,7 @@ import type {
     MultiSelectOption,
 } from '@shared/react/components/MultiSelect'
 import type { SearchBarOption } from '@shared/react/components/SearchBar'
-import { getOptions } from '@shared/react/getOptions'
+import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
 
 export const SANS_APPEL_A_PROJET_LABEL =
     "Aucun appel à projet n'est lié à ce plan"
