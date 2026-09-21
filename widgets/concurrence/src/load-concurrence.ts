@@ -36,6 +36,7 @@ export type PlanConcurrence = {
     nom: PlanDApprovisionnement['nom']
     departementDeSituation: Departement['libelle']
     installationCommune: Commune['codeInsee'] | null
+    statut: PlanDApprovisionnement['statut']
 }
 
 /**
@@ -105,6 +106,7 @@ export async function loadConcurrence(
             nom: plan?.nom ?? '',
             departementDeSituation: dep ? (libelleByDep.get(dep) ?? dep) : '',
             installationCommune: commune,
+            statut: plan?.statut ?? '',
         }
     }
 

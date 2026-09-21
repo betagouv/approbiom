@@ -55,6 +55,7 @@ const saintJunien: ConcurrenceRow = {
         nom: 'RC Saint Junien',
         departementDeSituation: 'Haute-Vienne',
         installationCommune: '87154',
+        statut: 'projet',
     },
     ressource: 'Plaquettes forestières',
     approvisionnements: [deHauteVienne, dAllemagne],

@@ -3,6 +3,7 @@ import DataTable, { type Column } from '@shared/react/components/DataTable'
 import ProvenanceMap from '@shared/react/components/Ressource/ProvenanceMap'
 import MultiSelect, {
     type MultiSelectGroup,
+    type MultiSelectOption,
 } from '@shared/react/components/MultiSelect'
 import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
 import type {
@@ -18,6 +19,8 @@ import {
 import { useCallback, useMemo, useState } from 'react'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ConcurrenceRow } from '../load-concurrence'
+import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import { PLAN_STATUT_PROJECT } from '@shared/core/domain/value-objects/plan-statut'
 
 type Props = {
     approvisionnementsByPlanAndRessource: readonly ConcurrenceRow[]
@@ -41,12 +44,14 @@ export default function Concurrence({
     const [ressource, setRessource] = useState<string[]>([])
     const [provenances, setProvenances] = useState<string[]>([])
     const [fournisseurs, setFournisseurs] = useState<Entreprise['siret'][]>([])
+    const [planStatut, setPlanStatut] = useState<
+        PlanDApprovisionnement['statut'][]
+    >([PLAN_STATUT_PROJECT])
 
     const ressourceOptions = getOptions(
         approvisionnementsByPlanAndRessource,
         (item) => item.ressource
     )
-
     const fournisseurOptions = entreprises.map((entreprise) => ({
         value: entreprise.siret,
         label: entreprise.denomination || entreprise.siret,
@@ -77,7 +82,6 @@ export default function Concurrence({
                 .map((libelle) => ({ value: libelle, label: libelle })),
         [approvisionnementsByPlanAndRessource]
     )
-
     const provenanceOptions: readonly MultiSelectGroup<string>[] =
         useMemo(() => {
             const regions = departementsByRegion
@@ -102,6 +106,10 @@ export default function Concurrence({
                 },
             ]
         }, [departementsByRegion, paysOptions])
+    const planStatutOptions: MultiSelectOption<string>[] = getOptions(
+        approvisionnementsByPlanAndRessource,
+        (item) => item.plan.statut
+    )
 
     const isSelected = useCallback(
         (approvisionnement: Approvisionnement) =>
@@ -121,14 +129,17 @@ export default function Concurrence({
                     (ressource.length === 0 ||
                         ressource.includes(item.ressource)) &&
                     ((provenances.length === 0 && fournisseurs.length === 0) ||
-                        item.approvisionnements.some(isSelected))
+                        item.approvisionnements.some(isSelected)) &&
+                    (planStatut.length === 0 ||
+                        planStatut.includes(item.plan.statut))
             ),
         [
             approvisionnementsByPlanAndRessource,
             ressource,
-            provenances,
-            fournisseurs,
+            provenances.length,
+            fournisseurs.length,
             isSelected,
+            planStatut,
         ]
     )
 
@@ -236,6 +247,15 @@ export default function Concurrence({
                 Filtres d&apos;analyse de la concurrence
             </p>
             <div className="concurrence__filters">
+                <div className="concurrence__filter">
+                    <MultiSelect
+                        label="Statut"
+                        options={planStatutOptions}
+                        selectedValues={planStatut}
+                        onSelectionChange={setPlanStatut}
+                        showSelectAll
+                    />
+                </div>
                 <div className="concurrence__filter">
                     <MultiSelect
                         label="Ressource"
