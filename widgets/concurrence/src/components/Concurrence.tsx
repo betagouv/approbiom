@@ -240,12 +240,9 @@ export default function Concurrence({
 
     return (
         <div className="concurrence">
-            <h1 className="fr-h3 concurrence__title">
+            <h1 className="fr-h6 concurrence__title">
                 Concurrence et conflits d&apos;usages potentiels entre projets
             </h1>
-            <p className="fr-h4 concurrence__filters_title">
-                Filtres d&apos;analyse de la concurrence
-            </p>
             <div className="concurrence__filters">
                 <div className="concurrence__filter">
                     <MultiSelect
@@ -288,8 +285,8 @@ export default function Concurrence({
                 <div className="concurrence__table">
                     <DataTable
                         caption={'Plans concernés'}
-                        description="Cliquez sur un plan d’approvisionnement pour voir sa ressource et ses fournisseurs retenus sans quitter la page."
                         showResultCount
+                        stickyHeader
                         expandable={{
                             columnId: 'plan_d_approvisionnement',
                             render: (item) => (

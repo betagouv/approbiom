@@ -1,29 +1,23 @@
-/* CSS lives next to its component: Concurrence.tsx imports this file directly. */
-
 .concurrence {
     display: flex;
     flex-direction: column;
 
-    gap: 1.5rem;
-    padding: 2rem;
-
-    min-height: 100vh;
+    height: 100vh;
 }
 
 .concurrence__title {
     margin: 0;
-}
-
-.concurrence__filters_title {
-    margin: 0;
+    padding: 0.5rem 0.75rem 0;
 }
 
 .concurrence__filters {
     display: flex;
-    flex-wrap: wrap;
 
     align-items: flex-end;
     gap: 1rem;
+    padding: 0.5rem 0.75rem 0.75rem;
+
+    border-bottom: 1px solid var(--border-default-grey);
 }
 
 .concurrence__filter {
@@ -36,39 +30,50 @@
 }
 
 .concurrence__results {
-    display: flex;
-    flex-wrap: wrap;
-
-    align-items: flex-start;
-    gap: 1.5rem;
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(35rem, 50%) 1fr;
+    grid-template-rows: minmax(0, 1fr);
+    min-height: 0;
 }
 
 .concurrence__table {
-    flex: 1 1 40rem;
+    padding: 0.5rem;
     min-width: 0;
-    min-height: 30rem;
-}
-
-.concurrence__map {
-    flex: 1 1 22rem;
-    min-width: 0;
-}
-
-.concurrence__map .map {
-    height: 30rem;
+    border-right: 1px solid var(--border-default-grey);
 }
 
 .concurrence__table .fr-table {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
     margin: 0;
 }
 
 .concurrence__table .fr-table__wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    min-height: 0;
     margin: 0;
 }
 
 .concurrence__table .fr-table__container {
+    flex: 1;
     margin: 0;
     padding-top: 0;
+}
+
+.concurrence__map {
+    min-width: 0;
+    isolation: isolate;
+}
+
+.concurrence__map .ressource__map,
+.concurrence__map .map {
+    height: 100%;
 }
 
 /* Detail panel of an expanded row: label/value pairs, laid out side by side
