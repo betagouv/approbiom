@@ -1,9 +1,8 @@
 // Where a commune sits and what a département looks like, read from datasets
 // bundled with the widget rather than from the network: both are référentiels
 // INSEE/IGN move about once a year, and a map that has to wait on a fetch has
-// nothing to draw. `pnpm generate:communes` and
-// `pnpm generate:departements-contours` are what refresh them.
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+// nothing to draw. `pnpm generate:referentiels` is what refreshes them.
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
@@ -79,16 +78,16 @@ function toPositions(contour: [Latitude, Longitude][][]) {
 }
 
 /**
- * The half of {@link LocalizationPort} the bundled datasets answer for. What a
+ * The half of {@link ReferentielGeoPort} the bundled datasets answer for. What a
  * document holds — which départements a région gathers — comes from the Grist
  * adapter instead, and the two are read as one port.
  */
-export type LocalizationDatasetPort = Pick<
-    LocalizationPort,
+export type ReferentielGeoDatasetPort = Pick<
+    ReferentielGeoPort,
     'getCommuneCenterPosition' | 'getDepartementContour' | 'getCountryContour'
 >
 
-export function createLocalizationAdapter(): LocalizationDatasetPort {
+export function createReferentielGeoAdapter(): ReferentielGeoDatasetPort {
     return {
         getCommuneCenterPosition(codeCommune) {
             const commune = communes[codeCommune]

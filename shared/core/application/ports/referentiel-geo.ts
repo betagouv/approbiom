@@ -3,7 +3,7 @@ import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { Region } from '@shared/core/domain/value-objects/region'
 
-export interface LocalizationPort {
+export interface ReferentielGeoPort {
     listDepartementsByRegion: () => Promise<readonly DepartementsByRegion[]>
     getCommuneCenterPosition: (codeCommune: Commune['codeInsee']) => {
         latitude: number

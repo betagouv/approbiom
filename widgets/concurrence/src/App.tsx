@@ -14,12 +14,14 @@ export default function App(ports: ConcurrencePorts) {
                     <Concurrence
                         {...screen}
                         getCommuneCenterPosition={
-                            ports.localization.getCommuneCenterPosition
+                            ports.referentielGeo.getCommuneCenterPosition
                         }
                         getDepartementContour={
-                            ports.localization.getDepartementContour
+                            ports.referentielGeo.getDepartementContour
                         }
-                        getCountryContour={ports.localization.getCountryContour}
+                        getCountryContour={
+                            ports.referentielGeo.getCountryContour
+                        }
                     />
                 )}
             </AsyncGate>

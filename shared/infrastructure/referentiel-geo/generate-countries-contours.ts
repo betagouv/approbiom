@@ -1,7 +1,7 @@
 // Regenerates countries-contours.json — the local ISO 3166-1 alpha-3 → outline
 // lookup used to draw a country on a map without hitting the network.
 //
-//     pnpm generate:countries-contours
+//     pnpm generate:referentiels pays
 //
 // geoBoundaries publishes one ADM0 (country) boundary per country under an open
 // licence, indexed by the API below. Each entry points at two GeoJSON files: the
@@ -15,7 +15,6 @@
 // has to be able to find a country by the name it is written under.
 
 import { writeFile } from 'node:fs/promises'
-import process from 'node:process'
 
 const SOURCE = 'https://www.geoboundaries.org/'
 
@@ -23,7 +22,8 @@ const INDEX_ENDPOINT =
     'https://www.geoboundaries.org/api/current/gbOpen/ALL/ADM0/'
 
 const OUTPUT_URL = new URL('./countries-contours.json', import.meta.url)
-const OUTPUT_PATH = 'shared/infrastructure/localization/countries-contours.json'
+export const OUTPUT_PATH =
+    'shared/infrastructure/referentiel-geo/countries-contours.json'
 
 // In degrees, so about 5 km. A country is read at world scale, where a degree
 // is a handful of pixels: a point sitting this close to the line its neighbours
@@ -538,7 +538,7 @@ function serialise(file: ContoursFile): string {
     return json
 }
 
-async function main(): Promise<void> {
+export async function generateCountriesContours(): Promise<void> {
     const entries = await fetchIndex()
     const names = frenchNames(entries)
 
@@ -604,18 +604,4 @@ async function main(): Promise<void> {
     console.log(`Points: ${points.toLocaleString('en-US')}`)
     console.log(`Source: ${SOURCE}`)
     console.log(`Generated at: ${data._metadata.generatedAt}`)
-}
-
-try {
-    await main()
-} catch (error) {
-    // A stack trace would only point at the fetch/parse plumbing; the message
-    // and its `cause` are what tell you whether the API is down, moved, or
-    // changed shape.
-    console.error(`Could not generate ${OUTPUT_PATH}.`)
-    console.error(error instanceof Error ? error.message : String(error))
-    if (error instanceof Error && error.cause !== undefined) {
-        console.error('Caused by:', error.cause)
-    }
-    process.exitCode = 1
 }

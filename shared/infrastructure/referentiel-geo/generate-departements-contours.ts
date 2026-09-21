@@ -1,7 +1,7 @@
 // Regenerates departements-contours.json — the local département code → outline
 // lookup used to draw a département on a map without hitting the network.
 //
-//     pnpm generate:departements-contours
+//     pnpm generate:referentiels departements
 //
 // geo.api.gouv.fr, which the communes come from, serves geometry for communes
 // only: `contour` on /departements answers nothing. The outlines come from the
@@ -9,7 +9,6 @@
 // published as a WFS.
 
 import { writeFile } from 'node:fs/promises'
-import process from 'node:process'
 
 const SOURCE = 'https://data.geopf.fr/'
 
@@ -20,8 +19,8 @@ const ENDPOINT =
     'https://data.geopf.fr/wfs/ows?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAMES=ADMINEXPRESS-COG-CARTO.LATEST:departement&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=200'
 
 const OUTPUT_URL = new URL('./departements-contours.json', import.meta.url)
-const OUTPUT_PATH =
-    'shared/infrastructure/localization/departements-contours.json'
+export const OUTPUT_PATH =
+    'shared/infrastructure/referentiel-geo/departements-contours.json'
 
 // In degrees, so about 100 m. IGN draws the coastline to the metre, which is
 // 20 MB of JSON no map at département scale can show — a point that sits this
@@ -341,7 +340,7 @@ function serialise(file: ContoursFile): string {
     return json
 }
 
-async function main(): Promise<void> {
+export async function generateDepartementsContours(): Promise<void> {
     const data = toContoursFile(await fetchDepartements())
 
     // Nothing is written until the whole payload has been validated, so a
@@ -360,18 +359,4 @@ async function main(): Promise<void> {
     console.log(`Points: ${points.toLocaleString('en-US')}`)
     console.log(`Source: ${SOURCE}`)
     console.log(`Generated at: ${data._metadata.generatedAt}`)
-}
-
-try {
-    await main()
-} catch (error) {
-    // A stack trace would only point at the fetch/parse plumbing; the message
-    // and its `cause` are what tell you whether the API is down, moved, or
-    // changed shape.
-    console.error(`Could not generate ${OUTPUT_PATH}.`)
-    console.error(error instanceof Error ? error.message : String(error))
-    if (error instanceof Error && error.cause !== undefined) {
-        console.error('Caused by:', error.cause)
-    }
-    process.exitCode = 1
 }

@@ -27,6 +27,12 @@
         // tsc is only ever used as a type checker here.
         "noEmit": true,
         "isolatedModules": true,
+
+        // The référentiel generators are run straight off the source by
+        // `node --experimental-strip-types`, whose resolver wants the real
+        // filename: relative imports between them carry the `.ts`.
+        "allowImportingTsExtensions": true,
+
         "verbatimModuleSyntax": true,
         "resolveJsonModule": true,
         "skipLibCheck": true

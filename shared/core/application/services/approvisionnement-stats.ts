@@ -7,8 +7,8 @@ import type {
 } from '@shared/core/application/ports/approvisionnement'
 import type {
     DepartementsByRegion,
-    LocalizationPort,
-} from '@shared/core/application/ports/localization'
+    ReferentielGeoPort,
+} from '@shared/core/application/ports/referentiel-geo'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -54,7 +54,7 @@ export type ApprovisionnementByRessourceStatsPorts = {
     approvisionnements: ApprovisionnementPort
     ressources: RessourcePort
     entreprises: EntreprisePort
-    listDepartementsByRegion: LocalizationPort['listDepartementsByRegion']
+    listDepartementsByRegion: ReferentielGeoPort['listDepartementsByRegion']
 }
 
 export type ApprovisionnementByRessourceStatsSources = {

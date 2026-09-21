@@ -1,13 +1,13 @@
 import { describe, expect, it } from 'vitest'
-import { createLocalizationAdapter } from './localization-adapter'
+import { createReferentielGeoAdapter } from './referentiel-geo-adapter'
 
-describe('createLocalizationAdapter', () => {
+describe('createReferentielGeoAdapter', () => {
     describe('getCommuneCenterPosition', () => {
         it('gives the centre of a commune the dataset knows', () => {
             // Anglet. Asserted loosely: regenerating the dataset can nudge a
             // centre by a few metres, which is not a regression.
             const position =
-                createLocalizationAdapter().getCommuneCenterPosition('64024')
+                createReferentielGeoAdapter().getCommuneCenterPosition('64024')
 
             expect(position.latitude).toBeCloseTo(43.49, 1)
             expect(position.longitude).toBeCloseTo(-1.52, 1)
@@ -15,7 +15,7 @@ describe('createLocalizationAdapter', () => {
 
         it('refuses a code no commune carries', () => {
             expect(() =>
-                createLocalizationAdapter().getCommuneCenterPosition('00000')
+                createReferentielGeoAdapter().getCommuneCenterPosition('00000')
             ).toThrow('00000')
         })
     })
@@ -23,7 +23,7 @@ describe('createLocalizationAdapter', () => {
     describe('getCountryContour', () => {
         it('gives an outline for a country named in French', () => {
             const contour =
-                createLocalizationAdapter().getCountryContour('Espagne')
+                createReferentielGeoAdapter().getCountryContour('Espagne')
 
             const points = contour.flat()
             const latitudes = points.map(({ latitude }) => latitude)
@@ -40,16 +40,16 @@ describe('createLocalizationAdapter', () => {
         })
 
         it('reads a name however it is accented or cased', () => {
-            const localization = createLocalizationAdapter()
+            const referentielGeo = createReferentielGeoAdapter()
 
-            expect(localization.getCountryContour("COTE D'IVOIRE")).toEqual(
-                localization.getCountryContour('Côte d’Ivoire')
+            expect(referentielGeo.getCountryContour("COTE D'IVOIRE")).toEqual(
+                referentielGeo.getCountryContour('Côte d’Ivoire')
             )
         })
 
         it('gives no outline for a name no country is known by', () => {
             expect(
-                createLocalizationAdapter().getCountryContour('Sylvanie')
+                createReferentielGeoAdapter().getCountryContour('Sylvanie')
             ).toEqual([])
         })
     })
@@ -57,7 +57,7 @@ describe('createLocalizationAdapter', () => {
     describe('getDepartementContour', () => {
         it('gives an outline that closes back on itself', () => {
             const [contour, ...others] =
-                createLocalizationAdapter().getDepartementContour('64')
+                createReferentielGeoAdapter().getDepartementContour('64')
 
             expect(others).toHaveLength(0)
             expect(contour.length).toBeGreaterThan(100)
@@ -67,7 +67,7 @@ describe('createLocalizationAdapter', () => {
         it('gives an outline the communes of the département fall inside', () => {
             // Anglet, on the coast, is the western edge of the case.
             const [contour] =
-                createLocalizationAdapter().getDepartementContour('64')
+                createReferentielGeoAdapter().getDepartementContour('64')
             const latitudes = contour.map(({ latitude }) => latitude)
             const longitudes = contour.map(({ longitude }) => longitude)
 
@@ -79,7 +79,7 @@ describe('createLocalizationAdapter', () => {
 
         it('refuses a code no département carries', () => {
             expect(() =>
-                createLocalizationAdapter().getDepartementContour('99')
+                createReferentielGeoAdapter().getDepartementContour('99')
             ).toThrow('99')
         })
     })

@@ -1,6 +1,6 @@
 import { cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import { toProvenance } from '@shared/core/domain/value-objects/provenance'
 import ProvenanceMap, { type ProvenanceMapProps } from './ProvenanceMap'
 
@@ -25,13 +25,13 @@ const contour = [
 function contours() {
     return {
         getCommuneCenterPosition: vi
-            .fn<LocalizationPort['getCommuneCenterPosition']>()
+            .fn<ReferentielGeoPort['getCommuneCenterPosition']>()
             .mockReturnValue({ latitude: 44.84, longitude: -0.58 }),
         getDepartementContour: vi
-            .fn<LocalizationPort['getDepartementContour']>()
+            .fn<ReferentielGeoPort['getDepartementContour']>()
             .mockReturnValue(contour),
         getCountryContour: vi
-            .fn<LocalizationPort['getCountryContour']>()
+            .fn<ReferentielGeoPort['getCountryContour']>()
             .mockReturnValue(contour),
     }
 }

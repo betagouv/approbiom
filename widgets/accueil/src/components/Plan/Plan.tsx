@@ -7,7 +7,7 @@ import PiecesJointes from './tabs/PiecesJointes'
 import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
 import Ressource from '@shared/react/components/Ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import {
     getAppelsAProjet,
     type PlanDetail,
@@ -31,9 +31,9 @@ export type PlanProps = {
     approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
     plan: PlanDetail
     getFileUrl: (id: Attachment['id']) => Promise<string>
-    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
-    getDepartementContour: LocalizationPort['getDepartementContour']
-    getCountryContour: LocalizationPort['getCountryContour']
+    getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+    getDepartementContour: ReferentielGeoPort['getDepartementContour']
+    getCountryContour: ReferentielGeoPort['getCountryContour']
     onClose: () => void
     updateInstruction: UpdateInstruction
     updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide

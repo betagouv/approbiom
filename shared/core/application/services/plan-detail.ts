@@ -12,14 +12,14 @@ import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { Region } from '@shared/core/domain/value-objects/region'
 import type { ApprovisionnementGroupedByPlanRessourceAndFournisseur } from '@shared/core/application/ports/approvisionnement'
-import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
+import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { CrbPort } from '@shared/core/application/ports/crb'
 import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type { InstructionPort } from '@shared/core/application/ports/instruction'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
@@ -257,7 +257,7 @@ export function composePlanDetails({
 export type PlanDetailPorts = {
     plans: PlanPort
     installations: InstallationPort
-    listDepartementsByRegion: LocalizationPort['listDepartementsByRegion']
+    listDepartementsByRegion: ReferentielGeoPort['listDepartementsByRegion']
     demandesSubvention: DemandeSubventionPort
     programmesAide: ProgrammeAidePort
     instructions: InstructionPort

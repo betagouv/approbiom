@@ -3,8 +3,8 @@ import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { InstallationPort } from '@shared/core/application/ports/installation'
 import type {
     DepartementsByRegion,
-    LocalizationPort,
-} from '@shared/core/application/ports/localization'
+    ReferentielGeoPort,
+} from '@shared/core/application/ports/referentiel-geo'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
@@ -23,8 +23,8 @@ export type ConcurrencePorts = {
     installations: InstallationPort
     ressources: RessourcePort
     entreprises: EntreprisePort
-    localization: Pick<
-        LocalizationPort,
+    referentielGeo: Pick<
+        ReferentielGeoPort,
         | 'listDepartementsByRegion'
         | 'getCommuneCenterPosition'
         | 'getDepartementContour'
@@ -77,7 +77,7 @@ export async function loadConcurrence(
         ports.installations.list(),
         ports.ressources.list(),
         ports.entreprises.list(),
-        ports.localization.listDepartementsByRegion(),
+        ports.referentielGeo.listDepartementsByRegion(),
     ])
 
     const planById = new Map(plans.map((plan) => [plan.id, plan]))

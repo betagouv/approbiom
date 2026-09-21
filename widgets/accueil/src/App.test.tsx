@@ -13,7 +13,7 @@ import type { DemandeSubvention } from '@shared/core/domain/entities/demande-sub
 import type { Installation } from '@shared/core/domain/entities/installation'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
+import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import App from './App'
 import type { AccueilPorts } from './load-accueil'
 

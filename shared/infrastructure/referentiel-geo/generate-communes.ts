@@ -1,13 +1,12 @@
 // Regenerates communes.json — the local INSEE code → geographic centre lookup
 // used to place a commune on a map without hitting the network at runtime.
 //
-//     pnpm generate:communes
+//     pnpm generate:referentiels communes
 //
 // The dataset only changes when communes merge or split (a handful per year,
 // on 1 January), so this is run by hand and the result is committed.
 
 import { writeFile } from 'node:fs/promises'
-import process from 'node:process'
 
 const SOURCE = 'https://geo.api.gouv.fr/'
 
@@ -18,7 +17,7 @@ const ENDPOINT =
     'https://geo.api.gouv.fr/communes?fields=code,nom,centre&format=json&geometry=centre'
 
 const OUTPUT_URL = new URL('./communes.json', import.meta.url)
-const OUTPUT_PATH = 'shared/infrastructure/localization/communes.json'
+export const OUTPUT_PATH = 'shared/infrastructure/referentiel-geo/communes.json'
 
 /** One entry of the `GET /communes` array, as documented by geo.api.gouv.fr. */
 type ApiCommune = {
@@ -143,7 +142,7 @@ function describe(entry: unknown): string {
     return '(entry without a code)'
 }
 
-async function main(): Promise<void> {
+export async function generateCommunes(): Promise<void> {
     const data = toCommunesFile(await fetchCommunes())
 
     // Nothing is written until the whole payload has been validated, so a
@@ -155,18 +154,4 @@ async function main(): Promise<void> {
     console.log(`Communes: ${count.toLocaleString('en-US')}`)
     console.log(`Source: ${SOURCE}`)
     console.log(`Generated at: ${data._metadata.generatedAt}`)
-}
-
-try {
-    await main()
-} catch (error) {
-    // A stack trace would only point at the fetch/parse plumbing; the message
-    // and its `cause` are what tell you whether the API is down, moved, or
-    // changed shape.
-    console.error(`Could not generate ${OUTPUT_PATH}.`)
-    console.error(error instanceof Error ? error.message : String(error))
-    if (error instanceof Error && error.cause !== undefined) {
-        console.error('Caused by:', error.cause)
-    }
-    process.exitCode = 1
 }

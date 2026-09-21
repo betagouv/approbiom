@@ -1,8 +1,8 @@
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type {
     DepartementsByRegion,
-    LocalizationPort,
-} from '@shared/core/application/ports/localization'
+    ReferentielGeoPort,
+} from '@shared/core/application/ports/referentiel-geo'
 import {
     getApprovisionnementByRessourceStatsByPlan,
     type ApprovisionnementByRessourceStatsByPlan,
@@ -28,9 +28,9 @@ export type AccueilPorts = PlanDetailPorts &
     ApprovisionnementByRessourceStatsPorts &
     UpdateInstructionPorts &
     UpdateIsPlanLaureatForProgrammeAidePorts & {
-        getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
-        getDepartementContour: LocalizationPort['getDepartementContour']
-        getCountryContour: LocalizationPort['getCountryContour']
+        getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+        getDepartementContour: ReferentielGeoPort['getDepartementContour']
+        getCountryContour: ReferentielGeoPort['getCountryContour']
     }
 
 export type AccueilScreen = {

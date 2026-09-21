@@ -2,7 +2,7 @@ import { useMemo } from 'react'
 import { latLngBounds, type LatLngTuple } from 'leaflet'
 import Alert from '@shared/react/components/Alert'
 import Map from '@shared/react/components/Map'
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
 import { isCodeDepartement } from '@shared/core/domain/value-objects/departement'
 import {
@@ -19,9 +19,9 @@ export type ProvenanceMapProps = {
         'tonnageTotal' | 'provenance'
     >[]
     communes: readonly Commune['codeInsee'][]
-    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
-    getDepartementContour: LocalizationPort['getDepartementContour']
-    getCountryContour: LocalizationPort['getCountryContour']
+    getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+    getDepartementContour: ReferentielGeoPort['getDepartementContour']
+    getCountryContour: ReferentielGeoPort['getCountryContour']
 }
 
 const MINIMUM_FILL_OPACITY = 0.15

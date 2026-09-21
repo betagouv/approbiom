@@ -7,8 +7,8 @@ import MultiSelect, {
 import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
 import type {
     DepartementsByRegion,
-    LocalizationPort,
-} from '@shared/core/application/ports/localization'
+    ReferentielGeoPort,
+} from '@shared/core/application/ports/referentiel-geo'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import {
     getProvenanceLabel,
@@ -23,9 +23,9 @@ type Props = {
     approvisionnementsByPlanAndRessource: readonly ConcurrenceRow[]
     departementsByRegion: readonly DepartementsByRegion[]
     fournisseurs: readonly Entreprise[]
-    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
-    getDepartementContour: LocalizationPort['getDepartementContour']
-    getCountryContour: LocalizationPort['getCountryContour']
+    getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+    getDepartementContour: ReferentielGeoPort['getDepartementContour']
+    getCountryContour: ReferentielGeoPort['getCountryContour']
 }
 
 const byLabel = (a: string, b: string) => a.localeCompare(b, 'fr')

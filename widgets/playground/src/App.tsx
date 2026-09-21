@@ -4,7 +4,7 @@ import ProvenanceMap, {
     type ProvenanceMapProps,
 } from '@shared/react/components/Ressource/ProvenanceMap'
 import type { ProvenanceGroup } from '@shared/core/application/services/approvisionnement-stats'
-import { createLocalizationAdapter } from '@shared/infrastructure/localization/localization-adapter'
+import { createReferentielGeoAdapter } from '@shared/infrastructure/referentiel-geo/referentiel-geo-adapter'
 import { toProvenance } from '@shared/core/domain/value-objects/provenance'
 
 /** Anglet, Biarritz and Bayonne — the BAB, near enough to share one view. */
@@ -14,17 +14,17 @@ const CODE_DEPARTEMENT = '64'
 /** Where the plan's installation sits: Anglet, marked among the provenances. */
 const COMMUNE_INSTALLATION = CODES_INSEE[0]
 
-const localization = createLocalizationAdapter()
+const referentielGeo = createReferentielGeoAdapter()
 
 const MARKERS: LatLngTuple[] = CODES_INSEE.map((codeInsee) => {
     const { latitude, longitude } =
-        localization.getCommuneCenterPosition(codeInsee)
+        referentielGeo.getCommuneCenterPosition(codeInsee)
     return [latitude, longitude]
 })
 
 const CENTER: LatLngExpression = latLngBounds(MARKERS).getCenter()
 
-const CONTOUR: LatLngTuple[][] = localization
+const CONTOUR: LatLngTuple[][] = referentielGeo
     .getDepartementContour(CODE_DEPARTEMENT)
     .map((ring) => ring.map(({ latitude, longitude }) => [latitude, longitude]))
 
@@ -98,10 +98,10 @@ export default function App() {
                     approvisionnements={APPROVISIONNEMENTS}
                     communes={[COMMUNE_INSTALLATION]}
                     getCommuneCenterPosition={
-                        localization.getCommuneCenterPosition
+                        referentielGeo.getCommuneCenterPosition
                     }
-                    getDepartementContour={localization.getDepartementContour}
-                    getCountryContour={localization.getCountryContour}
+                    getDepartementContour={referentielGeo.getDepartementContour}
+                    getCountryContour={referentielGeo.getCountryContour}
                 />
             </section>
 
@@ -111,10 +111,10 @@ export default function App() {
                     approvisionnements={[]}
                     communes={[COMMUNE_INSTALLATION]}
                     getCommuneCenterPosition={
-                        localization.getCommuneCenterPosition
+                        referentielGeo.getCommuneCenterPosition
                     }
-                    getDepartementContour={localization.getDepartementContour}
-                    getCountryContour={localization.getCountryContour}
+                    getDepartementContour={referentielGeo.getDepartementContour}
+                    getCountryContour={referentielGeo.getCountryContour}
                 />
             </section>
         </main>

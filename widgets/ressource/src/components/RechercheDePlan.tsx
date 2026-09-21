@@ -8,7 +8,7 @@ import {
     type ApprovisionnementByRessourceStats,
     type ApprovisionnementByRessourceStatsPorts,
 } from '@shared/core/application/services/approvisionnement-stats'
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
 import type { Installation } from '@shared/core/domain/entities/installation'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
@@ -24,9 +24,9 @@ function Statistiques({
 }: {
     readStats: () => Promise<ApprovisionnementByRessourceStats>
     commune: Commune['codeInsee'] | null
-    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
-    getDepartementContour: LocalizationPort['getDepartementContour']
-    getCountryContour: LocalizationPort['getCountryContour']
+    getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+    getDepartementContour: ReferentielGeoPort['getDepartementContour']
+    getCountryContour: ReferentielGeoPort['getCountryContour']
 }) {
     const state = useAsyncState(readStats)
 
@@ -48,9 +48,9 @@ function Statistiques({
 export type RechercheDePlanProps = ApprovisionnementByRessourceStatsPorts & {
     plans: readonly Plan[]
     installations: readonly Installation[]
-    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
-    getDepartementContour: LocalizationPort['getDepartementContour']
-    getCountryContour: LocalizationPort['getCountryContour']
+    getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+    getDepartementContour: ReferentielGeoPort['getDepartementContour']
+    getCountryContour: ReferentielGeoPort['getCountryContour']
 }
 
 export default function RechercheDePlan({

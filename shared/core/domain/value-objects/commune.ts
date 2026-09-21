@@ -43,8 +43,8 @@ export function codeDepartementOf(
  *
  * This says well-formed, not existing. The list of communes is open — they
  * merge and split every 1 January — so only the dataset in
- * `shared/infrastructure/localization` can answer whether a well-formed code is
- * carried by a commune today.
+ * `shared/infrastructure/referentiel-geo` can answer whether a well-formed
+ * code is carried by a commune today.
  */
 export function isCodeInseeCommune(
     value: unknown

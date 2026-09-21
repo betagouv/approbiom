@@ -6,7 +6,7 @@ import type {
     ApprovisionnementByRessourceStats,
     ApprovisionnementStatsByRessource,
 } from '@shared/core/application/services/approvisionnement-stats'
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
 import { toProvenance } from '@shared/core/domain/value-objects/provenance'
@@ -50,9 +50,9 @@ function groupColumns(header: string): readonly Column<Group>[] {
 export type RessourceProps = {
     approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
     commune: Commune['codeInsee'] | null
-    getCommuneCenterPosition: LocalizationPort['getCommuneCenterPosition']
-    getDepartementContour: LocalizationPort['getDepartementContour']
-    getCountryContour: LocalizationPort['getCountryContour']
+    getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+    getDepartementContour: ReferentielGeoPort['getDepartementContour']
+    getCountryContour: ReferentielGeoPort['getCountryContour']
 }
 
 export default function Ressource({

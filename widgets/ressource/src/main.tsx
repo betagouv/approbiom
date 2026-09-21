@@ -5,15 +5,15 @@ import App from './App'
 import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/adapters/grist-adapter-approvisionnement'
 import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
 import { createGristInstallationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-installation'
-import { createGristLocalizationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-localization'
+import { createGristReferentielGeoPort } from '@shared/infrastructure/grist/adapters/grist-adapter-referentiel-geo'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
-import { createLocalizationAdapter } from '@shared/infrastructure/localization/localization-adapter'
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
+import { createReferentielGeoAdapter } from '@shared/infrastructure/referentiel-geo/referentiel-geo-adapter'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 
-const localization: LocalizationPort = {
-    ...createGristLocalizationPort(),
-    ...createLocalizationAdapter(),
+const referentielGeo: ReferentielGeoPort = {
+    ...createGristReferentielGeoPort(),
+    ...createReferentielGeoAdapter(),
 }
 
 const rootEl = document.getElementById('root')
@@ -27,10 +27,10 @@ createRoot(rootEl).render(
             installations={createGristInstallationPort()}
             ressources={createGristRessourcePort()}
             entreprises={createGristEntreprisePort()}
-            listDepartementsByRegion={localization.listDepartementsByRegion}
-            getCommuneCenterPosition={localization.getCommuneCenterPosition}
-            getDepartementContour={localization.getDepartementContour}
-            getCountryContour={localization.getCountryContour}
+            listDepartementsByRegion={referentielGeo.listDepartementsByRegion}
+            getCommuneCenterPosition={referentielGeo.getCommuneCenterPosition}
+            getDepartementContour={referentielGeo.getDepartementContour}
+            getCountryContour={referentielGeo.getCountryContour}
         />
     </StrictMode>
 )

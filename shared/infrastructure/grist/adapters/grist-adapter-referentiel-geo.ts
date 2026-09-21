@@ -1,13 +1,13 @@
-import type { LocalizationPort } from '@shared/core/application/ports/localization'
-import type { DepartementsByRegion } from '@shared/core/application/ports/localization'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
+import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import { gristReady } from '../grist-ready'
 import { asNumber, asString, fetchRowsOnce } from '../grist-helpers'
 import { COLUMNS, TABLE } from '../grist-tables'
 
 type Departements = DepartementsByRegion['departements'][number][]
 
-export function createGristLocalizationPort(): Pick<
-    LocalizationPort,
+export function createGristReferentielGeoPort(): Pick<
+    ReferentielGeoPort,
     'listDepartementsByRegion'
 > {
     return {
