@@ -3,7 +3,7 @@
     <head>
         <meta charset="UTF-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-        <title>Approbiom — widgets Grist</title>
+        <title>Approbiom - Liste des widgets Grist</title>
         <style>
             body {
                 font-family:
@@ -42,6 +42,36 @@
                 border-color: #000091;
                 background: #f5f5fe;
             }
+            button {
+                display: block;
+                width: 100%;
+                padding: 0.75rem 1rem;
+                border: none;
+                border-radius: 4px;
+                font: inherit;
+                text-align: left;
+                color: #fff;
+                background: #000091;
+                cursor: pointer;
+            }
+            button:hover {
+                background: #1212ff;
+            }
+            .toast {
+                /* left and top are set in JS, next to the cursor. */
+                position: fixed;
+                white-space: nowrap;
+                padding: 0.5rem 1rem;
+                border-radius: 4px;
+                color: #fff;
+                background: #161616;
+                opacity: 0;
+                transition: opacity 0.2s;
+                pointer-events: none;
+            }
+            .toast.visible {
+                opacity: 1;
+            }
         </style>
     </head>
     <body>
@@ -51,15 +81,73 @@
             Custom URL » d'un widget personnalisé Grist.
         </p>
         <ul>
-            <li><a href="./accueil/">Accueil</a></li>
-            <li><a href="./ressource/">Ressource</a></li>
-            <li><a href="./concurrence/">Concurrence</a></li>
-            <li><a href="./import/">Import</a></li>
+            <li>
+                <button onclick="copyWidgetUrl('accueil', event)">
+                    Accueil
+                </button>
+            </li>
+            <li>
+                <button onclick="copyWidgetUrl('ressource', event)">
+                    Ressource
+                </button>
+            </li>
+            <li>
+                <button onclick="copyWidgetUrl('concurrence', event)">
+                    Concurrence
+                </button>
+            </li>
+            <li>
+                <button onclick="copyWidgetUrl('import', event)">Import</button>
+            </li>
             <li>
                 <a href="./playground/"
-                    >Playground — composants partagés, hors Grist</a
+                    >Playground pour les devs - composants partagés, hors
+                    Grist</a
                 >
             </li>
         </ul>
+
+        <div id="toast" class="toast" role="status"></div>
+        <script>
+            let toastTimeout
+
+            function showToast(message, x, y) {
+                const toast = document.getElementById('toast')
+                toast.textContent = message
+
+                // Just below and to the right of (x, y), kept inside the window.
+                const offset = 12
+                const maxLeft = window.innerWidth - toast.offsetWidth - offset
+                const maxTop = window.innerHeight - toast.offsetHeight - offset
+                toast.style.left = Math.min(x + offset, maxLeft) + 'px'
+                toast.style.top = Math.min(y + offset, maxTop) + 'px'
+                toast.classList.add('visible')
+
+                // Restart the timer if the user clicks again while it's shown.
+                clearTimeout(toastTimeout)
+                toastTimeout = setTimeout(
+                    () => toast.classList.remove('visible'),
+                    2000
+                )
+            }
+
+            function copyWidgetUrl(nomWidget, event) {
+                const widgetUrl = new URL(`./${nomWidget}/`, location.href).href
+
+                const button = event.currentTarget
+                const label = button.textContent.trim()
+
+                const { left, bottom } = button.getBoundingClientRect()
+                const fromKeyboard = event.detail === 0
+                const x = fromKeyboard ? left : event.clientX
+                const y = fromKeyboard ? bottom : event.clientY
+
+                navigator.clipboard
+                    .writeText(widgetUrl)
+                    .then(() =>
+                        showToast(`Url du widget « ${label} » copié !`, x, y)
+                    )
+            }
+        </script>
     </body>
 </html>
