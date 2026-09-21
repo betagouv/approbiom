@@ -21,7 +21,7 @@ export default defineConfig([
     // findings we cannot act on.
     globalIgnores([
         'dist/',
-        'shared/infrastructure/grist/grist-plugin-api.d.ts',
+        'shared/infrastructure/grist/types/grist-plugin-api.d.ts',
     ]),
 
     {

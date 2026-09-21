@@ -5,7 +5,7 @@ import type {
 import { isAvisCRB } from '@shared/core/domain/value-objects/avis-crb'
 import { isAvisPrefet } from '@shared/core/domain/value-objects/avis-prefet'
 import { isPhaseInstruction } from '@shared/core/domain/value-objects/phase-instruction'
-import { gristReady } from '../grist-ready'
+import { gristReady } from '../helpers/grist-ready'
 import {
     asBoolean,
     asDate,
@@ -15,8 +15,8 @@ import {
     updateRow,
     type GristCells,
     type GristRow,
-} from '../grist-helpers'
-import { COLUMNS, TABLE, type InstructionColumn } from '../grist-tables'
+} from '../helpers/grist-helpers'
+import { COLUMNS, TABLE, type InstructionColumn } from '../types/grist-tables'
 import type { Instruction } from '@shared/core/domain/entities/instruction'
 
 const MAPPING_COLUMNS_INSTRUCTION = {

@@ -2,7 +2,7 @@ import type {
     ApprovisionnementGroupedByPlanAndRessource,
     ApprovisionnementPort,
 } from '@shared/core/application/ports/approvisionnement'
-import { gristReady } from '../grist-ready'
+import { gristReady } from '../helpers/grist-ready'
 import {
     asNumber,
     asString,
@@ -10,8 +10,8 @@ import {
     fetchRowsOnce,
     lookup,
     type GristRow,
-} from '../grist-helpers'
-import { COLUMNS, TABLE } from '../grist-tables'
+} from '../helpers/grist-helpers'
+import { COLUMNS, TABLE } from '../types/grist-tables'
 import {
     DEPARTEMENT_FRANCAIS,
     PAYS_ETRANGER,

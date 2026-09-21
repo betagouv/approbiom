@@ -1,7 +1,7 @@
 import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
-import { gristReady } from '../grist-ready'
-import { asNumber, fetchRowsOnce } from '../grist-helpers'
-import { COLUMNS, TABLE } from '../grist-tables'
+import { gristReady } from '../helpers/grist-ready'
+import { asNumber, fetchRowsOnce } from '../helpers/grist-helpers'
+import { COLUMNS, TABLE } from '../types/grist-tables'
 
 export function createGristDemandeSubventionPort(): DemandeSubventionPort {
     return {

@@ -3,7 +3,7 @@ import type {
     ProgrammeAideUpdateData,
 } from '@shared/core/application/ports/programme-aide'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import { gristReady } from '../grist-ready'
+import { gristReady } from '../helpers/grist-ready'
 import {
     asNumber,
     asString,
@@ -11,8 +11,8 @@ import {
     updateRow,
     type GristCells,
     type GristRow,
-} from '../grist-helpers'
-import { COLUMNS, TABLE, type ProgrammeAideColumn } from '../grist-tables'
+} from '../helpers/grist-helpers'
+import { COLUMNS, TABLE, type ProgrammeAideColumn } from '../types/grist-tables'
 
 const MAPPING_COLUMNS_PROGRAMME_AIDE = {
     laureat: 'Laureat',

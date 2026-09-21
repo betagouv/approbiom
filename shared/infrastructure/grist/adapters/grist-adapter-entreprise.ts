@@ -1,7 +1,7 @@
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
-import { gristReady } from '../grist-ready'
-import { asString, fetchRowsOnce } from '../grist-helpers'
-import { COLUMNS, TABLE } from '../grist-tables'
+import { gristReady } from '../helpers/grist-ready'
+import { asString, fetchRowsOnce } from '../helpers/grist-helpers'
+import { COLUMNS, TABLE } from '../types/grist-tables'
 
 export function createGristEntreprisePort(): EntreprisePort {
     return {

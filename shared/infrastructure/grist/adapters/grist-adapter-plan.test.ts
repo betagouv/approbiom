@@ -1,5 +1,5 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { ColumnMajorTable } from '../grist-helpers'
+import type { ColumnMajorTable } from '../helpers/grist-helpers'
 import { createGristPlanPort } from './grist-adapter-plan'
 
 // The adapter reads `grist.docApi.fetchTable` and `grist.ready`, both installed

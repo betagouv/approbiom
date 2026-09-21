@@ -1,8 +1,8 @@
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import { isUsageType } from '@shared/core/domain/value-objects/usage'
-import { gristReady } from '../grist-ready'
-import { asNumber, asString, fetchRowsOnce } from '../grist-helpers'
-import { COLUMNS, TABLE } from '../grist-tables'
+import { gristReady } from '../helpers/grist-ready'
+import { COLUMNS, TABLE } from '../types/grist-tables'
+import { asNumber, asString, fetchRowsOnce } from '../helpers/grist-helpers'
 
 export function createGristPlanPort(): PlanPort {
     return {

@@ -1,7 +1,7 @@
 import { act, cleanup, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { GristAttachmentRecord } from '@shared/infrastructure/grist/grist-on-record-attachment'
+import type { GristAttachmentRecord } from '@shared/infrastructure/grist/adapters/grist-on-record-attachment'
 
 type OnRecord = (record: unknown) => void
 

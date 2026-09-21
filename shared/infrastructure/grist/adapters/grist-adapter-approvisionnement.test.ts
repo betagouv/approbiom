@@ -3,8 +3,8 @@ import {
     DEPARTEMENT_FRANCAIS,
     PAYS_ETRANGER,
 } from '@shared/core/domain/value-objects/provenance'
-import type { ColumnMajorTable } from '../grist-helpers'
-import { COLUMNS, TABLE } from '../grist-tables'
+import type { ColumnMajorTable } from '../helpers/grist-helpers'
+import { COLUMNS, TABLE } from '../types/grist-tables'
 import { createGristApprovisionnementPort } from './grist-adapter-approvisionnement'
 
 /** The directories every approvisionnement resolves its Refs against. */

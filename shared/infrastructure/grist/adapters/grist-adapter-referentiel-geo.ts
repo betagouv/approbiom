@@ -1,8 +1,8 @@
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
-import { gristReady } from '../grist-ready'
-import { asNumber, asString, fetchRowsOnce } from '../grist-helpers'
-import { COLUMNS, TABLE } from '../grist-tables'
+import { gristReady } from '../helpers/grist-ready'
+import { asNumber, asString, fetchRowsOnce } from '../helpers/grist-helpers'
+import { COLUMNS, TABLE } from '../types/grist-tables'
 
 type Departements = DepartementsByRegion['departements'][number][]
 

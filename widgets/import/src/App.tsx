@@ -1,6 +1,6 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 
-import { gristReady } from '@shared/infrastructure/grist/grist-ready'
+import { gristReady } from '@shared/infrastructure/grist/helpers/grist-ready'
 import AsyncGate from '@shared/react/components/AsyncGate'
 import Alert from '@shared/react/components/Alert'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
@@ -9,7 +9,7 @@ import Import, { type ImportAttachment } from './components/Import'
 import {
     isGristAttachmentRecord,
     type GristAttachmentRecord,
-} from '@shared/infrastructure/grist/grist-on-record-attachment'
+} from '@shared/infrastructure/grist/adapters/grist-on-record-attachment'
 
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { ApprovisionnementAImporterAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-a-importer-approvisionnement'

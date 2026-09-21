@@ -1,12 +1,17 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
-import { gristReady } from '../grist-ready'
-import { asIdList, asNumber, asString, fetchRowsOnce } from '../grist-helpers'
+import { gristReady } from '../helpers/grist-ready'
+import {
+    asIdList,
+    asNumber,
+    asString,
+    fetchRowsOnce,
+} from '../helpers/grist-helpers'
 import {
     getAttachmentMetadata,
     getAttachmentsMetadata,
-} from '../grist-attachments'
-import { getAccessToken } from '../grist-get-access-token'
-import { COLUMNS, TABLE } from '../grist-tables'
+} from '../helpers/grist-attachments'
+import { getAccessToken } from '../helpers/grist-get-access-token'
+import { COLUMNS, TABLE } from '../types/grist-tables'
 
 export function createGristAttachmentPort(): AttachmentPort {
     return {
