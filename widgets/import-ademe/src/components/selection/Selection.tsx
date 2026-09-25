@@ -1,4 +1,7 @@
-import { useState } from 'react'
+import './Selection.css'
+import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
+import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
+
 import SearchBar from '@shared/react/components/SearchBar'
 import Badge from '@shared/react/components/Badge'
 import Tag from '@shared/react/components/Tag'
@@ -15,22 +18,35 @@ const UNKNOWN = 'Inconnu'
 export type SelectionProps = {
     plans: readonly SelectablePlan[]
     attachments: readonly Attachment[]
+    selectedPlanId: SelectablePlan['id'] | null
+    onSelectPlan: (id: SelectablePlan['id']) => void
+    selectedAttachmentId: Attachment['id'] | null
+    onSelectAttachment: (id: Attachment['id'] | null) => void
+    onValidate: () => void
 }
 
-export default function Selection({ plans, attachments }: SelectionProps) {
-    const [planId, setPlanId] = useState<SelectablePlan['id'] | null>(null)
-    const [attachmentId, setAttachmentId] = useState<Attachment['id'] | null>(
-        null
-    )
+export default function Selection({
+    plans,
+    attachments,
+    selectedPlanId: planId,
+    onSelectPlan,
+    selectedAttachmentId,
+    onSelectAttachment,
+    onValidate,
+}: SelectionProps) {
     const plan = plans.find(({ id }) => id === planId)
     const planAttachments = attachments.filter(
         ({ planDApprovisionnement }) => planDApprovisionnement === planId
     )
+    const selectedAttachment = planAttachments.find(
+        ({ id }) => id === selectedAttachmentId
+    )
 
-    function selectPlan(id: SelectablePlan['id']) {
-        setPlanId(id)
-        setAttachmentId(null)
-    }
+    const footerLabel = selectedAttachment
+        ? `Document sélectionné : ${selectedAttachment.name}`
+        : plan
+          ? 'Sélectionnez le document ADEME.'
+          : 'Aucun plan sélectionné.'
 
     const options = plans.map(({ id, nom }) => ({
         value: id,
@@ -46,7 +62,7 @@ export default function Selection({ plans, attachments }: SelectionProps) {
                     hint="Recherche sur le nom du plan"
                     placeholder="Ex. chaufferie Tulle"
                     options={options}
-                    onSelect={selectPlan}
+                    onSelect={onSelectPlan}
                 />
             </div>
 
@@ -84,8 +100,8 @@ export default function Selection({ plans, attachments }: SelectionProps) {
             {plan && (
                 <AttachmentPicker
                     attachments={planAttachments}
-                    selectedId={attachmentId}
-                    onSelect={setAttachmentId}
+                    selectedId={selectedAttachmentId}
+                    onSelect={onSelectAttachment}
                 />
             )}
 
@@ -96,6 +112,20 @@ export default function Selection({ plans, attachments }: SelectionProps) {
                     </p>
                 </div>
             )}
+
+            <div className="plan-selection__footer">
+                <p className="fr-text--sm fr-m-0 plan-selection__footer-label">
+                    {footerLabel}
+                </p>
+                <button
+                    type="button"
+                    className="fr-btn fr-btn--icon-right fr-icon-arrow-right-line"
+                    disabled={!selectedAttachment}
+                    onClick={onValidate}
+                >
+                    Extraire les données
+                </button>
+            </div>
         </div>
     )
 }

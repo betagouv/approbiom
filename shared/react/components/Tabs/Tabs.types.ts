@@ -14,6 +14,9 @@ export type TabItem = {
     // list, so the component can tie the two together and hide the ones that
     // are not being read.
     content: ReactNode
+    // A tab that cannot be opened yet — a step whose previous one is not done.
+    // It stays in the list, greyed out, and the arrow keys skip it.
+    disabled?: boolean
 }
 
 export type TabsProps = {
@@ -29,4 +32,10 @@ export type TabsProps = {
     // Only read on the first render: which tab is open afterwards is the
     // component's own business, the way it is in the DSFR script.
     defaultId?: string
+    // Which tab is open, when the caller decides it — to move to the next step
+    // from a button inside a panel, say. Given, the component follows it and
+    // reports clicks and arrow keys through `onSelect` instead.
+    currentId?: string
+    // Called with the id of the tab the user opened.
+    onSelect?: (id: string) => void
 }

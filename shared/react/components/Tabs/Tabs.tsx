@@ -24,16 +24,28 @@ const MOVES: Record<string, (index: number, count: number) => number> = {
     End: (_index, count) => count - 1,
 }
 
-export default function Tabs({ label, items, defaultId }: TabsProps) {
+export default function Tabs({
+    label,
+    items,
+    defaultId,
+    currentId: controlledId,
+    onSelect,
+}: TabsProps) {
     // Ids only have to be unique in the document; `useId` keeps two sets of
     // onglets on the same page from pointing their tabs at each other's panels.
     const id = useId()
     const tabId = (itemId: string) => `${id}-${itemId}`
     const panelId = (itemId: string) => `${id}-${itemId}-panel`
 
-    const [currentId, setCurrentId] = useState<string | undefined>(
+    const [ownId, setOwnId] = useState<string | undefined>(
         () => defaultId ?? items[0]?.id
     )
+    const currentId = controlledId ?? ownId
+
+    function open(id: string) {
+        setOwnId(id)
+        onSelect?.(id)
+    }
 
     // The arrow keys move focus as well as selection, so the tab being moved to
     // has to be reachable as a node. Keyed by id rather than held in an array:
@@ -49,7 +61,16 @@ export default function Tabs({ label, items, defaultId }: TabsProps) {
         // always the selected one — that is what the roving tabindex below
         // means — so the current index is where the move starts from.
         const index = items.findIndex((item) => item.id === currentId)
-        const next = items[move(index === -1 ? 0 : index, items.length)]
+
+        // A disabled tab is stepped over, in the direction of the move. Home
+        // and End land on an end, so from there the search goes inwards.
+        let nextIndex = move(index === -1 ? 0 : index, items.length)
+        const step = event.key === 'ArrowLeft' || event.key === 'End' ? -1 : 1
+        for (let tries = 0; items[nextIndex].disabled; tries++) {
+            if (tries === items.length) return
+            nextIndex = (nextIndex + step + items.length) % items.length
+        }
+        const next = items[nextIndex]
 
         // Otherwise the arrow keys scroll the page, and Home and End jump to
         // its ends, under the reader who was moving between tabs.
@@ -57,7 +78,7 @@ export default function Tabs({ label, items, defaultId }: TabsProps) {
 
         // Selection follows focus, as in the DSFR script: a panel is one press
         // away rather than a press and an Enter.
-        setCurrentId(next.id)
+        open(next.id)
         tabs.current.get(next.id)?.focus()
     }
 
@@ -91,7 +112,11 @@ export default function Tabs({ label, items, defaultId }: TabsProps) {
                                 // tablist and the next leaves it, instead of
                                 // stopping on every tab on the way to the
                                 // panel. The arrow keys move inside it.
-                                tabIndex={selected ? 0 : -1}
+                                tabIndex={
+                                    item.disabled ? -1 : selected ? 0 : -1
+                                }
+                                disabled={item.disabled}
+                                aria-disabled={item.disabled}
                                 ref={(node) => {
                                     const nodes = tabs.current
                                     if (node) nodes.set(item.id, node)
@@ -99,7 +124,7 @@ export default function Tabs({ label, items, defaultId }: TabsProps) {
                                         nodes.delete(item.id)
                                     }
                                 }}
-                                onClick={() => setCurrentId(item.id)}
+                                onClick={() => open(item.id)}
                             >
                                 {item.label}
                             </button>

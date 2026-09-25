@@ -1,26 +1,32 @@
 import AsyncGate from '@shared/react/components/AsyncGate'
-import Tabs from '@shared/react/components/Tabs'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import { createGristAttachmentPort } from '@shared/infrastructure/grist/adapters/grist-adapter-attachment'
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
 import { DataSourceUnavailableError } from '@shared/core/errors'
-import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 import {
     listPlans,
     type PlanViewPorts,
 } from '@shared/core/application/services/plan-view'
-import Selection from './components/Selection'
+import { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
 import { FAKE_PORTS } from './fake-data/ports'
+import Screen from './components/Screen'
+import { downloadAndExtract } from './download-and-extract'
+import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 
-type Ports = PlanViewPorts & { attachments: AttachmentPort }
+type Ports = PlanViewPorts & {
+    attachments: AttachmentPort
+    extractDataFromDocument: typeof importRows
+}
 
 const GRIST_PORTS: Ports = {
     plans: createGristPlanPort(),
     demandesSubvention: createGristDemandeSubventionPort(),
     programmesAide: createGristProgrammeAidePort(),
     attachments: createGristAttachmentPort(),
+    extractDataFromDocument: importRows,
 }
 
 async function load(ports: Ports) {
@@ -33,7 +39,15 @@ async function load(ports: Ports) {
         ports.attachments.list(),
     ])
 
-    return { plans, attachments }
+    return {
+        plans,
+        attachments,
+        extractDocument: (attachment: Attachment) =>
+            downloadAndExtract(attachment, {
+                getFileUrl: (id) => ports.attachments.getFileUrl(id),
+                extractDataFromDocument: ports.extractDataFromDocument,
+            }),
+    }
 }
 
 export default function App() {
@@ -56,33 +70,7 @@ export default function App() {
             </header>
 
             <AsyncGate state={state}>
-                {({ plans, attachments }) => (
-                    <Tabs
-                        label="Étapes de l'import"
-                        items={[
-                            {
-                                id: 'selection',
-                                label: '1. Sélection du document',
-                                content: (
-                                    <Selection
-                                        plans={plans}
-                                        attachments={attachments}
-                                    />
-                                ),
-                            },
-                            {
-                                id: 'extraction',
-                                label: '2. Extraction',
-                                content: <p>2. Extraction</p>,
-                            },
-                            {
-                                id: 'verification',
-                                label: '3. Vérification et import',
-                                content: <p>3. Vérification et import</p>,
-                            },
-                        ]}
-                    />
-                )}
+                {(data) => <Screen {...data} />}
             </AsyncGate>
         </main>
     )

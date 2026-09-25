@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import Tabs from './Tabs'
 import type { TabItem, TabsProps } from './Tabs.types'
 
@@ -170,5 +170,58 @@ describe('Tabs', () => {
 
         expect(handled).toBe(true)
         expect(openTab()?.textContent).toBe('Par provenance')
+    })
+
+    it('disables a tab marked as disabled', () => {
+        renderTabs({
+            items: ventilations.map((item) =>
+                item.id === 'fournisseur' ? { ...item, disabled: true } : item
+            ),
+        })
+
+        expect(
+            screen.getByRole<HTMLButtonElement>('tab', {
+                name: 'Par fournisseur',
+            }).disabled
+        ).toBe(true)
+    })
+
+    it('steps over a disabled tab with the arrow keys', () => {
+        renderTabs({
+            items: ventilations.map((item) =>
+                item.id === 'region-ou-pays'
+                    ? { ...item, disabled: true }
+                    : item
+            ),
+        })
+
+        const first = screen.getByRole('tab', { name: 'Par provenance' })
+        first.focus()
+        fireEvent.keyDown(first, { key: 'ArrowRight' })
+
+        expect(openTab()?.textContent).toBe('Par fournisseur')
+    })
+
+    it('opens the tab named by currentId, when the caller decides', () => {
+        const { rerender } = renderTabs({ currentId: 'provenance' })
+
+        rerender(
+            <Tabs
+                label="Ventilation"
+                items={ventilations}
+                currentId="fournisseur"
+            />
+        )
+
+        expect(openTab()?.textContent).toBe('Par fournisseur')
+    })
+
+    it('reports the tab that was opened', () => {
+        const onSelect = vi.fn()
+        renderTabs({ currentId: 'provenance', onSelect })
+
+        fireEvent.click(screen.getByRole('tab', { name: 'Par fournisseur' }))
+
+        expect(onSelect).toHaveBeenCalledWith('fournisseur')
     })
 })
