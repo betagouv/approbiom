@@ -4,6 +4,11 @@
     position: relative;
 }
 
+/* The gap DSFR leaves between a label and its input. */
+.shared-search-bar__label {
+    margin-bottom: 0.5rem;
+}
+
 .shared-search-bar__panel {
     position: absolute;
     top: 100%;

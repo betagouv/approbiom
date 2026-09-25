@@ -1,3 +1,4 @@
+import '@gouvfr/dsfr/dist/component/form/form.main.min.css'
 import '@gouvfr/dsfr/dist/component/input/input.main.min.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/component/search/search.main.min.css'
@@ -8,6 +9,8 @@ import { useEffect, useId, useRef, useState } from 'react'
 
 export default function SearchBar<T>({
     label,
+    hint,
+    showLabel = false,
     options = [],
     placeholder,
     onSearch,
@@ -17,6 +20,18 @@ export default function SearchBar<T>({
     const inputId = `${id}-search-input`
     const panelId = `${id}-search-panel`
     const displayedPlaceholder = placeholder ?? 'Rechercher'
+
+    const labelElement = (
+        <label
+            className={
+                showLabel ? 'fr-label shared-search-bar__label' : 'fr-label'
+            }
+            htmlFor={inputId}
+        >
+            {label}
+            {hint !== undefined && <span className="fr-hint-text">{hint}</span>}
+        </label>
+    )
 
     const [isRequested, setIsRequested] = useState(false)
     const [query, setQuery] = useState('')
@@ -71,6 +86,8 @@ export default function SearchBar<T>({
             ref={rootRef}
             onKeyDown={closeOnEscape}
         >
+            {/* Outside the form: `fr-search-bar` hides any label inside it. */}
+            {showLabel && labelElement}
             <form
                 className="fr-search-bar"
                 role="search"
@@ -87,9 +104,7 @@ export default function SearchBar<T>({
                     accessible name of the input, so this costs nothing on
                     screen — and without it the field has no name at all, a
                     placeholder being a hint rather than a name. */}
-                <label className="fr-label" htmlFor={inputId}>
-                    {label}
-                </label>
+                {!showLabel && labelElement}
                 <input
                     className="fr-input"
                     placeholder={displayedPlaceholder}

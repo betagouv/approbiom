@@ -207,4 +207,30 @@ describe('SearchBar', () => {
 
         expect(() => fireEvent.click(getButton())).not.toThrow()
     })
+
+    it('adds the hint to the name of the field', () => {
+        render(
+            <SearchBar label="Rechercher un plan" hint="Sur le nom du plan" />
+        )
+
+        expect(
+            screen.getByRole('combobox', {
+                name: /^Rechercher un plan\s*Sur le nom du plan$/,
+            })
+        ).toBeDefined()
+    })
+
+    // `fr-search-bar` hides a label inside it, so a shown one sits outside.
+    it('puts the label outside the search form only when it is shown', () => {
+        const { rerender } = render(<SearchBar label="Rechercher un plan" />)
+        const labelInForm = () =>
+            screen.getByRole('search').querySelector('label') !== null
+
+        expect(labelInForm()).toBe(true)
+
+        rerender(<SearchBar label="Rechercher un plan" showLabel />)
+
+        expect(labelInForm()).toBe(false)
+        expect(getInput()).toBeDefined()
+    })
 })
