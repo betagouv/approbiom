@@ -4,6 +4,7 @@ import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import Selection, { type SelectablePlan } from './selection'
 import Extraction from './extraction'
+import Verification from './verification'
 
 type ExtractedData = {
     lines: readonly ImportedLines[]
@@ -105,8 +106,13 @@ export default function Screen({
                 {
                     id: 'verification',
                     label: '3. Vérification et import',
-                    content: extracted && (
-                        <pre>{JSON.stringify(extracted.lines, null, 2)}</pre>
+                    content: plan && attachment && extracted && (
+                        <Verification
+                            plan={plan}
+                            attachment={attachment}
+                            lines={extracted.lines}
+                            date={extracted.date}
+                        />
                     ),
                     disabled: extracted === null,
                 },

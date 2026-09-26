@@ -1,0 +1,17 @@
+/* The modal is a native <dialog>, opened with `showModal()` for its focus
+   trap. The browser's own dialog styles are undone so DSFR's apply: the
+   overlay is `.fr-modal` itself, full screen, so the backdrop stays clear. */
+.fr-modal.shared-modal {
+    max-width: none;
+    max-height: none;
+}
+
+.fr-modal.shared-modal::backdrop {
+    background: transparent;
+}
+
+/* DSFR fades `visibility` in over .3s, and a hidden element cannot take the
+   focus: the modal becomes visible at once, only the opacity fades. */
+.fr-modal.shared-modal.fr-modal--opened {
+    transition: opacity 0.3s;
+}
