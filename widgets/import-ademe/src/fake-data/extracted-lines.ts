@@ -12,7 +12,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 17,
-            supplier: 'SARL Bois Energie Corrèze',
+            supplier: 'SARL Bois Fictif Énergie',
             resource: 'Plaquettes forestières dont souches et rémanents',
             tonnage: 3200,
             rawProvenance: '50% corrèze, 30% creuse, 20% haute-vienne',
@@ -31,7 +31,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 18,
-            supplier: 'Office National des Forêts (agence Limousin)',
+            supplier: 'Coopérative Fictive des Forêts (agence Nord)',
             resource: 'Plaquettes forestières (référentiel 2017 - 1A - PFA)',
             tonnage: 1800,
             rawProvenance: 'Corrèze et Creuse',
@@ -49,7 +49,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 19,
-            supplier: 'Scierie Lagarde',
+            supplier: 'Scierie Fictive du Vallon',
             resource:
                 'Plaquettes de produits connexes de scieries (référentiel 2017 - 2B - CIB)',
             tonnage: 950,
@@ -66,7 +66,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 20,
-            supplier: 'Granulés du Centre',
+            supplier: 'Granulés Fictifs du Plateau',
             resource: 'Granulés de bois - pellets DIN+',
             tonnage: 600,
             rawProvenance: '60 % Allemagne, reste france',
@@ -83,7 +83,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 21,
-            supplier: 'Coopérative forestière CFBL',
+            supplier: 'Coopérative forestière Exemple',
             resource: 'Bois bûche (catégorie 1D-BR)',
             tonnage: 1200,
             rawProvenance: 'rayon 100 km autour du site',
@@ -98,7 +98,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 22,
-            supplier: 'SAS Recyclage Bois 87',
+            supplier: 'SAS Recyclage Fictif 00',
             resource: 'Bois fin de vie cl. A',
             tonnage: 400,
             rawProvenance: '87 : 70%, 86 : 30%',
@@ -115,7 +115,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 23,
-            supplier: 'Alliance Forêts Bois',
+            supplier: 'Alliance Fictive Bois',
             resource: 'Plaquettes forestières',
             tonnage: 2100,
             rawProvenance: 'Massif central (15, 19, 63)',
@@ -134,7 +134,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 24,
-            supplier: 'Lagarde & fils - SIRET 401 225 873 00027',
+            supplier: 'Vallon & fils - SIRET 000 000 000 00003',
             resource: 'Ecorces',
             tonnage: 300,
             rawProvenance: 'Corrèze principalement, un peu Dordogne',
@@ -151,7 +151,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 25,
-            supplier: 'Bois Limousin SAS',
+            supplier: 'Bois Fictif du Sud SAS',
             resource: 'Plaquettes bocagères ou agroforestières',
             tonnage: 500,
             rawProvenance: 'Haute-Vienne 80% Creuse 20%',
@@ -168,7 +168,7 @@ export function fakeReadLines(
         {
             document,
             excelRow: 26,
-            supplier: 'Ets Dupuy',
+            supplier: 'Ets Imaginaire',
             resource: 'Sciures',
             tonnage: 250,
             rawProvenance: 'Espagne',

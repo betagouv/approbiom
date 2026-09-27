@@ -2,44 +2,46 @@ import { describe, expect, it } from 'vitest'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import { matchFournisseur } from './match-fournisseur'
 
-const lagarde: Entreprise = {
-    denomination: 'SCIERIE LAGARDE',
-    siret: '40122587300027',
+const vallon: Entreprise = {
+    denomination: 'SCIERIE FICTIVE DU VALLON',
+    siret: '00000000000003',
 }
-const onf: Entreprise = {
-    denomination: 'OFFICE NATIONAL DES FORETS',
-    siret: '66204311600018',
+const cooperative: Entreprise = {
+    denomination: 'COOPERATIVE FICTIVE DES FORETS',
+    siret: '00000000000002',
 }
-const entreprises = [lagarde, onf]
+const entreprises = [vallon, cooperative]
 
 describe('matchFournisseur', () => {
     it('finds the entreprise by its denomination', () => {
-        expect(matchFournisseur('SCIERIE LAGARDE', entreprises)).toBe(lagarde)
+        expect(matchFournisseur('SCIERIE FICTIVE DU VALLON', entreprises)).toBe(
+            vallon
+        )
     })
 
     it('ignores case, accents and extra spaces in the denomination', () => {
         expect(
-            matchFournisseur('  Office  national des Forêts ', entreprises)
-        ).toBe(onf)
+            matchFournisseur('  Coopérative  fictive des Forêts ', entreprises)
+        ).toBe(cooperative)
     })
 
     it('falls back on the siret when no denomination matches', () => {
-        expect(matchFournisseur('401 225 873 00027', entreprises)).toBe(lagarde)
+        expect(matchFournisseur('000 000 000 00003', entreprises)).toBe(vallon)
     })
 
     it('prefers the denomination over the siret', () => {
         const namedLikeASiret: Entreprise = {
-            denomination: '66204311600018',
+            denomination: '00000000000002',
             siret: '11111111111111',
         }
 
-        expect(matchFournisseur('66204311600018', [onf, namedLikeASiret])).toBe(
-            namedLikeASiret
-        )
+        expect(
+            matchFournisseur('00000000000002', [cooperative, namedLikeASiret])
+        ).toBe(namedLikeASiret)
     })
 
     it('returns null when nothing matches', () => {
-        expect(matchFournisseur('Ets Dupuy', entreprises)).toBeNull()
+        expect(matchFournisseur('Ets Imaginaire', entreprises)).toBeNull()
     })
 
     it('returns null for an empty supplier', () => {
@@ -53,20 +55,20 @@ describe('matchFournisseur', () => {
 
     it('detects the correct denomination even if there is other comments', () => {
         expect(
-            matchFournisseur('OFFICE NATIONAL DES FORETS (autoconsommation)', [
-                ...entreprises,
-                { denomination: '', siret: '' },
-            ])
-        ).toBe(onf)
+            matchFournisseur(
+                'COOPERATIVE FICTIVE DES FORETS (autoconsommation)',
+                [...entreprises, { denomination: '', siret: '' }]
+            )
+        ).toBe(cooperative)
     })
 
     it('finds the denomination anywhere in the supplier', () => {
         expect(
             matchFournisseur(
-                'qsdqdqs OFFICE NATIONAL DES FORETS qsdqsd',
+                'qsdqdqs COOPERATIVE FICTIVE DES FORETS qsdqsd',
                 entreprises
             )
-        ).toBe(onf)
+        ).toBe(cooperative)
     })
 
     it('only matches whole words of the denomination', () => {
@@ -76,16 +78,16 @@ describe('matchFournisseur', () => {
     })
 
     it('prefers the most specific denomination when several appear', () => {
-        const lagardeEtFils: Entreprise = {
-            denomination: 'SCIERIE LAGARDE ET FILS',
+        const vallonEtFils: Entreprise = {
+            denomination: 'SCIERIE FICTIVE DU VALLON ET FILS',
             siret: '2',
         }
 
         expect(
-            matchFournisseur('SARL SCIERIE LAGARDE ET FILS', [
-                lagarde,
-                lagardeEtFils,
+            matchFournisseur('SARL SCIERIE FICTIVE DU VALLON ET FILS', [
+                vallon,
+                vallonEtFils,
             ])
-        ).toBe(lagardeEtFils)
+        ).toBe(vallonEtFils)
     })
 })

@@ -1,13 +1,14 @@
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 
+// Fictional entreprises: neither the names nor the SIRETs exist.
 export const FAKE_ENTREPRISES: readonly Entreprise[] = [
-    { denomination: 'BOIS ENERGIE CORREZE', siret: '81234567800012' },
-    { denomination: 'OFFICE NATIONAL DES FORETS', siret: '66204311600018' },
-    { denomination: 'SCIERIE LAGARDE', siret: '40122587300027' },
-    { denomination: 'GRANULES DU CENTRE', siret: '52311890200035' },
-    { denomination: 'CFBL COOPERATIVE FORESTIERE', siret: '77561200400041' },
-    { denomination: 'RECYCLAGE BOIS 87', siret: '83055421900016' },
-    { denomination: 'ALLIANCE FORETS BOIS', siret: '31170799500224' },
-    { denomination: 'BOIS LIMOUSIN', siret: '49803166700019' },
-    { denomination: 'DUPUY ET FILS', siret: '35287614000030' },
+    { denomination: 'BOIS FICTIF ENERGIE', siret: '00000000000001' },
+    { denomination: 'COOPERATIVE FICTIVE DES FORETS', siret: '00000000000002' },
+    { denomination: 'SCIERIE FICTIVE DU VALLON', siret: '00000000000003' },
+    { denomination: 'GRANULES FICTIFS DU PLATEAU', siret: '00000000000004' },
+    { denomination: 'EXEMPLE COOPERATIVE FORESTIERE', siret: '00000000000005' },
+    { denomination: 'RECYCLAGE FICTIF 00', siret: '00000000000006' },
+    { denomination: 'ALLIANCE FICTIVE BOIS', siret: '00000000000007' },
+    { denomination: 'BOIS FICTIF DU SUD', siret: '00000000000008' },
+    { denomination: 'NEGOCE IMAGINAIRE', siret: '00000000000009' },
 ]
