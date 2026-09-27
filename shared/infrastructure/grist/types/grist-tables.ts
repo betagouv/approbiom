@@ -22,6 +22,7 @@ export const TABLE = {
     programmeAide: 'Prog_aides',
     attachment: 'Piece_jointe',
     aImporterApprovisionnement: 'A_importer_Approvisionnement',
+    extractedApprovisionnement: 'Approvisionnement_extrait_d_un_document',
 } as const
 
 /** The columns every summary is keyed and measured by, whatever it groups on. */
@@ -93,6 +94,22 @@ export const COLUMNS = {
         'Laureat',
     ],
     attachment: ['id', 'Plan_d_approvisionnement', 'piece_jointe', 'type'],
+    extractedApprovisionnement: [
+        'id',
+        'Etat',
+        'Document',
+        'Plan_d_approvisionnement',
+        'Ligne_Excel',
+        'Date_d_extraction',
+        'Document_fournisseur',
+        'Document_ressource',
+        'Document_tonnage',
+        'Document_repartition_par_provenance',
+        'Document_donnees_additionnelles',
+        'Fournisseur',
+        'Ressource',
+        'Repartition_par_provenance',
+    ],
 } as const satisfies Record<string, readonly string[]>
 
 export type InstructionColumn = (typeof COLUMNS)['instruction'][number]

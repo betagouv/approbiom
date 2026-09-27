@@ -1,7 +1,24 @@
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import { gristReady } from '../helpers/grist-ready'
-import { asString, fetchRowsOnce } from '../helpers/grist-helpers'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import {
+    asString,
+    fetchRowsOnce,
+    type GristRow,
+} from '../helpers/grist-helpers'
 import { COLUMNS, TABLE } from '../types/grist-tables'
+
+export function toEntreprise(row: GristRow): Entreprise {
+    return {
+        // Stored numeric, but it identifies an entreprise rather than
+        // measuring anything, so it crosses as the string it is.
+        siret:
+            typeof row.Siret === 'number'
+                ? String(row.Siret)
+                : asString(row.Siret),
+        denomination: asString(row.Denomination),
+    }
+}
 
 export function createGristEntreprisePort(): EntreprisePort {
     return {
@@ -13,15 +30,7 @@ export function createGristEntreprisePort(): EntreprisePort {
                 COLUMNS.entreprise
             )
 
-            return rows.map((row) => ({
-                // Stored numeric, but it identifies an entreprise rather than
-                // measuring anything, so it crosses as the string it is.
-                siret:
-                    typeof row.Siret === 'number'
-                        ? String(row.Siret)
-                        : asString(row.Siret),
-                denomination: asString(row.Denomination),
-            }))
+            return rows.map(toEntreprise)
         },
     }
 }

@@ -1,0 +1,34 @@
+import type {
+    ExtractedApprovisionnementPort,
+    StoredExtractedLine,
+} from '../extracted-approvisionnement-port'
+
+// Stands in for the table « Approvisionnement extrait d'un document », in
+// memory: it lasts as long as the page.
+export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnementPort {
+    const rows = new Map<number, StoredExtractedLine[]>()
+    let nextId = 1
+
+    return {
+        listByDocument: (attachment) =>
+            Promise.resolve(
+                (rows.get(attachment.id) ?? []).map((row) => ({
+                    ...row,
+                    read: { ...row.read, document: attachment.name },
+                }))
+            ),
+        create: (attachment, lines, extractedAt) => {
+            rows.set(attachment.id, [
+                ...(rows.get(attachment.id) ?? []),
+                ...lines.map((line) => ({
+                    ...line,
+                    id: nextId++,
+                    state: 'Pas importés' as const,
+                    extractedAt,
+                })),
+            ])
+
+            return Promise.resolve()
+        },
+    }
+}

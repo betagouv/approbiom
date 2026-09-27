@@ -14,10 +14,7 @@ type ExtractedData = {
 export type ScreenProps = {
     plans: readonly SelectablePlan[]
     attachments: readonly Attachment[]
-    // Downloads a document and reads its lines; throws with a message on failure.
-    extractDocument: (
-        attachment: Attachment
-    ) => Promise<readonly ExtractedLine[]>
+    extractDocument: (attachment: Attachment) => Promise<ExtractedData>
 }
 
 export default function Screen({

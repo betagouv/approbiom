@@ -13,7 +13,9 @@ import ExtractionSuccess from './ExtractionSuccess'
 export type ExtractionProps = {
     plan: SelectablePlan
     attachment: Attachment
-    extract: (attachment: Attachment) => Promise<readonly ExtractedLine[]>
+    extract: (
+        attachment: Attachment
+    ) => Promise<{ lines: readonly ExtractedLine[]; date: Date }>
     onExtracted: (data: { lines: readonly ExtractedLine[]; date: Date }) => void
     onBack: () => void
 }
@@ -39,10 +41,9 @@ export default function Extraction({
         let cancelled = false
 
         runExtract(attachment).then(
-            (lines) => {
+            (data) => {
                 if (cancelled) return
 
-                const data = { lines, date: new Date() }
                 setExtractionStatus({ status: 'success', ...data })
                 reportExtracted(data)
             },

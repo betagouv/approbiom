@@ -6,6 +6,7 @@ import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
+import { createGristExtractedApprovisionnementAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-extracted-approvisionnement'
 import { DataSourceUnavailableError } from '@shared/core/errors'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import {
@@ -16,6 +17,8 @@ import { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
 import { FAKE_PORTS } from './fake-data/ports'
 import Screen from './components/Screen'
 import { downloadAndExtract } from './download-and-extract'
+import { extractDocument } from './extract-document'
+import type { ExtractedApprovisionnementPort } from './extracted-approvisionnement-port'
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
@@ -25,6 +28,7 @@ type Ports = PlanViewPorts & {
     entreprises: EntreprisePort
     ressources: RessourcePort
     extractDataFromDocument: typeof importRows
+    extractedApprovisionnements: ExtractedApprovisionnementPort
 }
 
 const GRIST_PORTS: Ports = {
@@ -35,6 +39,7 @@ const GRIST_PORTS: Ports = {
     entreprises: createGristEntreprisePort(),
     ressources: createGristRessourcePort(),
     extractDataFromDocument: importRows,
+    extractedApprovisionnements: createGristExtractedApprovisionnementAdapter(),
 }
 
 async function load(ports: Ports) {
@@ -51,11 +56,15 @@ async function load(ports: Ports) {
         plans,
         attachments,
         extractDocument: (attachment: Attachment) =>
-            downloadAndExtract(attachment, {
-                getFileUrl: (id) => ports.attachments.getFileUrl(id),
-                extractDataFromDocument: ports.extractDataFromDocument,
-                listEntreprises: () => ports.entreprises.list(),
-                listRessources: () => ports.ressources.list(),
+            extractDocument(attachment, {
+                extractedApprovisionnements: ports.extractedApprovisionnements,
+                downloadAndExtract: () =>
+                    downloadAndExtract(attachment, {
+                        getFileUrl: (id) => ports.attachments.getFileUrl(id),
+                        extractDataFromDocument: ports.extractDataFromDocument,
+                        listEntreprises: () => ports.entreprises.list(),
+                        listRessources: () => ports.ressources.list(),
+                    }),
             }),
     }
 }

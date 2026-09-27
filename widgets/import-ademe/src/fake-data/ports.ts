@@ -10,6 +10,8 @@ import { FAKE_PLANS } from './plans'
 import { FAKE_PROGRAMMES_AIDE } from './programmes-aide'
 import { FAKE_ENTREPRISES } from './entreprises'
 import { FAKE_RESSOURCES } from './ressources'
+import { createFakeExtractedApprovisionnements } from './extracted-approvisionnements'
+import type { ExtractedApprovisionnementPort } from '../extracted-approvisionnement-port'
 
 // The ports the widget reads through, answered from the fake data.
 // An empty file: the fake extraction only looks at the document's name.
@@ -22,6 +24,7 @@ export const FAKE_PORTS: PlanViewPorts & {
     entreprises: EntreprisePort
     ressources: RessourcePort
     extractDataFromDocument: typeof importRows
+    extractedApprovisionnements: ExtractedApprovisionnementPort
 } = {
     plans: { list: () => Promise.resolve(FAKE_PLANS) },
     demandesSubvention: {
@@ -53,4 +56,5 @@ export const FAKE_PORTS: PlanViewPorts & {
     entreprises: { list: () => Promise.resolve(FAKE_ENTREPRISES) },
     ressources: { list: () => Promise.resolve(FAKE_RESSOURCES) },
     extractDataFromDocument: fakeExtractDataFromDocument,
+    extractedApprovisionnements: createFakeExtractedApprovisionnements(),
 }
