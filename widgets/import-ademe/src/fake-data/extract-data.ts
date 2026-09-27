@@ -1,5 +1,5 @@
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
-import { fakeExtractedLines } from './extracted-lines'
+import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import { fakeReadLines } from './extracted-lines'
 
 const DELAY_MS = 1300
 
@@ -16,13 +16,13 @@ const DELAY_MS = 1300
 export function fakeExtractDataFromDocument(
     _file: Blob,
     name: string
-): Promise<ImportedLines[]> {
+): Promise<ReadLineWithProvenanceParseResults[]> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             const error = fakeError(name)
 
             if (error) reject(error)
-            else resolve(fakeExtractedLines(name))
+            else resolve(fakeReadLines(name))
         }, DELAY_MS)
     })
 }

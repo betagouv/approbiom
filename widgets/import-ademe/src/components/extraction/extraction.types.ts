@@ -1,6 +1,10 @@
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 export type ExtractionStatus =
     | { status: 'loading' }
-    | { status: 'success'; lines: readonly ImportedLines[]; date: Date }
+    | {
+          status: 'success'
+          lines: readonly ReadLineWithProvenanceParseResults[]
+          date: Date
+      }
     | { status: 'error'; message: string }

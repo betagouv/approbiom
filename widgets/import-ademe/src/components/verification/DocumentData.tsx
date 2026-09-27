@@ -1,10 +1,10 @@
 import { useId } from 'react'
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 const TONNAGE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
 export type DocumentDataProps = {
-    line: ImportedLines
+    line: ReadLineWithProvenanceParseResults
 }
 
 export default function DocumentData({ line }: DocumentDataProps) {

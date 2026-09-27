@@ -1,5 +1,5 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import { gristReady } from '../helpers/grist-ready'
 import { createRows } from '../helpers/grist-helpers'
 import {
@@ -7,7 +7,7 @@ import {
     type AImporterApprovisionnementColumn,
 } from '../types/grist-tables'
 
-export type ApprovisionnementAImporter = ImportedLines & {
+export type ApprovisionnementAImporter = ReadLineWithProvenanceParseResults & {
     planDApprovisionnement: Attachment['planDApprovisionnement']
 }
 
@@ -27,16 +27,16 @@ function mapFromApplicationToGrist(
         Tonnage_total: line.tonnage,
         Repartition_valeur_brute: line.rawProvenance,
         Repartition_calculee_par_le_script: JSON.stringify(
-            line.provenance.map(
-                ({ source, provenance, percentage, additionalData }) => ({
+            line.provenanceParseResults.distribution.map(
+                ({ source, provenance, percentage }) => ({
                     source,
                     provenance,
                     pourcentage: percentage,
-                    donnees_additionnelles: additionalData,
+                    donnees_additionnelles: line.additionalData,
                 })
             )
         ),
-        Niveau_de_confiance: line.confidence,
+        Niveau_de_confiance: line.provenanceParseResults.confidence,
     }
 }
 

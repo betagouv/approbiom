@@ -5,7 +5,7 @@ import { useState } from 'react'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import Modal from '@shared/react/components/Modal'
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { SelectablePlan } from '../selection'
 import ImportContext from '../import-context'
@@ -16,7 +16,7 @@ const DATE = new Intl.DateTimeFormat('fr-FR')
 
 const TONNAGE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
-const DATA_COLUMNS: readonly Column<ImportedLines>[] = [
+const DATA_COLUMNS: readonly Column<ReadLineWithProvenanceParseResults>[] = [
     {
         id: 'excel-row',
         header: 'Ligne de la feuille Fournisseur',
@@ -58,7 +58,7 @@ const DATA_COLUMNS: readonly Column<ImportedLines>[] = [
 export type VerificationProps = {
     plan: SelectablePlan
     attachment: Attachment
-    lines: readonly ImportedLines[]
+    lines: readonly ReadLineWithProvenanceParseResults[]
     // When the document was extracted.
     date: Date
 }
@@ -70,9 +70,10 @@ export default function Verification({
     date,
 }: VerificationProps) {
     // The line being reviewed in the modal, if any.
-    const [reviewedLine, setReviewedLine] = useState<ImportedLines | null>(null)
+    const [reviewedLine, setReviewedLine] =
+        useState<ReadLineWithProvenanceParseResults | null>(null)
 
-    const columns: readonly Column<ImportedLines>[] = [
+    const columns: readonly Column<ReadLineWithProvenanceParseResults>[] = [
         {
             id: 'action',
             header: 'Action',

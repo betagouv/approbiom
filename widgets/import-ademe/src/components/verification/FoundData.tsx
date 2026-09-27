@@ -1,9 +1,9 @@
 import { useId } from 'react'
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import ProvenanceFound from './ProvenanceFound'
 
 export type FoundDataProps = {
-    line: ImportedLines
+    line: ReadLineWithProvenanceParseResults
 }
 
 export default function FoundData({ line }: FoundDataProps) {

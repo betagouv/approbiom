@@ -1,9 +1,6 @@
 import * as XLSX from 'xlsx'
 import { normalize } from './transform-provenance/reference-data'
-import {
-    type Confidence,
-    type ProvenanceShare,
-} from './transform-provenance/transform-provenance'
+import type { ProvenanceParseResults } from './transform-provenance/transform-provenance'
 import type { CellValue } from 'grist/GristData'
 
 // - - - - - Configurations - - - - - - //
@@ -33,7 +30,7 @@ const MAX_ROW_HEADER_SEARCH = 40
 
 type ColumnName = keyof typeof COLUMN_HEADER_PREFIXES
 
-export type ExtractedLines = {
+export type ReadLine = {
     document: string
     excelRow: number
     supplier: string
@@ -43,10 +40,8 @@ export type ExtractedLines = {
     additionalData: string
 }
 
-export type ImportedLines = ExtractedLines & {
-    provenance: (ProvenanceShare & { additionalData?: string })[]
-    confidence: Confidence
-    unrecognized: string[]
+export type ReadLineWithProvenanceParseResults = ReadLine & {
+    provenanceParseResults: ProvenanceParseResults
 }
 
 // - - - - - utils - - - - - - //
@@ -166,7 +161,7 @@ function findAdditionalColumns(
 export async function extractRows(
     file: Blob,
     document: string
-): Promise<ExtractedLines[]> {
+): Promise<ReadLine[]> {
     const rows = readFournisseurSheet(await file.arrayBuffer())
 
     const headerRow = findHeaderRow(rows)
@@ -177,7 +172,7 @@ export async function extractRows(
     const endsAt = dataRows.findIndex((row) => (row[0] ?? null) === null)
     const table = endsAt === -1 ? dataRows : dataRows.slice(0, endsAt)
 
-    const lines: ExtractedLines[] = []
+    const lines: ReadLine[] = []
     const invalidTonnages: string[] = []
 
     table.forEach((row, offset) => {

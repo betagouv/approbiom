@@ -16,14 +16,14 @@ export type Confidence =
     | typeof NEEDS_REVIEW
     | typeof UNRESOLVED
 
-export type ProvenanceShare = {
+export type ProvenanceRepartition = {
     source: Provenance['source']
     provenance: string
     percentage: number
 }
 
-export type ProvenanceReading = {
-    distribution: ProvenanceShare[]
+export type ProvenanceParseResults = {
+    distribution: ProvenanceRepartition[]
     confidence: Confidence
     unrecognized: string[]
 }
@@ -404,7 +404,7 @@ function buildDistribution(
     mentions: readonly Mention[],
     percentages: readonly Percentage[],
     pairing: Pairing
-): ProvenanceReading {
+): ProvenanceParseResults {
     let places = groupByPlace(mentions, pairing.shares)
     let leftOver: Span[] = pairing.unpaired.map(({ start, end }) => ({
         start,
@@ -504,7 +504,7 @@ function buildDistribution(
 export function transformProvenance(
     raw: string,
     reference: ReferenceData
-): ProvenanceReading {
+): ProvenanceParseResults {
     const text = normalize(raw)
     const mentions = findPlaces(text, reference)
     const percentages = findPercentages(text)

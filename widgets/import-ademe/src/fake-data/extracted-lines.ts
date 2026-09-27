@@ -1,10 +1,12 @@
-import type { ImportedLines } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 const DEP = 'Département français' as const
 const PAYS = 'Pays étranger' as const
 
 // The lines of the mock-up, as importRows would hand them over.
-export function fakeExtractedLines(document: string): ImportedLines[] {
+export function fakeReadLines(
+    document: string
+): ReadLineWithProvenanceParseResults[] {
     return [
         {
             document,
@@ -15,13 +17,15 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             rawProvenance: '50% corrèze, 30% creuse, 20% haute-vienne',
             additionalData:
                 'PCI: 2,8, Fournisseur certifié: oui, Taux PEFC: 70',
-            provenance: [
-                { source: DEP, provenance: '19', percentage: 50 },
-                { source: DEP, provenance: '23', percentage: 30 },
-                { source: DEP, provenance: '87', percentage: 20 },
-            ],
-            confidence: 'Explicite',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: DEP, provenance: '19', percentage: 50 },
+                    { source: DEP, provenance: '23', percentage: 30 },
+                    { source: DEP, provenance: '87', percentage: 20 },
+                ],
+                confidence: 'Explicite',
+                unrecognized: [],
+            },
         },
         {
             document,
@@ -32,12 +36,14 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             rawProvenance: 'Corrèze et Creuse',
             additionalData:
                 'PCI: 2,7, Fournisseur certifié: oui, Taux PEFC: 100',
-            provenance: [
-                { source: DEP, provenance: '19', percentage: 50 },
-                { source: DEP, provenance: '23', percentage: 50 },
-            ],
-            confidence: 'Répartition égale',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: DEP, provenance: '19', percentage: 50 },
+                    { source: DEP, provenance: '23', percentage: 50 },
+                ],
+                confidence: 'Répartition égale',
+                unrecognized: [],
+            },
         },
         {
             document,
@@ -47,9 +53,13 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             tonnage: 950,
             rawProvenance: '100% 19',
             additionalData: 'PCI: 2,5, Fournisseur certifié: non',
-            provenance: [{ source: DEP, provenance: '19', percentage: 100 }],
-            confidence: 'Explicite',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: DEP, provenance: '19', percentage: 100 },
+                ],
+                confidence: 'Explicite',
+                unrecognized: [],
+            },
         },
         {
             document,
@@ -60,11 +70,13 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             rawProvenance: '60 % Allemagne, reste france',
             additionalData:
                 'PCI: 4,6, Fournisseur certifié: oui, Taux PEFC: 50',
-            provenance: [
-                { source: PAYS, provenance: 'Allemagne', percentage: 60 },
-            ],
-            confidence: 'À vérifier',
-            unrecognized: ['reste france'],
+            provenanceParseResults: {
+                distribution: [
+                    { source: PAYS, provenance: 'Allemagne', percentage: 60 },
+                ],
+                confidence: 'À vérifier',
+                unrecognized: ['reste france'],
+            },
         },
         {
             document,
@@ -75,9 +87,11 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             rawProvenance: 'rayon 100 km autour du site',
             additionalData:
                 'PCI: 3,1, Fournisseur certifié: oui, Taux PEFC: 80',
-            provenance: [],
-            confidence: 'Non résolu',
-            unrecognized: ['rayon 100 km autour du site'],
+            provenanceParseResults: {
+                distribution: [],
+                confidence: 'Non résolu',
+                unrecognized: ['rayon 100 km autour du site'],
+            },
         },
         {
             document,
@@ -87,12 +101,14 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             tonnage: 400,
             rawProvenance: '87 : 70%, 86 : 30%',
             additionalData: 'PCI: 3,4, Fournisseur certifié: non',
-            provenance: [
-                { source: DEP, provenance: '87', percentage: 70 },
-                { source: DEP, provenance: '86', percentage: 30 },
-            ],
-            confidence: 'Explicite',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: DEP, provenance: '87', percentage: 70 },
+                    { source: DEP, provenance: '86', percentage: 30 },
+                ],
+                confidence: 'Explicite',
+                unrecognized: [],
+            },
         },
         {
             document,
@@ -103,13 +119,15 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             rawProvenance: 'Massif central (15, 19, 63)',
             additionalData:
                 'PCI: 2,8, Fournisseur certifié: oui, Taux PEFC: 90',
-            provenance: [
-                { source: DEP, provenance: '15', percentage: 33.3 },
-                { source: DEP, provenance: '19', percentage: 33.3 },
-                { source: DEP, provenance: '63', percentage: 33.4 },
-            ],
-            confidence: 'Répartition égale',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: DEP, provenance: '15', percentage: 33.3 },
+                    { source: DEP, provenance: '19', percentage: 33.3 },
+                    { source: DEP, provenance: '63', percentage: 33.4 },
+                ],
+                confidence: 'Répartition égale',
+                unrecognized: [],
+            },
         },
         {
             document,
@@ -119,12 +137,14 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             tonnage: 300,
             rawProvenance: 'Corrèze principalement, un peu Dordogne',
             additionalData: 'PCI: 2,2, Fournisseur certifié: non',
-            provenance: [
-                { source: DEP, provenance: '19', percentage: 50 },
-                { source: DEP, provenance: '24', percentage: 50 },
-            ],
-            confidence: 'À vérifier',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: DEP, provenance: '19', percentage: 50 },
+                    { source: DEP, provenance: '24', percentage: 50 },
+                ],
+                confidence: 'À vérifier',
+                unrecognized: [],
+            },
         },
         {
             document,
@@ -134,12 +154,14 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             tonnage: 500,
             rawProvenance: 'Haute-Vienne 80% Creuse 20%',
             additionalData: 'PCI: 2,6, Fournisseur certifié: non',
-            provenance: [
-                { source: DEP, provenance: '87', percentage: 80 },
-                { source: DEP, provenance: '23', percentage: 20 },
-            ],
-            confidence: 'Explicite',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: DEP, provenance: '87', percentage: 80 },
+                    { source: DEP, provenance: '23', percentage: 20 },
+                ],
+                confidence: 'Explicite',
+                unrecognized: [],
+            },
         },
         {
             document,
@@ -149,11 +171,13 @@ export function fakeExtractedLines(document: string): ImportedLines[] {
             tonnage: 250,
             rawProvenance: 'Espagne',
             additionalData: 'PCI: 4,0, Fournisseur certifié: non',
-            provenance: [
-                { source: PAYS, provenance: 'Espagne', percentage: 100 },
-            ],
-            confidence: 'Explicite',
-            unrecognized: [],
+            provenanceParseResults: {
+                distribution: [
+                    { source: PAYS, provenance: 'Espagne', percentage: 100 },
+                ],
+                confidence: 'Explicite',
+                unrecognized: [],
+            },
         },
     ]
 }
