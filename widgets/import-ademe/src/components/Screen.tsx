@@ -1,13 +1,13 @@
 import { useState } from 'react'
 import Tabs from '@shared/react/components/Tabs'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import Selection, { type SelectablePlan } from './selection'
 import Extraction from './extraction'
 import Verification from './verification'
 
 type ExtractedData = {
-    lines: readonly ReadLineWithProvenanceParseResults[]
+    lines: readonly ExtractedLine[]
     date: Date
 }
 
@@ -17,7 +17,7 @@ export type ScreenProps = {
     // Downloads a document and reads its lines; throws with a message on failure.
     extractDocument: (
         attachment: Attachment
-    ) => Promise<readonly ReadLineWithProvenanceParseResults[]>
+    ) => Promise<readonly ExtractedLine[]>
 }
 
 export default function Screen({

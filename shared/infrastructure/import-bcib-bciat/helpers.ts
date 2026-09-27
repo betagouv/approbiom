@@ -1,5 +1,6 @@
 import * as XLSX from 'xlsx'
 import { normalize } from './transform-provenance/reference-data'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProvenanceParseResults } from './transform-provenance/transform-provenance'
 import type { CellValue } from 'grist/GristData'
 
@@ -40,8 +41,12 @@ export type ReadLine = {
     additionalData: string
 }
 
-export type ReadLineWithProvenanceParseResults = ReadLine & {
-    provenanceParseResults: ProvenanceParseResults
+export type ExtractedLine = {
+    read: ReadLine
+    derived: {
+        parsedProvenance: ProvenanceParseResults
+        matchedFournisseur: Entreprise | null
+    }
 }
 
 // - - - - - utils - - - - - - //

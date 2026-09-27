@@ -1,4 +1,4 @@
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { ProvenanceRepartition } from '@shared/infrastructure/import-bcib-bciat/transform-provenance/transform-provenance'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
@@ -11,18 +11,18 @@ function provenanceLabel({
 }
 
 export type ProvenanceFoundProps = {
-    line: ReadLineWithProvenanceParseResults
+    line: ExtractedLine
 }
 
 export default function ProvenanceFound({ line }: ProvenanceFoundProps) {
-    const totalPercentage = line.provenanceParseResults.distribution.reduce(
+    const totalPercentage = line.derived.parsedProvenance.distribution.reduce(
         (total, share) => total + share.percentage,
         0
     )
 
     return (
         <div className="provenance-found">
-            {line.provenanceParseResults.distribution.length === 0 ? (
+            {line.derived.parsedProvenance.distribution.length === 0 ? (
                 <p className="fr-text--sm fr-m-0 review__label">
                     Aucune provenance reconnue.
                 </p>
@@ -36,14 +36,15 @@ export default function ProvenanceFound({ line }: ProvenanceFoundProps) {
                         </tr>
                     </thead>
                     <tbody>
-                        {line.provenanceParseResults.distribution.map(
+                        {line.derived.parsedProvenance.distribution.map(
                             (share) => (
                                 <tr key={`${share.source}-${share.provenance}`}>
                                     <td>{provenanceLabel(share)}</td>
                                     <td>{NUMBER.format(share.percentage)} %</td>
                                     <td>
                                         {NUMBER.format(
-                                            (line.tonnage * share.percentage) /
+                                            (line.read.tonnage *
+                                                share.percentage) /
                                                 100
                                         )}{' '}
                                         t
@@ -58,7 +59,7 @@ export default function ProvenanceFound({ line }: ProvenanceFoundProps) {
                             <td>{NUMBER.format(totalPercentage)} %</td>
                             <td>
                                 {NUMBER.format(
-                                    (line.tonnage * totalPercentage) / 100
+                                    (line.read.tonnage * totalPercentage) / 100
                                 )}{' '}
                                 t
                             </td>
@@ -67,10 +68,10 @@ export default function ProvenanceFound({ line }: ProvenanceFoundProps) {
                 </table>
             )}
 
-            {line.provenanceParseResults.unrecognized.length > 0 && (
+            {line.derived.parsedProvenance.unrecognized.length > 0 && (
                 <p className="fr-text--sm fr-m-0">
                     <span className="review__label">Non reconnu : </span>
-                    {line.provenanceParseResults.unrecognized.join(', ')}
+                    {line.derived.parsedProvenance.unrecognized.join(', ')}
                 </p>
             )}
         </div>

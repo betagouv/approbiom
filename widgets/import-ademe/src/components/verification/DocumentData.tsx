@@ -1,20 +1,23 @@
 import { useId } from 'react'
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 const TONNAGE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
 export type DocumentDataProps = {
-    line: ReadLineWithProvenanceParseResults
+    line: ExtractedLine
 }
 
 export default function DocumentData({ line }: DocumentDataProps) {
     const titleId = useId()
     const entries = [
-        { label: 'Fournisseur', value: line.supplier },
-        { label: 'Sous catégorie de combustible', value: line.resource },
-        { label: 'Tonnage / an', value: `${TONNAGE.format(line.tonnage)} t` },
-        { label: 'Répartition par provenance', value: line.rawProvenance },
-        { label: 'Données additionnelles', value: line.additionalData },
+        { label: 'Fournisseur', value: line.read.supplier },
+        { label: 'Sous catégorie de combustible', value: line.read.resource },
+        {
+            label: 'Tonnage / an',
+            value: `${TONNAGE.format(line.read.tonnage)} t`,
+        },
+        { label: 'Répartition par provenance', value: line.read.rawProvenance },
+        { label: 'Données additionnelles', value: line.read.additionalData },
     ]
 
     return (

@@ -1,20 +1,31 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
 export type DownloadAndExtractDependencies = {
     getFileUrl: AttachmentPort['getFileUrl']
     extractDataFromDocument: (
         file: Blob,
-        document: Attachment['name']
-    ) => Promise<ReadLineWithProvenanceParseResults[]>
+        document: Attachment['name'],
+        entreprises: readonly Entreprise[]
+    ) => Promise<ExtractedLine[]>
+    listEntreprises: EntreprisePort['list']
 }
 
 export async function downloadAndExtract(
     attachment: Pick<Attachment, 'id' | 'name'>,
-    { getFileUrl, extractDataFromDocument }: DownloadAndExtractDependencies
-): Promise<ReadLineWithProvenanceParseResults[]> {
-    const response = await fetch(await getFileUrl(attachment.id))
+    {
+        getFileUrl,
+        extractDataFromDocument,
+        listEntreprises,
+    }: DownloadAndExtractDependencies
+): Promise<ExtractedLine[]> {
+    const [response, entreprises] = await Promise.all([
+        getFileUrl(attachment.id).then((url) => fetch(url)),
+        listEntreprises(),
+    ])
 
     if (!response.ok) {
         throw new Error(
@@ -25,7 +36,7 @@ export async function downloadAndExtract(
     const file = await response.blob()
 
     try {
-        return await extractDataFromDocument(file, attachment.name)
+        return await extractDataFromDocument(file, attachment.name, entreprises)
     } catch (cause) {
         throw new Error(
             `Un problème est survenu : ${

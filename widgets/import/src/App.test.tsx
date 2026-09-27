@@ -72,6 +72,12 @@ async function renderApp(findOne: (id: number) => Promise<Attachment>) {
                         new Error('no line is created by these tests')
                     ),
             }}
+            entreprises={{
+                list: () =>
+                    Promise.reject(
+                        new Error('no entreprise is read by these tests')
+                    ),
+            }}
         />
     )
 

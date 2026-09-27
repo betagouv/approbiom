@@ -5,7 +5,7 @@ import { useState } from 'react'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import Modal from '@shared/react/components/Modal'
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { SelectablePlan } from '../selection'
 import ImportContext from '../import-context'
@@ -16,49 +16,49 @@ const DATE = new Intl.DateTimeFormat('fr-FR')
 
 const TONNAGE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
-const DATA_COLUMNS: readonly Column<ReadLineWithProvenanceParseResults>[] = [
+const DATA_COLUMNS: readonly Column<ExtractedLine>[] = [
     {
         id: 'excel-row',
         header: 'Ligne de la feuille Fournisseur',
         render: (line) => (
-            <span className="verification__mention">{line.excelRow}</span>
+            <span className="verification__mention">{line.read.excelRow}</span>
         ),
     },
     {
         id: 'supplier',
         header: 'Fournisseur',
-        render: (line) => line.supplier,
+        render: (line) => line.read.supplier,
     },
     {
         id: 'resource',
         header: 'Sous catégorie de combustible',
-        render: (line) => line.resource,
+        render: (line) => line.read.resource,
     },
     {
         id: 'tonnage',
         header: 'Tonnage / an',
         render: (line) => (
             <span className="verification__tonnage">
-                {TONNAGE.format(line.tonnage)} t
+                {TONNAGE.format(line.read.tonnage)} t
             </span>
         ),
     },
     {
         id: 'provenance',
         header: 'Répartition par provenance',
-        render: (line) => line.rawProvenance,
+        render: (line) => line.read.rawProvenance,
     },
     {
         id: 'additionalData',
         header: 'Données additionnelles',
-        render: (line) => line.additionalData,
+        render: (line) => line.read.additionalData,
     },
 ]
 
 export type VerificationProps = {
     plan: SelectablePlan
     attachment: Attachment
-    lines: readonly ReadLineWithProvenanceParseResults[]
+    lines: readonly ExtractedLine[]
     // When the document was extracted.
     date: Date
 }
@@ -70,10 +70,9 @@ export default function Verification({
     date,
 }: VerificationProps) {
     // The line being reviewed in the modal, if any.
-    const [reviewedLine, setReviewedLine] =
-        useState<ReadLineWithProvenanceParseResults | null>(null)
+    const [reviewedLine, setReviewedLine] = useState<ExtractedLine | null>(null)
 
-    const columns: readonly Column<ReadLineWithProvenanceParseResults>[] = [
+    const columns: readonly Column<ExtractedLine>[] = [
         {
             id: 'action',
             header: 'Action',
@@ -83,10 +82,10 @@ export default function Verification({
                     className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
                     onClick={() => setReviewedLine(line)}
                 >
-                    Vérifier et importer
+                    Vérifier
                     <span className="fr-sr-only">
                         {' '}
-                        la ligne {line.excelRow}
+                        la ligne {line.read.excelRow}
                     </span>
                 </button>
             ),
@@ -113,7 +112,7 @@ export default function Verification({
             <Modal
                 open={reviewedLine !== null}
                 onClose={() => setReviewedLine(null)}
-                title={`Ligne ${reviewedLine?.excelRow ?? ''}`}
+                title={`Ligne ${reviewedLine?.read.excelRow ?? ''}`}
                 size="lg"
             >
                 {reviewedLine && (

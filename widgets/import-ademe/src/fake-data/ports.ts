@@ -1,4 +1,5 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
 import type { PlanViewPorts } from '@shared/core/application/services/plan-view'
 import { FAKE_ATTACHMENTS } from './attachments'
@@ -6,6 +7,7 @@ import { FAKE_DEMANDES_SUBVENTION } from './demandes-subvention'
 import { fakeExtractDataFromDocument } from './extract-data'
 import { FAKE_PLANS } from './plans'
 import { FAKE_PROGRAMMES_AIDE } from './programmes-aide'
+import { FAKE_ENTREPRISES } from './entreprises'
 
 // The ports the widget reads through, answered from the fake data.
 // An empty file: the fake extraction only looks at the document's name.
@@ -15,6 +17,7 @@ let egletonsDownloads = 0
 
 export const FAKE_PORTS: PlanViewPorts & {
     attachments: AttachmentPort
+    entreprises: EntreprisePort
     extractDataFromDocument: typeof importRows
 } = {
     plans: { list: () => Promise.resolve(FAKE_PLANS) },
@@ -44,5 +47,6 @@ export const FAKE_PORTS: PlanViewPorts & {
                 : Promise.reject(new Error(`No fake attachment ${id}.`))
         },
     },
+    entreprises: { list: () => Promise.resolve(FAKE_ENTREPRISES) },
     extractDataFromDocument: fakeExtractDataFromDocument,
 }

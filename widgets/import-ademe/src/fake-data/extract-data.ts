@@ -1,4 +1,6 @@
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import { matchFournisseur } from '@shared/infrastructure/import-bcib-bciat/match-fournisseur'
 import { fakeReadLines } from './extracted-lines'
 
 const DELAY_MS = 1300
@@ -15,14 +17,29 @@ const DELAY_MS = 1300
  */
 export function fakeExtractDataFromDocument(
     _file: Blob,
-    name: string
-): Promise<ReadLineWithProvenanceParseResults[]> {
+    name: string,
+    entreprises: readonly Entreprise[]
+): Promise<ExtractedLine[]> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
             const error = fakeError(name)
 
             if (error) reject(error)
-            else resolve(fakeReadLines(name))
+            else
+                resolve(
+                    fakeReadLines(name).map(
+                        ({ provenanceParseResults, ...read }) => ({
+                            read,
+                            derived: {
+                                parsedProvenance: provenanceParseResults,
+                                matchedFournisseur: matchFournisseur(
+                                    read.supplier,
+                                    entreprises
+                                ),
+                            },
+                        })
+                    )
+                )
         }, DELAY_MS)
     })
 }

@@ -2,7 +2,7 @@ import './Extraction.css'
 
 import { useEffect, useEffectEvent, useState } from 'react'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { SelectablePlan } from '../selection'
 import type { ExtractionStatus } from './extraction.types'
 import ImportContext from '../import-context'
@@ -13,13 +13,8 @@ import ExtractionSuccess from './ExtractionSuccess'
 export type ExtractionProps = {
     plan: SelectablePlan
     attachment: Attachment
-    extract: (
-        attachment: Attachment
-    ) => Promise<readonly ReadLineWithProvenanceParseResults[]>
-    onExtracted: (data: {
-        lines: readonly ReadLineWithProvenanceParseResults[]
-        date: Date
-    }) => void
+    extract: (attachment: Attachment) => Promise<readonly ExtractedLine[]>
+    onExtracted: (data: { lines: readonly ExtractedLine[]; date: Date }) => void
     onBack: () => void
 }
 

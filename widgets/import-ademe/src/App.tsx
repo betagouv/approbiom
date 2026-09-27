@@ -1,6 +1,7 @@
 import AsyncGate from '@shared/react/components/AsyncGate'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import { createGristAttachmentPort } from '@shared/infrastructure/grist/adapters/grist-adapter-attachment'
+import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
@@ -15,9 +16,11 @@ import { FAKE_PORTS } from './fake-data/ports'
 import Screen from './components/Screen'
 import { downloadAndExtract } from './download-and-extract'
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 
 type Ports = PlanViewPorts & {
     attachments: AttachmentPort
+    entreprises: EntreprisePort
     extractDataFromDocument: typeof importRows
 }
 
@@ -26,6 +29,7 @@ const GRIST_PORTS: Ports = {
     demandesSubvention: createGristDemandeSubventionPort(),
     programmesAide: createGristProgrammeAidePort(),
     attachments: createGristAttachmentPort(),
+    entreprises: createGristEntreprisePort(),
     extractDataFromDocument: importRows,
 }
 
@@ -46,6 +50,7 @@ async function load(ports: Ports) {
             downloadAndExtract(attachment, {
                 getFileUrl: (id) => ports.attachments.getFileUrl(id),
                 extractDataFromDocument: ports.extractDataFromDocument,
+                listEntreprises: () => ports.entreprises.list(),
             }),
     }
 }

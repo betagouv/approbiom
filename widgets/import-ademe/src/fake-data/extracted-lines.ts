@@ -1,4 +1,5 @@
-import type { ReadLineWithProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ReadLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/transform-provenance/transform-provenance'
 
 const DEP = 'Département français' as const
 const PAYS = 'Pays étranger' as const
@@ -6,7 +7,7 @@ const PAYS = 'Pays étranger' as const
 // The lines of the mock-up, as importRows would hand them over.
 export function fakeReadLines(
     document: string
-): ReadLineWithProvenanceParseResults[] {
+): (ReadLine & { provenanceParseResults: ProvenanceParseResults })[] {
     return [
         {
             document,
