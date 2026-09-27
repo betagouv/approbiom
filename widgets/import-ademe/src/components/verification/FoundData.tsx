@@ -8,7 +8,7 @@ export type FoundDataProps = {
 
 export default function FoundData({ line }: FoundDataProps) {
     const titleId = useId()
-    const { matchedFournisseur } = line.derived
+    const { matchedFournisseur, matchedRessource } = line.derived
 
     return (
         <section className="review__section" aria-labelledby={titleId}>
@@ -30,7 +30,11 @@ export default function FoundData({ line }: FoundDataProps) {
                     <dt className="fr-text--xs fr-m-0 review__label">
                         Ressource trouvée
                     </dt>
-                    <dd className="fr-text--sm fr-m-0">Aucune</dd>
+                    <dd className="fr-text--sm fr-m-0">
+                        {matchedRessource
+                            ? `${matchedRessource.code} · ${matchedRessource.description}`
+                            : 'Aucune'}
+                    </dd>
                 </div>
                 <div>
                     <dt className="fr-text--xs fr-m-0 review__label">

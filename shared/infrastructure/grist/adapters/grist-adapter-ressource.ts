@@ -15,7 +15,9 @@ export function createGristRessourcePort(): RessourcePort {
 
             return rows.map((row) => ({
                 code: asString(row.Code_ressource_Approbiom),
+                ademeCode: asString(row.ademe_2017),
                 title: asString(row.Description_courte),
+                description: asString(row.Description),
             }))
         },
     }

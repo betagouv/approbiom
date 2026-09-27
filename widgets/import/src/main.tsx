@@ -4,6 +4,7 @@ import '@gouvfr/dsfr/dist/core/core.main.min.css'
 import App from './App'
 import { createGristAttachmentPort } from '@shared/infrastructure/grist/adapters/grist-adapter-attachment'
 import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
+import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
 import { createGristApprovisionnementAImporterAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-a-importer-approvisionnement'
 
 const rootEl = document.getElementById('root')
@@ -15,6 +16,7 @@ createRoot(rootEl).render(
             attachments={createGristAttachmentPort()}
             approvisionnementsAImporter={createGristApprovisionnementAImporterAdapter()}
             entreprises={createGristEntreprisePort()}
+            ressources={createGristRessourcePort()}
         />
     </StrictMode>
 )

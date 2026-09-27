@@ -1,6 +1,9 @@
-import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type {
+    ExtractedLine,
+    MatchReferences,
+} from '@shared/infrastructure/import-bcib-bciat/helpers'
 import { matchFournisseur } from '@shared/infrastructure/import-bcib-bciat/match-fournisseur'
+import { matchRessource } from '@shared/infrastructure/import-bcib-bciat/match-ressource'
 import { fakeReadLines } from './extracted-lines'
 
 const DELAY_MS = 1300
@@ -18,7 +21,7 @@ const DELAY_MS = 1300
 export function fakeExtractDataFromDocument(
     _file: Blob,
     name: string,
-    entreprises: readonly Entreprise[]
+    { entreprises, ressources }: MatchReferences
 ): Promise<ExtractedLine[]> {
     return new Promise((resolve, reject) => {
         setTimeout(() => {
@@ -35,6 +38,10 @@ export function fakeExtractDataFromDocument(
                                 matchedFournisseur: matchFournisseur(
                                     read.supplier,
                                     entreprises
+                                ),
+                                matchedRessource: matchRessource(
+                                    read.resource,
+                                    ressources
                                 ),
                             },
                         })

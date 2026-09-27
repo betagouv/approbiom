@@ -1,13 +1,17 @@
-import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import { extractRows, type ExtractedLine } from './helpers'
+import {
+    extractRows,
+    type ExtractedLine,
+    type MatchReferences,
+} from './helpers'
 import { matchFournisseur } from './match-fournisseur'
+import { matchRessource } from './match-ressource'
 import { loadReferenceData } from './transform-provenance/reference-data'
 import { transformProvenance } from './transform-provenance/transform-provenance'
 
 export async function importRows(
     file: Blob,
     document: string,
-    entreprises: readonly Entreprise[]
+    { entreprises, ressources }: MatchReferences
 ): Promise<ExtractedLine[]> {
     const reference = loadReferenceData()
 
@@ -19,6 +23,7 @@ export async function importRows(
                 reference
             ),
             matchedFournisseur: matchFournisseur(read.supplier, entreprises),
+            matchedRessource: matchRessource(read.resource, ressources),
         },
     }))
 }

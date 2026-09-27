@@ -13,6 +13,7 @@ import {
 
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
+import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { ApprovisionnementAImporterAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-a-importer-approvisionnement'
 
 import { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
@@ -21,12 +22,14 @@ type WidgetImportProps = {
     attachments: Pick<AttachmentPort, 'findOne' | 'getFileUrl'>
     approvisionnementsAImporter: ApprovisionnementAImporterAdapter
     entreprises: EntreprisePort
+    ressources: RessourcePort
 }
 
 export default function App({
     attachments,
     approvisionnementsAImporter,
     entreprises,
+    ressources,
 }: WidgetImportProps) {
     const state = useAsyncState(() => gristReady())
 
@@ -53,11 +56,14 @@ export default function App({
             const file = await response.blob()
 
             try {
-                const lines = await importRows(
-                    file,
-                    name,
-                    await entreprises.list()
-                )
+                const [entrepriseList, ressourceList] = await Promise.all([
+                    entreprises.list(),
+                    ressources.list(),
+                ])
+                const lines = await importRows(file, name, {
+                    entreprises: entrepriseList,
+                    ressources: ressourceList,
+                })
 
                 await approvisionnementsAImporter.create(
                     lines.map((line) => ({ ...line, planDApprovisionnement }))
@@ -71,7 +77,7 @@ export default function App({
                 )
             }
         },
-        [attachments, approvisionnementsAImporter, entreprises]
+        [attachments, approvisionnementsAImporter, entreprises, ressources]
     )
 
     useEffect(() => {

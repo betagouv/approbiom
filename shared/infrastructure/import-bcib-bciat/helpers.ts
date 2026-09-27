@@ -1,6 +1,7 @@
 import * as XLSX from 'xlsx'
 import { normalize } from './transform-provenance/reference-data'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Ressource } from '@shared/core/domain/entities/ressource'
 import type { ProvenanceParseResults } from './transform-provenance/transform-provenance'
 import type { CellValue } from 'grist/GristData'
 
@@ -46,7 +47,13 @@ export type ExtractedLine = {
     derived: {
         parsedProvenance: ProvenanceParseResults
         matchedFournisseur: Entreprise | null
+        matchedRessource: Ressource | null
     }
+}
+
+export type MatchReferences = {
+    entreprises: readonly Entreprise[]
+    ressources: readonly Ressource[]
 }
 
 // - - - - - utils - - - - - - //

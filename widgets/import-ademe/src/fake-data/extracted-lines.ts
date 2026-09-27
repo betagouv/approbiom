@@ -13,7 +13,7 @@ export function fakeReadLines(
             document,
             excelRow: 17,
             supplier: 'SARL Bois Energie Corrèze',
-            resource: 'Plaquettes forestières',
+            resource: 'Plaquettes forestières dont souches et rémanents',
             tonnage: 3200,
             rawProvenance: '50% corrèze, 30% creuse, 20% haute-vienne',
             additionalData:
@@ -31,8 +31,8 @@ export function fakeReadLines(
         {
             document,
             excelRow: 18,
-            supplier: 'ONF agence Limousin',
-            resource: 'Plaquettes forestières',
+            supplier: 'Office National des Forêts (agence Limousin)',
+            resource: 'Plaquettes forestières (référentiel 2017 - 1A - PFA)',
             tonnage: 1800,
             rawProvenance: 'Corrèze et Creuse',
             additionalData:
@@ -50,7 +50,8 @@ export function fakeReadLines(
             document,
             excelRow: 19,
             supplier: 'Scierie Lagarde',
-            resource: 'Connexes de scierie',
+            resource:
+                'Plaquettes de produits connexes de scieries (référentiel 2017 - 2B - CIB)',
             tonnage: 950,
             rawProvenance: '100% 19',
             additionalData: 'PCI: 2,5, Fournisseur certifié: non',
@@ -66,7 +67,7 @@ export function fakeReadLines(
             document,
             excelRow: 20,
             supplier: 'Granulés du Centre',
-            resource: 'granulés DIN+',
+            resource: 'Granulés de bois - pellets DIN+',
             tonnage: 600,
             rawProvenance: '60 % Allemagne, reste france',
             additionalData:
@@ -83,7 +84,7 @@ export function fakeReadLines(
             document,
             excelRow: 21,
             supplier: 'Coopérative forestière CFBL',
-            resource: 'Bois bûche',
+            resource: 'Bois bûche (catégorie 1D-BR)',
             tonnage: 1200,
             rawProvenance: 'rayon 100 km autour du site',
             additionalData:
@@ -133,8 +134,8 @@ export function fakeReadLines(
         {
             document,
             excelRow: 24,
-            supplier: 'Lagarde & fils',
-            resource: 'Écorces',
+            supplier: 'Lagarde & fils - SIRET 401 225 873 00027',
+            resource: 'Ecorces',
             tonnage: 300,
             rawProvenance: 'Corrèze principalement, un peu Dordogne',
             additionalData: 'PCI: 2,2, Fournisseur certifié: non',
@@ -151,7 +152,7 @@ export function fakeReadLines(
             document,
             excelRow: 25,
             supplier: 'Bois Limousin SAS',
-            resource: 'Plaquettes bocagères',
+            resource: 'Plaquettes bocagères ou agroforestières',
             tonnage: 500,
             rawProvenance: 'Haute-Vienne 80% Creuse 20%',
             additionalData: 'PCI: 2,6, Fournisseur certifié: non',

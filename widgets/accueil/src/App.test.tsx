@@ -326,7 +326,12 @@ describe('App', () => {
                     },
                     ressources: {
                         list: rows([
-                            { code: 'PF', title: 'Plaquettes forestières' },
+                            {
+                                code: 'PF',
+                                ademeCode: '',
+                                title: 'Plaquettes forestières',
+                                description: '',
+                            },
                         ]),
                     },
                 })}

@@ -78,6 +78,12 @@ async function renderApp(findOne: (id: number) => Promise<Attachment>) {
                         new Error('no entreprise is read by these tests')
                     ),
             }}
+            ressources={{
+                list: () =>
+                    Promise.reject(
+                        new Error('no ressource is read by these tests')
+                    ),
+            }}
         />
     )
 
