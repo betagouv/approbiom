@@ -103,3 +103,25 @@
     border-bottom: 0;
     font-weight: 700;
 }
+
+/* The mock-up's compact field: hint on the label's line, small list. */
+.found-data__field .fr-select-group {
+    margin-bottom: 0;
+}
+
+.found-data__field .fr-label {
+    margin-bottom: 0.125rem;
+    font-size: 0.875rem;
+}
+
+.found-data__field .fr-label .fr-hint-text {
+    display: inline;
+    margin-left: 0.5rem;
+}
+
+.found-data__field .fr-select {
+    margin-top: 0;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+    font-size: 0.875rem;
+}

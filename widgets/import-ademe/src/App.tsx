@@ -43,18 +43,20 @@ const GRIST_PORTS: Ports = {
 }
 
 async function load(ports: Ports) {
-    const [plans, attachments] = await Promise.all([
+    const [plans, attachments, entreprises] = await Promise.all([
         listPlans(['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'], {
             plans: ports.plans,
             demandesSubvention: ports.demandesSubvention,
             programmesAide: ports.programmesAide,
         }),
         ports.attachments.list(),
+        ports.entreprises.list(),
     ])
 
     return {
         plans,
         attachments,
+        entreprises,
         extractDocument: (attachment: Attachment) =>
             extractDocument(attachment, {
                 extractedApprovisionnements: ports.extractedApprovisionnements,

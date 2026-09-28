@@ -7,6 +7,7 @@ import DataTable, { type Column } from '@shared/react/components/DataTable'
 import Modal from '@shared/react/components/Modal'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { SelectablePlan } from '../selection'
 import ImportContext from '../import-context'
 import DocumentData from './DocumentData'
@@ -61,6 +62,7 @@ export type VerificationProps = {
     lines: readonly ExtractedLine[]
     // When the document was extracted.
     date: Date
+    entreprises: readonly Entreprise[]
 }
 
 export default function Verification({
@@ -68,6 +70,7 @@ export default function Verification({
     attachment,
     lines,
     date,
+    entreprises,
 }: VerificationProps) {
     // The line being reviewed in the modal, if any.
     const [reviewedLine, setReviewedLine] = useState<ExtractedLine | null>(null)
@@ -118,7 +121,11 @@ export default function Verification({
                 {reviewedLine && (
                     <div className="review">
                         <DocumentData line={reviewedLine} />
-                        <FoundData line={reviewedLine} />
+                        <FoundData
+                            key={reviewedLine.read.excelRow}
+                            line={reviewedLine}
+                            entreprises={entreprises}
+                        />
                     </div>
                 )}
             </Modal>

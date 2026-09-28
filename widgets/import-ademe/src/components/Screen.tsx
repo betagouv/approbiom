@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Tabs from '@shared/react/components/Tabs'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import Selection, { type SelectablePlan } from './selection'
 import Extraction from './extraction'
@@ -14,12 +15,14 @@ type ExtractedData = {
 export type ScreenProps = {
     plans: readonly SelectablePlan[]
     attachments: readonly Attachment[]
+    entreprises: readonly Entreprise[]
     extractDocument: (attachment: Attachment) => Promise<ExtractedData>
 }
 
 export default function Screen({
     plans,
     attachments,
+    entreprises,
     extractDocument,
 }: ScreenProps) {
     const [tab, setTab] = useState('selection')
@@ -109,6 +112,7 @@ export default function Screen({
                             attachment={attachment}
                             lines={extracted.lines}
                             date={extracted.date}
+                            entreprises={entreprises}
                         />
                     ),
                     disabled: extracted === null,
