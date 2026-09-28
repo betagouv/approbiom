@@ -8,11 +8,17 @@
     color: var(--text-mention-grey);
 }
 
-.verification__tonnage {
-    display: block;
-    font-variant-numeric: tabular-nums;
-    text-align: right;
+.verification__state {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
     white-space: nowrap;
+}
+
+.verification__distribution {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
 }
 
 .verification__action {

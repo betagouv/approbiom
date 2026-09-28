@@ -25,46 +25,14 @@ import type { Approvisionnement } from '@shared/core/domain/entities/approvision
 
 const DATE = new Intl.DateTimeFormat('fr-FR')
 
-const TONNAGE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
+const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
-const DATA_COLUMNS: readonly Column<ExtractedLine>[] = [
-    {
-        id: 'excel-row',
-        header: 'Ligne de la feuille Fournisseur',
-        render: (line) => (
-            <span className="verification__mention">{line.read.excelRow}</span>
-        ),
-    },
-    {
-        id: 'supplier',
-        header: 'Fournisseur',
-        render: (line) => line.read.supplier,
-    },
-    {
-        id: 'resource',
-        header: 'Sous catégorie de combustible',
-        render: (line) => line.read.resource,
-    },
-    {
-        id: 'tonnage',
-        header: 'Tonnage / an',
-        render: (line) => (
-            <span className="verification__tonnage">
-                {TONNAGE.format(line.read.tonnage)} t
-            </span>
-        ),
-    },
-    {
-        id: 'provenance',
-        header: 'Répartition par provenance',
-        render: (line) => line.read.rawProvenance,
-    },
-    {
-        id: 'additionalData',
-        header: 'Données additionnelles',
-        render: (line) => line.read.additionalData,
-    },
-]
+function provenanceCount(line: ExtractedLine): string {
+    const { length } = line.derived.parsedProvenance.distribution
+    if (length === 0) return 'Aucune provenance'
+
+    return length === 1 ? '1 provenance' : `${length} provenances`
+}
 
 export type VerificationProps = {
     plan: SelectablePlan
@@ -105,30 +73,68 @@ export default function Verification({
         ? toApprovisionnements(reviewedLine, plan.id, attachment.id)
         : []
 
+    const departementLabels = new Map(
+        departementsByRegion.flatMap(({ departements }) =>
+            departements.map(({ dep, libelle }) => [dep, `${libelle} (${dep})`])
+        )
+    )
+
     const columns: readonly Column<StoredExtractedLine>[] = [
         {
-            id: 'action',
-            header: 'Action',
+            id: 'state',
+            header: 'État',
             render: (line) =>
                 line.state === 'Importés' ? (
                     <Badge size="sm" status="success">
                         Importée
                     </Badge>
                 ) : (
-                    <button
-                        type="button"
-                        className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
-                        onClick={() => setReviewedLineId(line.id)}
-                    >
-                        Vérifier
-                        <span className="fr-sr-only">
-                            {' '}
-                            la ligne {line.read.excelRow}
-                        </span>
-                    </button>
+                    <div className="verification__state">
+                        <Badge size="sm">Pas importée</Badge>
+                        <button
+                            type="button"
+                            className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
+                            onClick={() => setReviewedLineId(line.id)}
+                        >
+                            Modifier
+                            <span className="fr-sr-only">
+                                {' '}
+                                la ligne {line.read.excelRow}
+                            </span>
+                        </button>
+                    </div>
                 ),
         },
-        ...DATA_COLUMNS,
+        {
+            id: 'excel-row',
+            header: 'Ligne',
+            render: (line) => (
+                <span className="verification__mention">
+                    {line.read.excelRow}
+                </span>
+            ),
+        },
+        {
+            id: 'fournisseur',
+            header: 'Fournisseur',
+            render: (line) =>
+                line.derived.matchedFournisseur?.denomination ?? (
+                    <span className="verification__mention">Aucun</span>
+                ),
+        },
+        {
+            id: 'ressource',
+            header: 'Ressource',
+            render: (line) =>
+                line.derived.matchedRessource?.description ?? (
+                    <span className="verification__mention">Aucune</span>
+                ),
+        },
+        {
+            id: 'provenance',
+            header: 'Répartition par provenance',
+            render: provenanceCount,
+        },
     ]
 
     return (
@@ -145,6 +151,40 @@ export default function Verification({
                 columns={columns}
                 bordered
                 multiLine
+                expandable={{
+                    columnId: 'provenance',
+                    render: (line) =>
+                        line.derived.parsedProvenance.distribution.length ===
+                        0 ? (
+                            <p className="fr-m-0 verification__mention">
+                                Aucune provenance trouvée.
+                            </p>
+                        ) : (
+                            <ul className="verification__distribution">
+                                {line.derived.parsedProvenance.distribution.map(
+                                    (
+                                        { source, provenance, percentage },
+                                        index
+                                    ) => (
+                                        <li key={index}>
+                                            {source === 'Pays étranger'
+                                                ? provenance
+                                                : (departementLabels.get(
+                                                      provenance
+                                                  ) ?? provenance)}{' '}
+                                            : {NUMBER.format(percentage)} % ·{' '}
+                                            {NUMBER.format(
+                                                (line.read.tonnage *
+                                                    percentage) /
+                                                    100
+                                            )}{' '}
+                                            tonnes de matière verte / an
+                                        </li>
+                                    )
+                                )}
+                            </ul>
+                        ),
+                }}
             />
 
             <Modal
