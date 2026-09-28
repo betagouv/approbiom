@@ -1,19 +1,30 @@
 import { useId, useState } from 'react'
 import Select, { type SelectProps } from '@shared/react/components/Select'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Ressource } from '@shared/core/domain/entities/ressource'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLineChanges } from '../../extracted-approvisionnement-port'
 import ProvenanceFound from './ProvenanceFound'
 
 export type FoundDataProps = {
     line: ExtractedLine
     entreprises: readonly Entreprise[]
+    ressources: readonly Ressource[]
+    onUpdate: (changes: ExtractedLineChanges) => Promise<void>
 }
 
-function fournisseurHint(
-    matchedSiret: Entreprise['siret'] | undefined,
-    selectedSiret: Entreprise['siret'] | null
-): Pick<SelectProps<Entreprise['siret']>, 'description' | 'message'> {
-    if (selectedSiret === null)
+const SAVE_FAILED = {
+    message: {
+        severity: 'error',
+        text: "Le choix n'a pas pu être enregistré. Réessayez.",
+    },
+} as const
+
+function matchHint(
+    matched: string | undefined,
+    selected: string | null
+): Pick<SelectProps<string>, 'description' | 'message'> {
+    if (selected === null)
         return {
             message: {
                 severity: 'error',
@@ -22,29 +33,66 @@ function fournisseurHint(
         }
 
     return {
-        description:
-            selectedSiret === matchedSiret
-                ? 'Correspondance trouvée'
-                : 'Modifié',
+        description: 'Correspondance trouvée',
     }
 }
 
-export default function FoundData({ line, entreprises }: FoundDataProps) {
+export default function FoundData({
+    line,
+    entreprises,
+    ressources,
+    onUpdate,
+}: FoundDataProps) {
     const titleId = useId()
     const { matchedFournisseur, matchedRessource } = line.derived
     const [fournisseurSiret, setFournisseurSiret] = useState<
         Entreprise['siret'] | null
     >(matchedFournisseur?.siret ?? null)
+    const [ressourceCode, setRessourceCode] = useState<
+        Ressource['code'] | null
+    >(matchedRessource?.code ?? null)
+    const [failedField, setFailedField] = useState<
+        'fournisseur' | 'ressource' | null
+    >(null)
+
+    function save(
+        field: 'fournisseur' | 'ressource',
+        changes: ExtractedLineChanges
+    ) {
+        setFailedField(null)
+        onUpdate(changes).catch(() => setFailedField(field))
+    }
+
+    function selectFournisseur(siret: Entreprise['siret']) {
+        setFournisseurSiret(siret)
+        save('fournisseur', {
+            matchedFournisseur:
+                entreprises.find((entreprise) => entreprise.siret === siret) ??
+                null,
+        })
+    }
+
+    function selectRessource(code: Ressource['code']) {
+        setRessourceCode(code)
+        save('ressource', {
+            matchedRessource:
+                ressources.find((ressource) => ressource.code === code) ?? null,
+        })
+    }
 
     const fournisseurOptions = entreprises.map(({ denomination, siret }) => ({
         value: siret,
         label: `${denomination} — ${siret}`,
     }))
+    const ressourceOptions = ressources.map(({ code, description }) => ({
+        value: code,
+        label: `${code} · ${description}`,
+    }))
 
     return (
         <section className="review__section" aria-labelledby={titleId}>
             <h3 id={titleId} className="fr-text--xs fr-m-0 review__title">
-                Données trouvées
+                Données à importer
             </h3>
             <div className="found-data__field">
                 <Select
@@ -52,24 +100,23 @@ export default function FoundData({ line, entreprises }: FoundDataProps) {
                     placeholder="Choisir une entreprise"
                     options={fournisseurOptions}
                     value={fournisseurSiret}
-                    onChange={setFournisseurSiret}
-                    {...fournisseurHint(
-                        matchedFournisseur?.siret,
-                        fournisseurSiret
-                    )}
+                    onChange={selectFournisseur}
+                    {...matchHint(matchedFournisseur?.siret, fournisseurSiret)}
+                    {...(failedField === 'fournisseur' && SAVE_FAILED)}
+                />
+            </div>
+            <div className="found-data__field">
+                <Select
+                    label="Ressource"
+                    placeholder="Choisir une ressource"
+                    options={ressourceOptions}
+                    value={ressourceCode}
+                    onChange={selectRessource}
+                    {...matchHint(matchedRessource?.code, ressourceCode)}
+                    {...(failedField === 'ressource' && SAVE_FAILED)}
                 />
             </div>
             <dl className="review__list">
-                <div>
-                    <dt className="fr-text--xs fr-m-0 review__label">
-                        Ressource trouvée
-                    </dt>
-                    <dd className="fr-text--sm fr-m-0">
-                        {matchedRessource
-                            ? `${matchedRessource.code} · ${matchedRessource.description}`
-                            : 'Aucune'}
-                    </dd>
-                </div>
                 <div>
                     <dt className="fr-text--xs fr-m-0 review__label">
                         Répartition trouvée

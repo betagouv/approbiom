@@ -10,23 +10,23 @@ import ExtractionFailure from './ExtractionFailure'
 import ExtractionLoading from './ExtractionLoading'
 import ExtractionSuccess from './ExtractionSuccess'
 
-export type ExtractionProps = {
+export type ExtractionProps<L extends ExtractedLine> = {
     plan: SelectablePlan
     attachment: Attachment
     extract: (
         attachment: Attachment
-    ) => Promise<{ lines: readonly ExtractedLine[]; date: Date }>
-    onExtracted: (data: { lines: readonly ExtractedLine[]; date: Date }) => void
+    ) => Promise<{ lines: readonly L[]; date: Date }>
+    onExtracted: (data: { lines: readonly L[]; date: Date }) => void
     onBack: () => void
 }
 
-export default function Extraction({
+export default function Extraction<L extends ExtractedLine>({
     plan,
     attachment,
     extract,
     onExtracted,
     onBack,
-}: ExtractionProps) {
+}: ExtractionProps<L>) {
     const [attempt, setAttempt] = useState(0)
     const [extractionStatus, setExtractionStatus] = useState<ExtractionStatus>({
         status: 'loading',

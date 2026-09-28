@@ -18,7 +18,11 @@ import { FAKE_PORTS } from './fake-data/ports'
 import Screen from './components/Screen'
 import { downloadAndExtract } from './download-and-extract'
 import { extractDocument } from './extract-document'
-import type { ExtractedApprovisionnementPort } from './extracted-approvisionnement-port'
+import type {
+    ExtractedApprovisionnementPort,
+    ExtractedLineChanges,
+    StoredExtractedLine,
+} from './extracted-approvisionnement-port'
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
@@ -43,7 +47,7 @@ const GRIST_PORTS: Ports = {
 }
 
 async function load(ports: Ports) {
-    const [plans, attachments, entreprises] = await Promise.all([
+    const [plans, attachments, entreprises, ressources] = await Promise.all([
         listPlans(['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'], {
             plans: ports.plans,
             demandesSubvention: ports.demandesSubvention,
@@ -51,12 +55,18 @@ async function load(ports: Ports) {
         }),
         ports.attachments.list(),
         ports.entreprises.list(),
+        ports.ressources.list(),
     ])
 
     return {
         plans,
         attachments,
         entreprises,
+        ressources,
+        updateExtractedLine: (
+            id: StoredExtractedLine['id'],
+            changes: ExtractedLineChanges
+        ) => ports.extractedApprovisionnements.update(id, changes),
         extractDocument: (attachment: Attachment) =>
             extractDocument(attachment, {
                 extractedApprovisionnements: ports.extractedApprovisionnements,

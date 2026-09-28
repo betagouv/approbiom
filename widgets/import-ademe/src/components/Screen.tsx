@@ -2,13 +2,17 @@ import { useState } from 'react'
 import Tabs from '@shared/react/components/Tabs'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type {
+    ExtractedLineChanges,
+    StoredExtractedLine,
+} from '../extracted-approvisionnement-port'
 import Selection, { type SelectablePlan } from './selection'
 import Extraction from './extraction'
 import Verification from './verification'
 
 type ExtractedData = {
-    lines: readonly ExtractedLine[]
+    lines: readonly StoredExtractedLine[]
     date: Date
 }
 
@@ -16,14 +20,21 @@ export type ScreenProps = {
     plans: readonly SelectablePlan[]
     attachments: readonly Attachment[]
     entreprises: readonly Entreprise[]
+    ressources: readonly Ressource[]
     extractDocument: (attachment: Attachment) => Promise<ExtractedData>
+    updateExtractedLine: (
+        id: StoredExtractedLine['id'],
+        changes: ExtractedLineChanges
+    ) => Promise<void>
 }
 
 export default function Screen({
     plans,
     attachments,
     entreprises,
+    ressources,
     extractDocument,
+    updateExtractedLine,
 }: ScreenProps) {
     const [tab, setTab] = useState('selection')
     const [planId, setPlanId] = useState<SelectablePlan['id'] | null>(null)
@@ -63,6 +74,27 @@ export default function Screen({
     function handleExtracted(data: ExtractedData) {
         setExtracted(data)
         setTab('verification')
+    }
+
+    async function updateLine(
+        id: StoredExtractedLine['id'],
+        changes: ExtractedLineChanges
+    ) {
+        await updateExtractedLine(id, changes)
+        setExtracted(
+            (previous) =>
+                previous && {
+                    ...previous,
+                    lines: previous.lines.map((line) =>
+                        line.id === id
+                            ? {
+                                  ...line,
+                                  derived: { ...line.derived, ...changes },
+                              }
+                            : line
+                    ),
+                }
+        )
     }
 
     return (
@@ -113,6 +145,8 @@ export default function Screen({
                             lines={extracted.lines}
                             date={extracted.date}
                             entreprises={entreprises}
+                            ressources={ressources}
+                            onUpdateLine={updateLine}
                         />
                     ),
                     disabled: extracted === null,

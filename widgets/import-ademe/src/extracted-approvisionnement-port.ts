@@ -9,6 +9,10 @@ export type StoredExtractedLine = ExtractedLine & {
     extractedAt: Date
 }
 
+export type ExtractedLineChanges = Partial<
+    Pick<ExtractedLine['derived'], 'matchedFournisseur' | 'matchedRessource'>
+>
+
 export interface ExtractedApprovisionnementPort {
     listByDocument(
         attachment: Pick<Attachment, 'id' | 'name'>
@@ -17,5 +21,9 @@ export interface ExtractedApprovisionnementPort {
         attachment: Pick<Attachment, 'id'>,
         lines: readonly ExtractedLine[],
         extractedAt: Date
+    ): Promise<void>
+    update(
+        id: StoredExtractedLine['id'],
+        changes: ExtractedLineChanges
     ): Promise<void>
 }

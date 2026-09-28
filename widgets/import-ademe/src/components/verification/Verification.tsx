@@ -6,8 +6,13 @@ import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import Modal from '@shared/react/components/Modal'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type {
+    ExtractedLineChanges,
+    StoredExtractedLine,
+} from '../../extracted-approvisionnement-port'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Ressource } from '@shared/core/domain/entities/ressource'
 import type { SelectablePlan } from '../selection'
 import ImportContext from '../import-context'
 import DocumentData from './DocumentData'
@@ -59,10 +64,15 @@ const DATA_COLUMNS: readonly Column<ExtractedLine>[] = [
 export type VerificationProps = {
     plan: SelectablePlan
     attachment: Attachment
-    lines: readonly ExtractedLine[]
+    lines: readonly StoredExtractedLine[]
     // When the document was extracted.
     date: Date
     entreprises: readonly Entreprise[]
+    ressources: readonly Ressource[]
+    onUpdateLine: (
+        id: StoredExtractedLine['id'],
+        changes: ExtractedLineChanges
+    ) => Promise<void>
 }
 
 export default function Verification({
@@ -71,11 +81,14 @@ export default function Verification({
     lines,
     date,
     entreprises,
+    ressources,
+    onUpdateLine,
 }: VerificationProps) {
     // The line being reviewed in the modal, if any.
-    const [reviewedLine, setReviewedLine] = useState<ExtractedLine | null>(null)
+    const [reviewedLine, setReviewedLine] =
+        useState<StoredExtractedLine | null>(null)
 
-    const columns: readonly Column<ExtractedLine>[] = [
+    const columns: readonly Column<StoredExtractedLine>[] = [
         {
             id: 'action',
             header: 'Action',
@@ -125,6 +138,10 @@ export default function Verification({
                             key={reviewedLine.read.excelRow}
                             line={reviewedLine}
                             entreprises={entreprises}
+                            ressources={ressources}
+                            onUpdate={(changes) =>
+                                onUpdateLine(reviewedLine.id, changes)
+                            }
                         />
                     </div>
                 )}

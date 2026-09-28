@@ -30,5 +30,21 @@ export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnem
 
             return Promise.resolve()
         },
+        update: (id, changes) => {
+            for (const [attachmentId, lines] of rows)
+                rows.set(
+                    attachmentId,
+                    lines.map((line) =>
+                        line.id === id
+                            ? {
+                                  ...line,
+                                  derived: { ...line.derived, ...changes },
+                              }
+                            : line
+                    )
+                )
+
+            return Promise.resolve()
+        },
     }
 }

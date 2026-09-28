@@ -1,4 +1,6 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Ressource } from '@shared/core/domain/entities/ressource'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { ProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/transform-provenance/transform-provenance'
 import { gristReady } from '../helpers/grist-ready'
@@ -10,6 +12,7 @@ import {
     byRowId,
     createRows,
     fetchRowsOnce,
+    updateRow,
     type GristRow,
 } from '../helpers/grist-helpers'
 import { COLUMNS, TABLE } from '../types/grist-tables'
@@ -175,6 +178,49 @@ export function createGristExtractedApprovisionnementAdapter() {
                     ),
                 }))
             )
+        },
+
+        async update(
+            id: number,
+            changes: {
+                matchedFournisseur?: Entreprise | null
+                matchedRessource?: Ressource | null
+            }
+        ): Promise<void> {
+            await gristReady()
+
+            const [entrepriseRows, ressourceRows] = await Promise.all([
+                fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise),
+                fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
+            ])
+
+            const fields: Record<string, number> = {}
+            if (changes.matchedFournisseur !== undefined) {
+                const { matchedFournisseur } = changes
+                fields.Fournisseur = matchedFournisseur
+                    ? (asNumber(
+                          entrepriseRows.find(
+                              (row) =>
+                                  toEntreprise(row).siret ===
+                                  matchedFournisseur.siret
+                          )?.id
+                      ) ?? 0)
+                    : 0
+            }
+            if (changes.matchedRessource !== undefined) {
+                const { matchedRessource } = changes
+                fields.Ressource = matchedRessource
+                    ? (asNumber(
+                          ressourceRows.find(
+                              (row) =>
+                                  toRessource(row).code ===
+                                  matchedRessource.code
+                          )?.id
+                      ) ?? 0)
+                    : 0
+            }
+
+            await updateRow(TABLE.extractedApprovisionnement, id, fields)
         },
     }
 }
