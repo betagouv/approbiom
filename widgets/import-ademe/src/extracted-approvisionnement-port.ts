@@ -1,7 +1,9 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 
-export type ExtractedApprovisionnementState = 'Importés' | 'Pas importés'
+// Computed by Grist: « Créés » once Approvisionnement holds the same plan,
+// fournisseur and ressource, whatever created it.
+export type ExtractedApprovisionnementState = 'Créés' | 'Pas créés'
 
 export type StoredExtractedLine = ExtractedLine & {
     id: number
@@ -13,7 +15,7 @@ export type ExtractionSummary = {
     attachmentId: Attachment['id']
     extractedAt: Date
     lineCount: number
-    importedCount: number
+    createdCount: number
 }
 
 export type ExtractedLineChanges = Partial<ExtractedLine['derived']>

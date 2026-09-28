@@ -27,7 +27,7 @@ function ExtractionState({
 }) {
     if (!summary) return <Badge size="sm">Pas encore extrait</Badge>
 
-    const { extractedAt, lineCount, importedCount } = summary
+    const { extractedAt, lineCount, createdCount } = summary
 
     return (
         <>
@@ -35,8 +35,8 @@ function ExtractionState({
                 Extrait le {DATE.format(extractedAt)}
             </Badge>
             <span className="fr-text--xs attachment-picker__meta">
-                {importedCount} ligne{importedCount > 1 ? 's' : ''} importée
-                {importedCount > 1 ? 's' : ''} sur {lineCount}
+                Déjà présentes : {createdCount} ligne
+                {createdCount > 1 ? 's' : ''} sur {lineCount}
             </span>
         </>
     )
@@ -93,7 +93,10 @@ export default function AttachmentPicker({
                                             {attachment.name}
                                         </span>
                                         <span className="fr-text--xs attachment-picker__meta">
-                                            {formatSize(attachment.sizeInBytes)}
+                                            {formatSize(attachment.sizeInBytes)}{' '}
+                                            ·{' '}
+                                            {attachment.type ||
+                                                'type non renseigné'}
                                         </span>
                                         <ExtractionState
                                             summary={extractions.get(

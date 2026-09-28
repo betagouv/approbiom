@@ -14,8 +14,8 @@ export default function ExtractionSuccess({
     return (
         <div className="fr-alert fr-alert--success fr-alert--sm">
             <p>
-                Extraction réussie — {lineCount} lignes extraites le{' '}
-                {DATE.format(date)}
+                Extraction réussie — {lineCount} ligne{lineCount > 1 ? 's' : ''}{' '}
+                extraite{lineCount > 1 ? 's' : ''} le {DATE.format(date)}
             </p>
         </div>
     )

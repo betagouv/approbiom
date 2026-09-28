@@ -38,9 +38,7 @@ describe('extractDocument', () => {
         })
 
         expect(downloadAndExtract).toHaveBeenCalledOnce()
-        expect(lines).toMatchObject([
-            { state: 'Pas importés', read: line.read },
-        ])
+        expect(lines).toMatchObject([{ state: 'Pas créés', read: line.read }])
     })
 
     it('reads back a document already in the table, without extracting it again', async () => {

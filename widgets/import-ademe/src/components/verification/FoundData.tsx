@@ -123,8 +123,8 @@ export default function FoundData({
     return (
         <>
             <section className="review__section" aria-labelledby={titleId}>
-                <h3 id={titleId} className="fr-text--xs fr-m-0 review__title">
-                    Données à importer
+                <h3 id={titleId} className="fr-h6 fr-m-0">
+                    Données retenues
                 </h3>
                 {fournisseurEditing === 'create' ? (
                     <NewFournisseurForm

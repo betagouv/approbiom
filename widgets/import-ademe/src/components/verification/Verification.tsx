@@ -1,7 +1,8 @@
 import './Verification.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 
-import { useState } from 'react'
+import { useRef, useState } from 'react'
+import Alert from '@shared/react/components/Alert'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import Modal from '@shared/react/components/Modal'
@@ -19,6 +20,8 @@ import type { SelectablePlan } from '../selection'
 import ImportContext from '../import-context'
 import DocumentData from './DocumentData'
 import FoundData from './FoundData'
+import ImportedData from './ImportedData'
+import DistributionList, { departementLabelsOf } from './DistributionList'
 import ImportActions from './ImportActions'
 import { toApprovisionnements } from '../../import-line'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
@@ -27,11 +30,19 @@ const DATE = new Intl.DateTimeFormat('fr-FR')
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
-function provenanceCount(line: ExtractedLine): string {
-    const { length } = line.derived.parsedProvenance.distribution
-    if (length === 0) return 'Aucune provenance'
+const plural = (count: number, word: string) =>
+    `${count} ${word}${count > 1 ? 's' : ''}`
 
-    return length === 1 ? '1 provenance' : `${length} provenances`
+function provenanceSummary(line: ExtractedLine): string {
+    const { distribution } = line.derived.parsedProvenance
+    if (distribution.length === 0) return 'Aucune provenance'
+
+    const total = distribution.reduce(
+        (sum, { percentage }) => sum + percentage,
+        0
+    )
+
+    return `${plural(distribution.length, 'provenance')} · ${NUMBER.format(total)} %`
 }
 
 export type VerificationProps = {
@@ -75,41 +86,67 @@ export default function Verification({
         StoredExtractedLine['id'] | null
     >(null)
     const reviewedLine = lines.find(({ id }) => id === reviewedLineId) ?? null
+    const readOnly = reviewedLine?.state === 'Créés'
     const approvisionnements = reviewedLine
         ? toApprovisionnements(reviewedLine, plan.id, attachment.id)
         : []
+    const [lastImport, setLastImport] = useState<{
+        excelRow: number
+        count: number
+    } | null>(null)
+    const successRef = useRef<HTMLDivElement>(null)
 
-    const departementLabels = new Map(
-        departementsByRegion.flatMap(({ departements }) =>
-            departements.map(({ dep, libelle }) => [dep, `${libelle} (${dep})`])
-        )
+    const departementLabels = departementLabelsOf(departementsByRegion)
+
+    function review(line: StoredExtractedLine) {
+        setLastImport(null)
+        setReviewedLineId(line.id)
+    }
+
+    async function importReviewedLine(line: StoredExtractedLine) {
+        await onImportLine(approvisionnements)
+        setReviewedLineId(null)
+        setLastImport({
+            excelRow: line.read.excelRow,
+            count: approvisionnements.length,
+        })
+        // The line's button is gone once imported: the focus goes to the
+        // message instead.
+        requestAnimationFrame(() => successRef.current?.focus())
+    }
+
+    const actionButton = (line: StoredExtractedLine, label: string) => (
+        <button
+            type="button"
+            className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
+            onClick={() => review(line)}
+        >
+            {label}
+            <span className="fr-sr-only"> la ligne {line.read.excelRow}</span>
+        </button>
     )
 
     const columns: readonly Column<StoredExtractedLine>[] = [
         {
             id: 'state',
             header: 'État',
-            render: (line) =>
-                line.state === 'Importés' ? (
-                    <Badge size="sm" status="success">
-                        Importée
-                    </Badge>
-                ) : (
-                    <div className="verification__state">
-                        <Badge size="sm">Pas importée</Badge>
-                        <button
-                            type="button"
-                            className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
-                            onClick={() => setReviewedLineId(line.id)}
-                        >
-                            Modifier
-                            <span className="fr-sr-only">
-                                {' '}
-                                la ligne {line.read.excelRow}
-                            </span>
-                        </button>
-                    </div>
-                ),
+            render: (line) => (
+                <div className="verification__state">
+                    {line.state === 'Créés' ? (
+                        <>
+                            <Badge size="sm" status="success">
+                                Déjà présente
+                            </Badge>
+                            {actionButton(line, 'Voir')}
+                        </>
+                    ) : (
+                        <>
+                            <Badge size="sm">Pas créée</Badge>
+                            {actionButton(line, 'Modifier')}
+                        </>
+                    )}
+                </div>
+            ),
         },
         {
             id: 'excel-row',
@@ -139,7 +176,7 @@ export default function Verification({
         {
             id: 'provenance',
             header: 'Répartition par provenance',
-            render: provenanceCount,
+            render: provenanceSummary,
         },
     ]
 
@@ -151,9 +188,21 @@ export default function Verification({
                 getAttachmentUrl={getAttachmentUrl}
             >
                 <Badge size="sm" status="success">
-                    {lines.length} lignes extraites le {DATE.format(date)}
+                    {plural(lines.length, 'ligne')} extraite
+                    {lines.length > 1 ? 's' : ''} le {DATE.format(date)}
                 </Badge>
             </ImportContext>
+
+            {lastImport && (
+                <div ref={successRef} tabIndex={-1}>
+                    <Alert severity="success">
+                        Ligne {lastImport.excelRow} importée :{' '}
+                        {plural(lastImport.count, 'approvisionnement')} créé
+                        {lastImport.count > 1 ? 's' : ''} dans
+                        Approvisionnement.
+                    </Alert>
+                </div>
+            )}
 
             <DataTable
                 caption="Lignes extraites"
@@ -163,37 +212,12 @@ export default function Verification({
                 multiLine
                 expandable={{
                     columnId: 'provenance',
-                    render: (line) =>
-                        line.derived.parsedProvenance.distribution.length ===
-                        0 ? (
-                            <p className="fr-m-0 verification__mention">
-                                Aucune provenance trouvée.
-                            </p>
-                        ) : (
-                            <ul className="verification__distribution">
-                                {line.derived.parsedProvenance.distribution.map(
-                                    (
-                                        { source, provenance, percentage },
-                                        index
-                                    ) => (
-                                        <li key={index}>
-                                            {source === 'Pays étranger'
-                                                ? provenance
-                                                : (departementLabels.get(
-                                                      provenance
-                                                  ) ?? provenance)}{' '}
-                                            : {NUMBER.format(percentage)} % ·{' '}
-                                            {NUMBER.format(
-                                                (line.read.tonnage *
-                                                    percentage) /
-                                                    100
-                                            )}{' '}
-                                            tonnes de matière verte / an
-                                        </li>
-                                    )
-                                )}
-                            </ul>
-                        ),
+                    render: (line) => (
+                        <DistributionList
+                            line={line}
+                            departementLabels={departementLabels}
+                        />
+                    ),
                 }}
             />
 
@@ -203,15 +227,13 @@ export default function Verification({
                 title={`Ligne ${reviewedLine?.read.excelRow ?? ''}`}
                 size="lg"
                 actions={
-                    reviewedLine && (
+                    reviewedLine &&
+                    !readOnly && (
                         <ImportActions
                             key={reviewedLine.id}
                             approvisionnementCount={approvisionnements.length}
                             onCancel={() => setReviewedLineId(null)}
-                            onImport={async () => {
-                                await onImportLine(approvisionnements)
-                                setReviewedLineId(null)
-                            }}
+                            onImport={() => importReviewedLine(reviewedLine)}
                         />
                     )
                 }
@@ -219,19 +241,26 @@ export default function Verification({
                 {reviewedLine && (
                     <div className="review">
                         <DocumentData line={reviewedLine} />
-                        <FoundData
-                            key={reviewedLine.read.excelRow}
-                            line={reviewedLine}
-                            entreprises={entreprises}
-                            ressources={ressources}
-                            departementsByRegion={departementsByRegion}
-                            pays={pays}
-                            onUpdate={(changes) =>
-                                onUpdateLine(reviewedLine.id, changes)
-                            }
-                            onCreateFournisseur={onCreateFournisseur}
-                            onCreatePays={onCreatePays}
-                        />
+                        {readOnly ? (
+                            <ImportedData
+                                line={reviewedLine}
+                                departementLabels={departementLabels}
+                            />
+                        ) : (
+                            <FoundData
+                                key={reviewedLine.read.excelRow}
+                                line={reviewedLine}
+                                entreprises={entreprises}
+                                ressources={ressources}
+                                departementsByRegion={departementsByRegion}
+                                pays={pays}
+                                onUpdate={(changes) =>
+                                    onUpdateLine(reviewedLine.id, changes)
+                                }
+                                onCreateFournisseur={onCreateFournisseur}
+                                onCreatePays={onCreatePays}
+                            />
+                        )}
                     </div>
                 )}
             </Modal>

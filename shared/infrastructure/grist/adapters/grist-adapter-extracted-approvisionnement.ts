@@ -19,11 +19,11 @@ import { COLUMNS, TABLE } from '../types/grist-tables'
 import { toEntreprise } from './grist-adapter-entreprise'
 import { toRessource } from './grist-adapter-ressource'
 
-const IMPORTED = 'Importés'
-const NOT_IMPORTED = 'Pas importés'
+const CREATED = 'Créés'
+const NOT_CREATED = 'Pas créés'
 
-function stateOf(value: unknown): typeof IMPORTED | typeof NOT_IMPORTED {
-    return value === IMPORTED ? IMPORTED : NOT_IMPORTED
+function stateOf(value: unknown): typeof CREATED | typeof NOT_CREATED {
+    return value === CREATED ? CREATED : NOT_CREATED
 }
 
 // Attachments are identified by their file; the table points at the
@@ -137,8 +137,8 @@ export function createGristExtractedApprovisionnementAdapter() {
                     extractedAt:
                         asDate(lines[0].Date_d_extraction) ?? new Date(0),
                     lineCount: lines.length,
-                    importedCount: lines.filter(
-                        (row) => stateOf(row.Etat) === IMPORTED
+                    createdCount: lines.filter(
+                        (row) => stateOf(row.Etat) === CREATED
                     ).length,
                 }
 

@@ -223,7 +223,7 @@ export default function ProvenanceEditor({
                                         className="fr-label"
                                         htmlFor={tonnageId}
                                     >
-                                        Tonnage (en tonne de matière verte / an)
+                                        Tonnage (en tonne MV/an)
                                     </label>
                                     <input
                                         id={tonnageId}
@@ -321,8 +321,7 @@ export default function ProvenanceEditor({
                 </button>
                 <p className="fr-text--sm fr-m-0 provenance-editor__total">
                     Total : {NUMBER.format(totalPercentage)} % ·{' '}
-                    {NUMBER.format(tonnageOf(totalPercentage))} tonnes de
-                    matière verte / an
+                    {NUMBER.format(tonnageOf(totalPercentage))} tonnes MV/an
                 </p>
             </div>
         </div>

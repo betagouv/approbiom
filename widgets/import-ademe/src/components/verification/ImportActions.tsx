@@ -35,9 +35,8 @@ export default function ImportActions({
             >
                 {failed
                     ? "L'import a échoué. Réessayez."
-                    : canImport
-                      ? `${approvisionnementCount} ligne${approvisionnementCount > 1 ? 's' : ''} ${approvisionnementCount > 1 ? 'seront créées' : 'sera créée'} dans Approvisionnement.`
-                      : 'Choisissez un fournisseur, une ressource et au moins une provenance.'}
+                    : !canImport &&
+                      'Choisissez un fournisseur, une ressource et au moins une provenance.'}
             </p>
             <button
                 type="button"

@@ -18,7 +18,7 @@ function line(
 ): StoredExtractedLine {
     return {
         id: 7,
-        state: 'Pas importés',
+        state: 'Pas créés',
         extractedAt: new Date('2026-09-27'),
         read: {
             document: 'plan.xlsx',

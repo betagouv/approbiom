@@ -25,7 +25,7 @@ export default function DocumentData({ line }: DocumentDataProps) {
             className="review__section document-data"
             aria-labelledby={titleId}
         >
-            <h3 id={titleId} className="fr-text--xs fr-m-0 review__title">
+            <h3 id={titleId} className="fr-h6 fr-m-0">
                 Données du document
             </h3>
             <dl className="review__list">
