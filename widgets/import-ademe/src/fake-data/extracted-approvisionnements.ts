@@ -46,5 +46,18 @@ export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnem
 
             return Promise.resolve()
         },
+        markAsImported: (id) => {
+            for (const [attachmentId, lines] of rows)
+                rows.set(
+                    attachmentId,
+                    lines.map((line) =>
+                        line.id === id
+                            ? { ...line, state: 'Importés' as const }
+                            : line
+                    )
+                )
+
+            return Promise.resolve()
+        },
     }
 }

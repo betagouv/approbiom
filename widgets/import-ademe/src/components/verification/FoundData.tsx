@@ -21,7 +21,6 @@ const SAVE_FAILED = {
 } as const
 
 function matchHint(
-    matched: string | undefined,
     selected: string | null
 ): Pick<SelectProps<string>, 'description' | 'message'> {
     if (selected === null)
@@ -101,7 +100,7 @@ export default function FoundData({
                     options={fournisseurOptions}
                     value={fournisseurSiret}
                     onChange={selectFournisseur}
-                    {...matchHint(matchedFournisseur?.siret, fournisseurSiret)}
+                    {...matchHint(fournisseurSiret)}
                     {...(failedField === 'fournisseur' && SAVE_FAILED)}
                 />
             </div>
@@ -112,7 +111,7 @@ export default function FoundData({
                     options={ressourceOptions}
                     value={ressourceCode}
                     onChange={selectRessource}
-                    {...matchHint(matchedRessource?.code, ressourceCode)}
+                    {...matchHint(ressourceCode)}
                     {...(failedField === 'ressource' && SAVE_FAILED)}
                 />
             </div>

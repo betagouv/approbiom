@@ -1,4 +1,5 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
@@ -25,6 +26,7 @@ export const FAKE_PORTS: PlanViewPorts & {
     ressources: RessourcePort
     extractDataFromDocument: typeof importRows
     extractedApprovisionnements: ExtractedApprovisionnementPort
+    approvisionnements: ApprovisionnementPort
 } = {
     plans: { list: () => Promise.resolve(FAKE_PLANS) },
     demandesSubvention: {
@@ -57,4 +59,12 @@ export const FAKE_PORTS: PlanViewPorts & {
     ressources: { list: () => Promise.resolve(FAKE_RESSOURCES) },
     extractDataFromDocument: fakeExtractDataFromDocument,
     extractedApprovisionnements: createFakeExtractedApprovisionnements(),
+    approvisionnements: {
+        list: () => Promise.resolve([]),
+        create: () => Promise.resolve(),
+        listGroupedByPlanAndRessource: () => Promise.resolve([]),
+        listGroupedByPlanRessourceAndRegionOuPays: () => Promise.resolve([]),
+        listGroupedByPlanRessourceAndProvenance: () => Promise.resolve([]),
+        listGroupedByPlanRessourceAndFournisseur: () => Promise.resolve([]),
+    },
 }

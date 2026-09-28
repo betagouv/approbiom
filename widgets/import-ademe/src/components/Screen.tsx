@@ -3,6 +3,7 @@ import Tabs from '@shared/react/components/Tabs'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type {
     ExtractedLineChanges,
     StoredExtractedLine,
@@ -26,6 +27,10 @@ export type ScreenProps = {
         id: StoredExtractedLine['id'],
         changes: ExtractedLineChanges
     ) => Promise<void>
+    importLine: (
+        approvisionnements: readonly Approvisionnement[],
+        line: StoredExtractedLine
+    ) => Promise<void>
 }
 
 export default function Screen({
@@ -35,6 +40,7 @@ export default function Screen({
     ressources,
     extractDocument,
     updateExtractedLine,
+    importLine,
 }: ScreenProps) {
     const [tab, setTab] = useState('selection')
     const [planId, setPlanId] = useState<SelectablePlan['id'] | null>(null)
@@ -97,6 +103,24 @@ export default function Screen({
         )
     }
 
+    async function importReviewedLine(
+        approvisionnements: readonly Approvisionnement[],
+        imported: StoredExtractedLine
+    ) {
+        await importLine(approvisionnements, imported)
+        setExtracted(
+            (previous) =>
+                previous && {
+                    ...previous,
+                    lines: previous.lines.map((line) =>
+                        line.id === imported.id
+                            ? { ...line, state: 'Importés' as const }
+                            : line
+                    ),
+                }
+        )
+    }
+
     return (
         <Tabs
             label="Étapes de l'import"
@@ -147,6 +171,7 @@ export default function Screen({
                             entreprises={entreprises}
                             ressources={ressources}
                             onUpdateLine={updateLine}
+                            onImportLine={importReviewedLine}
                         />
                     ),
                     disabled: extracted === null,

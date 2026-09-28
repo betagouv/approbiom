@@ -125,3 +125,21 @@
     padding-bottom: 0.375rem;
     font-size: 0.875rem;
 }
+
+.import-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.import-actions__summary {
+    flex: 1;
+    min-width: 12rem;
+    color: var(--text-mention-grey);
+}
+
+.import-actions__summary--error {
+    color: var(--text-default-error);
+}

@@ -221,3 +221,86 @@ describe('createGristApprovisionnementPort', () => {
         })
     })
 })
+
+describe('createGristApprovisionnementPort().create', () => {
+    function mockGristForCreate() {
+        const create = vi.fn(() => Promise.resolve())
+        const tables: Record<string, ColumnMajorTable> = {
+            ...DIRECTORIES,
+            [TABLE.attachment]: {
+                id: [4],
+                Plan_d_approvisionnement: [160],
+                piece_jointe: [['L', 20]],
+                type: ['excel ademe'],
+            },
+        }
+
+        vi.stubGlobal('grist', {
+            docApi: {
+                fetchTable: vi.fn((tableId: string) =>
+                    Promise.resolve(tables[tableId])
+                ),
+            },
+            getTable: () => ({ create }),
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        return create
+    }
+
+    it('writes an approvisionnement with its Refs resolved', async () => {
+        const create = mockGristForCreate()
+
+        await createGristApprovisionnementPort().create([
+            {
+                planDApprovisionnement: 160,
+                fournisseur: '11111111111111',
+                ressource: 'PF',
+                provenance: { source: DEPARTEMENT_FRANCAIS, code: '2A' },
+                tonnageTotal: 700,
+                additionalDataFromDocument: 'PCI: 2,8',
+                source: 20,
+            },
+            {
+                planDApprovisionnement: 160,
+                fournisseur: '11111111111111',
+                ressource: 'PF',
+                provenance: { source: PAYS_ETRANGER, libelle: 'Espagne' },
+                tonnageTotal: 300,
+            },
+        ])
+
+        expect(create).toHaveBeenCalledWith([
+            {
+                fields: {
+                    Plan_d_approvisionnement: 160,
+                    Fournisseur: 1,
+                    Ressource: 1,
+                    Departement_de_provenance: 2,
+                    Pays_de_provenance: 'France',
+                    Total_en_tMv_an_: 700,
+                    Donnees_additionnelles_provenant_du_document: 'PCI: 2,8',
+                    Source: 4,
+                },
+            },
+            {
+                fields: {
+                    Plan_d_approvisionnement: 160,
+                    Fournisseur: 1,
+                    Ressource: 1,
+                    Departement_de_provenance: 0,
+                    Pays_de_provenance: 'Espagne',
+                    Total_en_tMv_an_: 300,
+                    Donnees_additionnelles_provenant_du_document: '',
+                    Source: 0,
+                },
+            },
+        ])
+    })
+})

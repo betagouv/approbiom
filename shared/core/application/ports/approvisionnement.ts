@@ -27,6 +27,8 @@ export type ApprovisionnementGroupedByPlanRessourceAndFournisseur =
 export interface ApprovisionnementPort {
     list(): Promise<readonly Approvisionnement[]>
 
+    create(approvisionnements: readonly Approvisionnement[]): Promise<void>
+
     listGroupedByPlanAndRessource(): Promise<
         readonly ApprovisionnementGroupedByPlanAndRessource[]
     >

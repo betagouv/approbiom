@@ -6,6 +6,7 @@ import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
+import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/adapters/grist-adapter-approvisionnement'
 import { createGristExtractedApprovisionnementAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-extracted-approvisionnement'
 import { DataSourceUnavailableError } from '@shared/core/errors'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
@@ -18,6 +19,9 @@ import { FAKE_PORTS } from './fake-data/ports'
 import Screen from './components/Screen'
 import { downloadAndExtract } from './download-and-extract'
 import { extractDocument } from './extract-document'
+import { importLine } from './import-line'
+import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type {
     ExtractedApprovisionnementPort,
     ExtractedLineChanges,
@@ -33,6 +37,7 @@ type Ports = PlanViewPorts & {
     ressources: RessourcePort
     extractDataFromDocument: typeof importRows
     extractedApprovisionnements: ExtractedApprovisionnementPort
+    approvisionnements: ApprovisionnementPort
 }
 
 const GRIST_PORTS: Ports = {
@@ -44,6 +49,7 @@ const GRIST_PORTS: Ports = {
     ressources: createGristRessourcePort(),
     extractDataFromDocument: importRows,
     extractedApprovisionnements: createGristExtractedApprovisionnementAdapter(),
+    approvisionnements: createGristApprovisionnementPort(),
 }
 
 async function load(ports: Ports) {
@@ -67,6 +73,10 @@ async function load(ports: Ports) {
             id: StoredExtractedLine['id'],
             changes: ExtractedLineChanges
         ) => ports.extractedApprovisionnements.update(id, changes),
+        importLine: (
+            approvisionnements: readonly Approvisionnement[],
+            line: StoredExtractedLine
+        ) => importLine(approvisionnements, line, ports),
         extractDocument: (attachment: Attachment) =>
             extractDocument(attachment, {
                 extractedApprovisionnements: ports.extractedApprovisionnements,

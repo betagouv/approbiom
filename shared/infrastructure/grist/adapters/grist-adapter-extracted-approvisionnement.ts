@@ -222,5 +222,12 @@ export function createGristExtractedApprovisionnementAdapter() {
 
             await updateRow(TABLE.extractedApprovisionnement, id, fields)
         },
+
+        async markAsImported(id: number): Promise<void> {
+            await gristReady()
+            await updateRow(TABLE.extractedApprovisionnement, id, {
+                Etat: IMPORTED,
+            })
+        },
     }
 }

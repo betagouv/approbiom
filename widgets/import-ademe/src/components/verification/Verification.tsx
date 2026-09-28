@@ -17,6 +17,9 @@ import type { SelectablePlan } from '../selection'
 import ImportContext from '../import-context'
 import DocumentData from './DocumentData'
 import FoundData from './FoundData'
+import ImportActions from './ImportActions'
+import { toApprovisionnements } from '../../import-line'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 
 const DATE = new Intl.DateTimeFormat('fr-FR')
 
@@ -73,6 +76,10 @@ export type VerificationProps = {
         id: StoredExtractedLine['id'],
         changes: ExtractedLineChanges
     ) => Promise<void>
+    onImportLine: (
+        approvisionnements: readonly Approvisionnement[],
+        line: StoredExtractedLine
+    ) => Promise<void>
 }
 
 export default function Verification({
@@ -83,28 +90,38 @@ export default function Verification({
     entreprises,
     ressources,
     onUpdateLine,
+    onImportLine,
 }: VerificationProps) {
-    // The line being reviewed in the modal, if any.
-    const [reviewedLine, setReviewedLine] =
-        useState<StoredExtractedLine | null>(null)
+    const [reviewedLineId, setReviewedLineId] = useState<
+        StoredExtractedLine['id'] | null
+    >(null)
+    const reviewedLine = lines.find(({ id }) => id === reviewedLineId) ?? null
+    const approvisionnements = reviewedLine
+        ? toApprovisionnements(reviewedLine, plan.id, attachment.id)
+        : []
 
     const columns: readonly Column<StoredExtractedLine>[] = [
         {
             id: 'action',
             header: 'Action',
-            render: (line) => (
-                <button
-                    type="button"
-                    className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
-                    onClick={() => setReviewedLine(line)}
-                >
-                    Vérifier
-                    <span className="fr-sr-only">
-                        {' '}
-                        la ligne {line.read.excelRow}
-                    </span>
-                </button>
-            ),
+            render: (line) =>
+                line.state === 'Importés' ? (
+                    <Badge size="sm" status="success">
+                        Importée
+                    </Badge>
+                ) : (
+                    <button
+                        type="button"
+                        className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
+                        onClick={() => setReviewedLineId(line.id)}
+                    >
+                        Vérifier
+                        <span className="fr-sr-only">
+                            {' '}
+                            la ligne {line.read.excelRow}
+                        </span>
+                    </button>
+                ),
         },
         ...DATA_COLUMNS,
     ]
@@ -127,9 +144,25 @@ export default function Verification({
 
             <Modal
                 open={reviewedLine !== null}
-                onClose={() => setReviewedLine(null)}
+                onClose={() => setReviewedLineId(null)}
                 title={`Ligne ${reviewedLine?.read.excelRow ?? ''}`}
                 size="lg"
+                actions={
+                    reviewedLine && (
+                        <ImportActions
+                            key={reviewedLine.id}
+                            approvisionnementCount={approvisionnements.length}
+                            onCancel={() => setReviewedLineId(null)}
+                            onImport={async () => {
+                                await onImportLine(
+                                    approvisionnements,
+                                    reviewedLine
+                                )
+                                setReviewedLineId(null)
+                            }}
+                        />
+                    )
+                }
             >
                 {reviewedLine && (
                     <div className="review">
