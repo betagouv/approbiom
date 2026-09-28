@@ -1,5 +1,6 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import { FAKE_DEPARTEMENTS_BY_REGION } from './departements'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
@@ -21,6 +22,8 @@ import type { ExtractedApprovisionnementPort } from '../extracted-approvisionnem
 const EMPTY_FILE_URL = 'data:,'
 
 let egletonsDownloads = 0
+
+const createdApprovisionnements: Approvisionnement[] = []
 
 export const FAKE_PORTS: PlanViewPorts & {
     attachments: AttachmentPort
@@ -61,10 +64,20 @@ export const FAKE_PORTS: PlanViewPorts & {
     entreprises: { list: () => Promise.resolve(FAKE_ENTREPRISES) },
     ressources: { list: () => Promise.resolve(FAKE_RESSOURCES) },
     extractDataFromDocument: fakeExtractDataFromDocument,
-    extractedApprovisionnements: createFakeExtractedApprovisionnements(),
+    extractedApprovisionnements: createFakeExtractedApprovisionnements(
+        ({ derived }) =>
+            createdApprovisionnements.some(
+                ({ fournisseur, ressource }) =>
+                    fournisseur === derived.matchedFournisseur?.siret &&
+                    ressource === derived.matchedRessource?.code
+            )
+    ),
     approvisionnements: {
         list: () => Promise.resolve([]),
-        create: () => Promise.resolve(),
+        create: (approvisionnements) => {
+            createdApprovisionnements.push(...approvisionnements)
+            return Promise.resolve()
+        },
         listPaysDeProvenance: () =>
             Promise.resolve([
                 { libelle: 'Espagne' },

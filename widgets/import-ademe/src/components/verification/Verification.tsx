@@ -81,8 +81,7 @@ export type VerificationProps = {
         changes: ExtractedLineChanges
     ) => Promise<void>
     onImportLine: (
-        approvisionnements: readonly Approvisionnement[],
-        line: StoredExtractedLine
+        approvisionnements: readonly Approvisionnement[]
     ) => Promise<void>
 }
 
@@ -160,10 +159,7 @@ export default function Verification({
                             approvisionnementCount={approvisionnements.length}
                             onCancel={() => setReviewedLineId(null)}
                             onImport={async () => {
-                                await onImportLine(
-                                    approvisionnements,
-                                    reviewedLine
-                                )
+                                await onImportLine(approvisionnements)
                                 setReviewedLineId(null)
                             }}
                         />

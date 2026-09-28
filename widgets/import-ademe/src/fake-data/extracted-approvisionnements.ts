@@ -1,3 +1,4 @@
+import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type {
     ExtractedApprovisionnementPort,
     StoredExtractedLine,
@@ -5,7 +6,10 @@ import type {
 
 // Stands in for the table « Approvisionnement extrait d'un document », in
 // memory: it lasts as long as the page.
-export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnementPort {
+// Stands in for the Grist formula that tells an imported line apart.
+export function createFakeExtractedApprovisionnements(
+    isImported: (line: ExtractedLine) => boolean = () => false
+): ExtractedApprovisionnementPort {
     const rows = new Map<number, StoredExtractedLine[]>()
     let nextId = 1
 
@@ -14,6 +18,7 @@ export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnem
             Promise.resolve(
                 (rows.get(attachment.id) ?? []).map((row) => ({
                     ...row,
+                    state: isImported(row) ? 'Importés' : 'Pas importés',
                     read: { ...row.read, document: attachment.name },
                 }))
             ),
@@ -40,19 +45,6 @@ export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnem
                                   ...line,
                                   derived: { ...line.derived, ...changes },
                               }
-                            : line
-                    )
-                )
-
-            return Promise.resolve()
-        },
-        markAsImported: (id) => {
-            for (const [attachmentId, lines] of rows)
-                rows.set(
-                    attachmentId,
-                    lines.map((line) =>
-                        line.id === id
-                            ? { ...line, state: 'Importés' as const }
                             : line
                     )
                 )

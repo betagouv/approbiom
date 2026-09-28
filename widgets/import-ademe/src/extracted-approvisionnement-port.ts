@@ -24,5 +24,4 @@ export interface ExtractedApprovisionnementPort {
         id: StoredExtractedLine['id'],
         changes: ExtractedLineChanges
     ): Promise<void>
-    markAsImported(id: StoredExtractedLine['id']): Promise<void>
 }

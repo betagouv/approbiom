@@ -8,10 +8,7 @@ import {
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
 import type { ProvenanceRepartition } from '@shared/infrastructure/import-bcib-bciat/transform-provenance/transform-provenance'
-import type {
-    ExtractedApprovisionnementPort,
-    StoredExtractedLine,
-} from './extracted-approvisionnement-port'
+import type { StoredExtractedLine } from './extracted-approvisionnement-port'
 
 function toProvenance({
     source,
@@ -52,17 +49,11 @@ export function toApprovisionnements(
     }))
 }
 
+// Whether the line counts as imported is computed by Grist, off what exists in
+// Approvisionnement: nothing is written back on the line itself.
 export async function importLine(
     approvisionnements: readonly Approvisionnement[],
-    line: StoredExtractedLine,
-    ports: {
-        approvisionnements: Pick<ApprovisionnementPort, 'create'>
-        extractedApprovisionnements: Pick<
-            ExtractedApprovisionnementPort,
-            'markAsImported'
-        >
-    }
+    ports: { approvisionnements: Pick<ApprovisionnementPort, 'create'> }
 ): Promise<void> {
     await ports.approvisionnements.create(approvisionnements)
-    await ports.extractedApprovisionnements.markAsImported(line.id)
 }

@@ -152,7 +152,6 @@ export function createGristExtractedApprovisionnementAdapter() {
             await createRows(
                 TABLE.extractedApprovisionnement,
                 lines.map(({ read, derived }) => ({
-                    Etat: NOT_IMPORTED,
                     Document: asNumber(attachmentRow.id) ?? 0,
                     Plan_d_approvisionnement:
                         asNumber(attachmentRow.Plan_d_approvisionnement) ?? 0,
@@ -228,13 +227,6 @@ export function createGristExtractedApprovisionnementAdapter() {
             }
 
             await updateRow(TABLE.extractedApprovisionnement, id, fields)
-        },
-
-        async markAsImported(id: number): Promise<void> {
-            await gristReady()
-            await updateRow(TABLE.extractedApprovisionnement, id, {
-                Etat: IMPORTED,
-            })
         },
     }
 }

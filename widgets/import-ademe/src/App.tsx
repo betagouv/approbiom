@@ -88,10 +88,8 @@ async function load(ports: Ports) {
             id: StoredExtractedLine['id'],
             changes: ExtractedLineChanges
         ) => ports.extractedApprovisionnements.update(id, changes),
-        importLine: (
-            approvisionnements: readonly Approvisionnement[],
-            line: StoredExtractedLine
-        ) => importLine(approvisionnements, line, ports),
+        importLine: (approvisionnements: readonly Approvisionnement[]) =>
+            importLine(approvisionnements, ports),
         extractDocument: (attachment: Attachment) =>
             extractDocument(attachment, {
                 extractedApprovisionnements: ports.extractedApprovisionnements,

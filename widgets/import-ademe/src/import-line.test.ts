@@ -107,39 +107,14 @@ describe('toApprovisionnements', () => {
 })
 
 describe('importLine', () => {
-    it('creates the approvisionnements, then marks the line as imported', async () => {
-        const calls: string[] = []
-        const create = vi.fn(() => {
-            calls.push('create')
-            return Promise.resolve()
-        })
-        const markAsImported = vi.fn(() => {
-            calls.push('markAsImported')
-            return Promise.resolve()
-        })
+    it('creates the approvisionnements', async () => {
+        const create = vi.fn(() => Promise.resolve())
         const approvisionnements = toApprovisionnements(line(), 160, 20)
 
-        await importLine(approvisionnements, line(), {
+        await importLine(approvisionnements, {
             approvisionnements: { create },
-            extractedApprovisionnements: { markAsImported },
         })
 
         expect(create).toHaveBeenCalledWith(approvisionnements)
-        expect(markAsImported).toHaveBeenCalledWith(7)
-        expect(calls).toEqual(['create', 'markAsImported'])
-    })
-
-    it('leaves the line not imported when the creation fails', async () => {
-        const markAsImported = vi.fn(() => Promise.resolve())
-
-        await expect(
-            importLine([], line(), {
-                approvisionnements: {
-                    create: () => Promise.reject(new Error('refusé')),
-                },
-                extractedApprovisionnements: { markAsImported },
-            })
-        ).rejects.toThrow('refusé')
-        expect(markAsImported).not.toHaveBeenCalled()
     })
 })
