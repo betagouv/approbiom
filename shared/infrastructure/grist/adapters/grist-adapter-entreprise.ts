@@ -3,6 +3,7 @@ import { gristReady } from '../helpers/grist-ready'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import {
     asString,
+    createRows,
     fetchRowsOnce,
     type GristRow,
 } from '../helpers/grist-helpers'
@@ -31,6 +32,14 @@ export function createGristEntreprisePort(): EntreprisePort {
             )
 
             return rows.map(toEntreprise)
+        },
+
+        async create({ siret, denomination }) {
+            await gristReady()
+
+            await createRows(TABLE.entreprise, [
+                { Siret: Number(siret), Denomination: denomination },
+            ])
         },
     }
 }

@@ -62,6 +62,45 @@ function toGroup(
     }
 }
 
+const PAYS_DE_PROVENANCE = 'Pays_de_provenance'
+const FRANCE = 'France'
+
+// The countries are the choices of the Pays_de_provenance column, kept in its
+// widget options.
+async function readPaysDeProvenanceColumn(): Promise<{
+    widgetOptions: Record<string, unknown>
+    choices: string[]
+}> {
+    await gristReady()
+
+    const [tables, columns] = await Promise.all([
+        fetchRowsOnce('_grist_Tables', ['id', 'tableId']),
+        fetchRowsOnce('_grist_Tables_column', [
+            'parentId',
+            'colId',
+            'widgetOptions',
+        ]),
+    ])
+    const tableRef = tables.find(
+        (table) => table.tableId === TABLE.approvisionnement
+    )?.id
+    const column = columns.find(
+        (column) =>
+            column.parentId === tableRef && column.colId === PAYS_DE_PROVENANCE
+    )
+    const widgetOptions = JSON.parse(
+        asString(column?.widgetOptions) || '{}'
+    ) as Record<string, unknown>
+    const { choices } = widgetOptions
+
+    return {
+        widgetOptions,
+        choices: (Array.isArray(choices) ? choices : []).filter(
+            (choice): choice is string => typeof choice === 'string'
+        ),
+    }
+}
+
 export function createGristApprovisionnementPort(): ApprovisionnementPort {
     /** Every summary needs the ressource directory to resolve its Ref. */
     const readTotals = async (tableId: string, columns: readonly string[]) => {
@@ -154,7 +193,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                         Pays_de_provenance:
                             provenance.source === PAYS_ETRANGER
                                 ? provenance.libelle
-                                : 'France',
+                                : FRANCE,
                         Total_en_tMv_an_: approvisionnement.tonnageTotal,
                         Donnees_additionnelles_provenant_du_document:
                             approvisionnement.additionalDataFromDocument ?? '',
@@ -172,34 +211,30 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
         },
 
         async listPaysDeProvenance() {
-            await gristReady()
+            const { choices } = await readPaysDeProvenanceColumn()
 
-            const [tables, columns] = await Promise.all([
-                fetchRowsOnce('_grist_Tables', ['id', 'tableId']),
-                fetchRowsOnce('_grist_Tables_column', [
-                    'parentId',
-                    'colId',
-                    'widgetOptions',
-                ]),
-            ])
-            const tableRef = tables.find(
-                (table) => table.tableId === TABLE.approvisionnement
-            )?.id
-            const column = columns.find(
-                (column) =>
-                    column.parentId === tableRef &&
-                    column.colId === 'Pays_de_provenance'
-            )
-            const { choices } = JSON.parse(
-                asString(column?.widgetOptions) || '{}'
-            ) as { choices?: unknown }
-
-            return (Array.isArray(choices) ? choices : [])
-                .filter(
-                    (choice): choice is string =>
-                        typeof choice === 'string' && choice !== 'France'
-                )
+            return choices
+                .filter((choice) => choice !== FRANCE)
                 .map((libelle) => ({ libelle }))
+        },
+
+        async addPaysDeProvenance({ libelle }) {
+            const { widgetOptions, choices } =
+                await readPaysDeProvenanceColumn()
+
+            await grist.docApi.applyUserActions([
+                [
+                    'ModifyColumn',
+                    TABLE.approvisionnement,
+                    PAYS_DE_PROVENANCE,
+                    {
+                        widgetOptions: JSON.stringify({
+                            ...widgetOptions,
+                            choices: [...choices, libelle],
+                        }),
+                    },
+                ],
+            ])
         },
 
         async listGroupedByPlanAndRessource() {

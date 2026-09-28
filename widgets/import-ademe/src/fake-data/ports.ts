@@ -1,6 +1,7 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import { FAKE_DEPARTEMENTS_BY_REGION } from './departements'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
@@ -24,6 +25,14 @@ const EMPTY_FILE_URL = 'data:,'
 let egletonsDownloads = 0
 
 const createdApprovisionnements: Approvisionnement[] = []
+
+const entreprises = [...FAKE_ENTREPRISES]
+
+const paysDeProvenance: Pays[] = [
+    { libelle: 'Espagne' },
+    { libelle: 'Italie' },
+    { libelle: 'Allemagne' },
+]
 
 export const FAKE_PORTS: PlanViewPorts & {
     attachments: AttachmentPort
@@ -61,7 +70,13 @@ export const FAKE_PORTS: PlanViewPorts & {
                 : Promise.reject(new Error(`No fake attachment ${id}.`))
         },
     },
-    entreprises: { list: () => Promise.resolve(FAKE_ENTREPRISES) },
+    entreprises: {
+        list: () => Promise.resolve([...entreprises]),
+        create: (entreprise) => {
+            entreprises.push(entreprise)
+            return Promise.resolve()
+        },
+    },
     ressources: { list: () => Promise.resolve(FAKE_RESSOURCES) },
     extractDataFromDocument: fakeExtractDataFromDocument,
     extractedApprovisionnements: createFakeExtractedApprovisionnements(
@@ -78,12 +93,11 @@ export const FAKE_PORTS: PlanViewPorts & {
             createdApprovisionnements.push(...approvisionnements)
             return Promise.resolve()
         },
-        listPaysDeProvenance: () =>
-            Promise.resolve([
-                { libelle: 'Espagne' },
-                { libelle: 'Italie' },
-                { libelle: 'Allemagne' },
-            ]),
+        listPaysDeProvenance: () => Promise.resolve([...paysDeProvenance]),
+        addPaysDeProvenance: (pays) => {
+            paysDeProvenance.push(pays)
+            return Promise.resolve()
+        },
         listGroupedByPlanAndRessource: () => Promise.resolve([]),
         listGroupedByPlanRessourceAndRegionOuPays: () => Promise.resolve([]),
         listGroupedByPlanRessourceAndProvenance: () => Promise.resolve([]),

@@ -53,13 +53,14 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
             list: rows([]),
             create: () => Promise.resolve(),
             listPaysDeProvenance: rows([]),
+            addPaysDeProvenance: () => Promise.resolve(),
             listGroupedByPlanAndRessource: rows([]),
             listGroupedByPlanRessourceAndRegionOuPays: rows([]),
             listGroupedByPlanRessourceAndProvenance: rows([]),
             listGroupedByPlanRessourceAndFournisseur: rows([]),
         },
         ressources: { list: rows([]) },
-        entreprises: { list: rows([]) },
+        entreprises: { list: rows([]), create: () => Promise.resolve() },
         listDepartementsByRegion: rows([]),
         getCommuneCenterPosition: () => ({ latitude: 0, longitude: 0 }),
         getDepartementContour: () => [],
@@ -316,6 +317,7 @@ describe('App', () => {
                         list: rows([]),
                         create: () => Promise.resolve(),
                         listPaysDeProvenance: rows([]),
+                        addPaysDeProvenance: () => Promise.resolve(),
                         listGroupedByPlanAndRessource: rows([
                             {
                                 planDApprovisionnement: saintJunien.id,

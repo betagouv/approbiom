@@ -165,3 +165,65 @@
     font-weight: 700;
     font-variant-numeric: tabular-nums;
 }
+
+.new-fournisseur__fieldset {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--border-active-blue-france);
+}
+
+.new-fournisseur__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.new-fournisseur__fields .fr-input-group {
+    margin-bottom: 0;
+}
+
+.new-fournisseur__actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.new-fournisseur .fr-label {
+    margin-bottom: 0.125rem;
+    font-size: 0.875rem;
+}
+
+.new-fournisseur .fr-label .fr-hint-text {
+    display: inline;
+    margin-left: 0.5rem;
+}
+
+.new-fournisseur .fr-input {
+    margin-top: 0;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.provenance-editor__extra {
+    grid-column: 1 / -1;
+}
+
+.new-pays {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--border-active-blue-france);
+}
+
+.new-pays .fr-input-group {
+    margin-bottom: 0;
+}
+
+.new-pays__line {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.new-pays__line .fr-input {
+    max-width: 18rem;
+}

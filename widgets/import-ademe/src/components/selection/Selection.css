@@ -133,3 +133,8 @@
     min-width: 0;
     color: var(--text-mention-grey);
 }
+
+.attachment-picker__text .fr-badge {
+    align-self: flex-start;
+    margin-top: 0.25rem;
+}

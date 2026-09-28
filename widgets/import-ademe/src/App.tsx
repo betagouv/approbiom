@@ -12,6 +12,8 @@ import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/a
 import { createGristExtractedApprovisionnementAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-extracted-approvisionnement'
 import { DataSourceUnavailableError } from '@shared/core/errors'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Pays } from '@shared/core/domain/value-objects/pays'
 import {
     listPlans,
     type PlanViewPorts,
@@ -89,6 +91,10 @@ async function load(ports: Ports) {
         pays,
         importProgress,
         loadImportProgress: () => loadImportProgress(ports),
+        createEntreprise: (entreprise: Entreprise) =>
+            ports.entreprises.create(entreprise),
+        createPays: (created: Pays) =>
+            ports.approvisionnements.addPaysDeProvenance(created),
         getAttachmentUrl: (id: Attachment['id']) =>
             ports.attachments.getFileUrl(id),
         updateExtractedLine: (

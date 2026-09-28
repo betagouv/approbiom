@@ -52,6 +52,8 @@ export type VerificationProps = {
     onImportLine: (
         approvisionnements: readonly Approvisionnement[]
     ) => Promise<void>
+    onCreateFournisseur: (entreprise: Entreprise) => Promise<void>
+    onCreatePays: (pays: Pays) => Promise<void>
 }
 
 export default function Verification({
@@ -66,6 +68,8 @@ export default function Verification({
     pays,
     onUpdateLine,
     onImportLine,
+    onCreateFournisseur,
+    onCreatePays,
 }: VerificationProps) {
     const [reviewedLineId, setReviewedLineId] = useState<
         StoredExtractedLine['id'] | null
@@ -225,6 +229,8 @@ export default function Verification({
                             onUpdate={(changes) =>
                                 onUpdateLine(reviewedLine.id, changes)
                             }
+                            onCreateFournisseur={onCreateFournisseur}
+                            onCreatePays={onCreatePays}
                         />
                     </div>
                 )}

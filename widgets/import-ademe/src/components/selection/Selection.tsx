@@ -3,6 +3,7 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
 import SearchBar from '@shared/react/components/SearchBar'
+import Alert from '@shared/react/components/Alert'
 import Badge from '@shared/react/components/Badge'
 import Tag from '@shared/react/components/Tag'
 import type { PlanView } from '@shared/core/application/services/plan-view'
@@ -101,15 +102,17 @@ export default function Selection({
                             <Tag size="sm">{plan.statut}</Tag>
                         </dd>
                     </div>
-                    <div className="plan-summary__entry">
-                        <dt className="fr-text--xs">Approvisionnements</dt>
-                        <dd className="fr-text--sm">
-                            {approvisionnementCount === 0
-                                ? 'Aucun pour ce plan'
-                                : `${approvisionnementCount} déjà liés à ce plan`}
-                        </dd>
-                    </div>
                 </dl>
+            )}
+
+            {plan && approvisionnementCount > 0 && (
+                <Alert
+                    severity="warning"
+                    title={`${approvisionnementCount} approvisionnement${approvisionnementCount > 1 ? 's sont' : ' est'} déjà lié${approvisionnementCount > 1 ? 's' : ''} à ce plan`}
+                >
+                    Vérifiez qu&apos;ils ne font pas doublon avec ceux du
+                    document avant d&apos;importer.
+                </Alert>
             )}
 
             {plan && (

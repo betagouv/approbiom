@@ -2,6 +2,7 @@ import '@gouvfr/dsfr/dist/component/form/form.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import Badge from '@shared/react/components/Badge'
 import { documentIconOf } from '@shared/react/components/document-icon'
 import type { ExtractionSummary } from '../../extracted-approvisionnement-port'
 
@@ -19,12 +20,26 @@ function formatSize(bytes: number): string {
         : `${SIZE.format(bytes / MO)} Mo`
 }
 
-function describeExtraction(summary: ExtractionSummary | undefined): string {
-    if (!summary) return 'Pas encore extrait'
+function ExtractionState({
+    summary,
+}: {
+    summary: ExtractionSummary | undefined
+}) {
+    if (!summary) return <Badge size="sm">Pas encore extrait</Badge>
 
     const { extractedAt, lineCount, importedCount } = summary
 
-    return `Extrait le ${DATE.format(extractedAt)} · ${importedCount} ligne${importedCount > 1 ? 's' : ''} importée${importedCount > 1 ? 's' : ''} sur ${lineCount}`
+    return (
+        <>
+            <Badge size="sm" status="info" noIcon>
+                Extrait le {DATE.format(extractedAt)}
+            </Badge>
+            <span className="fr-text--xs attachment-picker__meta">
+                {importedCount} ligne{importedCount > 1 ? 's' : ''} importée
+                {importedCount > 1 ? 's' : ''} sur {lineCount}
+            </span>
+        </>
+    )
 }
 
 export type AttachmentPickerProps = {
@@ -80,11 +95,11 @@ export default function AttachmentPicker({
                                         <span className="fr-text--xs attachment-picker__meta">
                                             {formatSize(attachment.sizeInBytes)}
                                         </span>
-                                        <span className="fr-text--xs attachment-picker__meta">
-                                            {describeExtraction(
-                                                extractions.get(attachment.id)
+                                        <ExtractionState
+                                            summary={extractions.get(
+                                                attachment.id
                                             )}
-                                        </span>
+                                        />
                                     </span>
                                     {selected && (
                                         <span

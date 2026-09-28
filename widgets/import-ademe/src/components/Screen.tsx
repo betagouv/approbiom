@@ -30,6 +30,8 @@ export type ScreenProps = {
     importProgress: ImportProgress
     loadImportProgress: () => Promise<ImportProgress>
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
+    createEntreprise: (entreprise: Entreprise) => Promise<void>
+    createPays: (pays: Pays) => Promise<void>
     extractDocument: (attachment: Attachment) => Promise<ExtractedData>
     updateExtractedLine: (
         id: StoredExtractedLine['id'],
@@ -43,10 +45,12 @@ export type ScreenProps = {
 export default function Screen({
     plans,
     attachments,
-    entreprises,
+    entreprises: initialEntreprises,
     ressources,
     departementsByRegion,
-    pays,
+    pays: initialPays,
+    createEntreprise,
+    createPays,
     importProgress: initialImportProgress,
     loadImportProgress,
     getAttachmentUrl,
@@ -68,6 +72,8 @@ export default function Screen({
     )
 
     const [extracted, setExtracted] = useState<ExtractedData | null>(null)
+    const [entreprises, setEntreprises] = useState(initialEntreprises)
+    const [pays, setPays] = useState(initialPays)
     const [importProgress, setImportProgress] = useState(initialImportProgress)
 
     const plan = plans.find(({ id }) => id === planId)
@@ -88,6 +94,16 @@ export default function Screen({
         setExtractionRequest((previous) => (previous ?? 0) + 1)
         setExtracted(null)
         setTab('extraction')
+    }
+
+    async function createFournisseur(entreprise: Entreprise) {
+        await createEntreprise(entreprise)
+        setEntreprises((previous) => [...previous, entreprise])
+    }
+
+    async function createPaysDeProvenance(created: Pays) {
+        await createPays(created)
+        setPays((previous) => [...previous, created])
     }
 
     function refreshImportProgress() {
@@ -187,6 +203,8 @@ export default function Screen({
                             pays={pays}
                             onUpdateLine={updateLine}
                             onImportLine={importReviewedLine}
+                            onCreateFournisseur={createFournisseur}
+                            onCreatePays={createPaysDeProvenance}
                         />
                     ),
                     disabled: extracted === null,

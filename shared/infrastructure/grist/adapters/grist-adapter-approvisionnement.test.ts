@@ -304,3 +304,55 @@ describe('createGristApprovisionnementPort().create', () => {
         ])
     })
 })
+
+describe('createGristApprovisionnementPort().addPaysDeProvenance', () => {
+    it('adds the country to the choices of Pays_de_provenance', async () => {
+        const applyUserActions = vi.fn(() => Promise.resolve())
+        const tables: Record<string, ColumnMajorTable> = {
+            _grist_Tables: { id: [3], tableId: [TABLE.approvisionnement] },
+            _grist_Tables_column: {
+                parentId: [3],
+                colId: ['Pays_de_provenance'],
+                widgetOptions: [
+                    JSON.stringify({
+                        widget: 'TextBox',
+                        choices: ['France', 'Espagne'],
+                    }),
+                ],
+            },
+        }
+        vi.stubGlobal('grist', {
+            docApi: {
+                fetchTable: vi.fn((tableId: string) =>
+                    Promise.resolve(tables[tableId])
+                ),
+                applyUserActions,
+            },
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        await createGristApprovisionnementPort().addPaysDeProvenance({
+            libelle: 'Portugal',
+        })
+
+        expect(applyUserActions).toHaveBeenCalledWith([
+            [
+                'ModifyColumn',
+                TABLE.approvisionnement,
+                'Pays_de_provenance',
+                {
+                    widgetOptions: JSON.stringify({
+                        widget: 'TextBox',
+                        choices: ['France', 'Espagne', 'Portugal'],
+                    }),
+                },
+            ],
+        ])
+    })
+})

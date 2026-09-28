@@ -32,6 +32,8 @@ export interface ApprovisionnementPort {
 
     listPaysDeProvenance(): Promise<readonly Pays[]>
 
+    addPaysDeProvenance(pays: Pays): Promise<void>
+
     listGroupedByPlanAndRessource(): Promise<
         readonly ApprovisionnementGroupedByPlanAndRessource[]
     >
