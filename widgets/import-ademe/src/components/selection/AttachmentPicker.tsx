@@ -3,6 +3,9 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import { documentIconOf } from '@shared/react/components/document-icon'
+import type { ExtractionSummary } from '../../extracted-approvisionnement-port'
+
+const DATE = new Intl.DateTimeFormat('fr-FR')
 
 const SIZE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 const KO = 1024
@@ -16,14 +19,24 @@ function formatSize(bytes: number): string {
         : `${SIZE.format(bytes / MO)} Mo`
 }
 
+function describeExtraction(summary: ExtractionSummary | undefined): string {
+    if (!summary) return 'Pas encore extrait'
+
+    const { extractedAt, lineCount, importedCount } = summary
+
+    return `Extrait le ${DATE.format(extractedAt)} · ${importedCount} ligne${importedCount > 1 ? 's' : ''} importée${importedCount > 1 ? 's' : ''} sur ${lineCount}`
+}
+
 export type AttachmentPickerProps = {
     attachments: readonly Attachment[]
+    extractions: ReadonlyMap<Attachment['id'], ExtractionSummary>
     selectedId: Attachment['id'] | null
     onSelect: (id: Attachment['id']) => void
 }
 
 export default function AttachmentPicker({
     attachments,
+    extractions,
     selectedId,
     onSelect,
 }: AttachmentPickerProps) {
@@ -66,6 +79,11 @@ export default function AttachmentPicker({
                                         </span>
                                         <span className="fr-text--xs attachment-picker__meta">
                                             {formatSize(attachment.sizeInBytes)}
+                                        </span>
+                                        <span className="fr-text--xs attachment-picker__meta">
+                                            {describeExtraction(
+                                                extractions.get(attachment.id)
+                                            )}
                                         </span>
                                     </span>
                                     {selected && (

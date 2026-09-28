@@ -13,6 +13,7 @@ import ExtractionSuccess from './ExtractionSuccess'
 export type ExtractionProps<L extends ExtractedLine> = {
     plan: SelectablePlan
     attachment: Attachment
+    getAttachmentUrl: (id: Attachment['id']) => Promise<string>
     extract: (
         attachment: Attachment
     ) => Promise<{ lines: readonly L[]; date: Date }>
@@ -23,6 +24,7 @@ export type ExtractionProps<L extends ExtractedLine> = {
 export default function Extraction<L extends ExtractedLine>({
     plan,
     attachment,
+    getAttachmentUrl,
     extract,
     onExtracted,
     onBack,
@@ -70,7 +72,11 @@ export default function Extraction<L extends ExtractedLine>({
 
     return (
         <div className="extraction">
-            <ImportContext plan={plan} attachment={attachment} />
+            <ImportContext
+                plan={plan}
+                attachment={attachment}
+                getAttachmentUrl={getAttachmentUrl}
+            />
 
             {extractionStatus.status === 'loading' && <ExtractionLoading />}
 

@@ -5,8 +5,8 @@ import type {
 } from '../extracted-approvisionnement-port'
 
 // Stands in for the table « Approvisionnement extrait d'un document », in
-// memory: it lasts as long as the page.
-// Stands in for the Grist formula that tells an imported line apart.
+// memory: it lasts as long as the page. `isImported` stands in for the Grist
+// formula that tells an imported line apart.
 export function createFakeExtractedApprovisionnements(
     isImported: (line: ExtractedLine) => boolean = () => false
 ): ExtractedApprovisionnementPort {
@@ -20,6 +20,15 @@ export function createFakeExtractedApprovisionnements(
                     ...row,
                     state: isImported(row) ? 'Importés' : 'Pas importés',
                     read: { ...row.read, document: attachment.name },
+                }))
+            ),
+        listSummaries: () =>
+            Promise.resolve(
+                [...rows].map(([attachmentId, lines]) => ({
+                    attachmentId,
+                    extractedAt: lines[0].extractedAt,
+                    lineCount: lines.length,
+                    importedCount: lines.filter(isImported).length,
                 }))
             ),
         create: (attachment, lines, extractedAt) => {

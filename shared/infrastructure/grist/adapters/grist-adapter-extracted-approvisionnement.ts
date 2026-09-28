@@ -116,6 +116,38 @@ export function createGristExtractedApprovisionnementAdapter() {
                 .sort((a, b) => a.read.excelRow - b.read.excelRow)
         },
 
+        async listSummaries() {
+            await gristReady()
+
+            const [attachmentRows, rows] = await Promise.all([
+                fetchRowsOnce(TABLE.attachment, COLUMNS.attachment),
+                fetchRowsOnce(
+                    TABLE.extractedApprovisionnement,
+                    COLUMNS.extractedApprovisionnement
+                ),
+            ])
+
+            return attachmentRows.flatMap((attachmentRow) => {
+                const lines = rows.filter(
+                    (row) => row.Document === attachmentRow.id
+                )
+                if (lines.length === 0) return []
+
+                const summary = {
+                    extractedAt:
+                        asDate(lines[0].Date_d_extraction) ?? new Date(0),
+                    lineCount: lines.length,
+                    importedCount: lines.filter(
+                        (row) => stateOf(row.Etat) === IMPORTED
+                    ).length,
+                }
+
+                return asIdList(attachmentRow.piece_jointe).map(
+                    (attachmentId) => ({ attachmentId, ...summary })
+                )
+            })
+        },
+
         async create(
             attachment: Pick<Attachment, 'id'>,
             lines: readonly ExtractedLine[],

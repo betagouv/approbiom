@@ -7,7 +7,9 @@ import Badge from '@shared/react/components/Badge'
 import Tag from '@shared/react/components/Tag'
 import type { PlanView } from '@shared/core/application/services/plan-view'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { ImportProgress } from '../../import-progress'
 import AttachmentPicker from './AttachmentPicker'
+
 export type SelectablePlan = Pick<
     PlanView,
     'id' | 'nom' | 'typeDePlan' | 'statut' | 'appelsAProjet'
@@ -18,6 +20,7 @@ const UNKNOWN = 'Inconnu'
 export type SelectionProps = {
     plans: readonly SelectablePlan[]
     attachments: readonly Attachment[]
+    importProgress: ImportProgress
     selectedPlanId: SelectablePlan['id'] | null
     onSelectPlan: (id: SelectablePlan['id']) => void
     selectedAttachmentId: Attachment['id'] | null
@@ -28,6 +31,7 @@ export type SelectionProps = {
 export default function Selection({
     plans,
     attachments,
+    importProgress,
     selectedPlanId: planId,
     onSelectPlan,
     selectedAttachmentId,
@@ -38,6 +42,9 @@ export default function Selection({
     const planAttachments = attachments.filter(
         ({ planDApprovisionnement }) => planDApprovisionnement === planId
     )
+    const approvisionnementCount = plan
+        ? (importProgress.approvisionnementCounts.get(plan.id) ?? 0)
+        : 0
     const selectedAttachment = planAttachments.find(
         ({ id }) => id === selectedAttachmentId
     )
@@ -94,12 +101,21 @@ export default function Selection({
                             <Tag size="sm">{plan.statut}</Tag>
                         </dd>
                     </div>
+                    <div className="plan-summary__entry">
+                        <dt className="fr-text--xs">Approvisionnements</dt>
+                        <dd className="fr-text--sm">
+                            {approvisionnementCount === 0
+                                ? 'Aucun pour ce plan'
+                                : `${approvisionnementCount} déjà liés à ce plan`}
+                        </dd>
+                    </div>
                 </dl>
             )}
 
             {plan && (
                 <AttachmentPicker
                     attachments={planAttachments}
+                    extractions={importProgress.extractions}
                     selectedId={selectedAttachmentId}
                     onSelect={onSelectAttachment}
                 />

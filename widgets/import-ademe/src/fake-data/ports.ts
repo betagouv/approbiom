@@ -73,7 +73,7 @@ export const FAKE_PORTS: PlanViewPorts & {
             )
     ),
     approvisionnements: {
-        list: () => Promise.resolve([]),
+        list: () => Promise.resolve(createdApprovisionnements),
         create: (approvisionnements) => {
             createdApprovisionnements.push(...approvisionnements)
             return Promise.resolve()

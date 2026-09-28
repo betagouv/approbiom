@@ -22,6 +22,7 @@ import Screen from './components/Screen'
 import { downloadAndExtract } from './download-and-extract'
 import { extractDocument } from './extract-document'
 import { importLine } from './import-line'
+import { loadImportProgress } from './import-progress'
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type {
@@ -64,6 +65,7 @@ async function load(ports: Ports) {
         ressources,
         departementsByRegion,
         pays,
+        importProgress,
     ] = await Promise.all([
         listPlans(['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'], {
             plans: ports.plans,
@@ -75,6 +77,7 @@ async function load(ports: Ports) {
         ports.ressources.list(),
         ports.referentielGeo.listDepartementsByRegion(),
         ports.approvisionnements.listPaysDeProvenance(),
+        loadImportProgress(ports),
     ])
 
     return {
@@ -84,6 +87,10 @@ async function load(ports: Ports) {
         ressources,
         departementsByRegion,
         pays,
+        importProgress,
+        loadImportProgress: () => loadImportProgress(ports),
+        getAttachmentUrl: (id: Attachment['id']) =>
+            ports.attachments.getFileUrl(id),
         updateExtractedLine: (
             id: StoredExtractedLine['id'],
             changes: ExtractedLineChanges

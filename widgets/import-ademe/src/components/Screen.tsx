@@ -10,6 +10,7 @@ import type {
     ExtractedLineChanges,
     StoredExtractedLine,
 } from '../extracted-approvisionnement-port'
+import type { ImportProgress } from '../import-progress'
 import Selection, { type SelectablePlan } from './selection'
 import Extraction from './extraction'
 import Verification from './verification'
@@ -26,6 +27,9 @@ export type ScreenProps = {
     ressources: readonly Ressource[]
     departementsByRegion: readonly DepartementsByRegion[]
     pays: readonly Pays[]
+    importProgress: ImportProgress
+    loadImportProgress: () => Promise<ImportProgress>
+    getAttachmentUrl: (id: Attachment['id']) => Promise<string>
     extractDocument: (attachment: Attachment) => Promise<ExtractedData>
     updateExtractedLine: (
         id: StoredExtractedLine['id'],
@@ -43,6 +47,9 @@ export default function Screen({
     ressources,
     departementsByRegion,
     pays,
+    importProgress: initialImportProgress,
+    loadImportProgress,
+    getAttachmentUrl,
     extractDocument,
     updateExtractedLine,
     importLine,
@@ -61,6 +68,7 @@ export default function Screen({
     )
 
     const [extracted, setExtracted] = useState<ExtractedData | null>(null)
+    const [importProgress, setImportProgress] = useState(initialImportProgress)
 
     const plan = plans.find(({ id }) => id === planId)
     const attachment = attachments.find(({ id }) => id === attachmentId)
@@ -82,9 +90,14 @@ export default function Screen({
         setTab('extraction')
     }
 
+    function refreshImportProgress() {
+        loadImportProgress().then(setImportProgress, () => {})
+    }
+
     function handleExtracted(data: ExtractedData) {
         setExtracted(data)
         setTab('verification')
+        refreshImportProgress()
     }
 
     async function updateLine(
@@ -115,6 +128,7 @@ export default function Screen({
     ) {
         await importLine(approvisionnements)
         if (attachment) setExtracted(await extractDocument(attachment))
+        refreshImportProgress()
     }
 
     return (
@@ -130,6 +144,7 @@ export default function Screen({
                         <Selection
                             plans={plans}
                             attachments={attachments}
+                            importProgress={importProgress}
                             selectedPlanId={planId}
                             onSelectPlan={selectPlan}
                             selectedAttachmentId={attachmentId}
@@ -148,6 +163,7 @@ export default function Screen({
                                 key={extractionRequest}
                                 plan={plan}
                                 attachment={attachment}
+                                getAttachmentUrl={getAttachmentUrl}
                                 extract={extractDocument}
                                 onExtracted={handleExtracted}
                                 onBack={() => setTab('selection')}
@@ -162,6 +178,7 @@ export default function Screen({
                         <Verification
                             plan={plan}
                             attachment={attachment}
+                            getAttachmentUrl={getAttachmentUrl}
                             lines={extracted.lines}
                             date={extracted.date}
                             entreprises={entreprises}

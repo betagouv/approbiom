@@ -37,6 +37,7 @@ function provenanceCount(line: ExtractedLine): string {
 export type VerificationProps = {
     plan: SelectablePlan
     attachment: Attachment
+    getAttachmentUrl: (id: Attachment['id']) => Promise<string>
     lines: readonly StoredExtractedLine[]
     // When the document was extracted.
     date: Date
@@ -56,6 +57,7 @@ export type VerificationProps = {
 export default function Verification({
     plan,
     attachment,
+    getAttachmentUrl,
     lines,
     date,
     entreprises,
@@ -139,7 +141,11 @@ export default function Verification({
 
     return (
         <div className="verification">
-            <ImportContext plan={plan} attachment={attachment}>
+            <ImportContext
+                plan={plan}
+                attachment={attachment}
+                getAttachmentUrl={getAttachmentUrl}
+            >
                 <Badge size="sm" status="success">
                     {lines.length} lignes extraites le {DATE.format(date)}
                 </Badge>

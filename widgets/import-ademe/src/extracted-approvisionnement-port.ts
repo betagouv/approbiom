@@ -9,12 +9,20 @@ export type StoredExtractedLine = ExtractedLine & {
     extractedAt: Date
 }
 
+export type ExtractionSummary = {
+    attachmentId: Attachment['id']
+    extractedAt: Date
+    lineCount: number
+    importedCount: number
+}
+
 export type ExtractedLineChanges = Partial<ExtractedLine['derived']>
 
 export interface ExtractedApprovisionnementPort {
     listByDocument(
         attachment: Pick<Attachment, 'id' | 'name'>
     ): Promise<StoredExtractedLine[]>
+    listSummaries(): Promise<ExtractionSummary[]>
     create(
         attachment: Pick<Attachment, 'id'>,
         lines: readonly ExtractedLine[],
