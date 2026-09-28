@@ -1,0 +1,222 @@
+.verification {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.verification__mention {
+    color: var(--text-mention-grey);
+}
+
+.verification__state {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 0.5rem;
+    white-space: nowrap;
+}
+
+.verification__distribution {
+    margin: 0;
+    font-variant-numeric: tabular-nums;
+}
+
+.verification__action {
+    white-space: nowrap;
+}
+
+.review__section {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.document-data {
+    padding: 0.75rem 1rem;
+    background-color: var(--background-alt-grey);
+}
+
+.review {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.review__label {
+    color: var(--text-mention-grey);
+}
+
+.review__list {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    margin: 0;
+    padding: 0;
+}
+
+.review__list dd {
+    padding-left: 0;
+}
+
+/* The mock-up's compact field: hint on the label's line, small list. */
+.found-data__field .fr-select-group {
+    margin-bottom: 0;
+}
+
+.found-data__field .fr-label {
+    margin-bottom: 0.125rem;
+    font-size: 0.875rem;
+}
+
+.found-data__field .fr-label .fr-hint-text {
+    display: inline;
+    margin-left: 0.5rem;
+}
+
+.found-data__field .fr-select {
+    margin-top: 0;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.import-actions {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    width: 100%;
+}
+
+.import-actions__summary {
+    flex: 1;
+    min-width: 12rem;
+    color: var(--text-mention-grey);
+}
+
+.import-actions__summary--error {
+    color: var(--text-default-error);
+}
+
+.review__repartition {
+    margin: 0;
+}
+
+.provenance-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.provenance-editor__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.provenance-editor__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 9rem 14rem auto;
+    gap: 0.5rem;
+    align-items: end;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-default-grey);
+}
+
+.provenance-editor__row .fr-select-group,
+.provenance-editor__row .fr-input-group {
+    margin-bottom: 0;
+}
+
+.provenance-editor__row .fr-label {
+    font-size: 0.75rem;
+}
+
+.provenance-editor__row .fr-select,
+.provenance-editor__row .fr-input {
+    margin-top: 0.125rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.provenance-editor__number .fr-input {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.provenance-editor__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.provenance-editor__total {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
+}
+
+.new-fournisseur__fieldset {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--border-active-blue-france);
+}
+
+.new-fournisseur__fields {
+    display: grid;
+    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
+    gap: 1rem;
+    align-items: start;
+}
+
+.new-fournisseur__fields .fr-input-group {
+    margin-bottom: 0;
+}
+
+.new-fournisseur__actions {
+    display: flex;
+    gap: 0.5rem;
+    margin-top: 0.75rem;
+}
+
+.new-fournisseur .fr-label {
+    margin-bottom: 0.125rem;
+    font-size: 0.875rem;
+}
+
+.new-fournisseur .fr-label .fr-hint-text {
+    display: inline;
+    margin-left: 0.5rem;
+}
+
+.new-fournisseur .fr-input {
+    margin-top: 0;
+    padding-top: 0.375rem;
+    padding-bottom: 0.375rem;
+    font-size: 0.875rem;
+}
+
+.provenance-editor__extra {
+    grid-column: 1 / -1;
+}
+
+.new-pays {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--border-active-blue-france);
+}
+
+.new-pays .fr-input-group {
+    margin-bottom: 0;
+}
+
+.new-pays__line {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.new-pays__line .fr-input {
+    max-width: 18rem;
+}

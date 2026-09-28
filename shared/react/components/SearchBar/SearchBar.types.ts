@@ -9,6 +9,11 @@ export type SearchBarProps<T> = {
     // to go on — a placeholder is not a name. Required for that reason, even
     // though nothing draws it.
     label: string
+    // Shows the label above the field, as in a DSFR input group. Left out, the
+    // label stays hidden, as `fr-search-bar` draws it.
+    showLabel?: boolean
+    // A line of help under the label, part of the field's accessible name.
+    hint?: string
     // Read-only array: the component only iterates over it, and accepting
     // `readonly` lets callers pass frozen or `as const` data without a cast.
     // Empty (or absent) means no panel at all.

@@ -51,13 +51,16 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         installations: { list: rows([]) },
         approvisionnements: {
             list: rows([]),
+            create: () => Promise.resolve(),
+            listPaysDeProvenance: rows([]),
+            addPaysDeProvenance: () => Promise.resolve(),
             listGroupedByPlanAndRessource: rows([]),
             listGroupedByPlanRessourceAndRegionOuPays: rows([]),
             listGroupedByPlanRessourceAndProvenance: rows([]),
             listGroupedByPlanRessourceAndFournisseur: rows([]),
         },
         ressources: { list: rows([]) },
-        entreprises: { list: rows([]) },
+        entreprises: { list: rows([]), create: () => Promise.resolve() },
         listDepartementsByRegion: rows([]),
         getCommuneCenterPosition: () => ({ latitude: 0, longitude: 0 }),
         getDepartementContour: () => [],
@@ -312,6 +315,9 @@ describe('App', () => {
                     plans: planPort(rows([saintJunien])),
                     approvisionnements: {
                         list: rows([]),
+                        create: () => Promise.resolve(),
+                        listPaysDeProvenance: rows([]),
+                        addPaysDeProvenance: () => Promise.resolve(),
                         listGroupedByPlanAndRessource: rows([
                             {
                                 planDApprovisionnement: saintJunien.id,
@@ -326,7 +332,12 @@ describe('App', () => {
                     },
                     ressources: {
                         list: rows([
-                            { code: 'PF', title: 'Plaquettes forestières' },
+                            {
+                                code: 'PF',
+                                ademeCode: '',
+                                title: 'Plaquettes forestières',
+                                description: '',
+                            },
                         ]),
                     },
                 })}

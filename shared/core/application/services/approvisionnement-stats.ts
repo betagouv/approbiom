@@ -133,8 +133,8 @@ export function composeApprovisionnementStats({
     entreprises,
     departementsByRegion,
 }: ApprovisionnementByRessourceStatsSources): ApprovisionnementByRessourceStats {
-    const titleByCode = new Map(
-        ressources.map(({ code, title }) => [code, title])
+    const ressourceByCode = new Map(
+        ressources.map((ressource) => [ressource.code, ressource])
     )
 
     const nameBySiret = new Map(
@@ -170,7 +170,12 @@ export function composeApprovisionnementStats({
         ({ ressource: code, tonnageTotal, repartition }) => ({
             // A ressource the directory does not name is still drawn on:
             // it is read by its code rather than left blank.
-            ressource: { code, title: titleByCode.get(code) || code },
+            ressource: ressourceByCode.get(code) ?? {
+                code,
+                ademeCode: '',
+                title: code,
+                description: '',
+            },
             tonnageTotal,
             repartition,
             byRegionOuPays: regionsOuPays.get(code) ?? [],

@@ -16,14 +16,14 @@ export type Confidence =
     | typeof NEEDS_REVIEW
     | typeof UNRESOLVED
 
-export type ProvenanceShare = {
+export type ProvenanceRepartition = {
     source: Provenance['source']
     provenance: string
     percentage: number
 }
 
-export type ProvenanceReading = {
-    distribution: ProvenanceShare[]
+export type ProvenanceParseResults = {
+    distribution: ProvenanceRepartition[]
     confidence: Confidence
     unrecognized: string[]
 }
@@ -404,7 +404,7 @@ function buildDistribution(
     mentions: readonly Mention[],
     percentages: readonly Percentage[],
     pairing: Pairing
-): ProvenanceReading {
+): ProvenanceParseResults {
     let places = groupByPlace(mentions, pairing.shares)
     let leftOver: Span[] = pairing.unpaired.map(({ start, end }) => ({
         start,
@@ -449,17 +449,6 @@ function buildDistribution(
         }
     }
 
-    if (places.length > 0) {
-        const total = sum(places.map((place) => place.share ?? 0))
-
-        // Multiplying before dividing keeps the arithmetic bit-for-bit what the
-        // reference implementation produces.
-        places = places.map((place) => ({
-            ...place,
-            share: ((place.share ?? 0) * 100) / total,
-        }))
-    }
-
     const covered: Span[] = [
         ...places.flatMap((place) => place.spans),
         ...percentages.map(({ start, end }) => ({ start, end })),
@@ -498,13 +487,14 @@ function buildDistribution(
 }
 
 /**
- * Reads a free-text provenance cell into shares adding up to 100, and says how
- * much of the cell it managed to account for.
+ * Reads a free-text provenance cell into shares, and says how much of the
+ * cell it managed to account for. The shares are kept as written: a part that
+ * was not recognised is left missing rather than spread over the others.
  */
 export function transformProvenance(
     raw: string,
     reference: ReferenceData
-): ProvenanceReading {
+): ProvenanceParseResults {
     const text = normalize(raw)
     const mentions = findPlaces(text, reference)
     const percentages = findPercentages(text)

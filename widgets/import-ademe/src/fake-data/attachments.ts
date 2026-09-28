@@ -1,0 +1,103 @@
+import type { Attachment } from '@shared/core/domain/entities/attachment'
+
+// Stands in for the Piece_jointe table outside Grist.
+export const FAKE_ATTACHMENTS: readonly Attachment[] = [
+    {
+        id: 101,
+        planDApprovisionnement: 1,
+        type: 'Plan d’approvisionnement',
+        name: 'Plan_appro_ADEME_Tulle_2024.xlsx',
+        sizeInBytes: 215_040,
+    },
+    {
+        id: 102,
+        planDApprovisionnement: 1,
+        type: 'Convention',
+        name: 'Convention_financement.pdf',
+        sizeInBytes: 655_360,
+    },
+    {
+        id: 103,
+        planDApprovisionnement: 1,
+        type: 'Annexe',
+        name: 'Annexe_fournisseurs.xlsx',
+        sizeInBytes: 90_112,
+    },
+    {
+        id: 104,
+        planDApprovisionnement: 1,
+        type: 'Photo',
+        name: 'Photo_site.jpg',
+        sizeInBytes: 3_565_158,
+    },
+    {
+        id: 201,
+        planDApprovisionnement: 2,
+        type: 'Plan d’approvisionnement',
+        name: 'ADEME_plan_appro_Brive.xlsx',
+        sizeInBytes: 184_320,
+    },
+    {
+        id: 202,
+        planDApprovisionnement: 2,
+        type: 'Courrier',
+        name: 'Courrier_accompagnement.docx',
+        sizeInBytes: 46_080,
+    },
+    {
+        id: 401,
+        planDApprovisionnement: 4,
+        type: 'Plan d’approvisionnement',
+        name: 'Plan_appro_ADEME_Tulle_2025_v2.xlsx',
+        sizeInBytes: 235_520,
+    },
+    {
+        id: 402,
+        planDApprovisionnement: 4,
+        type: 'Plan d’approvisionnement',
+        name: 'Plan_appro_ADEME_Tulle_2025_v1.xlsx',
+        sizeInBytes: 230_400,
+    },
+    {
+        id: 501,
+        planDApprovisionnement: 5,
+        type: 'Plan d’approvisionnement',
+        name: 'Formulaire_ADEME_Egletons.xlsx',
+        sizeInBytes: 163_840,
+    },
+    {
+        id: 701,
+        planDApprovisionnement: 7,
+        type: 'Plan d’approvisionnement',
+        name: 'PA_CH_Tulle_ADEME.xlsx',
+        sizeInBytes: 194_560,
+    },
+    {
+        id: 702,
+        planDApprovisionnement: 7,
+        type: 'Annexe',
+        name: 'Tableau_tonnages.xlsx',
+        sizeInBytes: 53_248,
+    },
+    {
+        id: 801,
+        planDApprovisionnement: 8,
+        type: 'Plan d’approvisionnement',
+        name: 'Plan_appro_RCU_Aurillac.xlsx',
+        sizeInBytes: 245_760,
+    },
+    {
+        id: 901,
+        planDApprovisionnement: 9,
+        type: 'Plan d’approvisionnement',
+        name: 'ADEME_Saillat_2023.xlsx',
+        sizeInBytes: 204_800,
+    },
+    {
+        id: 1101,
+        planDApprovisionnement: 11,
+        type: 'Plan d’approvisionnement',
+        name: 'Plan_appro_Gueret_ADEME.xlsx',
+        sizeInBytes: 179_200,
+    },
+]

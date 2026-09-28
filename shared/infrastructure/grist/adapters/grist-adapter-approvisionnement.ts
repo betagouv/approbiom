@@ -4,9 +4,11 @@ import type {
 } from '@shared/core/application/ports/approvisionnement'
 import { gristReady } from '../helpers/grist-ready'
 import {
+    asIdList,
     asNumber,
     asString,
     byRowId,
+    createRows,
     fetchRowsOnce,
     lookup,
     type GristRow,
@@ -60,6 +62,45 @@ function toGroup(
     }
 }
 
+const PAYS_DE_PROVENANCE = 'Pays_de_provenance'
+const FRANCE = 'France'
+
+// The countries are the choices of the Pays_de_provenance column, kept in its
+// widget options.
+async function readPaysDeProvenanceColumn(): Promise<{
+    widgetOptions: Record<string, unknown>
+    choices: string[]
+}> {
+    await gristReady()
+
+    const [tables, columns] = await Promise.all([
+        fetchRowsOnce('_grist_Tables', ['id', 'tableId']),
+        fetchRowsOnce('_grist_Tables_column', [
+            'parentId',
+            'colId',
+            'widgetOptions',
+        ]),
+    ])
+    const tableRef = tables.find(
+        (table) => table.tableId === TABLE.approvisionnement
+    )?.id
+    const column = columns.find(
+        (column) =>
+            column.parentId === tableRef && column.colId === PAYS_DE_PROVENANCE
+    )
+    const widgetOptions = JSON.parse(
+        asString(column?.widgetOptions) || '{}'
+    ) as Record<string, unknown>
+    const { choices } = widgetOptions
+
+    return {
+        widgetOptions,
+        choices: (Array.isArray(choices) ? choices : []).filter(
+            (choice): choice is string => typeof choice === 'string'
+        ),
+    }
+}
+
 export function createGristApprovisionnementPort(): ApprovisionnementPort {
     /** Every summary needs the ressource directory to resolve its Ref. */
     const readTotals = async (tableId: string, columns: readonly string[]) => {
@@ -102,6 +143,98 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                 ),
                 tonnageTotal: asNumber(row.Total_en_tMv_an_) ?? 0,
             }))
+        },
+
+        async create(approvisionnements) {
+            await gristReady()
+
+            const [entreprises, ressources, departements, attachments] =
+                await Promise.all([
+                    fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise),
+                    fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
+                    fetchRowsOnce(TABLE.departement, COLUMNS.departement),
+                    fetchRowsOnce(TABLE.attachment, COLUMNS.attachment),
+                ])
+
+            // A Ref pointing at nothing is written 0.
+            const idOf = (
+                rows: readonly GristRow[],
+                matches: (row: GristRow) => boolean
+            ) => asNumber(rows.find(matches)?.id) ?? 0
+
+            await createRows(
+                TABLE.approvisionnement,
+                approvisionnements.map((approvisionnement) => {
+                    const { provenance, source } = approvisionnement
+
+                    return {
+                        Plan_d_approvisionnement:
+                            approvisionnement.planDApprovisionnement,
+                        Fournisseur: idOf(
+                            entreprises,
+                            (row) =>
+                                asText(row.Siret) ===
+                                approvisionnement.fournisseur
+                        ),
+                        Ressource: idOf(
+                            ressources,
+                            (row) =>
+                                asString(row.Code_ressource_Approbiom) ===
+                                approvisionnement.ressource
+                        ),
+                        Departement_de_provenance:
+                            provenance.source === DEPARTEMENT_FRANCAIS
+                                ? idOf(
+                                      departements,
+                                      (row) =>
+                                          asString(row.DEP) === provenance.code
+                                  )
+                                : 0,
+                        Pays_de_provenance:
+                            provenance.source === PAYS_ETRANGER
+                                ? provenance.libelle
+                                : FRANCE,
+                        Total_en_tMv_an_: approvisionnement.tonnageTotal,
+                        Donnees_additionnelles_provenant_du_document:
+                            approvisionnement.additionalDataFromDocument ?? '',
+                        Source:
+                            source === undefined
+                                ? 0
+                                : idOf(attachments, (row) =>
+                                      asIdList(row.piece_jointe).includes(
+                                          source
+                                      )
+                                  ),
+                    }
+                })
+            )
+        },
+
+        async listPaysDeProvenance() {
+            const { choices } = await readPaysDeProvenanceColumn()
+
+            return choices
+                .filter((choice) => choice !== FRANCE)
+                .map((libelle) => ({ libelle }))
+        },
+
+        async addPaysDeProvenance({ libelle }) {
+            const { widgetOptions, choices } =
+                await readPaysDeProvenanceColumn()
+
+            await grist.docApi.applyUserActions([
+                [
+                    'ModifyColumn',
+                    TABLE.approvisionnement,
+                    PAYS_DE_PROVENANCE,
+                    {
+                        widgetOptions: JSON.stringify({
+                            ...widgetOptions,
+                            choices: [...choices, libelle],
+                        }),
+                    },
+                ],
+            ])
         },
 
         async listGroupedByPlanAndRessource() {
