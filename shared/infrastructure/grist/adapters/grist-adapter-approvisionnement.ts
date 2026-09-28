@@ -4,9 +4,11 @@ import type {
 } from '@shared/core/application/ports/approvisionnement'
 import { gristReady } from '../helpers/grist-ready'
 import {
+    asIdList,
     asNumber,
     asString,
     byRowId,
+    createRows,
     fetchRowsOnce,
     lookup,
     type GristRow,
@@ -102,6 +104,71 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                 ),
                 tonnageTotal: asNumber(row.Total_en_tMv_an_) ?? 0,
             }))
+        },
+
+        async create(approvisionnements) {
+            await gristReady()
+
+            const [entreprises, ressources, departements, attachments] =
+                await Promise.all([
+                    fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise),
+                    fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
+                    fetchRowsOnce(TABLE.departement, COLUMNS.departement),
+                    fetchRowsOnce(TABLE.attachment, COLUMNS.attachment),
+                ])
+
+            // A Ref pointing at nothing is written 0.
+            const idOf = (
+                rows: readonly GristRow[],
+                matches: (row: GristRow) => boolean
+            ) => asNumber(rows.find(matches)?.id) ?? 0
+
+            await createRows(
+                TABLE.approvisionnement,
+                approvisionnements.map((approvisionnement) => {
+                    const { provenance, source } = approvisionnement
+
+                    return {
+                        Plan_d_approvisionnement:
+                            approvisionnement.planDApprovisionnement,
+                        Fournisseur: idOf(
+                            entreprises,
+                            (row) =>
+                                asText(row.Siret) ===
+                                approvisionnement.fournisseur
+                        ),
+                        Ressource: idOf(
+                            ressources,
+                            (row) =>
+                                asString(row.Code_ressource_Approbiom) ===
+                                approvisionnement.ressource
+                        ),
+                        Departement_de_provenance:
+                            provenance.source === DEPARTEMENT_FRANCAIS
+                                ? idOf(
+                                      departements,
+                                      (row) =>
+                                          asString(row.DEP) === provenance.code
+                                  )
+                                : 0,
+                        Pays_de_provenance:
+                            provenance.source === PAYS_ETRANGER
+                                ? provenance.libelle
+                                : 'France',
+                        Total_en_tMv_an_: approvisionnement.tonnageTotal,
+                        Donnees_additionnelles_provenant_du_document:
+                            approvisionnement.additionalDataFromDocument ?? '',
+                        Source:
+                            source === undefined
+                                ? 0
+                                : idOf(attachments, (row) =>
+                                      asIdList(row.piece_jointe).includes(
+                                          source
+                                      )
+                                  ),
+                    }
+                })
+            )
         },
 
         async listGroupedByPlanAndRessource() {
