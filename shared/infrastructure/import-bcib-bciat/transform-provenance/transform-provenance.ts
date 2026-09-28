@@ -449,17 +449,6 @@ function buildDistribution(
         }
     }
 
-    if (places.length > 0) {
-        const total = sum(places.map((place) => place.share ?? 0))
-
-        // Multiplying before dividing keeps the arithmetic bit-for-bit what the
-        // reference implementation produces.
-        places = places.map((place) => ({
-            ...place,
-            share: ((place.share ?? 0) * 100) / total,
-        }))
-    }
-
     const covered: Span[] = [
         ...places.flatMap((place) => place.spans),
         ...percentages.map(({ start, end }) => ({ start, end })),
@@ -498,8 +487,9 @@ function buildDistribution(
 }
 
 /**
- * Reads a free-text provenance cell into shares adding up to 100, and says how
- * much of the cell it managed to account for.
+ * Reads a free-text provenance cell into shares, and says how much of the
+ * cell it managed to account for. The shares are kept as written: a part that
+ * was not recognised is left missing rather than spread over the others.
  */
 export function transformProvenance(
     raw: string,
