@@ -1,5 +1,6 @@
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Pays } from '@shared/core/domain/value-objects/pays'
 
 export type ApprovisionnementGroupedByPlanAndRessource = Pick<
     Approvisionnement,
@@ -28,6 +29,8 @@ export interface ApprovisionnementPort {
     list(): Promise<readonly Approvisionnement[]>
 
     create(approvisionnements: readonly Approvisionnement[]): Promise<void>
+
+    listPaysDeProvenance(): Promise<readonly Pays[]>
 
     listGroupedByPlanAndRessource(): Promise<
         readonly ApprovisionnementGroupedByPlanAndRessource[]

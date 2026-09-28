@@ -185,6 +185,7 @@ export function createGristExtractedApprovisionnementAdapter() {
             changes: {
                 matchedFournisseur?: Entreprise | null
                 matchedRessource?: Ressource | null
+                parsedProvenance?: ProvenanceParseResults
             }
         ): Promise<void> {
             await gristReady()
@@ -194,7 +195,7 @@ export function createGristExtractedApprovisionnementAdapter() {
                 fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
             ])
 
-            const fields: Record<string, number> = {}
+            const fields: Record<string, number | string> = {}
             if (changes.matchedFournisseur !== undefined) {
                 const { matchedFournisseur } = changes
                 fields.Fournisseur = matchedFournisseur
@@ -218,6 +219,12 @@ export function createGristExtractedApprovisionnementAdapter() {
                           )?.id
                       ) ?? 0)
                     : 0
+            }
+
+            if (changes.parsedProvenance !== undefined) {
+                fields.Repartition_par_provenance = JSON.stringify(
+                    changes.parsedProvenance
+                )
             }
 
             await updateRow(TABLE.extractedApprovisionnement, id, fields)

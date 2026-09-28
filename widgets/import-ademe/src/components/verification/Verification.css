@@ -31,16 +31,9 @@
 }
 
 .review {
-    display: grid;
-    grid-template-columns: minmax(0, 0.85fr) minmax(0, 1.15fr);
+    display: flex;
+    flex-direction: column;
     gap: 1.25rem;
-    align-items: start;
-}
-
-@media (max-width: 47.99em) {
-    .review {
-        grid-template-columns: minmax(0, 1fr);
-    }
 }
 
 .review__title {
@@ -64,44 +57,6 @@
 
 .review__list dd {
     padding-left: 0;
-}
-
-.provenance-found {
-    display: flex;
-    flex-direction: column;
-    gap: 0.5rem;
-}
-
-.provenance-found__table {
-    width: 100%;
-    border-collapse: collapse;
-}
-
-.provenance-found__table th,
-.provenance-found__table td {
-    padding: 0.25rem 0.5rem 0.25rem 0;
-    border-bottom: 1px solid var(--border-default-grey);
-    text-align: left;
-}
-
-.provenance-found__table thead th {
-    border-bottom: 2px solid var(--border-plain-grey);
-}
-
-.provenance-found__table th:not(:first-child),
-.provenance-found__table td {
-    font-variant-numeric: tabular-nums;
-    text-align: right;
-}
-
-.provenance-found__table td:first-child {
-    text-align: left;
-}
-
-.provenance-found__table tfoot th,
-.provenance-found__table tfoot td {
-    border-bottom: 0;
-    font-weight: 700;
 }
 
 /* The mock-up's compact field: hint on the label's line, small list. */
@@ -142,4 +97,65 @@
 
 .import-actions__summary--error {
     color: var(--text-default-error);
+}
+
+.review__repartition {
+    margin: 0;
+}
+
+.provenance-editor {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+    width: 100%;
+}
+
+.provenance-editor__rows {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.provenance-editor__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 9rem 14rem auto;
+    gap: 0.5rem;
+    align-items: end;
+    padding-bottom: 0.5rem;
+    border-bottom: 1px solid var(--border-default-grey);
+}
+
+.provenance-editor__row .fr-select-group,
+.provenance-editor__row .fr-input-group {
+    margin-bottom: 0;
+}
+
+.provenance-editor__row .fr-label {
+    font-size: 0.75rem;
+}
+
+.provenance-editor__row .fr-select,
+.provenance-editor__row .fr-input {
+    margin-top: 0.125rem;
+    padding-top: 0.25rem;
+    padding-bottom: 0.25rem;
+    font-size: 0.875rem;
+}
+
+.provenance-editor__number .fr-input {
+    text-align: right;
+    font-variant-numeric: tabular-nums;
+}
+
+.provenance-editor__foot {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    justify-content: space-between;
+    gap: 0.5rem;
+}
+
+.provenance-editor__total {
+    font-weight: 700;
+    font-variant-numeric: tabular-nums;
 }

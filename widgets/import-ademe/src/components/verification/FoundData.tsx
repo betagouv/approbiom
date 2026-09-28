@@ -4,12 +4,16 @@ import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { ExtractedLineChanges } from '../../extracted-approvisionnement-port'
-import ProvenanceFound from './ProvenanceFound'
+import ProvenanceEditor from './ProvenanceEditor'
+import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
+import type { Pays } from '@shared/core/domain/value-objects/pays'
 
 export type FoundDataProps = {
     line: ExtractedLine
     entreprises: readonly Entreprise[]
     ressources: readonly Ressource[]
+    departementsByRegion: readonly DepartementsByRegion[]
+    pays: readonly Pays[]
     onUpdate: (changes: ExtractedLineChanges) => Promise<void>
 }
 
@@ -40,6 +44,8 @@ export default function FoundData({
     line,
     entreprises,
     ressources,
+    departementsByRegion,
+    pays,
     onUpdate,
 }: FoundDataProps) {
     const titleId = useId()
@@ -51,11 +57,11 @@ export default function FoundData({
         Ressource['code'] | null
     >(matchedRessource?.code ?? null)
     const [failedField, setFailedField] = useState<
-        'fournisseur' | 'ressource' | null
+        'fournisseur' | 'ressource' | 'repartition' | null
     >(null)
 
     function save(
-        field: 'fournisseur' | 'ressource',
+        field: 'fournisseur' | 'ressource' | 'repartition',
         changes: ExtractedLineChanges
     ) {
         setFailedField(null)
@@ -89,42 +95,64 @@ export default function FoundData({
     }))
 
     return (
-        <section className="review__section" aria-labelledby={titleId}>
-            <h3 id={titleId} className="fr-text--xs fr-m-0 review__title">
-                Données à importer
-            </h3>
-            <div className="found-data__field">
-                <Select
-                    label="Fournisseur"
-                    placeholder="Choisir une entreprise"
-                    options={fournisseurOptions}
-                    value={fournisseurSiret}
-                    onChange={selectFournisseur}
-                    {...matchHint(fournisseurSiret)}
-                    {...(failedField === 'fournisseur' && SAVE_FAILED)}
-                />
-            </div>
-            <div className="found-data__field">
-                <Select
-                    label="Ressource"
-                    placeholder="Choisir une ressource"
-                    options={ressourceOptions}
-                    value={ressourceCode}
-                    onChange={selectRessource}
-                    {...matchHint(ressourceCode)}
-                    {...(failedField === 'ressource' && SAVE_FAILED)}
-                />
-            </div>
-            <dl className="review__list">
-                <div>
-                    <dt className="fr-text--xs fr-m-0 review__label">
-                        Répartition trouvée
-                    </dt>
-                    <dd className="fr-m-0">
-                        <ProvenanceFound line={line} />
-                    </dd>
+        <>
+            <section className="review__section" aria-labelledby={titleId}>
+                <h3 id={titleId} className="fr-text--xs fr-m-0 review__title">
+                    Données à importer
+                </h3>
+                <div className="found-data__field">
+                    <Select
+                        label="Fournisseur"
+                        placeholder="Choisir une entreprise"
+                        options={fournisseurOptions}
+                        value={fournisseurSiret}
+                        onChange={selectFournisseur}
+                        {...matchHint(fournisseurSiret)}
+                        {...(failedField === 'fournisseur' && SAVE_FAILED)}
+                    />
                 </div>
-            </dl>
-        </section>
+                <div className="found-data__field">
+                    <Select
+                        label="Ressource"
+                        placeholder="Choisir une ressource"
+                        options={ressourceOptions}
+                        value={ressourceCode}
+                        onChange={selectRessource}
+                        {...matchHint(ressourceCode)}
+                        {...(failedField === 'ressource' && SAVE_FAILED)}
+                    />
+                </div>
+            </section>
+            <fieldset className="fr-fieldset fr-mb-0 review__repartition">
+                <legend className="fr-fieldset__legend fr-text--regular fr-text--sm fr-p-0 fr-mb-1v">
+                    Répartition par provenance
+                </legend>
+                <ProvenanceEditor
+                    distribution={line.derived.parsedProvenance.distribution}
+                    tonnage={line.read.tonnage}
+                    departementsByRegion={departementsByRegion}
+                    pays={pays}
+                    onChange={(distribution) =>
+                        save('repartition', {
+                            parsedProvenance: {
+                                ...line.derived.parsedProvenance,
+                                distribution,
+                            },
+                        })
+                    }
+                />
+                {failedField === 'repartition' && (
+                    <p className="fr-message fr-message--error">
+                        {SAVE_FAILED.message.text}
+                    </p>
+                )}
+                {line.derived.parsedProvenance.unrecognized.length > 0 && (
+                    <p className="fr-text--sm fr-m-0">
+                        <span className="review__label">Non reconnu : </span>
+                        {line.derived.parsedProvenance.unrecognized.join(', ')}
+                    </p>
+                )}
+            </fieldset>
+        </>
     )
 }

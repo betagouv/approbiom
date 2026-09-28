@@ -13,6 +13,8 @@ import type {
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
+import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { SelectablePlan } from '../selection'
 import ImportContext from '../import-context'
 import DocumentData from './DocumentData'
@@ -72,6 +74,8 @@ export type VerificationProps = {
     date: Date
     entreprises: readonly Entreprise[]
     ressources: readonly Ressource[]
+    departementsByRegion: readonly DepartementsByRegion[]
+    pays: readonly Pays[]
     onUpdateLine: (
         id: StoredExtractedLine['id'],
         changes: ExtractedLineChanges
@@ -89,6 +93,8 @@ export default function Verification({
     date,
     entreprises,
     ressources,
+    departementsByRegion,
+    pays,
     onUpdateLine,
     onImportLine,
 }: VerificationProps) {
@@ -172,6 +178,8 @@ export default function Verification({
                             line={reviewedLine}
                             entreprises={entreprises}
                             ressources={ressources}
+                            departementsByRegion={departementsByRegion}
+                            pays={pays}
                             onUpdate={(changes) =>
                                 onUpdateLine(reviewedLine.id, changes)
                             }

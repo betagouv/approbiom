@@ -23,7 +23,8 @@ function toProvenance({
 }
 
 // One approvisionnement per provenance of the line. Empty when the line
-// misses a fournisseur, a ressource or a provenance: it cannot be imported.
+// misses a fournisseur, a ressource or a provenance, or has a provenance left
+// blank: it cannot be imported.
 export function toApprovisionnements(
     line: StoredExtractedLine,
     plan: PlanDApprovisionnement['id'],
@@ -31,7 +32,14 @@ export function toApprovisionnements(
 ): Approvisionnement[] {
     const { matchedFournisseur, matchedRessource, parsedProvenance } =
         line.derived
-    if (!matchedFournisseur || !matchedRessource) return []
+    if (
+        !matchedFournisseur ||
+        !matchedRessource ||
+        parsedProvenance.distribution.some(
+            ({ provenance }) => provenance === ''
+        )
+    )
+        return []
 
     return parsedProvenance.distribution.map((repartition) => ({
         planDApprovisionnement: plan,

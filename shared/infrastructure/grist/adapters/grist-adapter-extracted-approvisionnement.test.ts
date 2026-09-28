@@ -96,4 +96,30 @@ describe('createGristExtractedApprovisionnementAdapter().update', () => {
             fields: { Fournisseur: 0 },
         })
     })
+
+    it('stores the distribution as JSON', async () => {
+        const update = mockGrist()
+        const parsedProvenance = {
+            distribution: [
+                {
+                    source: 'Département français' as const,
+                    provenance: '19',
+                    percentage: 25,
+                },
+            ],
+            confidence: 'Explicite' as const,
+            unrecognized: [],
+        }
+
+        await createGristExtractedApprovisionnementAdapter().update(5, {
+            parsedProvenance,
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 5,
+            fields: {
+                Repartition_par_provenance: JSON.stringify(parsedProvenance),
+            },
+        })
+    })
 })

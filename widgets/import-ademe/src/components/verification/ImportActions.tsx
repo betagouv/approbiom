@@ -54,7 +54,9 @@ export default function ImportActions({
             >
                 {approvisionnementCount > 1
                     ? `Importer les ${approvisionnementCount} approvisionnements`
-                    : "Importer l'approvisionnement"}
+                    : approvisionnementCount === 1
+                      ? "Importer l'approvisionnement"
+                      : 'Importer'}
             </button>
         </div>
     )

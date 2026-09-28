@@ -52,6 +52,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         approvisionnements: {
             list: rows([]),
             create: () => Promise.resolve(),
+            listPaysDeProvenance: rows([]),
             listGroupedByPlanAndRessource: rows([]),
             listGroupedByPlanRessourceAndRegionOuPays: rows([]),
             listGroupedByPlanRessourceAndProvenance: rows([]),
@@ -314,6 +315,7 @@ describe('App', () => {
                     approvisionnements: {
                         list: rows([]),
                         create: () => Promise.resolve(),
+                        listPaysDeProvenance: rows([]),
                         listGroupedByPlanAndRessource: rows([
                             {
                                 planDApprovisionnement: saintJunien.id,

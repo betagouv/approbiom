@@ -171,6 +171,37 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
             )
         },
 
+        async listPaysDeProvenance() {
+            await gristReady()
+
+            const [tables, columns] = await Promise.all([
+                fetchRowsOnce('_grist_Tables', ['id', 'tableId']),
+                fetchRowsOnce('_grist_Tables_column', [
+                    'parentId',
+                    'colId',
+                    'widgetOptions',
+                ]),
+            ])
+            const tableRef = tables.find(
+                (table) => table.tableId === TABLE.approvisionnement
+            )?.id
+            const column = columns.find(
+                (column) =>
+                    column.parentId === tableRef &&
+                    column.colId === 'Pays_de_provenance'
+            )
+            const { choices } = JSON.parse(
+                asString(column?.widgetOptions) || '{}'
+            ) as { choices?: unknown }
+
+            return (Array.isArray(choices) ? choices : [])
+                .filter(
+                    (choice): choice is string =>
+                        typeof choice === 'string' && choice !== 'France'
+                )
+                .map((libelle) => ({ libelle }))
+        },
+
         async listGroupedByPlanAndRessource() {
             const { rows, ressources } = await readTotals(
                 TABLE.totalByPlanAndRessource,

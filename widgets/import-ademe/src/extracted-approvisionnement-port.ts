@@ -9,9 +9,7 @@ export type StoredExtractedLine = ExtractedLine & {
     extractedAt: Date
 }
 
-export type ExtractedLineChanges = Partial<
-    Pick<ExtractedLine['derived'], 'matchedFournisseur' | 'matchedRessource'>
->
+export type ExtractedLineChanges = Partial<ExtractedLine['derived']>
 
 export interface ExtractedApprovisionnementPort {
     listByDocument(

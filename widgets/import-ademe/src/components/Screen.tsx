@@ -3,6 +3,8 @@ import Tabs from '@shared/react/components/Tabs'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
+import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type {
     ExtractedLineChanges,
@@ -22,6 +24,8 @@ export type ScreenProps = {
     attachments: readonly Attachment[]
     entreprises: readonly Entreprise[]
     ressources: readonly Ressource[]
+    departementsByRegion: readonly DepartementsByRegion[]
+    pays: readonly Pays[]
     extractDocument: (attachment: Attachment) => Promise<ExtractedData>
     updateExtractedLine: (
         id: StoredExtractedLine['id'],
@@ -38,6 +42,8 @@ export default function Screen({
     attachments,
     entreprises,
     ressources,
+    departementsByRegion,
+    pays,
     extractDocument,
     updateExtractedLine,
     importLine,
@@ -86,7 +92,6 @@ export default function Screen({
         id: StoredExtractedLine['id'],
         changes: ExtractedLineChanges
     ) {
-        await updateExtractedLine(id, changes)
         setExtracted(
             (previous) =>
                 previous && {
@@ -101,6 +106,7 @@ export default function Screen({
                     ),
                 }
         )
+        await updateExtractedLine(id, changes)
     }
 
     async function importReviewedLine(
@@ -170,6 +176,8 @@ export default function Screen({
                             date={extracted.date}
                             entreprises={entreprises}
                             ressources={ressources}
+                            departementsByRegion={departementsByRegion}
+                            pays={pays}
                             onUpdateLine={updateLine}
                             onImportLine={importReviewedLine}
                         />

@@ -6,6 +6,8 @@ import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
+import { createGristReferentielGeoPort } from '@shared/infrastructure/grist/adapters/grist-adapter-referentiel-geo'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/adapters/grist-adapter-approvisionnement'
 import { createGristExtractedApprovisionnementAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-extracted-approvisionnement'
 import { DataSourceUnavailableError } from '@shared/core/errors'
@@ -38,6 +40,7 @@ type Ports = PlanViewPorts & {
     extractDataFromDocument: typeof importRows
     extractedApprovisionnements: ExtractedApprovisionnementPort
     approvisionnements: ApprovisionnementPort
+    referentielGeo: Pick<ReferentielGeoPort, 'listDepartementsByRegion'>
 }
 
 const GRIST_PORTS: Ports = {
@@ -50,10 +53,18 @@ const GRIST_PORTS: Ports = {
     extractDataFromDocument: importRows,
     extractedApprovisionnements: createGristExtractedApprovisionnementAdapter(),
     approvisionnements: createGristApprovisionnementPort(),
+    referentielGeo: createGristReferentielGeoPort(),
 }
 
 async function load(ports: Ports) {
-    const [plans, attachments, entreprises, ressources] = await Promise.all([
+    const [
+        plans,
+        attachments,
+        entreprises,
+        ressources,
+        departementsByRegion,
+        pays,
+    ] = await Promise.all([
         listPlans(['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'], {
             plans: ports.plans,
             demandesSubvention: ports.demandesSubvention,
@@ -62,6 +73,8 @@ async function load(ports: Ports) {
         ports.attachments.list(),
         ports.entreprises.list(),
         ports.ressources.list(),
+        ports.referentielGeo.listDepartementsByRegion(),
+        ports.approvisionnements.listPaysDeProvenance(),
     ])
 
     return {
@@ -69,6 +82,8 @@ async function load(ports: Ports) {
         attachments,
         entreprises,
         ressources,
+        departementsByRegion,
+        pays,
         updateExtractedLine: (
             id: StoredExtractedLine['id'],
             changes: ExtractedLineChanges

@@ -1,5 +1,7 @@
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
+import { FAKE_DEPARTEMENTS_BY_REGION } from './departements'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
@@ -27,6 +29,7 @@ export const FAKE_PORTS: PlanViewPorts & {
     extractDataFromDocument: typeof importRows
     extractedApprovisionnements: ExtractedApprovisionnementPort
     approvisionnements: ApprovisionnementPort
+    referentielGeo: Pick<ReferentielGeoPort, 'listDepartementsByRegion'>
 } = {
     plans: { list: () => Promise.resolve(FAKE_PLANS) },
     demandesSubvention: {
@@ -62,9 +65,19 @@ export const FAKE_PORTS: PlanViewPorts & {
     approvisionnements: {
         list: () => Promise.resolve([]),
         create: () => Promise.resolve(),
+        listPaysDeProvenance: () =>
+            Promise.resolve([
+                { libelle: 'Espagne' },
+                { libelle: 'Italie' },
+                { libelle: 'Allemagne' },
+            ]),
         listGroupedByPlanAndRessource: () => Promise.resolve([]),
         listGroupedByPlanRessourceAndRegionOuPays: () => Promise.resolve([]),
         listGroupedByPlanRessourceAndProvenance: () => Promise.resolve([]),
         listGroupedByPlanRessourceAndFournisseur: () => Promise.resolve([]),
+    },
+    referentielGeo: {
+        listDepartementsByRegion: () =>
+            Promise.resolve(FAKE_DEPARTEMENTS_BY_REGION),
     },
 }
