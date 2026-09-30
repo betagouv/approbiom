@@ -6,6 +6,7 @@ import {
 } from '../doc-history'
 import StatePicker from './StatePicker'
 import EndpointDoc from './EndpointDoc'
+import CreatedTables from './CreatedTables'
 import RawResultView from './RawResultView'
 import { useRawResult } from './useRawResult'
 
@@ -82,6 +83,9 @@ export default function StateComparison() {
                 operationId="compareVersions"
             />
             <RawResultView result={result} />
+            {result.status === 'done' && (
+                <CreatedTables comparison={result.value} />
+            )}
         </>
     )
 }

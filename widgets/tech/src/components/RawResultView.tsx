@@ -1,4 +1,3 @@
-import CreatedTables from './CreatedTables'
 import JsonTree from './JsonTree'
 import type { RawResult } from './useRawResult'
 
@@ -12,12 +11,9 @@ export default function RawResultView({ result }: { result: RawResult }) {
             return <pre className="fr-mt-2w result">{result.message}</pre>
         case 'done':
             return (
-                <>
-                    <div className="fr-mt-2w result">
-                        <JsonTree value={result.value} />
-                    </div>
-                    <CreatedTables comparison={result.value} />
-                </>
+                <div className="fr-mt-2w result">
+                    <JsonTree value={result.value} />
+                </div>
             )
     }
 }
