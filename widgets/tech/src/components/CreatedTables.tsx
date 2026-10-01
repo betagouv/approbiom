@@ -1,6 +1,9 @@
 import DataTable from '@shared/react/components/DataTable'
 import type { Column } from '@shared/react/components/DataTable'
-import { findCreatedTables, type CreatedColumn } from '../created-tables'
+import {
+    findCreatedTablesFromComparison,
+    type CreatedColumn,
+} from '../created-tables'
 
 const COLUMNS: Column<CreatedColumn>[] = [
     {
@@ -16,7 +19,7 @@ const COLUMNS: Column<CreatedColumn>[] = [
 ]
 
 export default function CreatedTables({ comparison }: { comparison: unknown }) {
-    const createdTables = findCreatedTables(comparison)
+    const createdTables = findCreatedTablesFromComparison(comparison)
 
     return (
         <section className="fr-mt-4w">
@@ -31,10 +34,13 @@ export default function CreatedTables({ comparison }: { comparison: unknown }) {
                 et leur <code>type</code>.
             </p>
             {createdTables.length === 0 && <p>Aucune table créée.</p>}
-            {createdTables.map(({ tableId, columns }) => (
+            {createdTables.map(({ tableId, label, columns }) => (
                 <DataTable
                     key={tableId}
-                    caption={tableId}
+                    caption={label}
+                    description={
+                        label === tableId ? undefined : `tableId : ${tableId}`
+                    }
                     rows={columns}
                     columns={COLUMNS}
                     bordered

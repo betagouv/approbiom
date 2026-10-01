@@ -2,6 +2,7 @@ import { useEffect, useState, type SubmitEvent } from 'react'
 import { compareDocs, getCurrentDocId } from '../doc-history'
 import CopyableValue from './CopyableValue'
 import EndpointDoc from './EndpointDoc'
+import CreatedTables from './CreatedTables'
 import RawResultView from './RawResultView'
 import { useRawResult } from './useRawResult'
 
@@ -59,6 +60,9 @@ export default function DocComparison() {
                 operationId="compareDocuments"
             />
             <RawResultView result={result} />
+            {result.status === 'done' && (
+                <CreatedTables comparison={result.value} />
+            )}
         </>
     )
 }
