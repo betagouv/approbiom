@@ -1,5 +1,5 @@
 import JsonTree from './JsonTree'
-import type { RawResult } from './useRawResult'
+import type { RawResult } from '../hooks/useRawResult'
 
 export default function RawResultView({ result }: { result: RawResult }) {
     switch (result.status) {

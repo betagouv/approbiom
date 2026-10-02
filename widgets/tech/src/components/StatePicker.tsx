@@ -1,5 +1,5 @@
 import { useRef } from 'react'
-import type { HistoryState } from '../doc-history'
+import type { HistoryState } from '@shared/infrastructure/grist/helpers/grist-document-states'
 
 interface StatePickerProps {
     states?: HistoryState[]

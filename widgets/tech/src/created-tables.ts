@@ -1,18 +1,4 @@
-/** `[before, after]`, each wrapped in a one-item array, `null` when absent and `'?'` when unknown. */
-type CellDelta = [unknown[] | null | '?', unknown[] | null | '?']
-
-interface TableDelta {
-    addRows: number[]
-    columnDeltas: Record<string, Record<string, CellDelta> | undefined>
-}
-
-interface ComparisonWithDetails {
-    details?: {
-        rightChanges?: {
-            tableDeltas?: Record<string, TableDelta | undefined>
-        }
-    }
-}
+import type { TableDelta, TableDeltas } from './types/compare-version'
 
 export interface CreatedColumn {
     colId: string
@@ -30,12 +16,9 @@ function valueAfter(delta: TableDelta, column: string, rowId: number): unknown {
     return Array.isArray(after) ? after[0] : undefined
 }
 
-export function findCreatedTablesFromComparison(
-    comparison: unknown
+export function findCreatedTablesFromTableDeltas(
+    tableDeltas: TableDeltas
 ): CreatedTable[] {
-    const tableDeltas =
-        (comparison as ComparisonWithDetails).details?.rightChanges
-            ?.tableDeltas ?? {}
     const tables = tableDeltas._grist_Tables
     const sections = tableDeltas._grist_Views_section
     const columns = tableDeltas._grist_Tables_column

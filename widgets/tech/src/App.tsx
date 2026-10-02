@@ -13,7 +13,7 @@ export default function App() {
                 items={[
                     {
                         id: 'comparisons',
-                        label: 'Comparer des documents',
+                        label: 'Comparer des états',
                         content: <Comparisons />,
                     },
                     {

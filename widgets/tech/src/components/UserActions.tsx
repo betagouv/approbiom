@@ -5,7 +5,7 @@ import Modal from '@shared/react/components/Modal'
 import { applyUserActions, parseUserActions } from '../user-actions'
 import Accordion from './Accordion'
 import RawResultView from './RawResultView'
-import { useRawResult } from './useRawResult'
+import { useRawResult } from '../hooks/useRawResult'
 
 export default function UserActions() {
     const [actions, setActions] = useState('')

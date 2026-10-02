@@ -11,17 +11,6 @@ body {
     word-break: break-all;
 }
 
-.copyable-value {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: center;
-    gap: 0.5rem;
-}
-
-.copyable-value code {
-    word-break: break-all;
-}
-
 .json-node,
 .json-leaf {
     font-family: monospace;
@@ -43,31 +32,6 @@ body {
 
 .json-count {
     color: var(--text-mention-grey);
-}
-
-.copy-button--copied {
-    animation: copy-pop 0.3s ease-out;
-    color: var(--text-default-success);
-}
-
-.copy-button--failed {
-    color: var(--text-default-error);
-}
-
-.copy-flash {
-    animation: copy-flash 1.5s ease-out;
-}
-
-@keyframes copy-pop {
-    50% {
-        transform: scale(1.15);
-    }
-}
-
-@keyframes copy-flash {
-    from {
-        background-color: var(--background-contrast-success);
-    }
 }
 
 .state-picker > summary {

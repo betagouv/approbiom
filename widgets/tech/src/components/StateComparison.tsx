@@ -1,10 +1,11 @@
 import { useEffect, useState, type SubmitEvent } from 'react'
+
+import StatePicker from './StatePicker'
 import {
     compareStates,
     listHistoryStates,
     type HistoryState,
-} from '../doc-history'
-import StatePicker from './StatePicker'
+} from '@shared/infrastructure/grist/helpers/grist-document-states'
 
 type Props = {
     updateRawResultOnRequest: (request: () => Promise<unknown>) => Promise<void>

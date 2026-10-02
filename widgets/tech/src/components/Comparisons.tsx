@@ -1,9 +1,7 @@
 import { useState } from 'react'
-import { RadioGroup, type RadioOption } from '@shared/react/components/Radio'
-import DocComparison from './DocComparison'
 import StateComparison from './StateComparison'
 import RawResultView from './RawResultView'
-import CreatedTables from './CreatedTables'
+import ResultView from './ResultView'
 
 export type RawResult =
     | { status: 'idle' }
@@ -11,15 +9,7 @@ export type RawResult =
     | { status: 'error'; message: string }
     | { status: 'done'; value: unknown }
 
-type ComparisonKind = 'states' | 'documents'
-
-const COMPARISON_KINDS: readonly RadioOption<ComparisonKind>[] = [
-    { value: 'states', label: 'Deux états' },
-    { value: 'documents', label: 'Deux documents' },
-]
-
 export default function Comparisons() {
-    const [kind, setKind] = useState<ComparisonKind>('states')
     const [rawResult, setRawResult] = useState<RawResult>({ status: 'idle' })
     async function updateRawResultOnRequest(request: () => Promise<unknown>) {
         setRawResult({ status: 'loading' })
@@ -31,26 +21,12 @@ export default function Comparisons() {
     }
     return (
         <>
-            <RadioGroup
-                legend="Comparer"
-                options={COMPARISON_KINDS}
-                value={kind}
-                onChange={setKind}
-                inline
+            <StateComparison
+                updateRawResultOnRequest={updateRawResultOnRequest}
             />
-            {kind === 'states' && (
-                <StateComparison
-                    updateRawResultOnRequest={updateRawResultOnRequest}
-                />
-            )}
-            {kind === 'documents' && (
-                <DocComparison
-                    updateRawResultOnRequest={updateRawResultOnRequest}
-                />
-            )}
             <RawResultView result={rawResult} />
             {rawResult.status === 'done' && (
-                <CreatedTables comparison={rawResult.value} />
+                <ResultView comparison={rawResult.value} />
             )}
         </>
     )
