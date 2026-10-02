@@ -74,3 +74,9 @@ body {
 .state-picker__time {
     font-weight: bold;
 }
+
+/* DataTable gives its caption the size of a page title, larger than the section headings above it. */
+.comparison-result .fr-table .shared-data-table__header-title {
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
