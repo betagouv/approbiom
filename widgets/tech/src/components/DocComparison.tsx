@@ -1,31 +1,22 @@
-import { useEffect, useState, type SubmitEvent } from 'react'
-import { compareDocs, getCurrentDocId } from '../doc-history'
-import CopyableValue from './CopyableValue'
-import EndpointDoc from './EndpointDoc'
-import CreatedTables from './CreatedTables'
-import RawResultView from './RawResultView'
-import { useRawResult } from './useRawResult'
+import { useState, type SubmitEvent } from 'react'
+import { compareDocs } from '../doc-history'
 
-export default function DocComparison() {
-    const [currentDocId, setCurrentDocId] = useState('')
+type Props = {
+    updateRawResultOnRequest: (request: () => Promise<unknown>) => Promise<void>
+}
+
+export default function DocComparison({ updateRawResultOnRequest }: Props) {
     const [leftDocId, setLeftDocId] = useState('')
     const [rightDocId, setRightDocId] = useState('')
-    const { result, show } = useRawResult()
-
-    useEffect(() => {
-        getCurrentDocId()
-            .then(setCurrentDocId)
-            .catch(() => undefined)
-    }, [])
-
     function handleSubmit(event: SubmitEvent) {
         event.preventDefault()
-        void show(() => compareDocs(leftDocId.trim(), rightDocId.trim()))
+        void updateRawResultOnRequest(() =>
+            compareDocs(leftDocId.trim(), rightDocId.trim())
+        )
     }
 
     return (
         <>
-            <CopyableValue label="Id du document actuel" value={currentDocId} />
             <form onSubmit={handleSubmit}>
                 <div className="fr-input-group">
                     <label className="fr-label" htmlFor="left-doc-id">
@@ -55,14 +46,6 @@ export default function DocComparison() {
                     Comparer
                 </button>
             </form>
-            <EndpointDoc
-                endpoint="GET /docs/{docId}/compare/{docId2}"
-                operationId="compareDocuments"
-            />
-            <RawResultView result={result} />
-            {result.status === 'done' && (
-                <CreatedTables comparison={result.value} />
-            )}
         </>
     )
 }

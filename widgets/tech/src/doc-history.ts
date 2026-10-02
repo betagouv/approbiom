@@ -38,12 +38,6 @@ async function fetchJson(path: string, docId?: string): Promise<unknown> {
     return response.json()
 }
 
-/** Unlike the id in the page URL, which may be a shortened urlId. */
-export async function getCurrentDocId(): Promise<string> {
-    await gristReady()
-    return grist.docApi.getDocName()
-}
-
 /**
  * The body is an ActionBundle in Grist's marshal format, where a string is
  * `u` + its byte length (int32 LE) + its bytes and a float is `g` + float64 LE.

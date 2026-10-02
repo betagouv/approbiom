@@ -5,17 +5,16 @@ import {
     type HistoryState,
 } from '../doc-history'
 import StatePicker from './StatePicker'
-import EndpointDoc from './EndpointDoc'
-import CreatedTables from './CreatedTables'
-import RawResultView from './RawResultView'
-import { useRawResult } from './useRawResult'
 
-export default function StateComparison() {
+type Props = {
+    updateRawResultOnRequest: (request: () => Promise<unknown>) => Promise<void>
+}
+
+export default function StateComparison({ updateRawResultOnRequest }: Props) {
     const [leftActionHash, setLeftActionHash] = useState('')
     const [rightActionHash, setRightActionHash] = useState('HEAD')
     const [historyStates, setHistoryStates] = useState<HistoryState[]>()
     const [historyError, setHistoryError] = useState('')
-    const { result, show } = useRawResult()
 
     useEffect(() => {
         listHistoryStates()
@@ -25,7 +24,7 @@ export default function StateComparison() {
 
     function handleSubmit(event: SubmitEvent) {
         event.preventDefault()
-        void show(() =>
+        void updateRawResultOnRequest(() =>
             compareStates(leftActionHash.trim(), rightActionHash.trim())
         )
     }
@@ -78,14 +77,6 @@ export default function StateComparison() {
                     Comparer
                 </button>
             </form>
-            <EndpointDoc
-                endpoint="GET /docs/{docId}/compare"
-                operationId="compareVersions"
-            />
-            <RawResultView result={result} />
-            {result.status === 'done' && (
-                <CreatedTables comparison={result.value} />
-            )}
         </>
     )
 }
