@@ -4,7 +4,7 @@ import '@gouvfr/dsfr/dist/component/callout/callout.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
-import { useState } from 'react'
+import CopyButton from '@shared/react/components/CopyButton'
 
 export type ExtractionFailureProps = {
     message: string
@@ -17,25 +17,13 @@ export default function ExtractionFailure({
     onRetry,
     onBack,
 }: ExtractionFailureProps) {
-    const [copied, setCopied] = useState(false)
-
-    function copy() {
-        void navigator.clipboard.writeText(message).then(() => setCopied(true))
-    }
-
     return (
         <>
             <div className="fr-alert fr-alert--error" role="alert">
                 <h3 className="fr-alert__title">L&apos;extraction a échoué</h3>
                 <div className="extraction__error">
                     <code className="extraction__message">{message}</code>
-                    <button
-                        type="button"
-                        className="fr-btn fr-btn--tertiary fr-btn--sm"
-                        onClick={copy}
-                    >
-                        {copied ? 'Copié' : 'Copier'}
-                    </button>
+                    <CopyButton value={message} label="le message d'erreur" />
                 </div>
             </div>
 
