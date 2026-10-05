@@ -17,6 +17,8 @@ import { FAKE_ENTREPRISES } from './entreprises'
 import { FAKE_RESSOURCES } from './ressources'
 import { createFakeExtractedApprovisionnements } from './extracted-approvisionnements'
 import type { ExtractedApprovisionnementPort } from '../extracted-approvisionnement-port'
+import type { EntrepriseSearchPort } from '@shared/core/application/ports/entreprise-search'
+import { FAKE_ENTREPRISE_SEARCH } from './entreprise-search'
 
 // The ports the widget reads through, answered from the fake data.
 // An empty file: the fake extraction only looks at the document's name.
@@ -42,6 +44,7 @@ export const FAKE_PORTS: PlanViewPorts & {
     extractedApprovisionnements: ExtractedApprovisionnementPort
     approvisionnements: ApprovisionnementPort
     referentielGeo: Pick<ReferentielGeoPort, 'listDepartementsByRegion'>
+    entrepriseSearch: EntrepriseSearchPort
 } = {
     plans: { list: () => Promise.resolve(FAKE_PLANS) },
     demandesSubvention: {
@@ -107,4 +110,5 @@ export const FAKE_PORTS: PlanViewPorts & {
         listDepartementsByRegion: () =>
             Promise.resolve(FAKE_DEPARTEMENTS_BY_REGION),
     },
+    entrepriseSearch: FAKE_ENTREPRISE_SEARCH,
 }

@@ -1,12 +1,11 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import SearchBar from './SearchBar'
-import type { SearchBarOption } from './SearchBar.types'
 
-const options: readonly SearchBarOption<string>[] = [
-    { value: 'chaufferie', label: 'Chaufferie' },
-    { value: 'rc-st-junien', label: 'RC St Junien' },
-    { value: 'bio2-st-gaudens', label: 'BIO2 St Gaudens' },
+const options: readonly string[] = [
+    'Chaufferie',
+    'RC St Junien',
+    'BIO2 St Gaudens',
 ]
 
 afterEach(() => {
@@ -28,14 +27,14 @@ const type = (text: string) =>
 
 describe('SearchBar', () => {
     it('keeps the suggestion panel closed until the field is clicked', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
 
         expect(screen.queryByRole('listbox')).toBeNull()
         expect(getInput().getAttribute('aria-expanded')).toBe('false')
     })
 
     it('opens the suggestion panel with its options when the field is clicked', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
 
         fireEvent.click(getInput())
 
@@ -47,7 +46,7 @@ describe('SearchBar', () => {
     })
 
     it('restricts the suggestions to those matching what is typed', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
         type('st')
@@ -58,7 +57,7 @@ describe('SearchBar', () => {
     })
 
     it('closes the panel when nothing matches what is typed', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
         type('zzz')
@@ -67,7 +66,7 @@ describe('SearchBar', () => {
     })
 
     it('reopens the panel when a letter is removed after Enter closed it', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
         type('chaufx')
@@ -82,7 +81,7 @@ describe('SearchBar', () => {
     })
 
     it('opens the suggestion panel when the field is reached with the keyboard', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
 
         // Tabbing into the field fires `focus` and no click at all, so the two
         // handlers are not interchangeable.
@@ -117,7 +116,7 @@ describe('SearchBar', () => {
     })
 
     it('closes the suggestion panel when a click lands outside it', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
         // `mousedown` rather than `click`: that is the event the component
@@ -128,7 +127,7 @@ describe('SearchBar', () => {
     })
 
     it('closes the suggestion panel when Escape is pressed', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
         fireEvent.keyDown(getInput(), { key: 'Escape' })
@@ -136,13 +135,13 @@ describe('SearchBar', () => {
         expect(screen.queryByRole('listbox')).toBeNull()
     })
 
-    it('closes the suggestion panel when an option is picked', () => {
-        const onSelect = vi.fn()
+    it('searches for a suggestion when it is picked', () => {
+        const onSearch = vi.fn()
         render(
             <SearchBar
                 label="Rechercher un plan"
-                options={options}
-                onSelect={onSelect}
+                suggestions={options}
+                onSearch={onSearch}
             />
         )
         fireEvent.click(getInput())
@@ -150,14 +149,12 @@ describe('SearchBar', () => {
         fireEvent.click(screen.getByRole('option', { name: 'RC St Junien' }))
 
         expect(screen.queryByRole('listbox')).toBeNull()
-        // The choice is made, so it belongs in the field — and the caller gets
-        // the option's value, not its label.
         expect(getInput().value).toBe('RC St Junien')
-        expect(onSelect).toHaveBeenCalledWith('rc-st-junien')
+        expect(onSearch).toHaveBeenCalledWith('RC St Junien')
     })
 
     it('closes the suggestion panel when the search button is clicked', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
         fireEvent.click(getButton())
@@ -166,7 +163,7 @@ describe('SearchBar', () => {
     })
 
     it('closes the suggestion panel when the field is submitted with Enter', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
         fireEvent.submit(getInput())
@@ -175,7 +172,7 @@ describe('SearchBar', () => {
     })
 
     it('keeps what the user types in the field', () => {
-        render(<SearchBar label="Rechercher un plan" options={options} />)
+        render(<SearchBar label="Rechercher un plan" suggestions={options} />)
 
         type('chauf')
 
@@ -252,16 +249,19 @@ describe('SearchBar', () => {
 })
 
 describe('SearchBar, matching what is typed', () => {
-    const accentedOptions: readonly SearchBarOption<string>[] = [
-        { value: 'chaufferie', label: 'Chaufferie' },
-        { value: 'hopital', label: 'Chaufferie Hôpital Tulle' },
-        { value: 'reseau', label: 'Réseau de chaleur Brive' },
-        { value: 'egletons', label: 'ÉGLETONS' },
+    const accentedOptions: readonly string[] = [
+        'Chaufferie',
+        'Chaufferie Hôpital Tulle',
+        'Réseau de chaleur Brive',
+        'ÉGLETONS',
     ]
 
     const suggestionsFor = (text: string) => {
         render(
-            <SearchBar label="Rechercher un plan" options={accentedOptions} />
+            <SearchBar
+                label="Rechercher un plan"
+                suggestions={accentedOptions}
+            />
         )
         fireEvent.click(getInput())
         type(text)

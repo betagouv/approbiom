@@ -35,6 +35,9 @@ import type {
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
+import type { EntrepriseSearchPort } from '@shared/core/application/ports/entreprise-search'
+import { createRechercheEntreprisesPort } from '@shared/infrastructure/referentiel-entreprise/recherche-entreprises-adapter'
+import { findEntrepriseBySiret } from './find-entreprise-by-siret'
 
 type Ports = PlanViewPorts & {
     attachments: AttachmentPort
@@ -44,6 +47,7 @@ type Ports = PlanViewPorts & {
     extractedApprovisionnements: ExtractedApprovisionnementPort
     approvisionnements: ApprovisionnementPort
     referentielGeo: Pick<ReferentielGeoPort, 'listDepartementsByRegion'>
+    entrepriseSearch: EntrepriseSearchPort
 }
 
 const GRIST_PORTS: Ports = {
@@ -57,6 +61,7 @@ const GRIST_PORTS: Ports = {
     extractedApprovisionnements: createGristExtractedApprovisionnementAdapter(),
     approvisionnements: createGristApprovisionnementPort(),
     referentielGeo: createGristReferentielGeoPort(),
+    entrepriseSearch: createRechercheEntreprisesPort(),
 }
 
 async function load(ports: Ports) {
@@ -93,6 +98,10 @@ async function load(ports: Ports) {
         loadImportProgress: () => loadImportProgress(ports),
         createEntreprise: (entreprise: Entreprise) =>
             ports.entreprises.create(entreprise),
+        findEntrepriseBySiret: (siret: string) =>
+            findEntrepriseBySiret(siret, (query) =>
+                ports.entrepriseSearch.getEntrepriseFromQuery(query)
+            ),
         createPays: (created: Pays) =>
             ports.approvisionnements.addPaysDeProvenance(created),
         getAttachmentUrl: (id: Attachment['id']) =>

@@ -2,7 +2,7 @@ import './Selection.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
-import SearchBar from '@shared/react/components/SearchBar'
+import Combobox from '@shared/react/components/Combobox'
 import Alert from '@shared/react/components/Alert'
 import Badge from '@shared/react/components/Badge'
 import Tag from '@shared/react/components/Tag'
@@ -64,13 +64,17 @@ export default function Selection({
     return (
         <div className="plan-selection">
             <div className="plan-selection__search">
-                <SearchBar
+                <Combobox
                     label="Plan d'approvisionnement"
-                    showLabel
                     hint="Recherche sur le nom du plan"
                     placeholder="Ex. chaufferie Tulle"
                     options={options}
-                    onSelect={onSelectPlan}
+                    value={planId}
+                    // Typing over the chosen plan keeps it until another one
+                    // is chosen.
+                    onChange={(id) => {
+                        if (id !== null) onSelectPlan(id)
+                    }}
                 />
             </div>
 

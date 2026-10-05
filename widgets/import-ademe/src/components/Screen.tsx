@@ -11,6 +11,7 @@ import type {
     StoredExtractedLine,
 } from '../extracted-approvisionnement-port'
 import type { ImportProgress } from '../import-progress'
+import type { SiretLookup } from '../find-entreprise-by-siret'
 import Selection, { type SelectablePlan } from './selection'
 import Extraction from './extraction'
 import Verification from './verification'
@@ -32,6 +33,7 @@ export type ScreenProps = {
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
     createEntreprise: (entreprise: Entreprise) => Promise<void>
     createPays: (pays: Pays) => Promise<void>
+    findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     extractDocument: (attachment: Attachment) => Promise<ExtractedData>
     updateExtractedLine: (
         id: StoredExtractedLine['id'],
@@ -51,6 +53,7 @@ export default function Screen({
     pays: initialPays,
     createEntreprise,
     createPays,
+    findEntrepriseBySiret,
     importProgress: initialImportProgress,
     loadImportProgress,
     getAttachmentUrl,
@@ -205,6 +208,7 @@ export default function Screen({
                             onImportLine={importReviewedLine}
                             onCreateFournisseur={createFournisseur}
                             onCreatePays={createPaysDeProvenance}
+                            findEntrepriseBySiret={findEntrepriseBySiret}
                         />
                     ),
                     disabled: extracted === null,

@@ -21,7 +21,7 @@ import {
     getDepartementOptions,
     getFilteredRows,
     getFournisseurOptions,
-    getPlanOptions,
+    getPlanNames,
     getStatutOptions,
 } from '../../utils'
 
@@ -100,7 +100,7 @@ export default function PageAccueil({
 
     const statutOptions = getStatutOptions(plansApprovisionnement)
 
-    const planOptions = getPlanOptions(plansApprovisionnement)
+    const planNames = getPlanNames(plansApprovisionnement)
 
     const departementOptions = getDepartementOptions(departementsByRegion)
 
@@ -143,9 +143,8 @@ export default function PageAccueil({
                     key={searchGeneration}
                     label="Rechercher un plan"
                     placeholder="Rechercher un plan"
-                    options={planOptions}
+                    suggestions={planNames}
                     onSearch={setNom}
-                    onSelect={setNom}
                 />
             </div>
 

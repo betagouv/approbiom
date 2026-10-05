@@ -2,7 +2,7 @@ import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
 
 import CopyButton from '@shared/react/components/CopyButton'
 import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-search'
-import { annuaireEntrepriseUrl } from '../annuaire-entreprises'
+import { annuaireEntrepriseUrl } from '@shared/infrastructure/referentiel-entreprise/annuaire-entreprises'
 
 export type EntrepriseResultProps = {
     entreprise: FoundEntreprise

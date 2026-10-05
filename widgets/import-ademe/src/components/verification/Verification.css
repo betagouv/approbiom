@@ -159,43 +159,44 @@
     font-variant-numeric: tabular-nums;
 }
 
-.new-fournisseur__fieldset {
-    padding-left: 0.75rem;
-    border-left: 2px solid var(--border-active-blue-france);
+.new-fournisseur {
+    min-width: 0;
+    margin: 0;
+    padding: 1.5rem;
+    border: 1px solid var(--border-default-grey);
+    background-color: var(--background-alt-blue-france);
 }
 
-.new-fournisseur__fields {
-    display: grid;
-    grid-template-columns: minmax(0, 3fr) minmax(0, 2fr);
-    gap: 1rem;
-    align-items: start;
+.new-fournisseur__legend {
+    float: left;
+    width: 100%;
+    margin: 0 0 1.5rem;
+    padding: 0;
 }
 
-.new-fournisseur__fields .fr-input-group {
-    margin-bottom: 0;
+.new-fournisseur .fr-input-group {
+    clear: both;
+    margin-bottom: 1.5rem;
 }
 
-.new-fournisseur__actions {
-    display: flex;
-    gap: 0.5rem;
+.new-fournisseur__count {
+    margin: 0.25rem 0 0;
+    color: var(--text-mention-grey);
+}
+
+.new-fournisseur__shortcut {
     margin-top: 0.75rem;
 }
 
-.new-fournisseur .fr-label {
-    margin-bottom: 0.125rem;
-    font-size: 0.875rem;
+/* Read-only rather than disabled: it stays readable and focusable. */
+.new-fournisseur__denomination.fr-input {
+    background-color: var(--background-disabled-grey);
+    color: var(--text-default-grey);
+    box-shadow: inset 0 -2px 0 0 var(--border-disabled-grey);
 }
 
-.new-fournisseur .fr-label .fr-hint-text {
-    display: inline;
-    margin-left: 0.5rem;
-}
-
-.new-fournisseur .fr-input {
-    margin-top: 0;
-    padding-top: 0.375rem;
-    padding-bottom: 0.375rem;
-    font-size: 0.875rem;
+.new-fournisseur__actions {
+    margin: 0;
 }
 
 .provenance-editor__extra {
@@ -219,4 +220,8 @@
 
 .new-pays__line .fr-input {
     max-width: 18rem;
+}
+
+.new-fournisseur__help {
+    margin: 0 0 0.5rem;
 }

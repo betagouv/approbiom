@@ -1,6 +1,6 @@
 import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
 
-import { annuaireSearchUrl } from '../annuaire-entreprises'
+import { annuaireSearchUrl } from '@shared/infrastructure/referentiel-entreprise/annuaire-entreprises'
 
 export type AnnuaireSearchLinkProps = {
     query: string

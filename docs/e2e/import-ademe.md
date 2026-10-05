@@ -327,24 +327,32 @@ Pour vérifier les tables, ouvrir les pages Grist `Approvisionnement` et
 
 - Attendu :
     - Section « Données à créer » (même niveau de titre que « Données du
-      document ») : sélecteurs « Fournisseur »
-      (« DÉNOMINATION — SIRET ») et « Ressource » (« code · description »).
-    - Correspondance trouvée : valeur présélectionnée, indication
-      « Correspondance trouvée ».
-    - Pas de correspondance : sélecteur en erreur, « Aucune correspondance
-      trouvée ».
+      document ») : champ « Fournisseur » (combobox, options « DÉNOMINATION —
+      SIRET ») et sélecteur « Ressource » (« code · description »).
+    - Fournisseur trouvé : il est déjà choisi, son libellé est dans le champ.
+    - Pas de fournisseur trouvé : champ vide en erreur, « Aucune
+      correspondance trouvée ».
+    - Ressource trouvée : valeur présélectionnée, « Correspondance trouvée ».
 
-**E2E-3.2.4 — Changer le fournisseur ou la ressource**
+**E2E-3.2.4 — Changer la ressource**
 
-- Étapes : choisir une autre entreprise, puis une autre ressource.
+- Étapes : choisir une autre ressource.
 - Attendu :
-    - Dans `Approvisionnement_extrait_d_un_document`, `Fournisseur` et
+    - Dans `Approvisionnement_extrait_d_un_document` et
       `Ressource` de la ligne pointent vers les nouveaux choix.
     - Après fermeture et réouverture de la modale, puis rechargement du widget,
       les choix sont conservés.
     - Le tableau affiche les nouvelles valeurs.
 - Si l'enregistrement échoue (Grist injoignable) : « Le choix n'a pas pu être
   enregistré. Réessayez. ».
+  **E2E-3.2.4 — Changer le fournisseur**
+  Changer le fournisseur
+  Parcours
+  Je cherche par nom ou par SIRET (les espaces sont ignorés).
+  Introuvable : « Ajouter… » en fin de liste ouvre le formulaire « Nouveau fournisseur ». Un SIRET déjà tapé est pré-rempli.
+  SIRET valide → la dénomination est récupérée automatiquement, non modifiable.
+  « Ajouter le fournisseur » : il est créé, sélectionné, et le focus revient sur le champ Fournisseur.
+  Je me suis trompée : je modifie ou j'efface (✕), puis je choisis ou j'ajoute un autre fournisseur.
 
 **E2E-3.2.5 — Modifier la répartition**
 
@@ -425,49 +433,92 @@ Pour vérifier les tables, ouvrir les pages Grist `Approvisionnement` et
 - Attendu : le formulaire se ferme, rien n'est créé, le focus revient sur le
   sélecteur.
 
-### 3.4 Vérifier la création d'un fournisseur
+### 3.4 Vérifier la recherche et la création d'un fournisseur
 
-**E2E-3.4.1 — Ouvrir le formulaire**
+**E2E-3.4.1 — Chercher un fournisseur**
 
-- Préconditions : `LIGNE_SANS`, modale ouverte.
-- Attendu :
-    - Sous le sélecteur « Fournisseur » en erreur : « Créer le fournisseur
-      « <fournisseur lu dans le document> » ».
-    - Au clic : le sélecteur est remplacé par « Nouveau fournisseur » avec
-      « Dénomination » (préremplie avec le nom lu) et « SIRET » (14 chiffres) ;
-      le focus est dans « Dénomination ».
+- Préconditions : modale ouverte.
+- Étapes et attendus :
+    - Taper une partie du nom, sans tenir compte des majuscules ni des
+      accents : la liste ne garde que les fournisseurs correspondants, la
+      partie trouvée en gras, la 1re ligne active.
+    - Taper une partie du SIRET : la liste garde les fournisseurs dont le
+      SIRET la contient.
+    - ↓/↑ parcourent la liste (en boucle), Entrée choisit, le survol rend une
+      ligne active.
+    - Rien ne correspond : « Aucun résultat ne correspond à « … ». ».
+    - Les entreprises sans dénomination ne sont pas proposées.
+- Après un choix : le champ affiche « DÉNOMINATION — SIRET », la liste
+  marque le fournisseur choisi d'une coche, et `Fournisseur` de la ligne dans
+  `Approvisionnement_extrait_d_un_document` pointe vers lui.
 
-**E2E-3.4.2 — Validations**
+**E2E-3.4.2 — Changer d'avis**
 
-| Saisie                                 | Message attendu                                                            |
-| -------------------------------------- | -------------------------------------------------------------------------- |
-| dénomination vide                      | « Saisissez la dénomination. »                                             |
-| SIRET vide ou différent de 14 chiffres | « Le SIRET doit comporter 14 chiffres. »                                   |
-| SIRET d'une entreprise existante       | « Ce SIRET existe déjà : <DÉNOMINATION>. » et « Choisir cette entreprise » |
+- Modifier le texte après un choix annule la sélection et rouvre la liste.
+- ✕ « Effacer « Fournisseur » » vide le champ et la sélection, garde le focus
+  dans le champ et rouvre la liste complète.
+- Échap ferme la liste, puis, liste fermée, efface la saisie. La modale reste
+  ouverte.
+- Quitter le champ avec un texte non choisi : si le texte correspond
+  exactement à une option, elle est choisie ; sinon « Choisissez une valeur
+  dans la liste ou ajoutez-en une. ».
 
-- Les espaces du SIRET sont acceptés (« 123 456 789 00012 »).
-- Le message d'un champ disparaît dès que ce champ change.
-- « Choisir cette entreprise » sélectionne l'entreprise existante et ferme le
-  formulaire.
+**E2E-3.4.3 — Ouvrir l'ajout**
 
-**E2E-3.4.3 — Créer le fournisseur**
+- La dernière ligne de la liste propose l'ajout :
+    - saisie numérique : « Ajouter le fournisseur avec le SIRET 412 345 678
+      00019 » ;
+    - sinon : « Ajouter un nouveau fournisseur » ;
+    - absente si la saisie est exactement le SIRET d'un fournisseur connu.
+- Choisir cette ligne ouvre le bloc « Nouveau fournisseur » sous le champ ;
+  le SIRET déjà tapé y est pré-rempli et le focus est dans « SIRET ».
+- Le lien « Chercher sur l'Annuaire des Entreprises » (nouvelle fenêtre)
+  cherche le nom tapé, ou à défaut le fournisseur lu dans le document.
 
-- Étapes : saisir une dénomination et un SIRET inconnu, « Créer le
-  fournisseur ».
-- Attendu :
-    - Retour au sélecteur, avec la nouvelle entreprise choisie et le message
-      « Fournisseur créé » ; le focus est sur le sélecteur.
-    - Dans Grist :
-        - `Entreprise` contient une nouvelle ligne avec `Siret` et `Denomination`
-          saisis (les autres colonnes vides) ;
-        - la ligne de `Approvisionnement_extrait_d_un_document` pointe vers cette
-          entreprise (`Fournisseur`).
-    - La nouvelle entreprise est proposée dans les sélecteurs des autres lignes.
-    - Le tableau affiche le nouveau fournisseur pour la ligne.
+**E2E-3.4.4 — Règles du SIRET**
 
-**E2E-3.4.4 — Annuler**
+| Saisie                                      | Message attendu                                                                          | Quand                                               |
+| ------------------------------------------- | ---------------------------------------------------------------------------------------- | --------------------------------------------------- |
+| autre chose que des chiffres et des espaces | « Le SIRET ne doit contenir que des chiffres. »                                          | immédiatement                                       |
+| vide                                        | « Renseignez le SIRET du fournisseur. »                                                  | à l'ajout                                           |
+| moins ou plus de 14 chiffres                | « Le SIRET doit contenir 14 chiffres (n saisis). »                                       | à la sortie du champ, à l'ajout, ou dès 15 chiffres |
+| SIRET d'un fournisseur connu                | « Ce SIRET est déjà utilisé par le fournisseur « X ». » et bouton « Sélectionner « X » » | immédiatement                                       |
 
-- Attendu : le formulaire se ferme, rien n'est créé dans `Entreprise`.
+- Le compteur « n / 14 chiffres » suit la saisie.
+- « Sélectionner « X » » choisit ce fournisseur, ferme le bloc et rend le
+  focus au champ Fournisseur.
+
+**E2E-3.4.5 — Dénomination trouvée par l'API**
+
+- Dès que le SIRET passe les règles, la dénomination est cherchée
+  (« Recherche de la dénomination en cours… »).
+- Trouvée : « Établissement trouvé. », la dénomination remplit le champ
+  « Dénomination », qui n'est pas modifiable.
+- Inconnue : « Aucun établissement actif trouvé pour ce SIRET. Vérifiez le
+  numéro. ».
+- Service indisponible ou trop lent (6 s) : « Le service de recherche est
+  momentanément indisponible. » et bouton « Réessayer ».
+- Une réponse arrivée après une modification du SIRET est ignorée.
+- Fausses données (hors Grist) : un SIRET commençant par 000 est introuvable,
+  99999999999999 rend le service indisponible.
+
+**E2E-3.4.6 — Ajouter le fournisseur**
+
+- « Ajouter le fournisseur » (ou Entrée dans le SIRET), dénomination trouvée :
+    - le bloc se ferme, le fournisseur est choisi et le focus revient sur le
+      champ Fournisseur ;
+    - message « Fournisseur « X » ajouté et sélectionné. » ;
+    - dans Grist : une nouvelle ligne `Entreprise` (`Siret`, `Denomination`) et
+      `Fournisseur` de la ligne extraite qui pointe vers elle ;
+    - le nouveau fournisseur est proposé dans les autres lignes.
+- Dénomination pas encore trouvée : « La dénomination doit être trouvée pour
+  ajouter le fournisseur. », rien n'est créé.
+
+**E2E-3.4.7 — Annuler l'ajout**
+
+- « Annuler » ou Échap : le bloc se ferme, rien n'est créé dans
+  `Entreprise`, le focus revient sur le champ Fournisseur, la modale reste
+  ouverte.
 
 ### 3.5 Vérifier ce qui a été créé dans la table Approvisionnement
 
@@ -500,7 +551,7 @@ Pour vérifier les tables, ouvrir les pages Grist `Approvisionnement` et
 
 **E2E-3.5.3 — Fournisseur créé pendant la vérification**
 
-- Préconditions : E2E-3.4.3 puis import.
+- Préconditions : E2E-3.4.6 puis import.
 - Attendu : `Fournisseur` pointe vers la nouvelle ligne de `Entreprise`.
 
 **E2E-3.5.4 — État de la ligne extraite**

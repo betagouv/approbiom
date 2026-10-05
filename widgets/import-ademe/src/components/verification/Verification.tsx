@@ -25,6 +25,7 @@ import DistributionList, { departementLabelsOf } from './DistributionList'
 import ImportActions from './ImportActions'
 import { toApprovisionnements } from '../../import-line'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { SiretLookup } from '../../find-entreprise-by-siret'
 import { formatExtractedAt } from '../../format-extracted-at'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
@@ -64,6 +65,7 @@ export type VerificationProps = {
     ) => Promise<void>
     onCreateFournisseur: (entreprise: Entreprise) => Promise<void>
     onCreatePays: (pays: Pays) => Promise<void>
+    findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
 }
 
 export default function Verification({
@@ -80,6 +82,7 @@ export default function Verification({
     onImportLine,
     onCreateFournisseur,
     onCreatePays,
+    findEntrepriseBySiret,
 }: VerificationProps) {
     const [reviewedLineId, setReviewedLineId] = useState<
         StoredExtractedLine['id'] | null
@@ -265,6 +268,7 @@ export default function Verification({
                                 }
                                 onCreateFournisseur={onCreateFournisseur}
                                 onCreatePays={onCreatePays}
+                                findEntrepriseBySiret={findEntrepriseBySiret}
                             />
                         )}
                     </div>

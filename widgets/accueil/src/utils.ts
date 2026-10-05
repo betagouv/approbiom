@@ -11,7 +11,6 @@ import type {
     MultiSelectGroup,
     MultiSelectOption,
 } from '@shared/react/components/MultiSelect'
-import type { SearchBarOption } from '@shared/react/components/SearchBar'
 import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
 
 export const SANS_APPEL_A_PROJET_LABEL =
@@ -79,10 +78,8 @@ function capitalize(value: string): string {
     return value.charAt(0).toUpperCase() + value.slice(1)
 }
 
-export function getPlanOptions(
-    rows: readonly Plan[]
-): SearchBarOption<string>[] {
-    return getOptions(rows, (row) => row.nom)
+export function getPlanNames(rows: readonly Plan[]): string[] {
+    return getOptions(rows, (row) => row.nom).map(({ value }) => value)
 }
 
 export function getDepartementOptions(

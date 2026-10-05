@@ -10,15 +10,14 @@ import { useEffect, useId, useRef, useState } from 'react'
 const normalize = (text: string) =>
     text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
 
-export default function SearchBar<T>({
+export default function SearchBar({
     label,
     hint,
     showLabel = false,
-    options = [],
+    suggestions = [],
     placeholder,
     onSearch,
-    onSelect,
-}: SearchBarProps<T>) {
+}: SearchBarProps) {
     const id = useId()
     const inputId = `${id}-search-input`
     const panelId = `${id}-search-panel`
@@ -44,11 +43,11 @@ export default function SearchBar<T>({
     // below, leaving it open.
     const rootRef = useRef<HTMLDivElement>(null)
 
-    const visibleOptions = options.filter((option) =>
-        normalize(option.label).includes(normalize(query.trim()))
+    const visibleSuggestions = suggestions.filter((suggestion) =>
+        normalize(suggestion).includes(normalize(query.trim()))
     )
 
-    const isOpen = isRequested && visibleOptions.length > 0
+    const isOpen = isRequested && visibleSuggestions.length > 0
 
     // Escape is the keyboard's half of dismissing the panel: the click-outside
     // below is mouse and touch only. Focus is already in the input and stays
@@ -125,11 +124,9 @@ export default function SearchBar<T>({
                     // DSFR styles.
                     type="search"
                     // A combobox only when there is a list to open under it:
-                    // without options the field stays a plain search box, and
+                    // without suggestions the field stays a plain search box, and
                     // a screen reader announces no list that cannot come.
-                    // What is still missing is `aria-activedescendant`
-                    // following the arrow keys, and picking an option.
-                    {...(options.length > 0 && {
+                    {...(suggestions.length > 0 && {
                         role: 'combobox',
                         'aria-autocomplete': 'list',
                         'aria-controls': panelId,
@@ -158,23 +155,21 @@ export default function SearchBar<T>({
                     role="listbox"
                     aria-label={label}
                 >
-                    {visibleOptions.map((option, index) => (
+                    {visibleSuggestions.map((suggestion, index) => (
                         <li
                             key={index}
                             className="shared-search-bar__option"
                             role="option"
-                            // Picking one fills the field and puts the list
-                            // away — there is nothing left to choose from once
-                            // the choice is made. Reaching an option with the
-                            // arrow keys is still missing, so for now this is
-                            // the mouse's way in only.
+                            // Picking one searches for it, as if it had been
+                            // typed and submitted. With the keyboard, typing
+                            // and Enter do the same.
                             onClick={() => {
-                                setQuery(option.label)
+                                setQuery(suggestion)
                                 setIsRequested(false)
-                                onSelect?.(option.value)
+                                onSearch?.(suggestion)
                             }}
                         >
-                            {option.label}
+                            {suggestion}
                         </li>
                     ))}
                 </ul>
