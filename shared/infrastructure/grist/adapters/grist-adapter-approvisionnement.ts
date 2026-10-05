@@ -23,6 +23,19 @@ import {
 const asText = (value: unknown): string =>
     typeof value === 'number' ? String(value) : asString(value)
 
+function fournisseurSiret(
+    index: Map<number, GristRow>,
+    ref: unknown
+): string | undefined {
+    // Grist answers 0 for a Ref pointing at nothing: in Approvisionnement,
+    // `Fournisseur: 0` is an approvisionnement without fournisseur.
+    if (ref === 0) return undefined
+
+    const siret = asText(lookup(index, ref)?.Siret)
+
+    return siret === '' ? undefined : siret
+}
+
 const ressourceCode = (index: Map<number, GristRow>, ref: unknown): string =>
     asString(lookup(index, ref)?.Code_ressource_Approbiom)
 
@@ -138,9 +151,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                     asNumber(row.Plan_d_approvisionnement) ?? 0,
                 ressource: ressourceCode(ressourceById, row.Ressource),
                 provenance: toProvenance(row, departementById),
-                fournisseur: asText(
-                    lookup(entrepriseById, row.Fournisseur)?.Siret
-                ),
+                fournisseur: fournisseurSiret(entrepriseById, row.Fournisseur),
                 tonnageTotal: asNumber(row.Total_en_tMv_an_) ?? 0,
             }))
         },
@@ -269,9 +280,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
 
             return rows.map((row) => ({
                 ...toGroup(row, ressources),
-                fournisseur: asText(
-                    lookup(entrepriseById, row.Fournisseur)?.Siret
-                ),
+                fournisseur: fournisseurSiret(entrepriseById, row.Fournisseur),
             }))
         },
 

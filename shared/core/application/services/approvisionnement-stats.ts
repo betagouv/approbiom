@@ -161,7 +161,10 @@ export function composeApprovisionnementStats({
     }))
 
     const fournisseurs = groupsByRessource(forPlan(byFournisseur), (row) =>
-        measures(row, nameBySiret.get(row.fournisseur) || row.fournisseur)
+        measures(
+            row,
+            nameBySiret.get(row.fournisseur ?? '') || row.fournisseur || UNKNOWN
+        )
     )
 
     const totalsForPlan = forPlan(totals)

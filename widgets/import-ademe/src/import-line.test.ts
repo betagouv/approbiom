@@ -77,10 +77,17 @@ describe('toApprovisionnements', () => {
         ])
     })
 
-    it('makes none without a fournisseur', () => {
+    it('makes them without fournisseur when it is not given', () => {
+        const approvisionnements = toApprovisionnements(
+            line({ matchedFournisseur: null }),
+            160,
+            20
+        )
+
+        expect(approvisionnements).toHaveLength(2)
         expect(
-            toApprovisionnements(line({ matchedFournisseur: null }), 160, 20)
-        ).toEqual([])
+            approvisionnements.map(({ fournisseur }) => fournisseur)
+        ).toEqual([undefined, undefined])
     })
 
     it('makes none without a ressource', () => {

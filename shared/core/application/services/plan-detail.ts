@@ -150,7 +150,7 @@ function getFournisseursByPlan({
     } of approvisionnementsByFournisseur) {
         // An approvisionnement whose fournisseur the document left empty names
         // nobody to filter on.
-        if (fournisseur === '') continue
+        if (fournisseur === undefined) continue
 
         const fournisseurs =
             fournisseursByPlan.get(planDApprovisionnement) ?? []

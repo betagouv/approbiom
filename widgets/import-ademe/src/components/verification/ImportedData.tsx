@@ -1,6 +1,7 @@
 import { useId } from 'react'
 import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import DistributionList from './DistributionList'
+import { FOURNISSEUR_NOT_GIVEN } from '../../constant'
 
 export type ImportedDataProps = {
     line: ExtractedLine
@@ -27,7 +28,7 @@ export default function ImportedData({
                     <dd className="fr-text--sm fr-m-0">
                         {matchedFournisseur
                             ? `${matchedFournisseur.denomination} — ${matchedFournisseur.siret}`
-                            : '—'}
+                            : FOURNISSEUR_NOT_GIVEN}
                     </dd>
                 </div>
                 <div>

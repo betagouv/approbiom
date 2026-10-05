@@ -58,9 +58,10 @@ export default function FoundData({
 }: FoundDataProps) {
     const titleId = useId()
     const { matchedFournisseur, matchedRessource } = line.derived
+
     const [fournisseurSiret, setFournisseurSiret] = useState<
-        Entreprise['siret'] | null
-    >(matchedFournisseur?.siret ?? null)
+        Entreprise['siret'] | undefined
+    >(matchedFournisseur?.siret)
     const [ressourceCode, setRessourceCode] = useState<
         Ressource['code'] | null
     >(matchedRessource?.code ?? null)
@@ -76,9 +77,9 @@ export default function FoundData({
         onUpdate(changes).catch(() => setFailedField(field))
     }
 
-    function chooseFournisseur(entreprise: Entreprise | null) {
-        setFournisseurSiret(entreprise?.siret ?? null)
-        save('fournisseur', { matchedFournisseur: entreprise })
+    function chooseFournisseur(entreprise: Entreprise | undefined) {
+        setFournisseurSiret(entreprise?.siret)
+        save('fournisseur', { matchedFournisseur: entreprise ?? null })
     }
 
     function selectRessource(code: Ressource['code']) {

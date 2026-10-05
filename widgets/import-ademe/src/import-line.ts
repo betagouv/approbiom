@@ -29,8 +29,8 @@ export function toApprovisionnements(
 ): Approvisionnement[] {
     const { matchedFournisseur, matchedRessource, parsedProvenance } =
         line.derived
+
     if (
-        !matchedFournisseur ||
         !matchedRessource ||
         parsedProvenance.distribution.some(
             ({ provenance }) => provenance === ''
@@ -40,7 +40,7 @@ export function toApprovisionnements(
 
     return parsedProvenance.distribution.map((repartition) => ({
         planDApprovisionnement: plan,
-        fournisseur: matchedFournisseur.siret,
+        fournisseur: matchedFournisseur?.siret,
         ressource: matchedRessource.code,
         provenance: toProvenance(repartition),
         tonnageTotal: (line.read.tonnage * repartition.percentage) / 100,

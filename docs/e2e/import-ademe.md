@@ -330,8 +330,8 @@ Pour vérifier les tables, ouvrir les pages Grist `Approvisionnement` et
       document ») : champ « Fournisseur » (combobox, options « DÉNOMINATION —
       SIRET ») et sélecteur « Ressource » (« code · description »).
     - Fournisseur trouvé : il est déjà choisi, son libellé est dans le champ.
-    - Pas de fournisseur trouvé : champ vide en erreur, « Aucune
-      correspondance trouvée ».
+    - Pas de fournisseur trouvé : le champ affiche « Non renseigné » (voir
+      3.4.8).
     - Ressource trouvée : valeur présélectionnée, « Correspondance trouvée ».
 
 **E2E-3.2.4 — Changer la ressource**
@@ -519,6 +519,21 @@ Pour vérifier les tables, ouvrir les pages Grist `Approvisionnement` et
 - « Annuler » ou Échap : le bloc se ferme, rien n'est créé dans
   `Entreprise`, le focus revient sur le champ Fournisseur, la modale reste
   ouverte.
+
+**E2E-3.4.8 — Fournisseur non renseigné**
+
+- Dans Grist, une colonne `Fournisseur` vide veut dire « non renseigné » :
+    - à l'extraction, une cellule fournisseur vide dans le document, ou un
+      nom qu'aucune entreprise ne porte, donne une ligne « Non renseigné »
+      (tableau, champ Fournisseur), sans message d'erreur ;
+    - « Non renseigné » est la 1re option du champ Fournisseur ; la choisir
+      vide `Fournisseur` de la ligne dans
+      `Approvisionnement_extrait_d_un_document`, et le choix est conservé
+      après rechargement.
+- Avec une ressource et une provenance, la ligne s'importe : les
+  approvisionnements créés ont `Fournisseur` vide.
+- `Etat` passe à « Créés » quand `Approvisionnement` contient une ligne du
+  même plan et de la même ressource sans fournisseur.
 
 ### 3.5 Vérifier ce qui a été créé dans la table Approvisionnement
 

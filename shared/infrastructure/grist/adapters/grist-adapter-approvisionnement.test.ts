@@ -80,6 +80,22 @@ afterEach(() => {
 })
 
 describe('createGristApprovisionnementPort', () => {
+    it('reads a fournisseur left empty as undefined', async () => {
+        mockGrist({
+            ...drawnFrom([
+                [1, '87'],
+                [1, '87'],
+            ]),
+            Fournisseur: [1, 0],
+        })
+
+        const fournisseurs = (
+            await createGristApprovisionnementPort().list()
+        ).map(({ fournisseur }) => fournisseur)
+
+        expect(fournisseurs).toEqual(['11111111111111', undefined])
+    })
+
     it('reads a provenance inside France off the département Ref', async () => {
         mockGrist(drawnFrom([[1, '87']]))
 
@@ -297,6 +313,34 @@ describe('createGristApprovisionnementPort().create', () => {
                     Departement_de_provenance: 0,
                     Pays_de_provenance: 'Espagne',
                     Total_en_tMv_an_: 300,
+                    Donnees_additionnelles_provenant_du_document: '',
+                    Source: 0,
+                },
+            },
+        ])
+    })
+
+    it('writes an empty Ref for an approvisionnement without fournisseur', async () => {
+        const create = mockGristForCreate()
+
+        await createGristApprovisionnementPort().create([
+            {
+                planDApprovisionnement: 160,
+                ressource: 'PF',
+                provenance: { source: DEPARTEMENT_FRANCAIS, code: '87' },
+                tonnageTotal: 100,
+            },
+        ])
+
+        expect(create).toHaveBeenCalledWith([
+            {
+                fields: {
+                    Plan_d_approvisionnement: 160,
+                    Fournisseur: 0,
+                    Ressource: 1,
+                    Departement_de_provenance: 1,
+                    Pays_de_provenance: 'France',
+                    Total_en_tMv_an_: 100,
                     Donnees_additionnelles_provenant_du_document: '',
                     Source: 0,
                 },

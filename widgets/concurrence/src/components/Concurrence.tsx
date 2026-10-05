@@ -118,7 +118,8 @@ export default function Concurrence({
                     getProvenanceLabel(approvisionnement.provenance)
                 )) &&
             (fournisseurs.length === 0 ||
-                fournisseurs.includes(approvisionnement.fournisseur)),
+                (approvisionnement.fournisseur !== undefined &&
+                    fournisseurs.includes(approvisionnement.fournisseur))),
         [provenances, fournisseurs]
     )
 
@@ -174,11 +175,11 @@ export default function Concurrence({
                 ].join(', '),
                 fournisseurs: [
                     ...new Set(
-                        selectedApprovisionnements.map(
-                            (approvisionnement) =>
-                                denominationBySiret.get(
-                                    approvisionnement.fournisseur
-                                ) || approvisionnement.fournisseur
+                        selectedApprovisionnements.map(({ fournisseur }) =>
+                            fournisseur === undefined
+                                ? 'Non renseigné'
+                                : denominationBySiret.get(fournisseur) ||
+                                  fournisseur
                         )
                     ),
                 ].join(', '),

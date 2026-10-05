@@ -13,7 +13,7 @@ const PLATEAU = {
     denomination: 'BOIS FICTIF DU PLATEAU',
 }
 
-function renderField(value: Entreprise['siret'] | null = null) {
+function renderField(value?: Entreprise['siret']) {
     const onChange = vi.fn()
     const onCreate = vi.fn<(entreprise: Entreprise) => Promise<void>>(() =>
         Promise.resolve()
@@ -32,7 +32,7 @@ function renderField(value: Entreprise['siret'] | null = null) {
                 entreprises={entreprises}
                 value={current}
                 onChange={(entreprise) => {
-                    setCurrent(entreprise?.siret ?? null)
+                    setCurrent(entreprise?.siret)
                     onChange(entreprise)
                 }}
                 onCreate={async (entreprise) => {
@@ -68,9 +68,12 @@ describe('FournisseurField', () => {
     it('lists the fournisseurs by denomination, with their SIRET', () => {
         renderField()
 
-        fireEvent.click(input())
+        fireEvent.click(
+            screen.getByRole('button', { name: 'Effacer « Fournisseur »' })
+        )
 
         expect(optionTexts()).toEqual([
+            'Non renseigné',
             'BOIS FICTIF DU PLATEAU — 00000000000007',
             'SCIERIE FICTIVE DU VALLON — 00000000000003',
             'Ajouter un nouveau fournisseur',
@@ -116,10 +119,21 @@ describe('FournisseurField', () => {
         expect(onChange).toHaveBeenLastCalledWith(VALLON)
     })
 
-    it('says when the document named no known fournisseur', () => {
+    it('accepts a fournisseur not given', () => {
+        const { onChange } = renderField(VALLON.siret)
+
+        type('non renseigne')
+        fireEvent.keyDown(input(), { key: 'Enter' })
+
+        expect(onChange).toHaveBeenLastCalledWith(undefined)
+        expect(input().value).toBe('Non renseigné')
+        expect(screen.queryByText('Aucune correspondance trouvée')).toBeNull()
+    })
+
+    it('shows a fournisseur not given as such', () => {
         renderField()
 
-        expect(screen.getByText('Aucune correspondance trouvée')).toBeDefined()
+        expect(input().value).toBe('Non renseigné')
     })
 
     it('opens the new fournisseur panel with the SIRET typed', () => {

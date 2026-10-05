@@ -21,6 +21,7 @@ import ImportContext from '../import-context'
 import DocumentData from './DocumentData'
 import FoundData from './FoundData'
 import ImportedData from './ImportedData'
+import { FOURNISSEUR_NOT_GIVEN } from '../../constant'
 import DistributionList, { departementLabelsOf } from './DistributionList'
 import ImportActions from './ImportActions'
 import { toApprovisionnements } from '../../import-line'
@@ -169,9 +170,15 @@ export default function Verification({
         {
             id: 'fournisseur',
             header: 'Fournisseur',
-            render: (line) =>
-                line.derived.matchedFournisseur?.denomination ?? (
-                    <span className="verification__mention">Aucun</span>
+            render: ({ derived: { matchedFournisseur } }) =>
+                !matchedFournisseur ? (
+                    <span className="verification__mention">
+                        {FOURNISSEUR_NOT_GIVEN}
+                    </span>
+                ) : (
+                    (matchedFournisseur?.denomination ?? (
+                        <span className="verification__mention">Aucun</span>
+                    ))
                 ),
         },
         {

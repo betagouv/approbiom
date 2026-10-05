@@ -22,7 +22,7 @@ export type ApprovisionnementGroupedByPlanRessourceAndProvenance =
 
 export type ApprovisionnementGroupedByPlanRessourceAndFournisseur =
     ApprovisionnementGroupedByPlanAndRessource & {
-        fournisseur: Entreprise['siret']
+        fournisseur?: Entreprise['siret']
     }
 
 export interface ApprovisionnementPort {
