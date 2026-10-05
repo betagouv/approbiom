@@ -129,21 +129,28 @@ export default function Verification({
     const columns: readonly Column<StoredExtractedLine>[] = [
         {
             id: 'state',
+            header: 'Action',
+            render: (line) => (
+                <div className="verification__state">
+                    {line.state === 'Créés' ? (
+                        <>{actionButton(line, 'Voir')}</>
+                    ) : (
+                        <>{actionButton(line, 'Modifier et importer')}</>
+                    )}
+                </div>
+            ),
+        },
+        {
+            id: 'state',
             header: 'État',
             render: (line) => (
                 <div className="verification__state">
                     {line.state === 'Créés' ? (
-                        <>
-                            <Badge size="sm" status="success">
-                                Déjà présente
-                            </Badge>
-                            {actionButton(line, 'Voir')}
-                        </>
+                        <Badge size="sm" status="success">
+                            Déjà importée
+                        </Badge>
                     ) : (
-                        <>
-                            <Badge size="sm">Pas créée</Badge>
-                            {actionButton(line, 'Modifier')}
-                        </>
+                        <Badge size="sm">Non importée</Badge>
                     )}
                 </div>
             ),
