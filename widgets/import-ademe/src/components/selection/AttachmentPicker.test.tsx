@@ -26,8 +26,17 @@ function renderCard(summary?: ExtractionSummary) {
 
 afterEach(cleanup)
 
+const badgesOf = (card: HTMLElement) =>
+    [...card.querySelectorAll('.fr-badge')].map((badge) => badge.textContent)
+
 describe('AttachmentPicker', () => {
-    it('shows no extraction badge for a document never extracted', () => {
+    it('says when nothing is known of the document', () => {
+        expect(badgesOf(renderCard())).toEqual([
+            "Aucune extraction n'a encore été effectuée",
+        ])
+    })
+
+    it('shows no extraction date for a document never extracted', () => {
         const card = renderCard({
             attachmentId: ATTACHMENT.id,
             extractedAt: null,
@@ -35,15 +44,12 @@ describe('AttachmentPicker', () => {
             createdCount: 0,
         })
 
-        expect(card.querySelector('.fr-badge')).toBeNull()
-        expect(card.textContent).not.toMatch(/extrait|Déjà présentes/i)
+        expect(badgesOf(card)).toEqual([
+            'Lignes importées dans Approbiom : 0/0',
+        ])
     })
 
-    it('shows no extraction badge when nothing is known of the document', () => {
-        expect(renderCard().querySelector('.fr-badge')).toBeNull()
-    })
-
-    it('shows when an extracted document was extracted', () => {
+    it('shows when an extracted document was extracted and its imported lines', () => {
         const card = renderCard({
             attachmentId: ATTACHMENT.id,
             extractedAt: new Date(2026, 8, 27, 15, 36),
@@ -51,9 +57,9 @@ describe('AttachmentPicker', () => {
             createdCount: 1,
         })
 
-        expect(card.querySelector('.fr-badge')?.textContent).toBe(
-            'Extrait le 27/09/2026 à 15h36'
-        )
-        expect(card.textContent).toContain('Déjà présentes : 1 ligne sur 4')
+        expect(badgesOf(card)).toEqual([
+            'Extraction faite le 27/09/2026 à 15h36',
+            'Lignes importées dans Approbiom : 1/4',
+        ])
     })
 })

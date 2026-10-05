@@ -25,7 +25,11 @@ function ExtractionState({
     summary: ExtractionSummary | undefined
 }) {
     if (!summary)
-        return <Badge size="sm">Aucune extraction a été encore effectué</Badge>
+        return (
+            <Badge size="sm">
+                Aucune extraction n&apos;a encore été effectuée
+            </Badge>
+        )
 
     const { extractedAt, lineCount, createdCount } = summary
 
@@ -33,7 +37,7 @@ function ExtractionState({
         <>
             {extractedAt && (
                 <Badge size="sm" status="info" noIcon>
-                    Extraction fait le {formatExtractedAt(extractedAt)}
+                    Extraction faite le {formatExtractedAt(extractedAt)}
                 </Badge>
             )}
 
