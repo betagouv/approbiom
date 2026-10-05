@@ -5,8 +5,7 @@ import type { Attachment } from '@shared/core/domain/entities/attachment'
 import Badge from '@shared/react/components/Badge'
 import { documentIconOf } from '@shared/react/components/document-icon'
 import type { ExtractionSummary } from '../../extracted-approvisionnement-port'
-
-const DATE = new Intl.DateTimeFormat('fr-FR')
+import { formatExtractedAt } from '../../format-extracted-at'
 
 const SIZE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 const KO = 1024
@@ -25,19 +24,22 @@ function ExtractionState({
 }: {
     summary: ExtractionSummary | undefined
 }) {
-    if (!summary) return <Badge size="sm">Pas encore extrait</Badge>
+    if (!summary)
+        return <Badge size="sm">Aucune extraction a été encore effectué</Badge>
 
     const { extractedAt, lineCount, createdCount } = summary
 
     return (
         <>
+            {extractedAt && (
+                <Badge size="sm" status="info" noIcon>
+                    Extraction fait le {formatExtractedAt(extractedAt)}
+                </Badge>
+            )}
+
             <Badge size="sm" status="info" noIcon>
-                Extrait le {DATE.format(extractedAt)}
+                Lignes importées dans Approbiom : {createdCount}/{lineCount}
             </Badge>
-            <span className="fr-text--xs attachment-picker__meta">
-                Déjà présentes : {createdCount} ligne
-                {createdCount > 1 ? 's' : ''} sur {lineCount}
-            </span>
         </>
     )
 }

@@ -131,11 +131,11 @@ export function createGristExtractedApprovisionnementAdapter() {
                 const lines = rows.filter(
                     (row) => row.Document === attachmentRow.id
                 )
-                if (lines.length === 0) return []
-
                 const summary = {
                     extractedAt:
-                        asDate(lines[0].Date_d_extraction) ?? new Date(0),
+                        lines.length === 0
+                            ? null
+                            : (asDate(lines[0].Date_d_extraction) ?? null),
                     lineCount: lines.length,
                     createdCount: lines.filter(
                         (row) => stateOf(row.Etat) === CREATED

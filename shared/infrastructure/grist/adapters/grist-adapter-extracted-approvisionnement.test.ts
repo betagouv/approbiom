@@ -1,6 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnMajorTable } from '../helpers/grist-helpers'
-import { TABLE } from '../types/grist-tables'
+import { COLUMNS, TABLE } from '../types/grist-tables'
 import { createGristExtractedApprovisionnementAdapter } from './grist-adapter-extracted-approvisionnement'
 
 const TABLES: Record<string, ColumnMajorTable> = {
@@ -120,6 +120,88 @@ describe('createGristExtractedApprovisionnementAdapter().update', () => {
             fields: {
                 Repartition_par_provenance: JSON.stringify(parsedProvenance),
             },
+        })
+    })
+})
+
+describe('createGristExtractedApprovisionnementAdapter().listSummaries', () => {
+    function mockSummaries() {
+        const tables: Record<string, ColumnMajorTable> = {
+            [TABLE.attachment]: {
+                id: [4, 6],
+                Plan_d_approvisionnement: [160, 220],
+                piece_jointe: [
+                    ['L', 20],
+                    ['L', 21],
+                ],
+                type: ['excel ademe', 'excel ademe'],
+            },
+            [TABLE.extractedApprovisionnement]: {
+                id: [1, 2],
+                Document: [4, 4],
+                Date_d_extraction: [1790587200, 1790587200],
+                Etat: ['Créés', 'Pas créés'],
+                ...Object.fromEntries(
+                    COLUMNS.extractedApprovisionnement
+                        .filter(
+                            (column) =>
+                                ![
+                                    'id',
+                                    'Document',
+                                    'Date_d_extraction',
+                                    'Etat',
+                                ].includes(column)
+                        )
+                        .map((column) => [column, ['', '']])
+                ),
+            },
+        }
+
+        vi.stubGlobal('grist', {
+            docApi: {
+                fetchTable: vi.fn((tableId: string) =>
+                    Promise.resolve(tables[tableId])
+                ),
+            },
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+    }
+
+    it('summarises an extracted document', async () => {
+        mockSummaries()
+
+        const summaries =
+            await createGristExtractedApprovisionnementAdapter().listSummaries()
+
+        expect(
+            summaries.find(({ attachmentId }) => attachmentId === 20)
+        ).toEqual({
+            attachmentId: 20,
+            extractedAt: new Date(1790587200 * 1000),
+            lineCount: 2,
+            createdCount: 1,
+        })
+    })
+
+    it('has no extraction date for a document never extracted', async () => {
+        mockSummaries()
+
+        const summaries =
+            await createGristExtractedApprovisionnementAdapter().listSummaries()
+
+        expect(
+            summaries.find(({ attachmentId }) => attachmentId === 21)
+        ).toEqual({
+            attachmentId: 21,
+            extractedAt: null,
+            lineCount: 0,
+            createdCount: 0,
         })
     })
 })

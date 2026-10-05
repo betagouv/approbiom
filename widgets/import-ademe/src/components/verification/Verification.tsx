@@ -25,8 +25,7 @@ import DistributionList, { departementLabelsOf } from './DistributionList'
 import ImportActions from './ImportActions'
 import { toApprovisionnements } from '../../import-line'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-
-const DATE = new Intl.DateTimeFormat('fr-FR')
+import { formatExtractedAt } from '../../format-extracted-at'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
@@ -196,7 +195,7 @@ export default function Verification({
             >
                 <Badge size="sm" status="success">
                     {plural(lines.length, 'ligne')} extraite
-                    {lines.length > 1 ? 's' : ''} le {DATE.format(date)}
+                    {lines.length > 1 ? 's' : ''} le {formatExtractedAt(date)}
                 </Badge>
             </ImportContext>
 

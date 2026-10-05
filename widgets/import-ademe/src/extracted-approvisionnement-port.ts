@@ -13,7 +13,8 @@ export type StoredExtractedLine = ExtractedLine & {
 
 export type ExtractionSummary = {
     attachmentId: Attachment['id']
-    extractedAt: Date
+    // Null for a document never extracted.
+    extractedAt: Date | null
     lineCount: number
     createdCount: number
 }
