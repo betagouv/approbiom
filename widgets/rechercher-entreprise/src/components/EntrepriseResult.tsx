@@ -1,29 +1,33 @@
-import { useId } from 'react'
+import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
+
 import CopyButton from '@shared/react/components/CopyButton'
-import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-search'
+import { annuaireEntrepriseUrl } from '../annuaire-entreprises'
 
 export type EntrepriseResultProps = {
-    entreprise: Entreprise
+    entreprise: FoundEntreprise
 }
 
 export default function EntrepriseResult({
     entreprise,
 }: EntrepriseResultProps) {
-    const titleId = useId()
+    const { denomination, siret } = entreprise
+
     const entries = [
         {
             label: 'Dénomination',
-            value: entreprise.denomination,
-            copyLabel: 'la dénomination',
+            value: denomination,
+            copyLabel: `la dénomination de ${denomination}`,
         },
-        { label: 'SIRET', value: entreprise.siret, copyLabel: 'le SIRET' },
+        {
+            label: 'SIRET',
+            value: siret,
+            copyLabel: `le SIRET de ${denomination}`,
+        },
     ]
 
     return (
-        <section className="entreprise-result" aria-labelledby={titleId}>
-            <h2 id={titleId} className="fr-h6 fr-mb-2w">
-                Entreprise trouvée
-            </h2>
+        <div className="entreprise-result">
             <dl className="entreprise-result__list">
                 {entries.map(({ label, value, copyLabel }) => (
                     <div key={label} className="entreprise-result__entry">
@@ -37,6 +41,16 @@ export default function EntrepriseResult({
                     </div>
                 ))}
             </dl>
-        </section>
+            <a
+                className="fr-link fr-link--sm"
+                href={annuaireEntrepriseUrl(entreprise)}
+                target="_blank"
+                rel="noopener noreferrer"
+                title={`Plus de détails sur ${denomination} dans la page de l'Annuaire des Entreprises - nouvelle fenêtre`}
+            >
+                Plus de détails sur l&apos;entreprise dans la page de
+                l&apos;Annuaire des Entreprises
+            </a>
+        </div>
     )
 }

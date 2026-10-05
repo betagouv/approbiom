@@ -1,9 +1,9 @@
 import type { EntrepriseSearchPort } from '@shared/core/application/ports/entreprise-search'
-import { FAKE_ENTREPRISE_SEARCH } from './fake-data/entreprise-search'
+import { createRechercheEntreprisesPort } from '@shared/infrastructure/referentiel-entreprise/recherche-entreprises-adapter'
 import EntrepriseSearch from './components/EntrepriseSearch'
 
 const PORTS: { entrepriseSearch: EntrepriseSearchPort } = {
-    entrepriseSearch: FAKE_ENTREPRISE_SEARCH,
+    entrepriseSearch: createRechercheEntreprisesPort(),
 }
 
 export default function App() {

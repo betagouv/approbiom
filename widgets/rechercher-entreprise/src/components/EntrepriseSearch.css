@@ -6,6 +6,9 @@
 }
 
 .entreprise-result {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
     padding: 1rem 1.25rem;
     border: 1px solid var(--border-default-grey);
 }
@@ -15,6 +18,16 @@
     flex-direction: column;
     gap: 0.75rem;
     margin: 0;
+}
+
+.entreprise-result .fr-link {
+    align-self: flex-start;
+}
+
+.entreprise-search__results {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
 }
 
 .entreprise-result__label {
