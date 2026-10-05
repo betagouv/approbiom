@@ -1,0 +1,80 @@
+.shared-combobox__field {
+    position: relative;
+    margin-top: 0.5rem;
+}
+
+/* Room for the clear and chevron buttons drawn over the end of the field. */
+.shared-combobox__input.fr-input {
+    margin-top: 0;
+    padding-right: 5.5rem;
+}
+
+.shared-combobox__buttons {
+    position: absolute;
+    top: 0;
+    right: 0;
+    display: flex;
+    align-items: center;
+    height: 2.5rem;
+}
+
+.shared-combobox__buttons .fr-btn {
+    margin: 0 0.25rem 0 0;
+}
+
+.shared-combobox__panel {
+    position: absolute;
+    top: calc(100% + 4px);
+    left: 0;
+    right: 0;
+    z-index: 10;
+    background-color: var(--background-default-grey);
+    border: 1px solid var(--border-default-grey);
+    box-shadow: 0 6px 18px rgba(0, 0, 18, 0.16);
+}
+
+.shared-combobox__list {
+    max-height: 18rem;
+    margin: 0;
+    padding: 0.25rem 0;
+    overflow-y: auto;
+}
+
+.shared-combobox__option,
+.shared-combobox__action {
+    display: flex;
+    align-items: center;
+    margin: 0;
+    cursor: pointer;
+}
+
+.shared-combobox__option {
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 0.5rem 1rem;
+    color: var(--text-default-grey);
+}
+
+.shared-combobox__option--active {
+    background-color: var(--background-default-grey-hover);
+    box-shadow: inset 2px 0 0 var(--border-plain-blue-france);
+}
+
+.shared-combobox__option--selected {
+    color: var(--text-action-high-blue-france);
+}
+
+.shared-combobox__empty {
+    margin: 0;
+    padding: 0.5rem 1rem;
+    color: var(--text-mention-grey);
+    font-size: 0.875rem;
+}
+
+.shared-combobox__action {
+    gap: 0.5rem;
+    margin-top: 0.25rem;
+    padding: 0.75rem 1rem;
+    border-top: 1px solid var(--border-default-grey);
+    color: var(--text-action-high-blue-france);
+}

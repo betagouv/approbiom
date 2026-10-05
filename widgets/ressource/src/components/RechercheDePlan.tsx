@@ -1,5 +1,5 @@
 import './RechercheDePlan.css'
-import SearchBar from '@shared/react/components/SearchBar'
+import Combobox from '@shared/react/components/Combobox'
 import Ressource from '@shared/react/components/Ressource'
 import AsyncGate from '@shared/react/components/AsyncGate'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
@@ -80,11 +80,14 @@ export default function RechercheDePlan({
 
     return (
         <div className="recherche-de-plan fr-p-2w">
-            <SearchBar
+            <Combobox
                 label="Rechercher un plan d’approvisionnement"
                 placeholder="Rechercher un plan d’approvisionnement"
                 options={planOptions}
-                onSelect={setPlan}
+                value={plan}
+                onChange={(value) => {
+                    if (value !== null) setPlan(value)
+                }}
             />
 
             {plan !== null && (
