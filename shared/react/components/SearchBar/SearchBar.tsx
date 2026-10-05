@@ -122,17 +122,19 @@ export default function SearchBar<T>({
                         setIsRequested(true)
                     }}
                     // `type="search"` for the browser's own clear button, which
-                    // DSFR styles; `role="combobox"` for what the field
-                    // actually is once there is a list under it.
+                    // DSFR styles.
                     type="search"
-                    role="combobox"
-                    // What the field opens, and whether it is open — the pair a
-                    // screen reader needs to announce a combobox. What is still
-                    // missing is `aria-activedescendant` following the arrow
-                    // keys, and picking an option.
-                    aria-autocomplete="list"
-                    aria-controls={panelId}
-                    aria-expanded={isOpen}
+                    // A combobox only when there is a list to open under it:
+                    // without options the field stays a plain search box, and
+                    // a screen reader announces no list that cannot come.
+                    // What is still missing is `aria-activedescendant`
+                    // following the arrow keys, and picking an option.
+                    {...(options.length > 0 && {
+                        role: 'combobox',
+                        'aria-autocomplete': 'list',
+                        'aria-controls': panelId,
+                        'aria-expanded': isOpen,
+                    })}
                     // `focus` rather than `click`: it covers reaching the field
                     // with the keyboard too, and a click on an unfocused input
                     // focuses it anyway. Clicking a field that already has

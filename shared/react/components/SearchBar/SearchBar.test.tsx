@@ -14,7 +14,10 @@ afterEach(() => {
 })
 
 const getInput = () =>
-    screen.getByRole<HTMLInputElement>('combobox', {
+    screen.queryByRole<HTMLInputElement>('combobox', {
+        name: 'Rechercher un plan',
+    }) ??
+    screen.getByRole<HTMLInputElement>('searchbox', {
         name: 'Rechercher un plan',
     })
 
@@ -91,13 +94,26 @@ describe('SearchBar', () => {
     it('opens no panel when there is nothing to suggest', () => {
         render(<SearchBar label="Rechercher un plan" />)
 
-        fireEvent.click(getInput())
+        const field = screen.getByRole('searchbox', {
+            name: 'Rechercher un plan',
+        })
+        fireEvent.click(field)
 
-        // Asking for the panel is not enough to get one: an empty list is
-        // nothing to draw, and `aria-expanded` would be announcing a list that
-        // is not there.
         expect(screen.queryByRole('listbox')).toBeNull()
-        expect(getInput().getAttribute('aria-expanded')).toBe('false')
+    })
+
+    it('is a plain search field, not a list, when there is nothing to suggest', () => {
+        render(<SearchBar label="Rechercher un plan" />)
+
+        const field = screen.getByRole('searchbox', {
+            name: 'Rechercher un plan',
+        })
+
+        // A combobox announces a list to come: without options there is none.
+        expect(screen.queryByRole('combobox')).toBeNull()
+        expect(field.hasAttribute('aria-expanded')).toBe(false)
+        expect(field.hasAttribute('aria-controls')).toBe(false)
+        expect(field.hasAttribute('aria-autocomplete')).toBe(false)
     })
 
     it('closes the suggestion panel when a click lands outside it', () => {
@@ -214,7 +230,7 @@ describe('SearchBar', () => {
         )
 
         expect(
-            screen.getByRole('combobox', {
+            screen.getByRole('searchbox', {
                 name: /^Rechercher un plan\s*Sur le nom du plan$/,
             })
         ).toBeDefined()
