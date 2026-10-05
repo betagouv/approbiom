@@ -177,7 +177,9 @@ Pour vérifier les tables, ouvrir les pages Grist `Approvisionnement` et
       attendu.
     - Aucune ligne n'est créée dans `Approvisionnement_extrait_d_un_document`.
 - Variantes à couvrir, chacune avec son message :
-    - pas d'en-tête « Fournisseur » en colonne A dans les 40 premières lignes ;
+    - aucune ligne dont la colonne A porte le mot « fournisseur » ou
+      « fournisseurs » (majuscules et accents indifférents) dans les 40
+      premières lignes ;
     - colonne manquante (Sous catégorie, Tonnage, Répartition approximative) ;
     - tonnage non numérique.
 

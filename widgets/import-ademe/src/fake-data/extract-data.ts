@@ -64,7 +64,7 @@ function fakeError(name: string): Error | null {
         )
     if (lower.includes('brive'))
         return new Error(
-            "aucune des 40 premières lignes de la feuille « Fournisseurs » ne porte l'en-tête « Fournisseur » dans la colonne A"
+            'aucune des 40 premières lignes de la feuille « Fournisseurs » ne porte le mot « fournisseur » dans la colonne A'
         )
     if (lower.includes('v2') || lower.includes('saillat'))
         return new Error(

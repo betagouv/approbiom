@@ -9,10 +9,10 @@ import type { CellValue } from 'grist/GristData'
 
 // Input - Workbook structure
 const EXPECTED_WORD_CONTAINED_IN_SHEETNAME = 'Fournisseurs'
-const HEADER_COLUMN_FOURNISSEURS = 'Fournisseur'
+
+const EXPECTED_HEADER_COLUMN_FOURNISSEUR = /(?<![a-z])fournisseurs?(?![a-z])/
 
 const COLUMN_HEADER_PREFIXES = {
-    Fournisseur: 'fournisseur',
     Ressource: 'sous categorie',
     Tonnage: 'tonnage',
     Provenance: 'repartition approximative',
@@ -30,7 +30,7 @@ const MAX_ROW_HEADER_SEARCH = 40
 
 // Output
 
-type ColumnName = keyof typeof COLUMN_HEADER_PREFIXES
+type ColumnName = 'Fournisseur' | keyof typeof COLUMN_HEADER_PREFIXES
 
 export type ReadLine = {
     document: string
@@ -112,39 +112,53 @@ function readFournisseurSheet(file: ArrayBuffer): CellValue[][] {
     )
 }
 
-function findHeaderRow(rows: CellValue[][]): number {
-    const at = rows
-        .slice(0, MAX_ROW_HEADER_SEARCH)
-        .findIndex(
-            (row) =>
-                typeof row[0] === 'string' &&
-                row[0].trim() === HEADER_COLUMN_FOURNISSEURS
-        )
+const mentionsFournisseur = (header: string) =>
+    EXPECTED_HEADER_COLUMN_FOURNISSEUR.test(header)
 
-    if (at === -1) {
+function locateColumns(row: CellValue[]): [ColumnName, number][] {
+    const headers = row.map((header) => normalize(toText(header)))
+
+    return [
+        ['Fournisseur', headers.findIndex(mentionsFournisseur)],
+        ...Object.entries(COLUMN_HEADER_PREFIXES).map(
+            ([name, prefix]): [ColumnName, number] => [
+                name as ColumnName,
+                headers.findIndex((header) => header.startsWith(prefix)),
+            ]
+        ),
+    ]
+}
+
+const missingIn = (columns: [ColumnName, number][]) =>
+    columns.filter(([, at]) => at === -1).map(([name]) => name)
+
+function findHeaderRow(rows: CellValue[][]): number {
+    const candidates = rows
+        .slice(0, MAX_ROW_HEADER_SEARCH)
+        .map((row, at) => ({ row, at }))
+        .filter(({ row }) => mentionsFournisseur(normalize(toText(row[0]))))
+        .map(({ row, at }) => ({
+            at,
+            missing: missingIn(locateColumns(row)).length,
+        }))
+
+    if (candidates.length === 0) {
         throw new Error(
-            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » ne porte l'en-tête « ${HEADER_COLUMN_FOURNISSEURS} » dans la colonne A`
+            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » ne porte le mot « fournisseur » dans la colonne A`
         )
     }
 
-    return at
+    return candidates.reduce((best, candidate) =>
+        candidate.missing < best.missing ? candidate : best
+    ).at
 }
 
 function findColumns(
     rows: CellValue[][],
     headerRow: number
 ): Record<ColumnName, number> {
-    const headers = rows[headerRow].map((header) => normalize(toText(header)))
-
-    const found = Object.entries(COLUMN_HEADER_PREFIXES).map(
-        ([name, prefix]) =>
-            [
-                name as ColumnName,
-                headers.findIndex((header) => header.startsWith(prefix)),
-            ] as const
-    )
-
-    const missing = found.filter(([, at]) => at === -1).map(([name]) => name)
+    const found = locateColumns(rows[headerRow])
+    const missing = missingIn(found)
 
     if (missing.length > 0) {
         // Spreadsheet rows are numbered from 1; the array is indexed from 0.

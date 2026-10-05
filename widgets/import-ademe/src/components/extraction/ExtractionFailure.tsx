@@ -46,7 +46,7 @@ export default function ExtractionFailure({
                 <p className="fr-callout__text fr-text--md">
                     Un classeur Excel (.xlsx) avec une feuille dont le nom
                     contient « Fournisseurs ». Dans les 40 premières lignes, une
-                    ligne d&apos;en-tête commence par « Fournisseur » en colonne
+                    ligne d&apos;en-tête porte le mot « fournisseur » en colonne
                     A et contient les colonnes Sous catégorie, Tonnage et
                     Répartition approximative. Chaque ligne doit avoir un
                     tonnage numérique.
