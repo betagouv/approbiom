@@ -234,3 +234,52 @@ describe('SearchBar', () => {
         expect(getInput()).toBeDefined()
     })
 })
+
+describe('SearchBar, matching what is typed', () => {
+    const accentedOptions: readonly SearchBarOption<string>[] = [
+        { value: 'chaufferie', label: 'Chaufferie' },
+        { value: 'hopital', label: 'Chaufferie Hôpital Tulle' },
+        { value: 'reseau', label: 'Réseau de chaleur Brive' },
+        { value: 'egletons', label: 'ÉGLETONS' },
+    ]
+
+    const suggestionsFor = (text: string) => {
+        render(
+            <SearchBar label="Rechercher un plan" options={accentedOptions} />
+        )
+        fireEvent.click(getInput())
+        type(text)
+
+        return screen
+            .queryAllByRole('option')
+            .map((option) => option.textContent)
+    }
+
+    it('ignores the case of what is typed', () => {
+        expect(suggestionsFor('CHAUFFERIE')).toEqual([
+            'Chaufferie',
+            'Chaufferie Hôpital Tulle',
+        ])
+    })
+
+    it('finds an accented label from a query typed without accents', () => {
+        expect(suggestionsFor('reseau')).toEqual(['Réseau de chaleur Brive'])
+    })
+
+    it('finds a label without accents from an accented query', () => {
+        expect(suggestionsFor('chaufférie')).toEqual([
+            'Chaufferie',
+            'Chaufferie Hôpital Tulle',
+        ])
+    })
+
+    it('ignores case and accents together', () => {
+        expect(suggestionsFor('HOPITAL')).toEqual(['Chaufferie Hôpital Tulle'])
+        cleanup()
+        expect(suggestionsFor('egletons')).toEqual(['ÉGLETONS'])
+    })
+
+    it('still leaves out the labels that do not match', () => {
+        expect(suggestionsFor('brivé')).toEqual(['Réseau de chaleur Brive'])
+    })
+})

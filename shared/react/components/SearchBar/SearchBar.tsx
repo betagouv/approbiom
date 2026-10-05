@@ -7,6 +7,9 @@ import './SearchBar.css'
 import type { SearchBarProps } from './SearchBar.types'
 import { useEffect, useId, useRef, useState } from 'react'
 
+const normalize = (text: string) =>
+    text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+
 export default function SearchBar<T>({
     label,
     hint,
@@ -42,7 +45,7 @@ export default function SearchBar<T>({
     const rootRef = useRef<HTMLDivElement>(null)
 
     const visibleOptions = options.filter((option) =>
-        option.label.toLowerCase().includes(query.trim().toLowerCase())
+        normalize(option.label).includes(normalize(query.trim()))
     )
 
     const isOpen = isRequested && visibleOptions.length > 0
