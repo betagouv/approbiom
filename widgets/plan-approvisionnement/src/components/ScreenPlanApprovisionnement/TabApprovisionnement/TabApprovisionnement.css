@@ -28,17 +28,3 @@
     font-variant-numeric: tabular-nums;
     text-align: right;
 }
-
-.tab-approvisionnement__empty {
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    gap: 0.25rem;
-    padding: 1.25rem;
-    border: 1px dashed var(--border-default-grey);
-    text-align: center;
-}
-
-.tab-approvisionnement__empty-title {
-    font-weight: 700;
-}

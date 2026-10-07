@@ -12,6 +12,7 @@ import {
     type Referentiels,
 } from '../../../approvisionnement-rows'
 import { FOURNISSEUR_NOT_GIVEN } from '../../../constant'
+import EmptyPlan from '../EmptyPlan'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
@@ -83,19 +84,7 @@ export default function TabApprovisionnement({
         ? rows.filter(({ duplicate }) => duplicate !== null)
         : rows
 
-    if (rows.length === 0)
-        return (
-            <div className="tab-approvisionnement__empty">
-                <p className="fr-text--md fr-m-0 tab-approvisionnement__empty-title">
-                    Aucun approvisionnement pour ce plan
-                </p>
-                <p className="fr-text--sm fr-m-0 tab-approvisionnement__mention">
-                    {hasAttachments
-                        ? 'Ajoutez-les par saisie manuelle ou à partir du document BCIB/BCIAT joint au plan.'
-                        : "Ajoutez-les par saisie manuelle. Aucune pièce jointe n'est liée à ce plan pour importer un document BCIB/BCIAT."}
-                </p>
-            </div>
-        )
+    if (rows.length === 0) return <EmptyPlan hasAttachments={hasAttachments} />
 
     return (
         <div className="tab-approvisionnement">

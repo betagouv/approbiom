@@ -1,0 +1,21 @@
+/* On the text baseline: DSFR leaves a bottom margin under each tag, for when
+   the group wraps, which would push a centred label off the tags. */
+.ressource-filter {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    gap: 0.5rem;
+}
+
+.ressource-filter__label {
+    color: var(--text-mention-grey);
+}
+
+.ressource-filter--list {
+    flex-direction: column;
+    align-items: stretch;
+}
+
+.ressource-filter__select {
+    max-width: 24rem;
+}

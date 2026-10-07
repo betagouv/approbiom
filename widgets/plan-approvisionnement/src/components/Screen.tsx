@@ -35,6 +35,8 @@ export default function Screen({ plans, ...data }: ScreenProps) {
 
     return (
         <ScreenPlanApprovisionnement
+            // Another plan starts on its first tab, with no filter left on.
+            key={plan.id}
             plan={plan}
             onChangePlan={() => setPicking(true)}
             {...data}
