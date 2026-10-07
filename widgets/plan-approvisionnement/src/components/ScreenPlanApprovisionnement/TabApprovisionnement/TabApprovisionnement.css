@@ -28,3 +28,9 @@
     font-variant-numeric: tabular-nums;
     text-align: right;
 }
+
+.tab-approvisionnement__actions {
+    display: flex;
+    gap: 0.25rem;
+    white-space: nowrap;
+}

@@ -1,25 +1,30 @@
 import './TabApprovisionnement.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
+import '@gouvfr/dsfr/dist/utility/icons/icons-design/icons-design.main.min.css'
 
 import { useState } from 'react'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Pays } from '@shared/core/domain/value-objects/pays'
 import {
     toApprovisionnementRows,
     type ApprovisionnementRow,
     type Referentiels,
 } from '../../../approvisionnement-rows'
+import { toForm, type EditableFields } from '../../../approvisionnement-form'
 import { FOURNISSEUR_NOT_GIVEN } from '../../../constant'
 import EmptyPlan from '../EmptyPlan'
+import ApprovisionnementModal from './ApprovisionnementModal'
+import DeleteApprovisionnementModal from './DeleteApprovisionnementModal'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
 const plural = (count: number, word: string) =>
     `${count} ${word}${count > 1 ? 's' : ''}`
 
-const COLUMNS: readonly Column<ApprovisionnementRow>[] = [
+const DATA_COLUMNS: readonly Column<ApprovisionnementRow>[] = [
     {
         id: 'controle',
         header: 'Contrôle',
@@ -61,18 +66,43 @@ const COLUMNS: readonly Column<ApprovisionnementRow>[] = [
     },
 ]
 
+// What a screen reader hears after « Modifier » or « Supprimer »: the buttons
+// of every row read the same otherwise.
+const describe = ({
+    fournisseur,
+    ressource,
+    provenance,
+}: ApprovisionnementRow) =>
+    ` l'approvisionnement ${fournisseur ?? FOURNISSEUR_NOT_GIVEN}, ${ressource}, ${provenance}`
+
 export type TabApprovisionnementProps = Referentiels & {
     // Those of the plan only.
     approvisionnements: readonly Approvisionnement[]
+    pays: readonly Pays[]
     hasAttachments: boolean
+    // Both close their modal once done, and leave it open when they fail.
+    onUpdate: (
+        id: Approvisionnement['id'],
+        fields: EditableFields
+    ) => Promise<void>
+    onDelete: (id: Approvisionnement['id']) => Promise<void>
 }
 
 export default function TabApprovisionnement({
     approvisionnements,
+    pays,
     hasAttachments,
+    onUpdate,
+    onDelete,
     ...referentiels
 }: TabApprovisionnementProps) {
     const [duplicatesOnly, setDuplicatesOnly] = useState(false)
+    const [editedId, setEditedId] = useState<Approvisionnement['id'] | null>(
+        null
+    )
+    const [deletedId, setDeletedId] = useState<Approvisionnement['id'] | null>(
+        null
+    )
 
     const rows = toApprovisionnementRows(approvisionnements, referentiels)
     const duplicateCount = new Set(
@@ -83,6 +113,38 @@ export default function TabApprovisionnement({
     const shownRows = filtered
         ? rows.filter(({ duplicate }) => duplicate !== null)
         : rows
+
+    const edited = approvisionnements.find(({ id }) => id === editedId)
+    const deleted = rows.find(({ id }) => id === deletedId)
+
+    // DSFR puts the actions of a row in its last cell.
+    const columns: readonly Column<ApprovisionnementRow>[] = [
+        ...DATA_COLUMNS,
+        {
+            id: 'actions',
+            header: 'Actions',
+            render: (row) => (
+                <div className="tab-approvisionnement__actions">
+                    <button
+                        type="button"
+                        className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-edit-line"
+                        onClick={() => setEditedId(row.id)}
+                    >
+                        Modifier
+                        <span className="fr-sr-only">{describe(row)}</span>
+                    </button>
+                    <button
+                        type="button"
+                        className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-delete-line"
+                        onClick={() => setDeletedId(row.id)}
+                    >
+                        Supprimer
+                        <span className="fr-sr-only">{describe(row)}</span>
+                    </button>
+                </div>
+            ),
+        },
+    ]
 
     if (rows.length === 0) return <EmptyPlan hasAttachments={hasAttachments} />
 
@@ -123,9 +185,38 @@ export default function TabApprovisionnement({
                 caption="Approvisionnements du plan"
                 hideCaption
                 bordered
+                // Long names wrap, so the actions stay in view in a narrow
+                // Grist panel.
+                multiLine
                 rows={shownRows}
-                columns={COLUMNS}
+                columns={columns}
             />
+
+            {edited && (
+                <ApprovisionnementModal
+                    {...referentiels}
+                    pays={pays}
+                    title="Modifier l'approvisionnement"
+                    submitLabel="Enregistrer"
+                    initial={toForm(edited)}
+                    failureMessage="L'enregistrement a échoué. Vos modifications n'ont pas été prises en compte. Réessayez."
+                    onSubmit={async (fields) => {
+                        await onUpdate(edited.id, fields)
+                        setEditedId(null)
+                    }}
+                    onClose={() => setEditedId(null)}
+                />
+            )}
+            {deleted && (
+                <DeleteApprovisionnementModal
+                    row={deleted}
+                    onConfirm={async () => {
+                        await onDelete(deleted.id)
+                        setDeletedId(null)
+                    }}
+                    onClose={() => setDeletedId(null)}
+                />
+            )}
         </div>
     )
 }

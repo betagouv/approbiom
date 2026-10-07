@@ -15,9 +15,15 @@ export type AlertProps = {
     severity: AlertSeverity
     title?: string
     children: ReactNode
+    size?: 'sm' | 'md'
 }
 
-export default function Alert({ severity, title, children }: AlertProps) {
+export default function Alert({
+    severity,
+    title,
+    children,
+    size = 'md',
+}: AlertProps) {
     const roleBySeverity = {
         info: 'status',
         success: 'status',
@@ -27,8 +33,13 @@ export default function Alert({ severity, title, children }: AlertProps) {
 
     const role = roleBySeverity[severity]
     return (
-        <div className={`fr-alert fr-alert--${severity}`} role={role}>
-            {title && <h3 className="fr-alert__title">{title}</h3>}
+        <div
+            className={`fr-alert fr-alert--${severity}${size === 'sm' ? ' fr-alert--sm' : ''}`}
+            role={role}
+        >
+            {title && size !== 'sm' && (
+                <h3 className="fr-alert__title">{title}</h3>
+            )}
             <p>{children}</p>
         </div>
     )

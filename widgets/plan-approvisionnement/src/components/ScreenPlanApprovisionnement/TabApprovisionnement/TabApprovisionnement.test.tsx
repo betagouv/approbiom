@@ -1,14 +1,17 @@
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
     cleanup,
     fireEvent,
     render,
     screen,
+    waitFor,
     within,
 } from '@testing-library/react'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import { DEPARTEMENT_FRANCAIS } from '@shared/core/domain/value-objects/provenance'
-import TabApprovisionnement from './TabApprovisionnement'
+import TabApprovisionnement, {
+    type TabApprovisionnementProps,
+} from './TabApprovisionnement'
 
 const REFERENTIELS = {
     entreprises: [
@@ -51,16 +54,28 @@ function approvisionnement(
 
 function renderTab(
     approvisionnements: readonly Approvisionnement[],
-    hasAttachments = true
+    hasAttachments = true,
+    {
+        onUpdate = vi.fn(() => Promise.resolve()),
+        onDelete = vi.fn(() => Promise.resolve()),
+    }: {
+        onUpdate?: TabApprovisionnementProps['onUpdate']
+        onDelete?: TabApprovisionnementProps['onDelete']
+    } = {}
 ) {
     render(
         <TabApprovisionnement
             approvisionnements={approvisionnements}
+            pays={[{ libelle: 'Espagne' }]}
             hasAttachments={hasAttachments}
+            onUpdate={onUpdate}
+            onDelete={onDelete}
             {...REFERENTIELS}
         />
     )
 }
+
+const dialog = () => screen.getByRole('dialog')
 
 // The header row comes first.
 const bodyRows = () => screen.getAllByRole('row').slice(1)
@@ -85,6 +100,8 @@ describe('TabApprovisionnement', () => {
             '1A-PFA · Plaquettes forestières',
             'Corrèze (19)',
             '1 200,5',
+            // The actions of a row come last, as DSFR asks.
+            "Modifier l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)Supprimer l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)",
         ])
     })
 
@@ -150,5 +167,117 @@ describe('TabApprovisionnement', () => {
         expect(
             screen.getByText(/Aucune pièce jointe n'est liée à ce plan/)
         ).toBeTruthy()
+    })
+
+    describe('modifier', () => {
+        it('opens on the approvisionnement as it is', () => {
+            renderTab([approvisionnement(1, '19')])
+
+            fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+
+            expect(
+                within(dialog()).getByRole<HTMLInputElement>('combobox', {
+                    name: /Fournisseur/,
+                }).value
+            ).toBe('BOIS FICTIF ENERGIE — 00000000000001')
+            expect(
+                within(dialog()).getByRole<HTMLInputElement>('textbox', {
+                    name: /Tonnage/,
+                }).value
+            ).toBe('1200,5')
+        })
+
+        it('saves the fields and closes', async () => {
+            const onUpdate = vi.fn(() => Promise.resolve())
+            renderTab([approvisionnement(1, '19')], true, { onUpdate })
+
+            fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+            fireEvent.change(
+                within(dialog()).getByRole('textbox', { name: /Tonnage/ }),
+                { target: { value: '900' } }
+            )
+            fireEvent.click(
+                within(dialog()).getByRole('button', { name: 'Enregistrer' })
+            )
+
+            await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+            expect(onUpdate).toHaveBeenCalledWith(1, {
+                fournisseur: '00000000000001',
+                ressource: '1A-PFA',
+                provenance: { source: DEPARTEMENT_FRANCAIS, code: '19' },
+                tonnageTotal: 900,
+            })
+        })
+
+        it('stays open and says so when the save fails', async () => {
+            renderTab([approvisionnement(1, '19')], true, {
+                onUpdate: () => Promise.reject(new Error('Grist')),
+            })
+
+            fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+            fireEvent.click(
+                within(dialog()).getByRole('button', { name: 'Enregistrer' })
+            )
+
+            expect(
+                (await within(dialog()).findByRole('alert')).textContent
+            ).toMatch(/L'enregistrement a échoué/)
+        })
+
+        it('cannot save a tonnage that is not above zero', () => {
+            renderTab([approvisionnement(1, '19')])
+
+            fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+            fireEvent.change(
+                within(dialog()).getByRole('textbox', { name: /Tonnage/ }),
+                { target: { value: '0' } }
+            )
+
+            expect(
+                within(dialog()).getByRole<HTMLButtonElement>('button', {
+                    name: 'Enregistrer',
+                }).disabled
+            ).toBe(true)
+            expect(
+                within(dialog()).getByText(
+                    'Saisissez un tonnage supérieur à 0.'
+                )
+            ).toBeTruthy()
+        })
+    })
+
+    describe('supprimer', () => {
+        it('recalls the approvisionnement before deleting it', async () => {
+            const onDelete = vi.fn(() => Promise.resolve())
+            renderTab([approvisionnement(1, '19')], true, { onDelete })
+
+            fireEvent.click(screen.getByRole('button', { name: /^Supprimer/ }))
+            expect(
+                within(dialog()).getByText(
+                    /^Corrèze \(19\) · 1\s200,5\st MV\/an$/
+                )
+            ).toBeTruthy()
+            fireEvent.click(
+                within(dialog()).getByRole('button', { name: 'Supprimer' })
+            )
+
+            await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+            expect(onDelete).toHaveBeenCalledWith(1)
+        })
+
+        it('stays open and says so when the deletion fails', async () => {
+            renderTab([approvisionnement(1, '19')], true, {
+                onDelete: () => Promise.reject(new Error('Grist')),
+            })
+
+            fireEvent.click(screen.getByRole('button', { name: /^Supprimer/ }))
+            fireEvent.click(
+                within(dialog()).getByRole('button', { name: 'Supprimer' })
+            )
+
+            expect(
+                (await within(dialog()).findByRole('alert')).textContent
+            ).toMatch(/La suppression a échoué/)
+        })
     })
 })

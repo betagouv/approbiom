@@ -1,5 +1,13 @@
-import { afterEach, describe, expect, it } from 'vitest'
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import { afterEach, describe, expect, it, vi } from 'vitest'
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    within,
+} from '@testing-library/react'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import { DEPARTEMENT_FRANCAIS } from '@shared/core/domain/value-objects/provenance'
 import Screen from './Screen'
 import type { SelectablePlan } from './ScreenSelectPlan'
 
@@ -26,6 +34,9 @@ const DATA = {
     entreprises: [],
     ressources: [],
     departementsByRegion: [],
+    pays: [],
+    updateApprovisionnement: () => Promise.resolve(),
+    deleteApprovisionnement: () => Promise.resolve(),
 }
 
 afterEach(cleanup)
@@ -37,7 +48,45 @@ function choose(nom: string) {
     fireEvent.click(screen.getByRole('option', { name: nom }))
 }
 
+const SAINT_JUNIEN: Approvisionnement = {
+    id: 7,
+    planDApprovisionnement: 1,
+    ressource: '1A-PFA',
+    provenance: { source: DEPARTEMENT_FRANCAIS, code: '19' },
+    tonnageTotal: 300,
+}
+
 describe('Screen', () => {
+    it('drops a deleted approvisionnement and says so', async () => {
+        const deleteApprovisionnement = vi.fn(() => Promise.resolve())
+        render(
+            <Screen
+                plans={PLANS}
+                {...DATA}
+                approvisionnements={[SAINT_JUNIEN]}
+                deleteApprovisionnement={deleteApprovisionnement}
+            />
+        )
+        choose('Plan appro chaufferie Tulle 2024')
+
+        fireEvent.click(screen.getByRole('button', { name: /^Supprimer/ }))
+        fireEvent.click(
+            within(screen.getByRole('dialog')).getByRole('button', {
+                name: 'Supprimer',
+            })
+        )
+
+        expect((await screen.findByRole('status')).textContent).toBe(
+            'Approvisionnement supprimé.'
+        )
+        expect(deleteApprovisionnement).toHaveBeenCalledWith(7)
+        expect(
+            within(screen.getByRole('tabpanel')).getByText(
+                'Aucun approvisionnement pour ce plan'
+            )
+        ).toBeTruthy()
+    })
+
     it('opens on the plan search', () => {
         render(<Screen plans={PLANS} {...DATA} />)
 

@@ -1,5 +1,5 @@
 import './RessourceFilter.css'
-import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
+import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
 import '@gouvfr/dsfr/dist/component/tag/tag.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
@@ -31,7 +31,7 @@ export default function RessourceFilter({
     const reset = chosen.length > 0 && (
         <button
             type="button"
-            className="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left fr-icon-close-line"
+            className="fr-link fr-link--sm fr-link--icon-left fr-icon-close-line"
             onClick={() => onChange([])}
         >
             Toutes les ressources

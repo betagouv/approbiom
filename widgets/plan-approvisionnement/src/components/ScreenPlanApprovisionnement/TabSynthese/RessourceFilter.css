@@ -1,9 +1,10 @@
-/* On the text baseline: DSFR leaves a bottom margin under each tag, for when
-   the group wraps, which would push a centred label off the tags. */
+/* On the top edge: DSFR sets each tag at the top of a 2.75rem line, to space
+   the rows when the group wraps, so neither centre nor baseline lines up. The
+   label and the reset link are as tall as a tag (1.5rem), text centred. */
 .ressource-filter {
     display: flex;
     flex-wrap: wrap;
-    align-items: baseline;
+    align-items: flex-start;
     gap: 0.5rem;
 }
 

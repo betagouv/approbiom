@@ -9,6 +9,7 @@ import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapt
 import { createGristReferentielGeoPort } from '@shared/infrastructure/grist/adapters/grist-adapter-referentiel-geo'
 import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
 import { DataSourceUnavailableError } from '@shared/core/errors'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import { listPlans } from '@shared/core/application/services/plan-view'
 import { FAKE_PORTS } from './fake-data/ports'
 import type { Ports } from './ports'
@@ -33,6 +34,7 @@ async function load(ports: Ports) {
         entreprises,
         ressources,
         departementsByRegion,
+        pays,
     ] = await Promise.all([
         listPlans(
             ['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'],
@@ -43,6 +45,7 @@ async function load(ports: Ports) {
         ports.entreprises.list(),
         ports.ressources.list(),
         ports.referentielGeo.listDepartementsByRegion(),
+        ports.approvisionnements.listPaysDeProvenance(),
     ])
 
     return {
@@ -52,6 +55,13 @@ async function load(ports: Ports) {
         entreprises,
         ressources,
         departementsByRegion,
+        pays,
+        updateApprovisionnement: (
+            id: Approvisionnement['id'],
+            approvisionnement: Partial<Approvisionnement>
+        ) => ports.approvisionnements.update(id, approvisionnement),
+        deleteApprovisionnement: (id: Approvisionnement['id']) =>
+            ports.approvisionnements.delete(id),
     }
 }
 
