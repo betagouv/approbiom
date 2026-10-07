@@ -1,0 +1,16 @@
+.screen-select-plan {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    max-width: 45rem;
+}
+
+.screen-select-plan__header {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+}
+
+.screen-select-plan__mention {
+    color: var(--text-mention-grey);
+}
