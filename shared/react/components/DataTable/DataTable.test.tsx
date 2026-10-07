@@ -45,6 +45,25 @@ describe('DataTable', () => {
         ).toBeDefined()
     })
 
+    it('keeps a hidden caption as the table name', () => {
+        render(
+            <DataTable
+                caption="Plans d’approvisionnement"
+                hideCaption
+                rows={plans}
+                columns={columns}
+            />
+        )
+
+        const table = screen.getByRole('table', {
+            name: 'Plans d’approvisionnement',
+        })
+        const caption = screen.getByText('Plans d’approvisionnement')
+
+        expect(table).toBeDefined()
+        expect(caption.closest('.fr-sr-only')).not.toBeNull()
+    })
+
     it('renders all column headers', () => {
         render(
             <DataTable

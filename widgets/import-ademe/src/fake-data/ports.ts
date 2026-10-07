@@ -93,9 +93,22 @@ export const FAKE_PORTS: PlanViewPorts & {
     approvisionnements: {
         list: () => Promise.resolve(createdApprovisionnements),
         create: (approvisionnements) => {
-            createdApprovisionnements.push(...approvisionnements)
+            createdApprovisionnements.push(
+                ...approvisionnements.map((approvisionnement) => ({
+                    ...approvisionnement,
+                    id: createdApprovisionnements.length + 1,
+                }))
+            )
             return Promise.resolve()
         },
+        update: () =>
+            Promise.reject(
+                new Error('This widget changes no approvisionnement.')
+            ),
+        delete: () =>
+            Promise.reject(
+                new Error('This widget deletes no approvisionnement.')
+            ),
         listPaysDeProvenance: () => Promise.resolve([...paysDeProvenance]),
         addPaysDeProvenance: (pays) => {
             paysDeProvenance.push(pays)

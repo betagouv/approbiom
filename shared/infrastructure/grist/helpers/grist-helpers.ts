@@ -152,6 +152,22 @@ export async function createRows(
     }
 }
 
+export async function deleteRows(
+    tableId: string,
+    rowIds: readonly number[]
+): Promise<void> {
+    try {
+        await grist.getTable(tableId).destroy([...rowIds])
+    } catch (cause) {
+        const message = cause instanceof Error ? cause.message : String(cause)
+
+        throw new Error(
+            `Grist rows ${rowIds.join(', ')} of table "${tableId}" could not be deleted: ${message}`,
+            { cause }
+        )
+    }
+}
+
 export const asString = (value: unknown): string =>
     typeof value === 'string' ? value : ''
 

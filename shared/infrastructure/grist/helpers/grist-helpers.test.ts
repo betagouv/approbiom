@@ -1,6 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
     asIdList,
+    deleteRows,
     fetchRow,
     fetchRows,
     indexByKey,
@@ -105,6 +106,29 @@ describe('fetchRow', () => {
 
         await expect(fetchRow(TABLE_ID, 0)).rejects.toThrow(
             'Row "0 from table Plan_d_approvisionnement has not been found."'
+        )
+    })
+})
+
+describe('deleteRows', () => {
+    it('deletes the rows by their id', async () => {
+        const destroy = vi.fn(() => Promise.resolve())
+        vi.stubGlobal('grist', { getTable: () => ({ destroy }) })
+
+        await deleteRows('Approvisionnement', [3, 7])
+
+        expect(destroy).toHaveBeenCalledWith([3, 7])
+    })
+
+    it('names the table and the rows when Grist refuses', async () => {
+        vi.stubGlobal('grist', {
+            getTable: () => ({
+                destroy: () => Promise.reject(new Error('Access denied')),
+            }),
+        })
+
+        await expect(deleteRows('Approvisionnement', [3])).rejects.toThrow(
+            'Grist rows 3 of table "Approvisionnement" could not be deleted: Access denied'
         )
     })
 })

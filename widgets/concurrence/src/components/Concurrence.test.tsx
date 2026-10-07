@@ -35,6 +35,7 @@ const nouvelleAquitaine: DepartementsByRegion = {
 }
 
 const deHauteVienne: Approvisionnement = {
+    id: 1,
     planDApprovisionnement: 1,
     ressource: 'Plaquettes forestières',
     provenance: { source: DEPARTEMENT_FRANCAIS, code: '87' },
@@ -43,6 +44,7 @@ const deHauteVienne: Approvisionnement = {
 }
 
 const dAllemagne: Approvisionnement = {
+    id: 2,
     planDApprovisionnement: 1,
     ressource: 'Plaquettes forestières',
     provenance: { source: PAYS_ETRANGER, libelle: 'Allemagne' },

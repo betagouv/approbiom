@@ -1,12 +1,17 @@
 import { useState } from 'react'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Referentiels } from '../approvisionnement-rows'
 import ScreenSelectPlan, { type SelectablePlan } from './ScreenSelectPlan'
 import ScreenPlanApprovisionnement from './ScreenPlanApprovisionnement'
 
-export type ScreenProps = {
+export type ScreenProps = Referentiels & {
     plans: readonly SelectablePlan[]
+    approvisionnements: readonly Approvisionnement[]
+    attachments: readonly Attachment[]
 }
 
-export default function Screen({ plans }: ScreenProps) {
+export default function Screen({ plans, ...data }: ScreenProps) {
     const [planId, setPlanId] = useState<SelectablePlan['id'] | null>(null)
     // True while another plan is being looked for.
     const [picking, setPicking] = useState(false)
@@ -32,6 +37,7 @@ export default function Screen({ plans }: ScreenProps) {
         <ScreenPlanApprovisionnement
             plan={plan}
             onChangePlan={() => setPicking(true)}
+            {...data}
         />
     )
 }

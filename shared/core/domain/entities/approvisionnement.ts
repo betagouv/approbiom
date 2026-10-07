@@ -5,6 +5,7 @@ import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d
 import type { Ressource } from '@shared/core/domain/entities/ressource'
 
 export type Approvisionnement = {
+    id: number
     planDApprovisionnement: PlanDApprovisionnement['id']
     ressource: Ressource['code']
     provenance: Provenance

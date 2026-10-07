@@ -20,6 +20,14 @@ const PLANS: readonly SelectablePlan[] = [
     },
 ]
 
+const DATA = {
+    approvisionnements: [],
+    attachments: [],
+    entreprises: [],
+    ressources: [],
+    departementsByRegion: [],
+}
+
 afterEach(cleanup)
 
 const search = () => screen.getByRole('combobox', { name: /Plan/ })
@@ -31,7 +39,7 @@ function choose(nom: string) {
 
 describe('Screen', () => {
     it('opens on the plan search', () => {
-        render(<Screen plans={PLANS} />)
+        render(<Screen plans={PLANS} {...DATA} />)
 
         expect(
             screen.getByRole('heading', {
@@ -42,7 +50,7 @@ describe('Screen', () => {
     })
 
     it('shows the chosen plan in place of the search', () => {
-        render(<Screen plans={PLANS} />)
+        render(<Screen plans={PLANS} {...DATA} />)
 
         choose('Plan appro chaufferie Tulle 2024')
 
@@ -56,7 +64,7 @@ describe('Screen', () => {
     })
 
     it('says when a plan answers no appel à projet', () => {
-        render(<Screen plans={PLANS} />)
+        render(<Screen plans={PLANS} {...DATA} />)
 
         choose('Plan appro scierie Ussel')
 
@@ -64,7 +72,7 @@ describe('Screen', () => {
     })
 
     it('goes back to the plan without choosing another one', () => {
-        render(<Screen plans={PLANS} />)
+        render(<Screen plans={PLANS} {...DATA} />)
         choose('Plan appro chaufferie Tulle 2024')
 
         fireEvent.click(screen.getByRole('button', { name: 'Changer de plan' }))
@@ -82,7 +90,7 @@ describe('Screen', () => {
     })
 
     it('switches to another plan', () => {
-        render(<Screen plans={PLANS} />)
+        render(<Screen plans={PLANS} {...DATA} />)
         choose('Plan appro chaufferie Tulle 2024')
 
         fireEvent.click(screen.getByRole('button', { name: 'Changer de plan' }))

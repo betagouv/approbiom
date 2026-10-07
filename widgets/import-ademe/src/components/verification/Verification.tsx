@@ -62,7 +62,7 @@ export type VerificationProps = {
         changes: ExtractedLineChanges
     ) => Promise<void>
     onImportLine: (
-        approvisionnements: readonly Approvisionnement[]
+        approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
     ) => Promise<void>
     onCreateFournisseur: (entreprise: Entreprise) => Promise<void>
     onCreatePays: (pays: Pays) => Promise<void>

@@ -4,6 +4,7 @@ import { loadImportProgress } from './import-progress'
 
 function approvisionnement(planDApprovisionnement: number): Approvisionnement {
     return {
+        id: 1,
         planDApprovisionnement,
         fournisseur: '00000000000003',
         ressource: '1A-PFA',

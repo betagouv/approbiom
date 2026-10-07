@@ -45,6 +45,7 @@ const TOTAL_COLUMNS = [
 
 export const COLUMNS = {
     approvisionnement: [
+        'id',
         'Plan_d_approvisionnement',
         'Ressource',
         'Departement_de_provenance', // ref, est null si la provenance est un pays

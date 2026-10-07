@@ -1,0 +1,44 @@
+.tab-approvisionnement {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+.tab-approvisionnement__duplicates {
+    display: flex;
+    flex-direction: column;
+    gap: 0.25rem;
+    color: var(--text-default-error);
+}
+
+.tab-approvisionnement__duplicates-title {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    font-weight: 700;
+}
+
+.tab-approvisionnement__mention {
+    color: var(--text-mention-grey);
+}
+
+/* DSFR: numbers are right-aligned in their cell. */
+.tab-approvisionnement__number {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.tab-approvisionnement__empty {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    border: 1px dashed var(--border-default-grey);
+    text-align: center;
+}
+
+.tab-approvisionnement__empty-title {
+    font-weight: 700;
+}

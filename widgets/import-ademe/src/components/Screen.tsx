@@ -40,7 +40,7 @@ export type ScreenProps = {
         changes: ExtractedLineChanges
     ) => Promise<void>
     importLine: (
-        approvisionnements: readonly Approvisionnement[]
+        approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
     ) => Promise<void>
 }
 
@@ -143,7 +143,7 @@ export default function Screen({
     // Grist decides which lines are imported, and one import can change
     // several of them: the lines are read again.
     async function importReviewedLine(
-        approvisionnements: readonly Approvisionnement[]
+        approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
     ) {
         await importLine(approvisionnements)
         if (attachment) setExtracted(await extractDocument(attachment))

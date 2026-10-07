@@ -26,7 +26,7 @@ export function toApprovisionnements(
     line: StoredExtractedLine,
     plan: PlanDApprovisionnement['id'],
     source: Attachment['id']
-): Approvisionnement[] {
+): Omit<Approvisionnement, 'id'>[] {
     const { matchedFournisseur, matchedRessource, parsedProvenance } =
         line.derived
 
@@ -52,7 +52,7 @@ export function toApprovisionnements(
 // Whether the line counts as imported is computed by Grist, off what exists in
 // Approvisionnement: nothing is written back on the line itself.
 export async function importLine(
-    approvisionnements: readonly Approvisionnement[],
+    approvisionnements: readonly Omit<Approvisionnement, 'id'>[],
     ports: { approvisionnements: Pick<ApprovisionnementPort, 'create'> }
 ): Promise<void> {
     await ports.approvisionnements.create(approvisionnements)
