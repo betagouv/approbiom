@@ -3,9 +3,11 @@ import Alert from '@shared/react/components/Alert'
 import Tabs from '@shared/react/components/Tabs'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
-import type { Referentiels } from '../../approvisionnement-rows'
+import type { Referentiels } from '../../referentiels'
 import type { EditableFields } from '../../approvisionnement-form'
+import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import PlanHeader from '../PlanHeader'
 import type { SelectablePlan } from '../ScreenSelectPlan'
 import TabApprovisionnement from './TabApprovisionnement'
@@ -18,11 +20,15 @@ export type ScreenPlanApprovisionnementProps = Referentiels & {
     attachments: readonly Attachment[]
     pays: readonly Pays[]
     onChangePlan: () => void
+    onCreate: (fields: EditableFields) => Promise<void>
     onUpdate: (
         id: Approvisionnement['id'],
         fields: EditableFields
     ) => Promise<void>
     onDelete: (id: Approvisionnement['id']) => Promise<void>
+    onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
+    findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
+    onCreatePays: (pays: Pays) => Promise<void>
 }
 
 export default function ScreenPlanApprovisionnement({
@@ -31,8 +37,12 @@ export default function ScreenPlanApprovisionnement({
     attachments,
     pays,
     onChangePlan,
+    onCreate,
     onUpdate,
     onDelete,
+    onCreateEntreprise,
+    findEntrepriseBySiret,
+    onCreatePays,
     ...referentiels
 }: ScreenPlanApprovisionnementProps) {
     // What the last change did, until the next one.
@@ -68,6 +78,11 @@ export default function ScreenPlanApprovisionnement({
                                 approvisionnements={planApprovisionnements}
                                 pays={pays}
                                 hasAttachments={hasAttachments}
+                                onCreate={async (fields) => {
+                                    setSuccess(null)
+                                    await onCreate(fields)
+                                    setSuccess('Approvisionnement créé.')
+                                }}
                                 onUpdate={async (id, fields) => {
                                     setSuccess(null)
                                     await onUpdate(id, fields)
@@ -78,6 +93,9 @@ export default function ScreenPlanApprovisionnement({
                                     await onDelete(id)
                                     setSuccess('Approvisionnement supprimé.')
                                 }}
+                                onCreateEntreprise={onCreateEntreprise}
+                                findEntrepriseBySiret={findEntrepriseBySiret}
+                                onCreatePays={onCreatePays}
                                 {...referentiels}
                             />
                         ),

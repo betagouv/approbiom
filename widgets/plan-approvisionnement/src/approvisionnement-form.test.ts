@@ -5,7 +5,7 @@ import {
     PAYS_ETRANGER,
 } from '@shared/core/domain/value-objects/provenance'
 import {
-    NO_FOURNISSEUR,
+    EMPTY_FORM,
     parseTonnage,
     toEditableFields,
     toForm,
@@ -45,10 +45,10 @@ describe('toForm', () => {
         })
     })
 
-    it('chooses « Non renseigné » for a fournisseur left out', () => {
+    it('keeps a fournisseur left out as « Non renseigné »', () => {
         expect(
             toForm({ ...APPROVISIONNEMENT, fournisseur: undefined }).fournisseur
-        ).toBe(NO_FOURNISSEUR)
+        ).toBeUndefined()
     })
 
     it('leaves a blank département to be chosen again', () => {
@@ -87,13 +87,16 @@ describe('toEditableFields', () => {
         expect(
             toEditableFields({
                 ...toForm(APPROVISIONNEMENT),
-                fournisseur: NO_FOURNISSEUR,
+                fournisseur: undefined,
             })
         ).toHaveProperty('fournisseur', undefined)
     })
 
+    it('cannot save an empty form', () => {
+        expect(toEditableFields(EMPTY_FORM)).toBeNull()
+    })
+
     it.each([
-        ['fournisseur', null],
         ['ressource', null],
         ['provenance', null],
         ['tonnage', '0'],

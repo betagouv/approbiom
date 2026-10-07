@@ -3,11 +3,9 @@ import './TabSynthese.css'
 import { useId, useState } from 'react'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
-import {
-    toApprovisionnementRows,
-    type Referentiels,
-} from '../../../approvisionnement-rows'
-import { toSynthese, type Share } from '../../../synthese'
+import { toApprovisionnementRows } from '../../../approvisionnement-rows'
+import type { Referentiels } from '../../../referentiels'
+import { toSynthese, type Share } from './synthese'
 import { FOURNISSEUR_NOT_GIVEN } from '../../../constant'
 import EmptyPlan from '../EmptyPlan'
 import RessourceFilter from './RessourceFilter'

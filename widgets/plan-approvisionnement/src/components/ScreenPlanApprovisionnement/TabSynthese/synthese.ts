@@ -1,4 +1,4 @@
-import type { ApprovisionnementRow } from './approvisionnement-rows'
+import type { ApprovisionnementRow } from '../../../approvisionnement-rows'
 
 // What a provenance or a fournisseur weighs in the plan's tonnage.
 export type Share = {

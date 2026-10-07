@@ -72,7 +72,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
             const referencedTables = await readReferencedTables()
 
             // A new row fills every column, whatever was left out.
-            await createRows(
+            return createRows(
                 TABLE.approvisionnement,
                 approvisionnements.map((approvisionnement) =>
                     toCells(

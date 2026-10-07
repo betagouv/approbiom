@@ -15,7 +15,7 @@ const STORED: Approvisionnement = {
 describe('createFakeApprovisionnementPort', () => {
     it('gives a created approvisionnement the next id', async () => {
         const port = createFakeApprovisionnementPort([STORED])
-        await port.create([
+        const ids = await port.create([
             {
                 planDApprovisionnement: 1,
                 ressource: '2B-CIB',
@@ -24,6 +24,7 @@ describe('createFakeApprovisionnementPort', () => {
             },
         ])
 
+        expect(ids).toEqual([5])
         expect((await port.list()).map(({ id }) => id)).toEqual([4, 5])
     })
 

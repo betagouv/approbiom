@@ -4,7 +4,16 @@
     gap: 0.75rem;
 }
 
+.tab-approvisionnement__toolbar {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: flex-start;
+    gap: 1rem;
+}
+
 .tab-approvisionnement__duplicates {
+    flex: 1;
+    min-width: 16rem;
     display: flex;
     flex-direction: column;
     gap: 0.25rem;
@@ -33,4 +42,9 @@
     display: flex;
     gap: 0.25rem;
     white-space: nowrap;
+}
+
+/* On the right, even when there are no duplicates to the left of it. */
+.tab-approvisionnement__add {
+    margin-left: auto;
 }

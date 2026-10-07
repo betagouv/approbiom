@@ -58,9 +58,11 @@ function renderTab(
     {
         onUpdate = vi.fn(() => Promise.resolve()),
         onDelete = vi.fn(() => Promise.resolve()),
+        onCreatePays = vi.fn(() => Promise.resolve()),
     }: {
         onUpdate?: TabApprovisionnementProps['onUpdate']
         onDelete?: TabApprovisionnementProps['onDelete']
+        onCreatePays?: TabApprovisionnementProps['onCreatePays']
     } = {}
 ) {
     render(
@@ -68,8 +70,14 @@ function renderTab(
             approvisionnements={approvisionnements}
             pays={[{ libelle: 'Espagne' }]}
             hasAttachments={hasAttachments}
+            onCreate={() => Promise.resolve()}
             onUpdate={onUpdate}
             onDelete={onDelete}
+            onCreateEntreprise={() => Promise.resolve()}
+            findEntrepriseBySiret={() =>
+                Promise.resolve({ status: 'notfound' })
+            }
+            onCreatePays={onCreatePays}
             {...REFERENTIELS}
         />
     )
@@ -278,6 +286,79 @@ describe('TabApprovisionnement', () => {
             expect(
                 (await within(dialog()).findByRole('alert')).textContent
             ).toMatch(/La suppression a échoué/)
+        })
+    })
+
+    describe('ajouter', () => {
+        const openChoice = () =>
+            fireEvent.click(
+                screen.getByRole('button', {
+                    name: 'Ajouter des approvisionnements',
+                })
+            )
+
+        it('can be reached from an empty plan', () => {
+            renderTab([])
+
+            openChoice()
+
+            expect(
+                screen.getByRole('radio', { name: /Saisie manuelle/ })
+            ).toBeTruthy()
+        })
+
+        it('says why the document cannot be used without an attachment', () => {
+            renderTab([], false)
+
+            openChoice()
+
+            const document = screen.getByRole<HTMLInputElement>('radio', {
+                name: /document BCIB\/BCIAT/,
+            })
+            expect(document.disabled).toBe(true)
+            expect(
+                screen.getByText("Aucune pièce jointe n'est liée à ce plan.")
+            ).toBeTruthy()
+        })
+
+        it('waits for a choice before going on', () => {
+            renderTab([])
+
+            openChoice()
+
+            expect(
+                screen.getByRole<HTMLButtonElement>('button', {
+                    name: 'Continuer',
+                }).disabled
+            ).toBe(true)
+        })
+
+        it('creates a missing pays and chooses it', async () => {
+            const onCreatePays = vi.fn(() => Promise.resolve())
+            renderTab([], true, { onCreatePays })
+
+            openChoice()
+            fireEvent.click(
+                screen.getByRole('radio', { name: /Saisie manuelle/ })
+            )
+            fireEvent.click(screen.getByRole('button', { name: 'Continuer' }))
+            fireEvent.click(
+                within(dialog()).getByRole('button', {
+                    name: /Créer un pays/,
+                })
+            )
+            fireEvent.change(
+                within(dialog()).getByRole('textbox', { name: 'Nouveau pays' }),
+                { target: { value: 'Portugal' } }
+            )
+            fireEvent.click(
+                within(dialog()).getByRole('button', { name: 'Créer le pays' })
+            )
+
+            expect(
+                await within(dialog()).findByText('Pays créé et sélectionné.')
+            ).toBeTruthy()
+            expect(onCreatePays).toHaveBeenCalledWith({ libelle: 'Portugal' })
         })
     })
 })

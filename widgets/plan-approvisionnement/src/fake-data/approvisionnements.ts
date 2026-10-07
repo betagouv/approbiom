@@ -100,14 +100,12 @@ export function createFakeApprovisionnementPort(
     return {
         list: () => Promise.resolve([...rows]),
         create: (approvisionnements) => {
-            rows = [
-                ...rows,
-                ...approvisionnements.map((approvisionnement) => ({
-                    ...approvisionnement,
-                    id: nextId++,
-                })),
-            ]
-            return Promise.resolve()
+            const created = approvisionnements.map((approvisionnement) => ({
+                ...approvisionnement,
+                id: nextId++,
+            }))
+            rows = [...rows, ...created]
+            return Promise.resolve(created.map(({ id }) => id))
         },
         update: (id, approvisionnement) => {
             if (!rows.some((row) => row.id === id)) return missing(id)

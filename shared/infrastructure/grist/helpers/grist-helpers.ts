@@ -130,18 +130,19 @@ export async function updateRow(
     }
 }
 
+// The ids of the rows created, in the order the rows were given.
 export async function createRows(
     tableId: string,
     rows: readonly GristCells[]
-): Promise<void> {
+): Promise<number[]> {
     try {
         const records = rows.map((fields) => ({
             fields,
         }))
         const table = grist.getTable(tableId)
 
-        await table.create(records)
-        return
+        const created = await table.create(records)
+        return created.map(({ id }) => id)
     } catch (cause) {
         const message = cause instanceof Error ? cause.message : String(cause)
 

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { ApprovisionnementRow } from './approvisionnement-rows'
+import type { ApprovisionnementRow } from '../../../approvisionnement-rows'
 import { toSynthese } from './synthese'
 
 let nextId = 1

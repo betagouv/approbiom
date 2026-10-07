@@ -6,23 +6,24 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useId, useState } from 'react'
 import Alert from '@shared/react/components/Alert'
-import Combobox from '@shared/react/components/Combobox'
 import Modal from '@shared/react/components/Modal'
 import Select, { type SelectItem } from '@shared/react/components/Select'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import {
     DEPARTEMENT_FRANCAIS,
     PAYS_ETRANGER,
 } from '@shared/core/domain/value-objects/provenance'
-import type { Referentiels } from '../../../../approvisionnement-rows'
+import type { Referentiels } from '../../../../referentiels'
 import {
-    NO_FOURNISSEUR,
     parseTonnage,
     toEditableFields,
     type ApprovisionnementForm,
     type EditableFields,
 } from '../../../../approvisionnement-form'
-import { FOURNISSEUR_NOT_GIVEN } from '../../../../constant'
+import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
+import FournisseurField from '../../../FournisseurField'
+import NewPaysForm from '../../../NewPaysForm'
 
 export type ApprovisionnementModalProps = Referentiels & {
     pays: readonly Pays[]
@@ -33,6 +34,9 @@ export type ApprovisionnementModalProps = Referentiels & {
     failureMessage: string
     onSubmit: (fields: EditableFields) => Promise<void>
     onClose: () => void
+    onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
+    findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
+    onCreatePays: (pays: Pays) => Promise<void>
 }
 
 export default function ApprovisionnementModal({
@@ -46,28 +50,26 @@ export default function ApprovisionnementModal({
     failureMessage,
     onSubmit,
     onClose,
+    onCreateEntreprise,
+    findEntrepriseBySiret,
+    onCreatePays,
 }: ApprovisionnementModalProps) {
     const tonnageId = useId()
     const [form, setForm] = useState(initial)
     const [tonnageTouched, setTonnageTouched] = useState(false)
+    // The « Nouveau pays » form, then what came of it.
+    const [paysForm, setPaysForm] = useState<'closed' | 'open' | 'created'>(
+        'closed'
+    )
     const [saving, setSaving] = useState(false)
     const [failed, setFailed] = useState(false)
 
     const set = (changes: Partial<ApprovisionnementForm>) =>
         setForm((previous) => ({ ...previous, ...changes }))
 
-    // A value the referentiels lack is still offered, so that it shows.
-    const fournisseurOptions = [
-        { value: NO_FOURNISSEUR, label: FOURNISSEUR_NOT_GIVEN },
-        ...entreprises.map(({ siret, denomination }) => ({
-            value: siret,
-            label: `${denomination} — ${siret}`,
-        })),
-        ...(initial.fournisseur &&
-        !entreprises.some(({ siret }) => siret === initial.fournisseur)
-            ? [{ value: initial.fournisseur, label: initial.fournisseur }]
-            : []),
-    ]
+    const choosePays = ({ libelle }: Pays) =>
+        set({ provenance: `${PAYS_ETRANGER}|${libelle}` })
+
     const ressourceOptions = ressources.map(({ code, title }) => ({
         value: code,
         label: `${code} · ${title}`,
@@ -96,7 +98,6 @@ export default function ApprovisionnementModal({
         (tonnageTouched || form.tonnage.trim() !== '') &&
         parseTonnage(form.tonnage) === null
     const missing = [
-        form.fournisseur === null && 'le fournisseur (ou « Non renseigné »)',
         form.ressource === null && 'la ressource',
         form.provenance === null && 'la provenance',
         parseTonnage(form.tonnage) === null && 'un tonnage supérieur à 0',
@@ -152,13 +153,17 @@ export default function ApprovisionnementModal({
                     </Alert>
                 )}
 
-                <Combobox
-                    label="Fournisseur"
-                    hint="Dénomination ou SIRET"
-                    options={fournisseurOptions}
-                    value={form.fournisseur}
-                    onChange={(fournisseur) => set({ fournisseur })}
-                />
+                <div>
+                    <FournisseurField
+                        entreprises={entreprises}
+                        value={form.fournisseur}
+                        onChange={(entreprise) =>
+                            set({ fournisseur: entreprise?.siret })
+                        }
+                        onCreate={onCreateEntreprise}
+                        findEntrepriseBySiret={findEntrepriseBySiret}
+                    />
+                </div>
                 <Select
                     label="Ressource"
                     description="Obligatoire"
@@ -168,14 +173,46 @@ export default function ApprovisionnementModal({
                     onChange={(ressource) => set({ ressource })}
                 />
                 <div className="approvisionnement-modal__row">
-                    <Select
-                        label="Provenance"
-                        description="Obligatoire"
-                        placeholder="Choisir une provenance"
-                        options={provenanceOptions}
-                        value={form.provenance}
-                        onChange={(provenance) => set({ provenance })}
-                    />
+                    <div>
+                        <Select
+                            label="Provenance"
+                            description="Obligatoire"
+                            placeholder="Choisir une provenance"
+                            options={provenanceOptions}
+                            value={form.provenance}
+                            onChange={(provenance) => {
+                                set({ provenance })
+                                setPaysForm('closed')
+                            }}
+                        />
+                        {paysForm === 'open' ? (
+                            <NewPaysForm
+                                pays={pays}
+                                onCreate={async (created) => {
+                                    await onCreatePays(created)
+                                    choosePays(created)
+                                    setPaysForm('created')
+                                }}
+                                onSelectExisting={(existing) => {
+                                    choosePays(existing)
+                                    setPaysForm('closed')
+                                }}
+                                onCancel={() => setPaysForm('closed')}
+                            />
+                        ) : paysForm === 'created' ? (
+                            <p className="fr-valid-text fr-mt-1v">
+                                Pays créé et sélectionné.
+                            </p>
+                        ) : (
+                            <button
+                                type="button"
+                                className="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left fr-icon-add-line"
+                                onClick={() => setPaysForm('open')}
+                            >
+                                {'Pays absent de la liste\u00a0? Créer un pays'}
+                            </button>
+                        )}
+                    </div>
                     <div
                         className={`fr-input-group${tonnageInvalid ? ' fr-input-group--error' : ''}`}
                     >

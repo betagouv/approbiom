@@ -263,7 +263,9 @@ describe('createGristApprovisionnementPort', () => {
 
 describe('createGristApprovisionnementPort().create', () => {
     function mockGristForCreate() {
-        const create = vi.fn(() => Promise.resolve())
+        const create = vi.fn((records: unknown[]) =>
+            Promise.resolve(records.map((_, index) => ({ id: 40 + index })))
+        )
         const tables: Record<string, ColumnMajorTable> = {
             ...REFERENCED_TABLES,
             [TABLE.attachment]: {
@@ -341,6 +343,23 @@ describe('createGristApprovisionnementPort().create', () => {
                 },
             },
         ])
+    })
+
+    it('gives back the ids Grist gave the rows, in their order', async () => {
+        mockGristForCreate()
+        const approvisionnement = {
+            planDApprovisionnement: 160,
+            ressource: 'PF',
+            provenance: { source: DEPARTEMENT_FRANCAIS, code: '87' },
+            tonnageTotal: 100,
+        } as const
+
+        await expect(
+            createGristApprovisionnementPort().create([
+                approvisionnement,
+                approvisionnement,
+            ])
+        ).resolves.toEqual([40, 41])
     })
 
     it('writes an empty Ref for an approvisionnement without fournisseur', async () => {

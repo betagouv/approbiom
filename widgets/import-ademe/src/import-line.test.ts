@@ -115,7 +115,7 @@ describe('toApprovisionnements', () => {
 
 describe('importLine', () => {
     it('creates the approvisionnements', async () => {
-        const create = vi.fn(() => Promise.resolve())
+        const create = vi.fn(() => Promise.resolve([]))
         const approvisionnements = toApprovisionnements(line(), 160, 20)
 
         await importLine(approvisionnements, {

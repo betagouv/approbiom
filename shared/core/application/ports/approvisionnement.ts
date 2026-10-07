@@ -30,7 +30,7 @@ export interface ApprovisionnementPort {
 
     create(
         approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
-    ): Promise<void>
+    ): Promise<Approvisionnement['id'][]>
 
     update(
         id: Approvisionnement['id'],

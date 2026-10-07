@@ -1,0 +1,18 @@
+.new-pays {
+    padding-left: 0.75rem;
+    border-left: 2px solid var(--border-active-blue-france);
+}
+
+.new-pays .fr-input-group {
+    margin-bottom: 0;
+}
+
+.new-pays__line {
+    display: flex;
+    gap: 0.5rem;
+    align-items: center;
+}
+
+.new-pays__line .fr-input {
+    max-width: 18rem;
+}

@@ -5,6 +5,7 @@ import { FAKE_PROGRAMMES_AIDE } from './programmes-aide'
 import { createFakeApprovisionnementPort } from './approvisionnements'
 import { FAKE_ATTACHMENTS } from './attachments'
 import { FAKE_ENTREPRISES } from './entreprises'
+import { FAKE_ENTREPRISE_SEARCH } from './entreprise-search'
 import { FAKE_RESSOURCES } from './ressources'
 import { FAKE_DEPARTEMENTS_BY_REGION } from './departements'
 
@@ -20,7 +21,11 @@ export const FAKE_PORTS: Ports = {
     },
     approvisionnements: createFakeApprovisionnementPort(),
     attachments: { list: () => Promise.resolve(FAKE_ATTACHMENTS) },
-    entreprises: { list: () => Promise.resolve(FAKE_ENTREPRISES) },
+    entreprises: {
+        list: () => Promise.resolve(FAKE_ENTREPRISES),
+        create: () => Promise.resolve(),
+    },
+    entrepriseSearch: FAKE_ENTREPRISE_SEARCH,
     ressources: { list: () => Promise.resolve(FAKE_RESSOURCES) },
     referentielGeo: {
         listDepartementsByRegion: () =>

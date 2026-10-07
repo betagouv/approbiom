@@ -35,8 +35,21 @@ const DATA = {
     ressources: [],
     departementsByRegion: [],
     pays: [],
+    createApprovisionnements: () => Promise.resolve([]),
     updateApprovisionnement: () => Promise.resolve(),
     deleteApprovisionnement: () => Promise.resolve(),
+    createEntreprise: () => Promise.resolve(),
+    findEntrepriseBySiret: () =>
+        Promise.resolve({ status: 'notfound' } as const),
+    createPays: () => Promise.resolve(),
+}
+
+// Picks an option of a native list by what it shows.
+function pick(list: HTMLElement, label: string) {
+    const option = within(list).getByRole('option', { name: label })
+    fireEvent.change(list, {
+        target: { value: option.getAttribute('value') },
+    })
 }
 
 afterEach(cleanup)
@@ -57,6 +70,67 @@ const SAINT_JUNIEN: Approvisionnement = {
 }
 
 describe('Screen', () => {
+    it('adds an approvisionnement typed in and says so', async () => {
+        const createApprovisionnements = vi.fn(() => Promise.resolve([12]))
+        render(
+            <Screen
+                plans={PLANS}
+                {...DATA}
+                ressources={[
+                    {
+                        code: '1A-PFA',
+                        ademeCode: '2017-1A-PFA',
+                        title: 'Plaquettes forestières',
+                        description: '',
+                    },
+                ]}
+                departementsByRegion={[
+                    {
+                        region: { reg: '75', libelle: 'Nouvelle-Aquitaine' },
+                        departements: [{ dep: '19', libelle: 'Corrèze' }],
+                    },
+                ]}
+                createApprovisionnements={createApprovisionnements}
+            />
+        )
+        choose('Plan appro chaufferie Tulle 2024')
+
+        fireEvent.click(
+            screen.getByRole('button', {
+                name: 'Ajouter des approvisionnements',
+            })
+        )
+        fireEvent.click(screen.getByRole('radio', { name: /Saisie manuelle/ }))
+        fireEvent.click(screen.getByRole('button', { name: 'Continuer' }))
+
+        const form = within(screen.getByRole('dialog'))
+        pick(
+            form.getByRole('combobox', { name: /Ressource/ }),
+            '1A-PFA · Plaquettes forestières'
+        )
+        pick(form.getByRole('combobox', { name: /Provenance/ }), 'Corrèze (19)')
+        fireEvent.change(form.getByRole('textbox', { name: /Tonnage/ }), {
+            target: { value: '450' },
+        })
+        fireEvent.click(
+            form.getByRole('button', { name: "Créer l'approvisionnement" })
+        )
+
+        expect(await screen.findByText('Approvisionnement créé.')).toBeTruthy()
+        expect(createApprovisionnements).toHaveBeenCalledWith([
+            {
+                planDApprovisionnement: 1,
+                fournisseur: undefined,
+                ressource: '1A-PFA',
+                provenance: { source: DEPARTEMENT_FRANCAIS, code: '19' },
+                tonnageTotal: 450,
+            },
+        ])
+        expect(
+            screen.getByRole('tab', { name: 'Approvisionnements (1)' })
+        ).toBeTruthy()
+    })
+
     it('drops a deleted approvisionnement and says so', async () => {
         const deleteApprovisionnement = vi.fn(() => Promise.resolve())
         render(

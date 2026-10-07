@@ -51,7 +51,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         installations: { list: rows([]) },
         approvisionnements: {
             list: rows([]),
-            create: () => Promise.resolve(),
+            create: () => Promise.resolve([]),
             update: () => Promise.resolve(),
             delete: () => Promise.resolve(),
             listPaysDeProvenance: rows([]),
@@ -317,7 +317,7 @@ describe('App', () => {
                     plans: planPort(rows([saintJunien])),
                     approvisionnements: {
                         list: rows([]),
-                        create: () => Promise.resolve(),
+                        create: () => Promise.resolve([]),
                         update: () => Promise.resolve(),
                         delete: () => Promise.resolve(),
                         listPaysDeProvenance: rows([]),

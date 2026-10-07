@@ -7,15 +7,22 @@ import { useState } from 'react'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import {
     toApprovisionnementRows,
     type ApprovisionnementRow,
-    type Referentiels,
 } from '../../../approvisionnement-rows'
-import { toForm, type EditableFields } from '../../../approvisionnement-form'
+import type { Referentiels } from '../../../referentiels'
+import {
+    EMPTY_FORM,
+    toForm,
+    type EditableFields,
+} from '../../../approvisionnement-form'
+import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import { FOURNISSEUR_NOT_GIVEN } from '../../../constant'
 import EmptyPlan from '../EmptyPlan'
+import AddApprovisionnementModal from './AddApprovisionnementModal'
 import ApprovisionnementModal from './ApprovisionnementModal'
 import DeleteApprovisionnementModal from './DeleteApprovisionnementModal'
 
@@ -80,23 +87,33 @@ export type TabApprovisionnementProps = Referentiels & {
     approvisionnements: readonly Approvisionnement[]
     pays: readonly Pays[]
     hasAttachments: boolean
-    // Both close their modal once done, and leave it open when they fail.
+    // Each closes its modal once done, and leaves it open when it fails.
+    onCreate: (fields: EditableFields) => Promise<void>
     onUpdate: (
         id: Approvisionnement['id'],
         fields: EditableFields
     ) => Promise<void>
     onDelete: (id: Approvisionnement['id']) => Promise<void>
+    onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
+    findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
+    onCreatePays: (pays: Pays) => Promise<void>
 }
 
 export default function TabApprovisionnement({
     approvisionnements,
     pays,
     hasAttachments,
+    onCreate,
     onUpdate,
     onDelete,
+    onCreateEntreprise,
+    findEntrepriseBySiret,
+    onCreatePays,
     ...referentiels
 }: TabApprovisionnementProps) {
     const [duplicatesOnly, setDuplicatesOnly] = useState(false)
+    // How the user is adding approvisionnements, while they are.
+    const [adding, setAdding] = useState<'choosing' | 'manual' | null>(null)
     const [editedId, setEditedId] = useState<Approvisionnement['id'] | null>(
         null
     )
@@ -146,56 +163,96 @@ export default function TabApprovisionnement({
         },
     ]
 
-    if (rows.length === 0) return <EmptyPlan hasAttachments={hasAttachments} />
+    const formProps = {
+        ...referentiels,
+        pays,
+        onCreateEntreprise,
+        findEntrepriseBySiret,
+        onCreatePays,
+    }
 
     return (
         <div className="tab-approvisionnement">
-            {duplicateCount > 0 && (
-                <div className="tab-approvisionnement__duplicates">
-                    <p className="fr-text--sm fr-m-0 tab-approvisionnement__duplicates-title">
-                        <span
-                            className="fr-icon-error-fill fr-icon--sm"
-                            aria-hidden="true"
-                        />
-                        {plural(duplicateCount, 'doublon')} à corriger
-                    </p>
-                    <p className="fr-text--sm fr-m-0">
-                        Deux lignes ou plus ont le même fournisseur, la même
-                        ressource et la même provenance (badges de même lettre).
-                        Un plan ne doit pas contenir deux fois le même
-                        approvisionnement : modifiez ou supprimez les lignes en
-                        trop.
-                    </p>
-                    <div>
-                        <button
-                            type="button"
-                            className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-filter-line"
-                            aria-pressed={filtered}
-                            onClick={() => setDuplicatesOnly(!filtered)}
-                        >
-                            {filtered
-                                ? 'Afficher toutes les lignes'
-                                : 'Afficher uniquement les doublons'}
-                        </button>
+            <div className="tab-approvisionnement__toolbar">
+                {duplicateCount > 0 && (
+                    <div className="tab-approvisionnement__duplicates">
+                        <p className="fr-text--sm fr-m-0 tab-approvisionnement__duplicates-title">
+                            <span
+                                className="fr-icon-error-fill fr-icon--sm"
+                                aria-hidden="true"
+                            />
+                            {plural(duplicateCount, 'doublon')} à corriger
+                        </p>
+                        <p className="fr-text--sm fr-m-0">
+                            Deux lignes ou plus ont le même fournisseur, la même
+                            ressource et la même provenance (badges de même
+                            lettre). Un plan ne doit pas contenir deux fois le
+                            même approvisionnement : modifiez ou supprimez les
+                            lignes en trop.
+                        </p>
+                        <div>
+                            <button
+                                type="button"
+                                className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-filter-line"
+                                aria-pressed={filtered}
+                                onClick={() => setDuplicatesOnly(!filtered)}
+                            >
+                                {filtered
+                                    ? 'Afficher toutes les lignes'
+                                    : 'Afficher uniquement les doublons'}
+                            </button>
+                        </div>
                     </div>
-                </div>
+                )}
+                <button
+                    type="button"
+                    className="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-add-line tab-approvisionnement__add"
+                    onClick={() => setAdding('choosing')}
+                >
+                    Ajouter des approvisionnements
+                </button>
+            </div>
+
+            {rows.length === 0 ? (
+                <EmptyPlan hasAttachments={hasAttachments} />
+            ) : (
+                <DataTable
+                    caption="Approvisionnements du plan"
+                    hideCaption
+                    bordered
+                    // Long names wrap, so the actions stay in view in a narrow
+                    // Grist panel.
+                    multiLine
+                    rows={shownRows}
+                    columns={columns}
+                />
             )}
 
-            <DataTable
-                caption="Approvisionnements du plan"
-                hideCaption
-                bordered
-                // Long names wrap, so the actions stay in view in a narrow
-                // Grist panel.
-                multiLine
-                rows={shownRows}
-                columns={columns}
-            />
+            {adding === 'choosing' && (
+                <AddApprovisionnementModal
+                    hasAttachments={hasAttachments}
+                    onManual={() => setAdding('manual')}
+                    onClose={() => setAdding(null)}
+                />
+            )}
+            {adding === 'manual' && (
+                <ApprovisionnementModal
+                    {...formProps}
+                    title="Nouvel approvisionnement"
+                    submitLabel="Créer l'approvisionnement"
+                    initial={EMPTY_FORM}
+                    failureMessage="La création a échoué. L'approvisionnement n'a pas été ajouté au plan. Réessayez."
+                    onSubmit={async (fields) => {
+                        await onCreate(fields)
+                        setAdding(null)
+                    }}
+                    onClose={() => setAdding(null)}
+                />
+            )}
 
             {edited && (
                 <ApprovisionnementModal
-                    {...referentiels}
-                    pays={pays}
+                    {...formProps}
                     title="Modifier l'approvisionnement"
                     submitLabel="Enregistrer"
                     initial={toForm(edited)}

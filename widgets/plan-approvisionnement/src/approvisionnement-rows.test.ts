@@ -5,10 +5,8 @@ import {
     PAYS_ETRANGER,
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
-import {
-    toApprovisionnementRows,
-    type Referentiels,
-} from './approvisionnement-rows'
+import { toApprovisionnementRows } from './approvisionnement-rows'
+import type { Referentiels } from './referentiels'
 
 const REFERENTIELS: Referentiels = {
     entreprises: [

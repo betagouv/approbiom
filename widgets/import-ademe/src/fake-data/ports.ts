@@ -93,13 +93,14 @@ export const FAKE_PORTS: PlanViewPorts & {
     approvisionnements: {
         list: () => Promise.resolve(createdApprovisionnements),
         create: (approvisionnements) => {
-            createdApprovisionnements.push(
-                ...approvisionnements.map((approvisionnement) => ({
+            const created = approvisionnements.map(
+                (approvisionnement, index) => ({
                     ...approvisionnement,
-                    id: createdApprovisionnements.length + 1,
-                }))
+                    id: createdApprovisionnements.length + index + 1,
+                })
             )
-            return Promise.resolve()
+            createdApprovisionnements.push(...created)
+            return Promise.resolve(created.map(({ id }) => id))
         },
         update: () =>
             Promise.reject(

@@ -1,17 +1,9 @@
-import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
 import {
     PAYS_ETRANGER,
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
-
-export type Referentiels = {
-    entreprises: readonly Entreprise[]
-    ressources: readonly Ressource[]
-    departementsByRegion: readonly DepartementsByRegion[]
-}
+import type { Referentiels } from './referentiels'
 
 // An approvisionnement as the table of the plan shows it.
 export type ApprovisionnementRow = {

@@ -5,13 +5,10 @@ import {
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
 
-// The value of the « Non renseigné » choice: a SIRET is never empty.
-export const NO_FOURNISSEUR = ''
-
 // What the fields of the form hold. Null is nothing chosen yet.
 export type ApprovisionnementForm = {
-    // A SIRET, or NO_FOURNISSEUR.
-    fournisseur: string | null
+    // Undefined for « Non renseigné ».
+    fournisseur: string | undefined
     ressource: string | null
     // One key per provenance, see `provenanceKey`.
     provenance: string | null
@@ -60,7 +57,7 @@ export function toForm(
         approvisionnement
 
     return {
-        fournisseur: fournisseur ?? NO_FOURNISSEUR,
+        fournisseur,
         ressource,
         // A département left blank has to be chosen again.
         provenance:
@@ -71,13 +68,20 @@ export function toForm(
     }
 }
 
+// A new approvisionnement starts without fournisseur, as most plans give none.
+export const EMPTY_FORM: ApprovisionnementForm = {
+    fournisseur: undefined,
+    ressource: null,
+    provenance: null,
+    tonnage: '',
+}
+
 // Null while a field is missing or wrong: the form cannot be saved then.
 export function toEditableFields(
     form: ApprovisionnementForm
 ): EditableFields | null {
     const tonnageTotal = parseTonnage(form.tonnage)
     if (
-        form.fournisseur === null ||
         form.ressource === null ||
         form.provenance === null ||
         tonnageTotal === null
@@ -85,8 +89,7 @@ export function toEditableFields(
         return null
 
     return {
-        fournisseur:
-            form.fournisseur === NO_FOURNISSEUR ? undefined : form.fournisseur,
+        fournisseur: form.fournisseur,
         ressource: form.ressource,
         provenance: toProvenance(form.provenance),
         tonnageTotal,
