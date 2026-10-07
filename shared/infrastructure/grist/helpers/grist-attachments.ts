@@ -1,39 +1,32 @@
-import type { AccessTokenResult } from 'grist/GristAPI'
-
-import { asNumber, asString } from './grist-helpers'
-import { getAccessToken } from './grist-get-access-token'
+import { METADATA_TABLE } from '../types/grist-tables'
+import { asNumber, asString, fetchRowsOnce } from './grist-helpers'
 
 export type AttachmentMetadata = {
     name: string
     sizeInBytes: number
 }
-async function readMetadata(
-    { baseUrl, token }: AccessTokenResult,
-    id: number
-): Promise<AttachmentMetadata | null> {
-    const response = await fetch(`${baseUrl}/attachments/${id}?auth=${token}`)
 
-    if (!response.ok) {
-        throw new Error(
-            `Grist attachment ${id} could not be read — ${response.status} ${response.statusText}. `
-        )
-    }
+async function readAllMetadata(): Promise<Map<number, AttachmentMetadata>> {
+    const rows = await fetchRowsOnce(
+        METADATA_TABLE.gristAttachment.id,
+        METADATA_TABLE.gristAttachment.columnIds
+    )
 
-    const { fileName, fileSize } = (await response.json()) as {
-        fileName?: unknown
-        fileSize?: unknown
-    }
-
-    return {
-        name: asString(fileName),
-        sizeInBytes: asNumber(fileSize) ?? 0,
-    }
+    return new Map(
+        rows.map((row) => [
+            asNumber(row.id) ?? 0,
+            {
+                name: asString(row.fileName),
+                sizeInBytes: asNumber(row.fileSize) ?? 0,
+            },
+        ])
+    )
 }
 
 export async function getAttachmentMetadata(
     id: number
 ): Promise<AttachmentMetadata | null> {
-    return readMetadata(await getAccessToken(), id)
+    return (await readAllMetadata()).get(id) ?? null
 }
 
 export async function getAttachmentsMetadata(
@@ -41,15 +34,13 @@ export async function getAttachmentsMetadata(
 ): Promise<Map<number, AttachmentMetadata>> {
     if (ids.length === 0) return new Map()
 
-    const credentials = await getAccessToken()
+    const metadata = await readAllMetadata()
 
-    const files = await Promise.all(
-        ids.map(async (id) => {
-            const metadata = await readMetadata(credentials, id)
+    return new Map(
+        ids.flatMap((id) => {
+            const file = metadata.get(id)
 
-            return metadata === null ? null : ([id, metadata] as const)
+            return file === undefined ? [] : [[id, file] as const]
         })
     )
-
-    return new Map(files.filter((file) => file !== null))
 }

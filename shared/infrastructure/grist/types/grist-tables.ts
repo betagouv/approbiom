@@ -1,7 +1,17 @@
 /**
- * Every table id and column list the adapters read, in one place.
+ * Every metadata table id and column list the adapters read, in one place.
  */
-export const TABLE = {
+export const METADATA_TABLE = {
+    gristAttachment: {
+        id: '_grist_Attachments',
+        columnIds: ['id', 'fileName', 'fileSize'],
+    },
+}
+
+export /**
+ * Every user table id and column list the adapters read, in one place.
+ */
+const TABLE = {
     approvisionnement: 'Approvisionnement',
     totalByPlanAndRessource:
         'Approvisionnement_summary_Plan_d_approvisionnement_Ressource',
