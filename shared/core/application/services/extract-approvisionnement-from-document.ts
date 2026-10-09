@@ -24,26 +24,7 @@ export type ExtractApprovisionnementFromDocumentPorts = {
 
 type Document = Pick<Attachment, 'id' | 'name'>
 
-// React runs effects twice in development: without it, the lines would be
-// written twice.
-const inFlight = new Map<Attachment['id'], Promise<ExtractedDocument>>()
-
-export function extractApprovisionnementFromDocument(
-    attachment: Document,
-    ports: ExtractApprovisionnementFromDocumentPorts
-): Promise<ExtractedDocument> {
-    const pending = inFlight.get(attachment.id)
-    if (pending) return pending
-
-    const run = readOrExtract(attachment, ports).finally(() => {
-        inFlight.delete(attachment.id)
-    })
-    inFlight.set(attachment.id, run)
-
-    return run
-}
-
-async function readOrExtract(
+export async function extractApprovisionnementFromDocument(
     attachment: Document,
     ports: ExtractApprovisionnementFromDocumentPorts
 ): Promise<ExtractedDocument> {

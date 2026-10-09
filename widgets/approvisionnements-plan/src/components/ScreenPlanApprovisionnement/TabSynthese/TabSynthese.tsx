@@ -9,14 +9,14 @@ import { toSynthese, type Share } from './synthese'
 import { FOURNISSEUR_NOT_GIVEN } from '../../../constant'
 import EmptyPlan from '../EmptyPlan'
 import RessourceFilter from './RessourceFilter'
+import { formatNumber } from '@shared/react/format'
 
-const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 const PERCENT = new Intl.NumberFormat('fr-FR', {
     style: 'percent',
     maximumFractionDigits: 1,
 })
 
-const tonnageOf = (tonnage: number) => `${NUMBER.format(tonnage)} t MV/an`
+const tonnageOf = (tonnage: number) => `${formatNumber(tonnage)} t MV/an`
 
 function ShareCard({
     title,

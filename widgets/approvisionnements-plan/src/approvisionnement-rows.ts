@@ -1,8 +1,9 @@
-import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import {
-    PAYS_ETRANGER,
-    type Provenance,
-} from '@shared/core/domain/value-objects/provenance'
+    duplicateKey,
+    duplicatedKeys,
+    type Approvisionnement,
+} from '@shared/core/domain/entities/approvisionnement'
+import { PAYS_ETRANGER } from '@shared/core/domain/value-objects/provenance'
 import type { Referentiels } from './referentiels'
 
 export type ApprovisionnementRow = {
@@ -13,18 +14,6 @@ export type ApprovisionnementRow = {
     tonnage: number
     duplicate: string | null
 }
-
-const provenanceKey = (provenance: Provenance) =>
-    provenance.source === PAYS_ETRANGER
-        ? `${provenance.source}|${provenance.libelle}`
-        : `${provenance.source}|${provenance.code}`
-
-const duplicateKey = ({
-    fournisseur,
-    ressource,
-    provenance,
-}: Approvisionnement) =>
-    `${fournisseur ?? ''}|${ressource}|${provenanceKey(provenance)}`
 
 function letterOf(index: number): string {
     const letter = String.fromCharCode(65 + (index % 26))
@@ -51,11 +40,7 @@ export function toApprovisionnementRows(
         )
     )
 
-    const counts = new Map<string, number>()
-    for (const approvisionnement of approvisionnements) {
-        const key = duplicateKey(approvisionnement)
-        counts.set(key, (counts.get(key) ?? 0) + 1)
-    }
+    const duplicated = duplicatedKeys(approvisionnements)
 
     const rows = approvisionnements
         .map((approvisionnement) => {
@@ -90,7 +75,7 @@ export function toApprovisionnementRows(
 
     const letters = new Map<string, string>()
     for (const { key, row } of rows) {
-        if ((counts.get(key) ?? 0) < 2) continue
+        if (!duplicated.has(key)) continue
         if (!letters.has(key)) letters.set(key, letterOf(letters.size))
         row.duplicate = letters.get(key) ?? null
     }

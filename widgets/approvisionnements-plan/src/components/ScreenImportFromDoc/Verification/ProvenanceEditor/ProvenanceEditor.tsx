@@ -13,8 +13,7 @@ import {
 } from '@shared/core/domain/value-objects/provenance'
 import NewPaysForm from '../../../NewPaysForm'
 import type { ProvenanceRepartition } from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
-
-const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
+import { formatNumber } from '@shared/react/format'
 
 // A Select value has to be compared with ===, so a provenance is carried as
 // one string: its source, then its département code or country name.
@@ -323,8 +322,8 @@ export default function ProvenanceEditor({
                     <p
                         className={`fr-text--sm fr-m-0 provenance-editor__total-value${not100 ? ' provenance-editor__total-value--warning' : ''}`}
                     >
-                        Total : {NUMBER.format(totalPercentage)} % ·{' '}
-                        {NUMBER.format(tonnageOf(totalPercentage))} t MV/an
+                        Total : {formatNumber(totalPercentage)} % ·{' '}
+                        {formatNumber(tonnageOf(totalPercentage))} t MV/an
                     </p>
                     {not100 && (
                         <p className="fr-message fr-message--warning fr-m-0">

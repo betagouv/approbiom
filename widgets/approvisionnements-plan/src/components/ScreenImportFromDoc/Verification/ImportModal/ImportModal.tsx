@@ -5,9 +5,7 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 import { useState } from 'react'
 import Alert from '@shared/react/components/Alert'
 import Modal from '@shared/react/components/Modal'
-
-const plural = (count: number, word: string) =>
-    `${count} ${word}${count > 1 ? 's' : ''}`
+import { plural } from '@shared/react/format'
 
 export type ImportModalProps = {
     lineCount: number

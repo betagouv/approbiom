@@ -1,6 +1,6 @@
 import './Extraction.css'
 
-import { useEffect, useEffectEvent, useState } from 'react'
+import { useEffect, useEffectEvent, useRef, useState } from 'react'
 import ExtractionFailure from './ExtractionFailure'
 import ExtractionLoading from './ExtractionLoading'
 
@@ -18,7 +18,16 @@ export default function Extraction<T>({
     const [attempt, setAttempt] = useState(0)
     const [failure, setFailure] = useState<string | null>(null)
 
-    const runExtract = useEffectEvent(extract)
+    // React runs effects twice in development: one attempt must extract once,
+    // or the lines would be written twice.
+    const running = useRef<{ attempt: number; result: Promise<T> } | null>(null)
+
+    const runExtract = useEffectEvent(() => {
+        if (running.current?.attempt !== attempt)
+            running.current = { attempt, result: extract() }
+
+        return running.current.result
+    })
     const reportExtracted = useEffectEvent(onExtracted)
 
     useEffect(() => {

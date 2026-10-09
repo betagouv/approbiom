@@ -29,9 +29,7 @@ import Extraction from './Extraction'
 import ReextractModal from './ReextractModal'
 import Verification from './Verification'
 import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/extracted-approvisionnement'
-
-const plural = (count: number, word: string) =>
-    `${count} ${word}${count > 1 ? 's' : ''}`
+import { plural } from '@shared/react/format'
 
 type Step =
     | { name: 'choose' }

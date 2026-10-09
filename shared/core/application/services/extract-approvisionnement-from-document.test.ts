@@ -108,24 +108,6 @@ describe('extractApprovisionnementFromDocument', () => {
         expect(extracted.date).toEqual(extractedAt)
     })
 
-    it('writes the lines once when asked twice at the same time', async () => {
-        const dependencies = ports()
-
-        await Promise.all([
-            extractApprovisionnementFromDocument(attachment, dependencies),
-            extractApprovisionnementFromDocument(attachment, dependencies),
-        ])
-
-        expect(
-            dependencies.documentExtractorApprovisionnement.extract
-        ).toHaveBeenCalledOnce()
-        expect(
-            await dependencies.extractedApprovisionnements.listByDocument(
-                attachment
-            )
-        ).toHaveLength(1)
-    })
-
     it('says what went wrong in the extraction', async () => {
         const dependencies = ports()
         dependencies.documentExtractorApprovisionnement.extract.mockRejectedValue(

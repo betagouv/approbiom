@@ -7,17 +7,17 @@ import Badge from '@shared/react/components/Badge'
 import type { ExtractionSummary } from '@shared/core/application/ports/extracted-approvisionnement'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import { documentIconOf } from '@shared/react/components/document-icon'
+import { formatNumber } from '@shared/react/format'
 
-const SIZE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 const KO = 1024
 const MO = KO * KO
 
 function formatSize(bytes: number): string {
-    if (bytes < KO) return `${SIZE.format(bytes)} o`
+    if (bytes < KO) return `${formatNumber(bytes)} o`
 
     return bytes < MO
-        ? `${SIZE.format(Math.round(bytes / KO))} Ko`
-        : `${SIZE.format(bytes / MO)} Mo`
+        ? `${formatNumber(Math.round(bytes / KO))} Ko`
+        : `${formatNumber(bytes / MO)} Mo`
 }
 
 function ExtractionState({ summary }: { summary?: ExtractionSummary }) {

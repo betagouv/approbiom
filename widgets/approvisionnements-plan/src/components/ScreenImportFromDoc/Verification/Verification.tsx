@@ -21,11 +21,7 @@ import DocumentContext from '../DocumentContext'
 import DistributionList from './DistributionList'
 import ImportModal from './ImportModal'
 import ReviewModal from './ReviewModal'
-import {
-    distributionSummary,
-    formatPercentage,
-    formatTonnage,
-} from './extracted-line'
+import { distributionSummary } from './extracted-line'
 import {
     countVerified,
     distributionTotal,
@@ -33,9 +29,7 @@ import {
     toApprovisionnements,
     type ExtractedApprovisionnement,
 } from '@shared/core/domain/entities/extracted-approvisionnement'
-
-const plural = (count: number, word: string) =>
-    `${count} ${word}${count > 1 ? 's' : ''}`
+import { formatNumber, plural } from '@shared/react/format'
 
 export type VerificationProps = Referentiels & {
     attachment: Attachment
@@ -136,7 +130,7 @@ export default function Verification({
             ),
             render: ({ read }) => (
                 <span className="verification__number">
-                    {formatTonnage(read.tonnage)}
+                    {formatNumber(read.tonnage)}
                 </span>
             ),
         },
@@ -148,8 +142,8 @@ export default function Verification({
                     {distributionSummary(line)}
                     {isNot100(line) && (
                         <Badge size="sm" status="warning">
-                            Total {formatPercentage(distributionTotal(line))} %
-                            ≠ 100 %
+                            Total {formatNumber(distributionTotal(line))} % ≠
+                            100 %
                         </Badge>
                     )}
                 </span>

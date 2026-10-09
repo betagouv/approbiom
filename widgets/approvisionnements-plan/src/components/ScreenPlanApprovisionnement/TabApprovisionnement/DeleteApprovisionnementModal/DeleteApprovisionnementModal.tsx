@@ -7,8 +7,7 @@ import Alert from '@shared/react/components/Alert'
 import Modal from '@shared/react/components/Modal'
 import type { ApprovisionnementRow } from '../../../../approvisionnement-rows'
 import { FOURNISSEUR_NOT_GIVEN } from '../../../../constant'
-
-const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
+import { formatNumber } from '@shared/react/format'
 
 export type DeleteApprovisionnementModalProps = {
     row: ApprovisionnementRow
@@ -43,7 +42,7 @@ export default function DeleteApprovisionnementModal({
         { label: 'Ressource', value: row.ressource },
         {
             label: 'Provenance · tonnage',
-            value: `${row.provenance} · ${NUMBER.format(row.tonnage)} t MV/an`,
+            value: `${row.provenance} · ${formatNumber(row.tonnage)} t MV/an`,
         },
     ]
 

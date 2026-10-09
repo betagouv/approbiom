@@ -27,11 +27,7 @@ import EmptyPlan from '../EmptyPlan'
 import AddApprovisionnementModal from './AddApprovisionnementModal'
 import ApprovisionnementModal from './ApprovisionnementModal'
 import DeleteApprovisionnementModal from './DeleteApprovisionnementModal'
-
-const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
-
-const plural = (count: number, word: string) =>
-    `${count} ${word}${count > 1 ? 's' : ''}`
+import { formatNumber, plural } from '@shared/react/format'
 
 const DATA_COLUMNS: readonly Column<ApprovisionnementRow>[] = [
     {
@@ -69,7 +65,7 @@ const DATA_COLUMNS: readonly Column<ApprovisionnementRow>[] = [
         ),
         render: ({ tonnage }) => (
             <span className="tab-approvisionnement__number">
-                {NUMBER.format(tonnage)}
+                {formatNumber(tonnage)}
             </span>
         ),
     },

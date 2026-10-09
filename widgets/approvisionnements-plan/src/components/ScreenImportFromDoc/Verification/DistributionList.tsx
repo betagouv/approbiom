@@ -1,5 +1,5 @@
 import { PAYS_ETRANGER } from '@shared/core/domain/value-objects/provenance'
-import { formatPercentage } from './extracted-line'
+import { formatNumber } from '@shared/react/format'
 import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type DistributionListProps = {
@@ -28,8 +28,8 @@ export default function DistributionList({
                         ? provenance
                         : (departementLabels.get(provenance) ??
                           provenance)}{' '}
-                    : {formatPercentage(percentage)} % ·{' '}
-                    {formatPercentage((line.read.tonnage * percentage) / 100)}
+                    : {formatNumber(percentage)} % ·{' '}
+                    {formatNumber((line.read.tonnage * percentage) / 100)}
                     {' '}t MV/an
                 </li>
             ))}
