@@ -1,6 +1,5 @@
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
-// Stands in for the Plan_d_approvisionnement table outside Grist.
 export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
     {
         id: 1,

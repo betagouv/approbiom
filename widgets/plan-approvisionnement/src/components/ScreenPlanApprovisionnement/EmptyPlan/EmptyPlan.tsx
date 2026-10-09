@@ -1,7 +1,6 @@
 import './EmptyPlan.css'
 
 export type EmptyPlanProps = {
-    // Without one, only the manual entry is left to fill the plan.
     hasAttachments: boolean
 }
 

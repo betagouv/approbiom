@@ -5,7 +5,6 @@ import ExtractionFailure from './ExtractionFailure'
 import ExtractionLoading from './ExtractionLoading'
 
 export type ExtractionProps<T> = {
-    // Runs the extraction; called again by « Recommencer l'extraction ».
     extract: () => Promise<T>
     onExtracted: (result: T) => void
     onChooseAnother: () => void

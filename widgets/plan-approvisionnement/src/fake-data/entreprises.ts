@@ -1,6 +1,5 @@
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 
-// Fictional entreprises: neither the names nor the SIRETs exist.
 export const FAKE_ENTREPRISES: readonly Entreprise[] = [
     { denomination: 'BOIS FICTIF ENERGIE', siret: '00000000000001' },
     { denomination: 'COOPERATIVE FICTIVE DES FORETS', siret: '00000000000002' },

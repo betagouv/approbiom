@@ -119,7 +119,6 @@ async function load(ports: Ports) {
 export default function App() {
     const state = useAsyncState(() =>
         load(GRIST_PORTS).catch((error: unknown) => {
-            // Outside Grist, the widget runs on the fake data instead.
             if (error instanceof DataSourceUnavailableError)
                 return load(FAKE_PORTS)
 

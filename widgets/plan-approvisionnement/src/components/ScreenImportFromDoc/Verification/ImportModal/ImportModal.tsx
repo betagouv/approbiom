@@ -12,7 +12,6 @@ const plural = (count: number, word: string) =>
 export type ImportModalProps = {
     lineCount: number
     approvisionnementCount: number
-    // Leaves the modal open, with the reason, when it fails.
     onConfirm: () => Promise<void>
     onClose: () => void
 }

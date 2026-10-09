@@ -54,13 +54,6 @@ export function toProvenance(
         : { source: PAYS_ETRANGER, libelle }
 }
 
-/**
- * The fields every summary carries, whichever dimension it adds to them.
- *
- * A cell the document cannot answer for reads as zero here rather than crossing
- * the port unknown: left open, every screen would invent its own fallback and
- * they would not agree.
- */
 export function toGroup(
     row: GristRow,
     ressources: Map<number, GristRow>
@@ -76,8 +69,6 @@ export function toGroup(
 export const PAYS_DE_PROVENANCE = 'Pays_de_provenance'
 export const FRANCE = 'France'
 
-// Row ids keyed by what the domain names a row with. Rows without a key are
-// left out.
 function idsBy<K>(
     rows: readonly GristRow[],
     keysOf: (row: GristRow) => readonly K[]
@@ -91,9 +82,6 @@ function idsBy<K>(
     return ids
 }
 
-// The tables the Ref columns of Approvisionnement point at, indexed by what the
-// domain names their rows with: a SIRET, a ressource code, a département, a
-// file.
 export type ReferencedTables = {
     entrepriseIdBySiret: ReadonlyMap<string, number>
     ressourceIdByCode: ReadonlyMap<string, number>
@@ -121,7 +109,6 @@ export async function readReferencedTables(): Promise<ReferencedTables> {
         departementIdByDep: idsBy(departements, (row) =>
             nonEmpty(asString(row.DEP))
         ),
-        // A Piece_jointe row may hold several files.
         attachmentIdByFile: idsBy(attachments, (row) =>
             asIdList(row.piece_jointe)
         ),
@@ -138,7 +125,6 @@ function refTo<K>(ids: ReadonlyMap<K, number>, key: K, table: string): number {
     return id
 }
 
-// The cells of the fields given, Refs resolved.
 export function toCells(
     approvisionnement: Partial<Approvisionnement>,
     {
@@ -159,7 +145,6 @@ export function toCells(
     } = approvisionnement
     const cells: GristCells = {}
 
-    // A required field cannot be emptied: undefined means it is left out.
     if (planDApprovisionnement !== undefined)
         cells.Plan_d_approvisionnement = planDApprovisionnement
     if (ressource !== undefined)
@@ -180,7 +165,6 @@ export function toCells(
     }
     if (tonnageTotal !== undefined) cells.Total_en_tMv_an_ = tonnageTotal
 
-    // An optional field can be emptied: given as undefined, it is.
     const given = (field: keyof Approvisionnement) => field in approvisionnement
     if (given('fournisseur'))
         cells.Fournisseur =

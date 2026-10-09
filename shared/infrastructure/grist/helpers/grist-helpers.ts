@@ -130,7 +130,6 @@ export async function updateRow(
     }
 }
 
-// The ids of the rows created, in the order the rows were given.
 export async function createRows(
     tableId: string,
     rows: readonly GristCells[]

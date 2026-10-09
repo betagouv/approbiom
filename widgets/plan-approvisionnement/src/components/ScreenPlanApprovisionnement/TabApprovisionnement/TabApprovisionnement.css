@@ -31,7 +31,6 @@
     color: var(--text-mention-grey);
 }
 
-/* DSFR: numbers are right-aligned in their cell. */
 .tab-approvisionnement__number {
     display: block;
     font-variant-numeric: tabular-nums;
@@ -44,7 +43,6 @@
     white-space: nowrap;
 }
 
-/* On the right, even when there are no duplicates to the left of it. */
 .tab-approvisionnement__add {
     margin-left: auto;
 }

@@ -9,11 +9,9 @@ import { documentIconOf } from '@shared/react/components/document-icon'
 export type DocumentContextProps = {
     attachment: Attachment
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
-    // Shown after the document, such as a badge or an action.
     children?: ReactNode
 }
 
-// Which document the import is about, with a link to download it.
 export default function DocumentContext({
     attachment,
     getAttachmentUrl,

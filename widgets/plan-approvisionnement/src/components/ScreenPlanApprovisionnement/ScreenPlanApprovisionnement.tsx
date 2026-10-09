@@ -15,11 +15,9 @@ import TabSynthese from './TabSynthese'
 
 export type ScreenPlanApprovisionnementProps = Referentiels & {
     plan: SelectablePlan
-    // Those of every plan: the screen keeps the plan's own.
     approvisionnements: readonly Approvisionnement[]
     attachments: readonly Attachment[]
     pays: readonly Pays[]
-    // What the last import did, shown until the next change.
     notice?: string | null
     onChangePlan: () => void
     onCreate: (fields: EditableFields) => Promise<void>
@@ -50,7 +48,6 @@ export default function ScreenPlanApprovisionnement({
     onImportFromDocument,
     ...referentiels
 }: ScreenPlanApprovisionnementProps) {
-    // What the last change did, until the next one.
     const [success, setSuccess] = useState<string | null>(notice)
 
     const planApprovisionnements = approvisionnements.filter(

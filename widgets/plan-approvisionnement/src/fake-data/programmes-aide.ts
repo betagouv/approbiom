@@ -1,6 +1,5 @@
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 
-// Stands in for the Programme_d_aide table outside Grist.
 export const FAKE_PROGRAMMES_AIDE: readonly ProgrammeAide[] = [
     {
         id: 1,

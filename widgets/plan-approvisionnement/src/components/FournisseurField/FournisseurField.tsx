@@ -12,15 +12,11 @@ import NewFournisseurPanel from './NewFournisseurPanel'
 
 export type FournisseurFieldProps = {
     entreprises: readonly Entreprise[]
-    // Undefined for a fournisseur not given.
     value: Entreprise['siret'] | undefined
     onChange: (entreprise: Entreprise | undefined) => void
     onCreate: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
-    // The fournisseur as the document writes it, to look for on the
-    // Annuaire des Entreprises. Empty for an approvisionnement typed in.
     documentSupplier?: string
-    // From whoever saves the choice.
     message?: ComboboxMessage
 }
 
@@ -34,14 +30,12 @@ export default function FournisseurField({
     message,
 }: FournisseurFieldProps) {
     const comboboxRef = useRef<ComboboxHandle>(null)
-    // What the « Nouveau fournisseur » panel starts from, while it is open.
     const [creating, setCreating] = useState<{
         siret: string
         annuaireQuery: string
     } | null>(null)
     const [created, setCreated] = useState<Entreprise | null>(null)
 
-    // The SIRET is part of the label, so a number typed finds it too.
     // Rows of the Entreprise table without a name cannot be told apart, and
     // may share a SIRET with a named one.
     const entreprises = allEntreprises.filter(({ denomination }) =>
@@ -65,7 +59,6 @@ export default function FournisseurField({
         isNumericQuery(query) &&
         entreprises.some(({ siret }) => siret === digitsOf(query))
 
-    // The panel takes the focus; the field gets it back once it closes.
     function closePanel() {
         setCreating(null)
         requestAnimationFrame(() => comboboxRef.current?.focus())

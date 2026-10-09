@@ -9,14 +9,10 @@ import MultiSelect from '@shared/react/components/MultiSelect'
 import SelectableTag from '@shared/react/components/SelectableTag'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
 
-// DSFR: no more than six selectable tags for one filter. Past that, a list to
-// choose from and removable tags to recall the choice.
 const MAX_SELECTABLE_TAGS = 6
 
 export type RessourceFilterProps = {
-    // Those the plan draws on, in the order they are offered.
     ressources: readonly Pick<Ressource, 'code' | 'title'>[]
-    // None chosen is every ressource.
     chosen: readonly Ressource['code'][]
     onChange: (chosen: Ressource['code'][]) => void
 }

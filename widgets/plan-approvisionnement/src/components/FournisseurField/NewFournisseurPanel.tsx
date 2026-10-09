@@ -16,10 +16,7 @@ import { checkSiret } from './siret'
 type LookupResult = SiretLookup | { status: 'error' }
 
 export type NewFournisseurPanelProps = {
-    // Digits already typed in the Fournisseur field, if any.
     initialSiret: string
-    // What to look for on the Annuaire des Entreprises to find the SIRET: the
-    // name typed, or the fournisseur as the document writes it.
     annuaireQuery: string
     entreprises: readonly Entreprise[]
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
@@ -66,7 +63,6 @@ export default function NewFournisseurPanel({
         siretRef.current?.focus()
     }, [])
 
-    // The denomination is looked up as soon as the SIRET passes its own rules.
     useEffect(() => {
         if (current === null || requested.current.has(current)) return
 
@@ -161,7 +157,6 @@ export default function NewFournisseurPanel({
             onKeyDown={(event) => {
                 if (event.key !== 'Escape') return
 
-                // Handled here, so the dialog around stays open.
                 event.preventDefault()
                 event.stopPropagation()
                 onClose()

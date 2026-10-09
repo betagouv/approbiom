@@ -5,8 +5,6 @@ import {
 } from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
 import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/extracted-approvisionnement'
 
-// Stands in for the table « Approvisionnement extrait d'un document », in
-// memory: it lasts as long as the page.
 export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnementPort {
     const rows = new Map<number, ExtractedApprovisionnement[]>()
     let nextId = 1
@@ -19,7 +17,6 @@ export function createFakeExtractedApprovisionnements(): ExtractedApprovisionnem
                     read: { ...row.read, document: attachment.name },
                 }))
             ),
-        // A document whose lines were all imported has none left.
         listSummaries: () =>
             Promise.resolve(
                 [...rows]

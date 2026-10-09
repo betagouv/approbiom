@@ -83,11 +83,9 @@ const describe = ({
     ` l'approvisionnement ${fournisseur ?? FOURNISSEUR_NOT_GIVEN}, ${ressource}, ${provenance}`
 
 export type TabApprovisionnementProps = Referentiels & {
-    // Those of the plan only.
     approvisionnements: readonly Approvisionnement[]
     pays: readonly Pays[]
     hasAttachments: boolean
-    // Each closes its modal once done, and leaves it open when it fails.
     onCreate: (fields: EditableFields) => Promise<void>
     onUpdate: (
         id: Approvisionnement['id'],
@@ -114,7 +112,6 @@ export default function TabApprovisionnement({
     ...referentiels
 }: TabApprovisionnementProps) {
     const [duplicatesOnly, setDuplicatesOnly] = useState(false)
-    // How the user is adding approvisionnements, while they are.
     const [adding, setAdding] = useState<'choosing' | 'manual' | null>(null)
     const [editedId, setEditedId] = useState<Approvisionnement['id'] | null>(
         null
@@ -127,7 +124,6 @@ export default function TabApprovisionnement({
     const duplicateCount = new Set(
         rows.flatMap(({ duplicate }) => (duplicate ? [duplicate] : []))
     ).size
-    // Once the duplicates are fixed, there is nothing left to filter on.
     const filtered = duplicatesOnly && duplicateCount > 0
     const shownRows = filtered
         ? rows.filter(({ duplicate }) => duplicate !== null)
@@ -136,7 +132,6 @@ export default function TabApprovisionnement({
     const edited = approvisionnements.find(({ id }) => id === editedId)
     const deleted = rows.find(({ id }) => id === deletedId)
 
-    // DSFR puts the actions of a row in its last cell.
     const columns: readonly Column<ApprovisionnementRow>[] = [
         ...DATA_COLUMNS,
         {
@@ -222,8 +217,6 @@ export default function TabApprovisionnement({
                     caption="Approvisionnements du plan"
                     hideCaption
                     bordered
-                    // Long names wrap, so the actions stay in view in a narrow
-                    // Grist panel.
                     multiLine
                     rows={shownRows}
                     columns={columns}

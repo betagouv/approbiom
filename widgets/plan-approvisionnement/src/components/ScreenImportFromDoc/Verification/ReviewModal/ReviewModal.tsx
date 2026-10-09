@@ -23,7 +23,6 @@ import {
 export type ReviewModalProps = Referentiels & {
     line: ExtractedApprovisionnement
     pays: readonly Pays[]
-    // Each change is saved at once.
     onChange: (changes: ExtractedLineChanges) => Promise<void>
     onVerify: () => Promise<void>
     onClose: () => void

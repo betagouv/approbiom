@@ -5,7 +5,6 @@ import {
     type SiretProblem,
 } from '@shared/core/domain/value-objects/siret'
 
-// A search that could be the start of a SIRET.
 export const isNumericQuery = (text: string) => /^\d+$/.test(digitsOf(text))
 
 export type SiretCheck =
@@ -13,7 +12,6 @@ export type SiretCheck =
     | {
           ok: false
           error: string
-          // Shown as soon as it holds, rather than once the field is left.
           immediate: boolean
           duplicate?: Entreprise
       }
@@ -40,7 +38,6 @@ const MESSAGES: Record<
     }),
 }
 
-// The SIRET of a new fournisseur: a SIRET, and one no fournisseur has yet.
 export function checkSiret(
     raw: string,
     entreprises: readonly Entreprise[]

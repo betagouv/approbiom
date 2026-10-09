@@ -4,7 +4,6 @@
     gap: 1rem;
 }
 
-/* The provenance takes the room, the tonnage only what a number needs. */
 .approvisionnement-modal__row {
     display: grid;
     grid-template-columns: minmax(0, 1fr) 12rem;

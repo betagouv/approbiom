@@ -5,15 +5,12 @@ import {
 } from '@shared/core/domain/value-objects/provenance'
 import type { Referentiels } from './referentiels'
 
-// An approvisionnement as the table of the plan shows it.
 export type ApprovisionnementRow = {
     id: Approvisionnement['id']
-    // Null when the plan does not give the fournisseur.
     fournisseur: string | null
     ressource: string
     provenance: string
     tonnage: number
-    // Rows sharing a letter are duplicates of one another.
     duplicate: string | null
 }
 
@@ -22,8 +19,6 @@ const provenanceKey = (provenance: Provenance) =>
         ? `${provenance.source}|${provenance.libelle}`
         : `${provenance.source}|${provenance.code}`
 
-// A fournisseur left out counts as a value: two rows without one can be
-// duplicates.
 const duplicateKey = ({
     fournisseur,
     ressource,
@@ -31,7 +26,6 @@ const duplicateKey = ({
 }: Approvisionnement) =>
     `${fournisseur ?? ''}|${ressource}|${provenanceKey(provenance)}`
 
-// A, B… Z, then AA, AB…
 function letterOf(index: number): string {
     const letter = String.fromCharCode(65 + (index % 26))
 
@@ -41,8 +35,6 @@ function letterOf(index: number): string {
 const compare = (a: string, b: string) =>
     a.localeCompare(b, 'fr', { numeric: true })
 
-// Sorted by ressource, provenance then fournisseur, so that duplicates follow
-// each other. Letters go to the groups in the order they appear.
 export function toApprovisionnementRows(
     approvisionnements: readonly Approvisionnement[],
     { entreprises, ressources, departementsByRegion }: Referentiels

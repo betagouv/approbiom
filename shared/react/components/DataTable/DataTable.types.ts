@@ -23,8 +23,6 @@ export type ExpandableRows<T> = {
 
 export type DataTableProps<T> = {
     caption: string
-    // Keeps the caption for screen readers only, when what surrounds the table
-    // already says what it holds.
     hideCaption?: boolean
     rows: readonly T[]
     columns: readonly Column<T>[]

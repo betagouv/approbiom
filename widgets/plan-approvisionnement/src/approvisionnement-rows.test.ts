@@ -102,7 +102,6 @@ describe('toApprovisionnementRows', () => {
         expect(row.fournisseur).toBeNull()
     })
 
-    // A value missing from the referentiels still says something.
     it('falls back on the raw value for what the referentiels lack', () => {
         const [row] = rowsOf([
             approvisionnement('99999999999999', 'XX', departement('2A')),

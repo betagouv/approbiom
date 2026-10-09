@@ -20,8 +20,6 @@ function formatSize(bytes: number): string {
         : `${SIZE.format(bytes / MO)} Mo`
 }
 
-// Nothing for a document never extracted, or whose lines were all imported:
-// they are dropped once imported.
 function ExtractionState({ summary }: { summary?: ExtractionSummary }) {
     if (!summary || summary.lineCount === 0) return null
 
@@ -33,7 +31,6 @@ function ExtractionState({ summary }: { summary?: ExtractionSummary }) {
 }
 
 export type DocumentPickerProps = {
-    // Those of the plan.
     attachments: readonly Attachment[]
     extractions: ReadonlyMap<Attachment['id'], ExtractionSummary>
     selectedId: Attachment['id'] | null

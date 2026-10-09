@@ -36,7 +36,6 @@ const REFERENTIELS = {
     ],
 }
 
-// Null for an approvisionnement without fournisseur.
 function approvisionnement(
     id: number,
     dep: string,
@@ -86,7 +85,6 @@ function renderTab(
 
 const dialog = () => screen.getByRole('dialog')
 
-// The header row comes first.
 const bodyRows = () => screen.getAllByRole('row').slice(1)
 
 afterEach(cleanup)
@@ -109,7 +107,6 @@ describe('TabApprovisionnement', () => {
             '1A-PFA · Plaquettes forestières',
             'Corrèze (19)',
             '1 200,5',
-            // The actions of a row come last, as DSFR asks.
             "Modifier l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)Supprimer l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)",
         ])
     })

@@ -5,14 +5,10 @@ import {
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
 
-// What the fields of the form hold. Null is nothing chosen yet.
 export type ApprovisionnementForm = {
-    // Undefined for « Non renseigné ».
     fournisseur: string | undefined
     ressource: string | null
-    // One key per provenance, see `provenanceKey`.
     provenance: string | null
-    // As typed.
     tonnage: string
 }
 
@@ -21,7 +17,6 @@ export type EditableFields = Pick<
     'fournisseur' | 'ressource' | 'provenance' | 'tonnageTotal'
 >
 
-// A département and a country never share a key, even with the same name.
 export const provenanceKey = (provenance: Provenance) =>
     provenance.source === PAYS_ETRANGER
         ? `${PAYS_ETRANGER}|${provenance.libelle}`
@@ -35,8 +30,6 @@ function toProvenance(key: string): Provenance {
         : { source: DEPARTEMENT_FRANCAIS, code: value }
 }
 
-// « 1 200,5 » as well as « 1200.5 ». Null for anything that is not a
-// tonnage above zero.
 export function parseTonnage(text: string): number | null {
     const tonnage = Number(text.replace(/\s/g, '').replace(',', '.'))
 
@@ -59,7 +52,6 @@ export function toForm(
     return {
         fournisseur,
         ressource,
-        // A département left blank has to be chosen again.
         provenance:
             provenance.source === DEPARTEMENT_FRANCAIS && provenance.code === ''
                 ? null
@@ -68,7 +60,6 @@ export function toForm(
     }
 }
 
-// A new approvisionnement starts without fournisseur, as most plans give none.
 export const EMPTY_FORM: ApprovisionnementForm = {
     fournisseur: undefined,
     ressource: null,
@@ -76,7 +67,6 @@ export const EMPTY_FORM: ApprovisionnementForm = {
     tonnage: '',
 }
 
-// Null while a field is missing or wrong: the form cannot be saved then.
 export function toEditableFields(
     form: ApprovisionnementForm
 ): EditableFields | null {

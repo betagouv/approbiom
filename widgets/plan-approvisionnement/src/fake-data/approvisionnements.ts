@@ -16,9 +16,6 @@ const pays = (libelle: string): Provenance => ({
     libelle,
 })
 
-// Plan, fournisseur (SIRET), ressource, provenance, tonnage. Plan 1 holds two
-// pairs of duplicates, one of them without fournisseur; plans 3 and 10 are
-// empty.
 const SEED: readonly (readonly [
     number,
     string | undefined,
@@ -81,8 +78,6 @@ export const FAKE_APPROVISIONNEMENTS: readonly Approvisionnement[] = SEED.map(
     })
 )
 
-// Stands in for the Approvisionnement table, in memory: it lasts as long as
-// the page.
 export function createFakeApprovisionnementPort(
     initial: readonly Approvisionnement[] = FAKE_APPROVISIONNEMENTS
 ): ApprovisionnementPort {

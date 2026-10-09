@@ -4,7 +4,6 @@ import type { ProvenanceParseResults } from '@shared/core/domain/value-objects/e
 const DEP = 'Département français' as const
 const PAYS = 'Pays étranger' as const
 
-// The lines of the mock-up, as importRows would hand them over.
 export function fakeReadLines(
     document: string
 ): (ReadLine & { provenanceParseResults: ProvenanceParseResults })[] {

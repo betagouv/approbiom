@@ -1,6 +1,5 @@
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 
-// Stands in for the Demande_de_subvention table outside Grist.
 export const FAKE_DEMANDES_SUBVENTION: readonly DemandeSubvention[] = [
     { id: 1, programmeAide: 1, planDApprovisionnement: 1 },
     { id: 2, programmeAide: 1, planDApprovisionnement: 2 },

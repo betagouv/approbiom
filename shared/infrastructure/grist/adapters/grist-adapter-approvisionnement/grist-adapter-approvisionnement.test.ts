@@ -7,7 +7,6 @@ import type { ColumnMajorTable } from '../../helpers/grist-helpers'
 import { COLUMNS, TABLE } from '../../types/grist-tables'
 import { createGristApprovisionnementPort } from './grist-adapter-approvisionnement'
 
-/** The tables the Refs of every approvisionnement point at. */
 const REFERENCED_TABLES: Record<string, ColumnMajorTable> = {
     [TABLE.metaRessource]: {
         id: [1],
@@ -59,10 +58,6 @@ function mockGrist(approvisionnements: ColumnMajorTable) {
     })
 }
 
-/**
- * One approvisionnement per pair of provenance cells, everything else held
- * still. `0` is how Grist writes a Ref pointing at nothing.
- */
 function drawnFrom(
     cells: readonly (readonly [departement: number, provenance: unknown])[]
 ): ColumnMajorTable {
@@ -453,7 +448,6 @@ describe('createGristApprovisionnementPort().update', () => {
         })
     })
 
-    // Moving abroad must drop the département, or the row would hold both.
     it('clears the département of a provenance moved abroad', async () => {
         const update = mockGristForUpdate()
 
@@ -482,7 +476,6 @@ describe('createGristApprovisionnementPort().update', () => {
             fields: { Fournisseur: 0 },
         })
     })
-    // Written as an empty Ref, it would be lost without anyone noticing.
     it.each([
         ['fournisseur', { fournisseur: '99999999999999' }, /Entreprise/],
         ['ressource', { ressource: 'XX' }, /Meta_Ressource/],

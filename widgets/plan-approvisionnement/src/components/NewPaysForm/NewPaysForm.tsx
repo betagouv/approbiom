@@ -10,7 +10,6 @@ const FRANCE = 'France'
 
 type Errors = { libelle?: string; existing?: Pays; creation?: string }
 
-// Two spellings of one country differ only by case or accents.
 const normalized = (libelle: string) =>
     libelle
         .normalize('NFD')

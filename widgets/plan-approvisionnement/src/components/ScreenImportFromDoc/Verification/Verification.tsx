@@ -36,9 +36,7 @@ const plural = (count: number, word: string) =>
 export type VerificationProps = Referentiels & {
     attachment: Attachment
     lines: readonly ExtractedApprovisionnement[]
-    // When the document was extracted.
     date: Date
-    // The document had been extracted before: its verification goes on.
     resumed: boolean
     pays: readonly Pays[]
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
@@ -47,7 +45,6 @@ export type VerificationProps = Referentiels & {
         changes: ExtractedLineChanges
     ) => Promise<void>
     onReextract: () => void
-    // Creates the approvisionnements of the verified lines.
     onImport: (lines: readonly ExtractedApprovisionnement[]) => Promise<void>
     onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
@@ -81,7 +78,6 @@ export default function Verification({
         )
     )
     const verifiedCount = countVerified(lines)
-    // Imported once every line is verified.
     const canImport = lines.length > 0 && verifiedCount === lines.length
     const approvisionnementCount = lines.flatMap((line) =>
         toApprovisionnements(line, 0, attachment.id)
@@ -142,7 +138,6 @@ export default function Verification({
                 </span>
             ),
         },
-        // DSFR puts the actions of a row in its last cell.
         {
             id: 'action',
             header: 'Action',

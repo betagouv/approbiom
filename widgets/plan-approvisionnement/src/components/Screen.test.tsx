@@ -53,7 +53,6 @@ const DATA = {
     importExtractedApprovisionnements: () => Promise.resolve([]),
 }
 
-// Picks an option of a native list by what it shows.
 function pick(list: HTMLElement, label: string) {
     const option = within(list).getByRole('option', { name: label })
     fireEvent.change(list, {

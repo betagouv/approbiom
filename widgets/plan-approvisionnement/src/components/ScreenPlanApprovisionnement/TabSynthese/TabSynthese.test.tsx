@@ -40,7 +40,6 @@ const REFERENTIELS = {
 }
 
 let nextId = 1
-// Null for an approvisionnement without fournisseur.
 const approvisionnement = (
     ressource: string,
     dep: string,
@@ -71,7 +70,6 @@ function renderTab(approvisionnements: readonly Approvisionnement[] = PLAN) {
     )
 }
 
-// Each line of a card, its cells joined, spaces made plain.
 const linesOf = (title: string) =>
     within(screen.getByRole('region', { name: title }))
         .getAllByRole('listitem')

@@ -1,6 +1,5 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 
-// Stands in for the Piece_jointe table outside Grist.
 export const FAKE_ATTACHMENTS: readonly Attachment[] = [
     {
         id: 101,

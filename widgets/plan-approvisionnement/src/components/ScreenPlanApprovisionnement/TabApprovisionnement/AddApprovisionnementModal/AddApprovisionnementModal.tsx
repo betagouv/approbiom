@@ -10,7 +10,6 @@ type Way = 'manual' | 'document'
 export type AddApprovisionnementModalProps = {
     hasAttachments: boolean
     onManual: () => void
-    // Left out until the import can be reached from here.
     onDocument?: () => void
     onClose: () => void
 }

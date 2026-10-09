@@ -22,7 +22,6 @@ export type ScreenProps = Referentiels & {
     approvisionnements: readonly Approvisionnement[]
     attachments: readonly Attachment[]
     pays: readonly Pays[]
-    // The ids given, in the order of the approvisionnements.
     createApprovisionnements: (
         approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
     ) => Promise<Approvisionnement['id'][]>
@@ -71,18 +70,13 @@ export default function Screen({
     ...data
 }: ScreenProps) {
     const [planId, setPlanId] = useState<SelectablePlan['id'] | null>(null)
-    // True while another plan is being looked for.
     const [picking, setPicking] = useState(false)
-    // Kept in step with the table: changed once it has been written.
     const [approvisionnements, setApprovisionnements] = useState(
         initialApprovisionnements
     )
-    // Fournisseurs and pays created from the form join the lists.
     const [entreprises, setEntreprises] = useState(initialEntreprises)
     const [pays, setPays] = useState(initialPays)
-    // True while the plan is fed from a document.
     const [importing, setImporting] = useState(false)
-    // What the import did, said on the plan's page.
     const [notice, setNotice] = useState<string | null>(null)
     const [extractions, setExtractions] = useState(initialExtractions)
 
@@ -94,7 +88,6 @@ export default function Screen({
         setImporting(false)
     }
 
-    // A summary that cannot be read again keeps the last one shown.
     function refreshExtractions() {
         listExtractions().then(setExtractions, () => {})
     }
@@ -220,7 +213,6 @@ export default function Screen({
 
     return (
         <ScreenPlanApprovisionnement
-            // Another plan starts on its first tab, with no filter left on.
             key={plan.id}
             plan={plan}
             approvisionnements={approvisionnements}

@@ -30,7 +30,6 @@ export type ApprovisionnementModalProps = Referentiels & {
     title: string
     submitLabel: string
     initial: ApprovisionnementForm
-    // Shown at the top of the modal when `onSubmit` fails.
     failureMessage: string
     onSubmit: (fields: EditableFields) => Promise<void>
     onClose: () => void
@@ -57,7 +56,6 @@ export default function ApprovisionnementModal({
     const tonnageId = useId()
     const [form, setForm] = useState(initial)
     const [tonnageTouched, setTonnageTouched] = useState(false)
-    // The « Nouveau pays » form, then what came of it.
     const [paysForm, setPaysForm] = useState<'closed' | 'open' | 'created'>(
         'closed'
     )

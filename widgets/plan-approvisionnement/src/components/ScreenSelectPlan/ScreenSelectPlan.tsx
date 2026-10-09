@@ -15,7 +15,6 @@ export type SelectablePlan = Pick<
 
 export type ScreenSelectPlanProps = {
     plans: readonly SelectablePlan[]
-    // The plan being worked on, when another one is looked for.
     current?: SelectablePlan
     onSelect: (id: SelectablePlan['id']) => void
     onCancel: () => void
@@ -29,7 +28,6 @@ export default function ScreenSelectPlan({
 }: ScreenSelectPlanProps) {
     const comboboxRef = useRef<ComboboxHandle>(null)
 
-    // Coming from « Changer de plan »: the search is what comes next.
     useEffect(() => {
         if (current) comboboxRef.current?.focus()
     }, [current])

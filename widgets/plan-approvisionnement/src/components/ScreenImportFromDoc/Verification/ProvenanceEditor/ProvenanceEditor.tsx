@@ -37,7 +37,6 @@ const round = (value: number) => Math.round(value * 100) / 100
 
 type Row = ProvenanceRepartition & { key: number }
 
-// The field being typed in keeps its text as typed; the other one follows.
 type Draft = { key: number; field: 'percentage' | 'tonnage'; text: string }
 
 export type ProvenanceEditorProps = {
@@ -140,8 +139,6 @@ export default function ProvenanceEditor({
         commit(rows)
     }
 
-    // The form takes the place of the row's select: the focus goes back to
-    // the select once it has closed.
     function closePaysForm(key: number, created: boolean) {
         setPaysForm(created ? { key, state: 'created' } : null)
         requestAnimationFrame(() =>
@@ -329,7 +326,6 @@ export default function ProvenanceEditor({
                         Total : {NUMBER.format(totalPercentage)} % ·{' '}
                         {NUMBER.format(tonnageOf(totalPercentage))} t MV/an
                     </p>
-                    {/* Said, never blocking. */}
                     {not100 && (
                         <p className="fr-message fr-message--warning fr-m-0">
                             La répartition ne fait pas 100 %.

@@ -142,7 +142,6 @@ describe('createGristExtractedApprovisionnementAdapter().update, controle', () =
         })
     })
 
-    // A line changed after it was checked goes back to « Non vérifiée ».
     it('writes the controle along with a change', async () => {
         const update = mockGrist()
 

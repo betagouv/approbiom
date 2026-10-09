@@ -24,7 +24,6 @@ import {
 } from './utils'
 
 export function createGristApprovisionnementPort(): ApprovisionnementPort {
-    /** Every summary needs Meta_Ressource to resolve its Ref. */
     const readTotals = async (tableId: string, columns: readonly string[]) => {
         await gristReady()
 
@@ -71,7 +70,6 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
 
             const referencedTables = await readReferencedTables()
 
-            // A new row fills every column, whatever was left out.
             return createRows(
                 TABLE.approvisionnement,
                 approvisionnements.map((approvisionnement) =>

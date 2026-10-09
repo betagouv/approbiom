@@ -1,11 +1,8 @@
 import type { ApprovisionnementRow } from '../../../approvisionnement-rows'
 
-// What a provenance or a fournisseur weighs in the plan's tonnage.
 export type Share = {
-    // Null for the fournisseur the plan does not give.
     label: string | null
     tonnage: number
-    // Between 0 and 100.
     percentage: number
 }
 
@@ -30,7 +27,6 @@ function sharesBy(
         .map(([label, tonnage]) => ({
             label,
             tonnage,
-            // A plan whose tonnages are all zero weighs nothing anywhere.
             percentage: total === 0 ? 0 : (tonnage / total) * 100,
         }))
         .sort(
@@ -40,7 +36,6 @@ function sharesBy(
         )
 }
 
-// Heaviest first.
 export function toSynthese(rows: readonly ApprovisionnementRow[]): Synthese {
     const total = rows.reduce((sum, { tonnage }) => sum + tonnage, 0)
 

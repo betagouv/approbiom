@@ -9,7 +9,6 @@ import type { Attachment } from '@shared/core/domain/entities/attachment'
 
 export type ReextractModalProps = {
     attachment: Attachment
-    // Drops the lines extracted; the modal stays open when it fails.
     onConfirm: () => Promise<void>
     onClose: () => void
 }

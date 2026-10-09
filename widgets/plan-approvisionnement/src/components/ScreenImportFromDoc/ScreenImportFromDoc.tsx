@@ -34,17 +34,14 @@ const plural = (count: number, word: string) =>
 
 type Step =
     | { name: 'choose' }
-    // Each run is a new number, so that a new extraction starts afresh.
     | { name: 'extract'; run: number; resumed: boolean }
     | { name: 'verify'; extracted: ExtractedDocument; resumed: boolean }
 
 export type ScreenImportFromDocProps = Referentiels & {
     plan: SelectablePlan
-    // Those of the plan.
     attachments: readonly Attachment[]
     extractions: ReadonlyMap<Attachment['id'], ExtractionSummary>
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
-    // Reads back what was extracted before, or extracts the document.
     extractDocument: (attachment: Attachment) => Promise<ExtractedDocument>
     deleteExtraction: (attachment: Attachment) => Promise<void>
     updateExtractedApprovisionnement: (
@@ -59,9 +56,7 @@ export type ScreenImportFromDocProps = Referentiels & {
         lines: readonly ExtractedApprovisionnement[],
         source: Attachment['id']
     ) => Promise<Approvisionnement[]>
-    // The summaries changed: the plan's view reads them again.
     onExtractionsChanged: () => void
-    // Back to the plan, saying what was imported.
     onImported: (notice: string) => void
     onBack: () => void
 }

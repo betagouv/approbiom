@@ -8,7 +8,6 @@ const UNKNOWN = 'Inconnu'
 
 export type PlanHeaderProps = {
     plan: SelectablePlan
-    // Left out while importing: the plan cannot change then.
     onChangePlan?: () => void
 }
 

@@ -42,7 +42,6 @@
     list-style: none;
 }
 
-/* Each row lays its four cells on the grid of the list. */
 .share-card__row {
     display: contents;
 }

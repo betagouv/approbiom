@@ -76,7 +76,6 @@ function ShareCard({
 }
 
 export type TabSyntheseProps = Referentiels & {
-    // Those of the plan only.
     approvisionnements: readonly Approvisionnement[]
     hasAttachments: boolean
 }
@@ -86,13 +85,11 @@ export default function TabSynthese({
     hasAttachments,
     ...referentiels
 }: TabSyntheseProps) {
-    // None chosen is every ressource.
     const [chosen, setChosen] = useState<readonly Ressource['code'][]>([])
 
     if (approvisionnements.length === 0)
         return <EmptyPlan hasAttachments={hasAttachments} />
 
-    // Only the ressources the plan draws on can be filtered on.
     const titles = new Map(
         referentiels.ressources.map(({ code, title }) => [code, title])
     )
@@ -117,7 +114,6 @@ export default function TabSynthese({
                 <h2 className="fr-text--md fr-m-0 tab-synthese__title">
                     Répartition du tonnage du plan
                 </h2>
-                {/* With a single ressource, there is nothing to filter. */}
                 {ressources.length > 1 && (
                     <RessourceFilter
                         ressources={ressources}
