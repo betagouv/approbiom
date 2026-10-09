@@ -4,6 +4,7 @@ import {
     fireEvent,
     render,
     screen,
+    waitFor,
     within,
 } from '@testing-library/react'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
@@ -275,5 +276,52 @@ describe('Screen', () => {
         expect(
             screen.getByRole('button', { name: 'Changer de plan' })
         ).toBeTruthy()
+    })
+
+    it('resumes the verification of a document from the plan', async () => {
+        const attachment = {
+            id: 20,
+            planDApprovisionnement: 1,
+            type: 'excel ademe',
+            name: 'plan.xlsx',
+            sizeInBytes: 2048,
+        }
+        const extractDocument = vi.fn(() =>
+            Promise.resolve({ lines: [], date: new Date() })
+        )
+        render(
+            <Screen
+                plans={PLANS}
+                {...DATA}
+                attachments={[attachment]}
+                extractions={[
+                    {
+                        attachmentId: 20,
+                        extractedAt: new Date(2026, 9, 9, 10, 48),
+                        lineCount: 2,
+                        verifiedCount: 1,
+                    },
+                ]}
+                extractDocument={extractDocument}
+            />
+        )
+        choose('Plan appro chaufferie Tulle 2024')
+
+        expect(screen.getByText('Extraction en cours')).toBeTruthy()
+        expect(
+            screen.getByText(
+                /1\/2 lignes vérifiées · extraite le 09\/10\/2026 à 10h48/
+            )
+        ).toBeTruthy()
+
+        fireEvent.click(
+            screen.getByRole('button', {
+                name: 'Reprendre la vérification de plan.xlsx',
+            })
+        )
+
+        await waitFor(() =>
+            expect(extractDocument).toHaveBeenCalledWith(attachment)
+        )
     })
 })

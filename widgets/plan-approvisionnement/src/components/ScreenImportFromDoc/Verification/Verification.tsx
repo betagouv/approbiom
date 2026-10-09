@@ -21,7 +21,11 @@ import DocumentContext from '../DocumentContext'
 import DistributionList from './DistributionList'
 import ImportModal from './ImportModal'
 import ReviewModal from './ReviewModal'
-import { distributionSummary, formatPercentage } from './extracted-line'
+import {
+    distributionSummary,
+    formatPercentage,
+    formatTonnage,
+} from './extracted-line'
 import {
     countVerified,
     distributionTotal,
@@ -122,6 +126,19 @@ export default function Verification({
                 ) : (
                     <span className="verification__mention">Aucune</span>
                 ),
+        },
+        {
+            id: 'tonnage',
+            header: (
+                <span className="verification__number">
+                    Tonnage total (t MV/an)
+                </span>
+            ),
+            render: ({ read }) => (
+                <span className="verification__number">
+                    {formatTonnage(read.tonnage)}
+                </span>
+            ),
         },
         {
             id: 'repartition',

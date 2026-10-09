@@ -59,6 +59,7 @@ export type ScreenImportFromDocProps = Referentiels & {
     onExtractionsChanged: () => void
     onImported: (notice: string) => void
     onBack: () => void
+    resumedId?: Attachment['id']
 }
 
 export default function ScreenImportFromDoc({
@@ -77,10 +78,17 @@ export default function ScreenImportFromDoc({
     onExtractionsChanged,
     onImported,
     onBack,
+    resumedId,
     ...referentiels
 }: ScreenImportFromDocProps) {
-    const [step, setStep] = useState<Step>({ name: 'choose' })
-    const [selectedId, setSelectedId] = useState<Attachment['id'] | null>(null)
+    const [step, setStep] = useState<Step>(
+        resumedId === undefined
+            ? { name: 'choose' }
+            : { name: 'extract', run: 0, resumed: true }
+    )
+    const [selectedId, setSelectedId] = useState<Attachment['id'] | null>(
+        resumedId ?? null
+    )
     const [reextracting, setReextracting] = useState(false)
 
     const selected = attachments.find(({ id }) => id === selectedId)

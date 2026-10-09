@@ -16,3 +16,5 @@ export function distributionSummary(line: ExtractedLine): string {
 }
 
 export const formatPercentage = (value: number) => NUMBER.format(value)
+
+export const formatTonnage = (value: number) => NUMBER.format(value)

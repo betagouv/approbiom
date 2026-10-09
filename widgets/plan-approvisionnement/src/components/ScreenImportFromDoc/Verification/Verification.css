@@ -49,3 +49,9 @@
 .verification__import {
     margin-left: auto;
 }
+
+.verification__number {
+    display: block;
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}

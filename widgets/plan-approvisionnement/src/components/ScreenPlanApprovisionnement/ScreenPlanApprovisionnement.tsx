@@ -1,6 +1,7 @@
 import { useState } from 'react'
 import Alert from '@shared/react/components/Alert'
 import Tabs from '@shared/react/components/Tabs'
+import type { ExtractionSummary } from '@shared/core/application/ports/extracted-approvisionnement'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -10,6 +11,7 @@ import type { EditableFields } from '../../approvisionnement-form'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import PlanHeader from '../PlanHeader'
 import type { SelectablePlan } from '../ScreenSelectPlan'
+import ExtractionsInProgress from './ExtractionsInProgress'
 import TabApprovisionnement from './TabApprovisionnement'
 import TabSynthese from './TabSynthese'
 
@@ -17,6 +19,7 @@ export type ScreenPlanApprovisionnementProps = Referentiels & {
     plan: SelectablePlan
     approvisionnements: readonly Approvisionnement[]
     attachments: readonly Attachment[]
+    extractions: readonly ExtractionSummary[]
     pays: readonly Pays[]
     notice?: string | null
     onChangePlan: () => void
@@ -30,12 +33,14 @@ export type ScreenPlanApprovisionnementProps = Referentiels & {
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     onCreatePays: (pays: Pays) => Promise<void>
     onImportFromDocument: () => void
+    onResumeExtraction: (id: Attachment['id']) => void
 }
 
 export default function ScreenPlanApprovisionnement({
     plan,
     approvisionnements,
     attachments,
+    extractions,
     pays,
     notice = null,
     onChangePlan,
@@ -46,6 +51,7 @@ export default function ScreenPlanApprovisionnement({
     findEntrepriseBySiret,
     onCreatePays,
     onImportFromDocument,
+    onResumeExtraction,
     ...referentiels
 }: ScreenPlanApprovisionnementProps) {
     const [success, setSuccess] = useState<string | null>(notice)
@@ -53,9 +59,17 @@ export default function ScreenPlanApprovisionnement({
     const planApprovisionnements = approvisionnements.filter(
         ({ planDApprovisionnement }) => planDApprovisionnement === plan.id
     )
-    const hasAttachments = attachments.some(
+    const planAttachments = attachments.filter(
         ({ planDApprovisionnement }) => planDApprovisionnement === plan.id
     )
+    const hasAttachments = planAttachments.length > 0
+    const extractionsInProgress = planAttachments.flatMap((attachment) => {
+        const summary = extractions.find(
+            ({ attachmentId }) => attachmentId === attachment.id
+        )
+
+        return summary && summary.lineCount > 0 ? [{ attachment, summary }] : []
+    })
     const count = planApprovisionnements.length
 
     return (
@@ -100,7 +114,12 @@ export default function ScreenPlanApprovisionnement({
                                 onCreatePays={onCreatePays}
                                 onImportFromDocument={onImportFromDocument}
                                 {...referentiels}
-                            />
+                            >
+                                <ExtractionsInProgress
+                                    extractions={extractionsInProgress}
+                                    onResume={onResumeExtraction}
+                                />
+                            </TabApprovisionnement>
                         ),
                     },
                     {

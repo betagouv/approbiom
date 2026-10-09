@@ -120,6 +120,17 @@ describe('Verification', () => {
         ])
     })
 
+    it('shows the total tonnage of each line', () => {
+        renderVerification([line(1, NON_VERIFIEE)])
+
+        expect(
+            screen.getByRole('columnheader', {
+                name: 'Tonnage total (t MV/an)',
+            })
+        ).toBeTruthy()
+        expect(screen.getByRole('cell', { name: /^1\s000$/ })).toBeTruthy()
+    })
+
     it('counts the verified lines, and asks for the rest', () => {
         renderVerification([line(1, NON_VERIFIEE), line(2, VERIFIEE)])
 

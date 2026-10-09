@@ -76,7 +76,9 @@ export default function Screen({
     )
     const [entreprises, setEntreprises] = useState(initialEntreprises)
     const [pays, setPays] = useState(initialPays)
-    const [importing, setImporting] = useState(false)
+    const [importing, setImporting] = useState<
+        { resumedId?: Attachment['id'] } | false
+    >(false)
     const [notice, setNotice] = useState<string | null>(null)
     const [extractions, setExtractions] = useState(initialExtractions)
 
@@ -208,6 +210,7 @@ export default function Screen({
                     setImporting(false)
                 }}
                 onBack={() => setImporting(false)}
+                resumedId={importing.resumedId}
             />
         )
 
@@ -226,9 +229,14 @@ export default function Screen({
             findEntrepriseBySiret={findEntrepriseBySiret}
             onCreatePays={addPays}
             notice={notice}
+            extractions={extractions}
             onImportFromDocument={() => {
                 setNotice(null)
-                setImporting(true)
+                setImporting({})
+            }}
+            onResumeExtraction={(resumedId) => {
+                setNotice(null)
+                setImporting({ resumedId })
             }}
             {...data}
         />

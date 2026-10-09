@@ -3,7 +3,7 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-design/icons-design.main.min.css'
 
-import { useState } from 'react'
+import { useState, type ReactNode } from 'react'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
@@ -96,6 +96,7 @@ export type TabApprovisionnementProps = Referentiels & {
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     onCreatePays: (pays: Pays) => Promise<void>
     onImportFromDocument: () => void
+    children?: ReactNode
 }
 
 export default function TabApprovisionnement({
@@ -109,6 +110,7 @@ export default function TabApprovisionnement({
     findEntrepriseBySiret,
     onCreatePays,
     onImportFromDocument,
+    children,
     ...referentiels
 }: TabApprovisionnementProps) {
     const [duplicatesOnly, setDuplicatesOnly] = useState(false)
@@ -170,6 +172,7 @@ export default function TabApprovisionnement({
 
     return (
         <div className="tab-approvisionnement">
+            {children}
             <div className="tab-approvisionnement__toolbar">
                 {duplicateCount > 0 && (
                     <div className="tab-approvisionnement__duplicates">
