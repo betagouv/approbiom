@@ -1,7 +1,11 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { ColumnMajorTable } from '../helpers/grist-helpers'
-import { COLUMNS, TABLE } from '../types/grist-tables'
+import type { ColumnMajorTable } from '../../helpers/grist-helpers'
+import { COLUMNS, TABLE } from '../../types/grist-tables'
 import { createGristExtractedApprovisionnementAdapter } from './grist-adapter-extracted-approvisionnement'
+import {
+    NON_VERIFIEE,
+    VERIFIEE,
+} from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
 
 const TABLES: Record<string, ColumnMajorTable> = {
     [TABLE.entreprise]: {
@@ -124,6 +128,120 @@ describe('createGristExtractedApprovisionnementAdapter().update', () => {
     })
 })
 
+describe('createGristExtractedApprovisionnementAdapter().update, controle', () => {
+    it('writes the controle', async () => {
+        const update = mockGrist()
+
+        await createGristExtractedApprovisionnementAdapter().update(5, {
+            controle: VERIFIEE,
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 5,
+            fields: { Controle: VERIFIEE },
+        })
+    })
+
+    it('writes the controle along with a change', async () => {
+        const update = mockGrist()
+
+        await createGristExtractedApprovisionnementAdapter().update(5, {
+            matchedFournisseur: null,
+            controle: NON_VERIFIEE,
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 5,
+            fields: { Fournisseur: 0, Controle: NON_VERIFIEE },
+        })
+    })
+})
+
+describe('createGristExtractedApprovisionnementAdapter().deleteByDocument', () => {
+    function mockDocuments() {
+        const destroy = vi.fn(() => Promise.resolve())
+        const tables: Record<string, ColumnMajorTable> = {
+            [TABLE.attachment]: {
+                id: [4, 6],
+                Plan_d_approvisionnement: [160, 160],
+                piece_jointe: [
+                    ['L', 20],
+                    ['L', 21],
+                ],
+                type: ['excel ademe', 'excel ademe'],
+            },
+            [TABLE.extractedApprovisionnement]: Object.fromEntries(
+                COLUMNS.extractedApprovisionnement.map((column) => [
+                    column,
+                    column === 'id'
+                        ? [1, 2, 3]
+                        : column === 'Document'
+                          ? [4, 6, 4]
+                          : ['', '', ''],
+                ])
+            ),
+        }
+
+        vi.stubGlobal('grist', {
+            docApi: {
+                fetchTable: vi.fn((tableId: string) =>
+                    Promise.resolve(tables[tableId])
+                ),
+            },
+            getTable: () => ({ destroy }),
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        return destroy
+    }
+
+    it('deletes the lines of that document only', async () => {
+        const destroy = mockDocuments()
+
+        await createGristExtractedApprovisionnementAdapter().deleteByDocument({
+            id: 20,
+        })
+
+        expect(destroy).toHaveBeenCalledWith([1, 3])
+    })
+
+    it('deletes nothing for a document never extracted', async () => {
+        const destroy = mockDocuments()
+
+        await createGristExtractedApprovisionnementAdapter().deleteByDocument({
+            id: 99,
+        })
+
+        expect(destroy).not.toHaveBeenCalled()
+    })
+})
+
+describe('createGristExtractedApprovisionnementAdapter().deleteLines', () => {
+    it('deletes the lines imported', async () => {
+        const destroy = vi.fn(() => Promise.resolve())
+        vi.stubGlobal('grist', {
+            getTable: () => ({ destroy }),
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        await createGristExtractedApprovisionnementAdapter().deleteLines([1, 3])
+
+        expect(destroy).toHaveBeenCalledWith([1, 3])
+    })
+})
+
 describe('createGristExtractedApprovisionnementAdapter().listSummaries', () => {
     function mockSummaries() {
         const tables: Record<string, ColumnMajorTable> = {
@@ -137,10 +255,10 @@ describe('createGristExtractedApprovisionnementAdapter().listSummaries', () => {
                 type: ['excel ademe', 'excel ademe'],
             },
             [TABLE.extractedApprovisionnement]: {
-                id: [1, 2],
-                Document: [4, 4],
-                Date_d_extraction: [1790587200, 1790587200],
-                Etat: ['Créés', 'Pas créés'],
+                id: [1, 2, 3],
+                Document: [4, 4, 4],
+                Date_d_extraction: [1790587200, 1790587200, 1790587200],
+                Controle: [VERIFIEE, NON_VERIFIEE, null],
                 ...Object.fromEntries(
                     COLUMNS.extractedApprovisionnement
                         .filter(
@@ -149,10 +267,10 @@ describe('createGristExtractedApprovisionnementAdapter().listSummaries', () => {
                                     'id',
                                     'Document',
                                     'Date_d_extraction',
-                                    'Etat',
+                                    'Controle',
                                 ].includes(column)
                         )
-                        .map((column) => [column, ['', '']])
+                        .map((column) => [column, ['', '', '']])
                 ),
             },
         }
@@ -184,8 +302,8 @@ describe('createGristExtractedApprovisionnementAdapter().listSummaries', () => {
         ).toEqual({
             attachmentId: 20,
             extractedAt: new Date(1790587200 * 1000),
-            lineCount: 2,
-            createdCount: 1,
+            lineCount: 3,
+            verifiedCount: 1,
         })
     })
 
@@ -201,7 +319,7 @@ describe('createGristExtractedApprovisionnementAdapter().listSummaries', () => {
             attachmentId: 21,
             extractedAt: null,
             lineCount: 0,
-            createdCount: 0,
+            verifiedCount: 0,
         })
     })
 })

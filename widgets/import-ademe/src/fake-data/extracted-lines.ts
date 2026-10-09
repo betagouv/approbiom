@@ -1,5 +1,5 @@
-import type { ReadLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
-import type { ProvenanceParseResults } from '@shared/infrastructure/import-bcib-bciat/transform-provenance/transform-provenance'
+import type { ReadLine } from '@shared/core/domain/entities/extracted-approvisionnement'
+import type { ProvenanceParseResults } from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
 
 const DEP = 'Département français' as const
 const PAYS = 'Pays étranger' as const

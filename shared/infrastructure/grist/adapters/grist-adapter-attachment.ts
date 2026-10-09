@@ -13,6 +13,12 @@ import {
 import { getAccessToken } from '../helpers/grist-get-access-token'
 import { COLUMNS, TABLE } from '../types/grist-tables'
 
+async function getFileUrl(id: number) {
+    const { baseUrl, token } = await getAccessToken()
+
+    return `${baseUrl}/attachments/${id}/download?auth=${token}`
+}
+
 export function createGristAttachmentPort(): AttachmentPort {
     return {
         async list() {
@@ -81,10 +87,17 @@ export function createGristAttachmentPort(): AttachmentPort {
             }
         },
 
-        async getFileUrl(id) {
-            const { baseUrl, token } = await getAccessToken()
+        getFileUrl,
 
-            return `${baseUrl}/attachments/${id}/download?auth=${token}`
+        async download(id) {
+            const response = await fetch(await getFileUrl(id))
+            if (!response.ok) {
+                throw new Error(
+                    `le téléchargement du fichier a échoué (${response.status} ${response.statusText})`
+                )
+            }
+
+            return response.blob()
         },
     }
 }

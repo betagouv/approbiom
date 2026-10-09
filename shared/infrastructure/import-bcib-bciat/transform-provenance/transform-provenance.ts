@@ -2,31 +2,15 @@ import {
     PAYS_ETRANGER,
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
+import {
+    EVEN_SPLIT,
+    EXPLICIT,
+    NEEDS_REVIEW,
+    UNRESOLVED,
+    type Confidence,
+    type ProvenanceParseResults,
+} from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
 import { normalize, type ReferenceData } from './reference-data'
-
-/** How much confidence the reading of one cell deserves. */
-export const EXPLICIT = 'Explicite'
-export const EVEN_SPLIT = 'Répartition égale'
-export const NEEDS_REVIEW = 'À vérifier'
-export const UNRESOLVED = 'Non résolu'
-
-export type Confidence =
-    | typeof EXPLICIT
-    | typeof EVEN_SPLIT
-    | typeof NEEDS_REVIEW
-    | typeof UNRESOLVED
-
-export type ProvenanceRepartition = {
-    source: Provenance['source']
-    provenance: string
-    percentage: number
-}
-
-export type ProvenanceParseResults = {
-    distribution: ProvenanceRepartition[]
-    confidence: Confidence
-    unrecognized: string[]
-}
 
 /** A total written within one point of 100 is taken as meaning 100. */
 const TOLERANCE = 1

@@ -23,6 +23,7 @@ export type ExpandableRows<T> = {
 
 export type DataTableProps<T> = {
     caption: string
+    hideCaption?: boolean
     rows: readonly T[]
     columns: readonly Column<T>[]
 

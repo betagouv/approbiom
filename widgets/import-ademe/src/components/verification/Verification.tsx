@@ -6,10 +6,9 @@ import Alert from '@shared/react/components/Alert'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import Modal from '@shared/react/components/Modal'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type {
     ExtractedLineChanges,
-    StoredExtractedLine,
+    ExtractedApprovisionnement,
 } from '../../extracted-approvisionnement-port'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -28,6 +27,8 @@ import { toApprovisionnements } from '../../import-line'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { SiretLookup } from '../../find-entreprise-by-siret'
 import { formatExtractedAt } from '../../format-extracted-at'
+import { VERIFIEE } from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 
@@ -50,7 +51,7 @@ export type VerificationProps = {
     plan: SelectablePlan
     attachment: Attachment
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
-    lines: readonly StoredExtractedLine[]
+    lines: readonly ExtractedApprovisionnement[]
     // When the document was extracted.
     date: Date
     entreprises: readonly Entreprise[]
@@ -58,11 +59,11 @@ export type VerificationProps = {
     departementsByRegion: readonly DepartementsByRegion[]
     pays: readonly Pays[]
     onUpdateLine: (
-        id: StoredExtractedLine['id'],
+        id: ExtractedApprovisionnement['id'],
         changes: ExtractedLineChanges
     ) => Promise<void>
     onImportLine: (
-        approvisionnements: readonly Approvisionnement[]
+        approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
     ) => Promise<void>
     onCreateFournisseur: (entreprise: Entreprise) => Promise<void>
     onCreatePays: (pays: Pays) => Promise<void>
@@ -86,10 +87,10 @@ export default function Verification({
     findEntrepriseBySiret,
 }: VerificationProps) {
     const [reviewedLineId, setReviewedLineId] = useState<
-        StoredExtractedLine['id'] | null
+        ExtractedApprovisionnement['id'] | null
     >(null)
     const reviewedLine = lines.find(({ id }) => id === reviewedLineId) ?? null
-    const readOnly = reviewedLine?.state === 'Créés'
+    const readOnly = reviewedLine?.controle === VERIFIEE
     const approvisionnements = reviewedLine
         ? toApprovisionnements(reviewedLine, plan.id, attachment.id)
         : []
@@ -101,12 +102,12 @@ export default function Verification({
 
     const departementLabels = departementLabelsOf(departementsByRegion)
 
-    function review(line: StoredExtractedLine) {
+    function review(line: ExtractedApprovisionnement) {
         setLastImport(null)
         setReviewedLineId(line.id)
     }
 
-    async function importReviewedLine(line: StoredExtractedLine) {
+    async function importReviewedLine(line: ExtractedApprovisionnement) {
         await onImportLine(approvisionnements)
         setReviewedLineId(null)
         setLastImport({
@@ -118,7 +119,7 @@ export default function Verification({
         requestAnimationFrame(() => successRef.current?.focus())
     }
 
-    const actionButton = (line: StoredExtractedLine, label: string) => (
+    const actionButton = (line: ExtractedApprovisionnement, label: string) => (
         <button
             type="button"
             className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
@@ -129,13 +130,13 @@ export default function Verification({
         </button>
     )
 
-    const columns: readonly Column<StoredExtractedLine>[] = [
+    const columns: readonly Column<ExtractedApprovisionnement>[] = [
         {
             id: 'state',
             header: 'Action',
             render: (line) => (
                 <div className="verification__state">
-                    {line.state === 'Créés' ? (
+                    {line.controle === VERIFIEE ? (
                         <>{actionButton(line, 'Voir')}</>
                     ) : (
                         <>{actionButton(line, 'Modifier et importer')}</>
@@ -148,7 +149,7 @@ export default function Verification({
             header: 'État',
             render: (line) => (
                 <div className="verification__state">
-                    {line.state === 'Créés' ? (
+                    {line.controle === VERIFIEE ? (
                         <Badge size="sm" status="success">
                             Déjà importée
                         </Badge>

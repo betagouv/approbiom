@@ -1,12 +1,12 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type {
     ExtractedApprovisionnementPort,
-    StoredExtractedLine,
+    ExtractedApprovisionnement,
 } from './extracted-approvisionnement-port'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type ExtractedDocument = {
-    lines: readonly StoredExtractedLine[]
+    lines: readonly ExtractedApprovisionnement[]
     date: Date
 }
 

@@ -1,0 +1,25 @@
+.approvisionnement-modal {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+}
+
+.approvisionnement-modal__row {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) 12rem;
+    gap: 1rem;
+    align-items: start;
+}
+
+.approvisionnement-modal__row > * {
+    margin-bottom: 0;
+}
+
+.approvisionnement-modal__number {
+    font-variant-numeric: tabular-nums;
+    text-align: right;
+}
+
+.approvisionnement-modal__mention {
+    color: var(--text-mention-grey);
+}

@@ -6,8 +6,8 @@ import { useId, useRef, useState } from 'react'
 import Select, { type SelectItem } from '@shared/react/components/Select'
 import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
-import type { ProvenanceRepartition } from '@shared/infrastructure/import-bcib-bciat/transform-provenance/transform-provenance'
 import NewPaysForm from './NewPaysForm'
+import type { ProvenanceRepartition } from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 

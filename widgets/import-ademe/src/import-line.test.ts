@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { StoredExtractedLine } from './extracted-approvisionnement-port'
+import type { ExtractedApprovisionnement } from './extracted-approvisionnement-port'
 import { importLine, toApprovisionnements } from './import-line'
+import { NON_VERIFIEE } from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
 
 const vallon = {
     denomination: 'SCIERIE FICTIVE DU VALLON',
@@ -14,11 +15,11 @@ const plaquettes = {
 }
 
 function line(
-    derived: Partial<StoredExtractedLine['derived']> = {}
-): StoredExtractedLine {
+    derived: Partial<ExtractedApprovisionnement['derived']> = {}
+): ExtractedApprovisionnement {
     return {
         id: 7,
-        state: 'Pas créés',
+        controle: NON_VERIFIEE,
         extractedAt: new Date('2026-09-27'),
         read: {
             document: 'plan.xlsx',
@@ -115,7 +116,7 @@ describe('toApprovisionnements', () => {
 
 describe('importLine', () => {
     it('creates the approvisionnements', async () => {
-        const create = vi.fn(() => Promise.resolve())
+        const create = vi.fn(() => Promise.resolve([]))
         const approvisionnements = toApprovisionnements(line(), 160, 20)
 
         await importLine(approvisionnements, {

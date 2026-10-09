@@ -28,7 +28,16 @@ export type ApprovisionnementGroupedByPlanRessourceAndFournisseur =
 export interface ApprovisionnementPort {
     list(): Promise<readonly Approvisionnement[]>
 
-    create(approvisionnements: readonly Approvisionnement[]): Promise<void>
+    create(
+        approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
+    ): Promise<Approvisionnement['id'][]>
+
+    update(
+        id: Approvisionnement['id'],
+        approvisionnement: Partial<Approvisionnement>
+    ): Promise<void>
+
+    delete(id: Approvisionnement['id']): Promise<void>
 
     listPaysDeProvenance(): Promise<readonly Pays[]>
 

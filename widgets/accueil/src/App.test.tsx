@@ -51,7 +51,9 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         installations: { list: rows([]) },
         approvisionnements: {
             list: rows([]),
-            create: () => Promise.resolve(),
+            create: () => Promise.resolve([]),
+            update: () => Promise.resolve(),
+            delete: () => Promise.resolve(),
             listPaysDeProvenance: rows([]),
             addPaysDeProvenance: () => Promise.resolve(),
             listGroupedByPlanAndRessource: rows([]),
@@ -72,6 +74,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         attachments: {
             list: rows([]),
             getFileUrl: () => Promise.resolve(''),
+            download: () => Promise.resolve(new Blob()),
             findOne: () =>
                 Promise.reject(
                     new Error('no attachment is read one by one by these tests')
@@ -315,7 +318,9 @@ describe('App', () => {
                     plans: planPort(rows([saintJunien])),
                     approvisionnements: {
                         list: rows([]),
-                        create: () => Promise.resolve(),
+                        create: () => Promise.resolve([]),
+                        update: () => Promise.resolve(),
+                        delete: () => Promise.resolve(),
                         listPaysDeProvenance: rows([]),
                         addPaysDeProvenance: () => Promise.resolve(),
                         listGroupedByPlanAndRessource: rows([

@@ -3,12 +3,11 @@ import {
     DEPARTEMENT_FRANCAIS,
     PAYS_ETRANGER,
 } from '@shared/core/domain/value-objects/provenance'
-import type { ColumnMajorTable } from '../helpers/grist-helpers'
-import { COLUMNS, TABLE } from '../types/grist-tables'
+import type { ColumnMajorTable } from '../../helpers/grist-helpers'
+import { COLUMNS, TABLE } from '../../types/grist-tables'
 import { createGristApprovisionnementPort } from './grist-adapter-approvisionnement'
 
-/** The directories every approvisionnement resolves its Refs against. */
-const DIRECTORIES: Record<string, ColumnMajorTable> = {
+const REFERENCED_TABLES: Record<string, ColumnMajorTable> = {
     [TABLE.metaRessource]: {
         id: [1],
         Code_ressource_Approbiom: ['PF'],
@@ -27,13 +26,19 @@ const DIRECTORIES: Record<string, ColumnMajorTable> = {
         LIBELLE: ['Haute-Vienne', 'Corse-du-Sud'],
         REG: [1, 1],
     },
+    [TABLE.attachment]: {
+        id: [4],
+        Plan_d_approvisionnement: [160],
+        piece_jointe: [['L', 20]],
+        type: ['excel ademe'],
+    },
 }
 
 // The adapter reads `grist.docApi.fetchTable` and `grist.ready`, both installed
 // by the Grist plugin script, which does not exist under jsdom.
 function mockGrist(approvisionnements: ColumnMajorTable) {
     const tables: Record<string, ColumnMajorTable> = {
-        ...DIRECTORIES,
+        ...REFERENCED_TABLES,
         [TABLE.approvisionnement]: approvisionnements,
     }
 
@@ -53,14 +58,11 @@ function mockGrist(approvisionnements: ColumnMajorTable) {
     })
 }
 
-/**
- * One approvisionnement per pair of provenance cells, everything else held
- * still. `0` is how Grist writes a Ref pointing at nothing.
- */
 function drawnFrom(
     cells: readonly (readonly [departement: number, provenance: unknown])[]
 ): ColumnMajorTable {
     return {
+        id: cells.map((_, index) => index + 1),
         Plan_d_approvisionnement: cells.map(() => 1),
         Ressource: cells.map(() => 1),
         Departement_de_provenance: cells.map(([departement]) => departement),
@@ -80,6 +82,22 @@ afterEach(() => {
 })
 
 describe('createGristApprovisionnementPort', () => {
+    it('reads the id of each approvisionnement', async () => {
+        mockGrist({
+            ...drawnFrom([
+                [1, '87'],
+                [1, '87'],
+            ]),
+            id: [12, 30],
+        })
+
+        const ids = (await createGristApprovisionnementPort().list()).map(
+            ({ id }) => id
+        )
+
+        expect(ids).toEqual([12, 30])
+    })
+
     it('reads a fournisseur left empty as undefined', async () => {
         mockGrist({
             ...drawnFrom([
@@ -192,7 +210,7 @@ describe('createGristApprovisionnementPort', () => {
                         Promise.resolve(
                             requested === tableId
                                 ? columns
-                                : DIRECTORIES[requested]
+                                : REFERENCED_TABLES[requested]
                         )
                     ),
                 },
@@ -240,9 +258,11 @@ describe('createGristApprovisionnementPort', () => {
 
 describe('createGristApprovisionnementPort().create', () => {
     function mockGristForCreate() {
-        const create = vi.fn(() => Promise.resolve())
+        const create = vi.fn((records: unknown[]) =>
+            Promise.resolve(records.map((_, index) => ({ id: 40 + index })))
+        )
         const tables: Record<string, ColumnMajorTable> = {
-            ...DIRECTORIES,
+            ...REFERENCED_TABLES,
             [TABLE.attachment]: {
                 id: [4],
                 Plan_d_approvisionnement: [160],
@@ -320,6 +340,23 @@ describe('createGristApprovisionnementPort().create', () => {
         ])
     })
 
+    it('gives back the ids Grist gave the rows, in their order', async () => {
+        mockGristForCreate()
+        const approvisionnement = {
+            planDApprovisionnement: 160,
+            ressource: 'PF',
+            provenance: { source: DEPARTEMENT_FRANCAIS, code: '87' },
+            tonnageTotal: 100,
+        } as const
+
+        await expect(
+            createGristApprovisionnementPort().create([
+                approvisionnement,
+                approvisionnement,
+            ])
+        ).resolves.toEqual([40, 41])
+    })
+
     it('writes an empty Ref for an approvisionnement without fournisseur', async () => {
         const create = mockGristForCreate()
 
@@ -346,6 +383,192 @@ describe('createGristApprovisionnementPort().create', () => {
                 },
             },
         ])
+    })
+})
+
+describe('createGristApprovisionnementPort().update', () => {
+    function mockGristForUpdate() {
+        const update = vi.fn(() => Promise.resolve())
+
+        vi.stubGlobal('grist', {
+            docApi: {
+                fetchTable: vi.fn((tableId: string) =>
+                    Promise.resolve(
+                        tableId === TABLE.approvisionnement
+                            ? { id: [12] }
+                            : REFERENCED_TABLES[tableId]
+                    )
+                ),
+            },
+            getTable: () => ({ update }),
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        return update
+    }
+
+    it('writes the fields given, with their Refs resolved', async () => {
+        const update = mockGristForUpdate()
+
+        await createGristApprovisionnementPort().update(12, {
+            fournisseur: '11111111111111',
+            ressource: 'PF',
+            provenance: { source: DEPARTEMENT_FRANCAIS, code: '2A' },
+            tonnageTotal: 450,
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 12,
+            fields: {
+                Fournisseur: 1,
+                Ressource: 1,
+                Departement_de_provenance: 2,
+                Pays_de_provenance: 'France',
+                Total_en_tMv_an_: 450,
+            },
+        })
+    })
+
+    it('leaves the fields not given untouched', async () => {
+        const update = mockGristForUpdate()
+
+        await createGristApprovisionnementPort().update(12, {
+            tonnageTotal: 450,
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 12,
+            fields: { Total_en_tMv_an_: 450 },
+        })
+    })
+
+    it('clears the département of a provenance moved abroad', async () => {
+        const update = mockGristForUpdate()
+
+        await createGristApprovisionnementPort().update(12, {
+            provenance: { source: PAYS_ETRANGER, libelle: 'Espagne' },
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 12,
+            fields: {
+                Departement_de_provenance: 0,
+                Pays_de_provenance: 'Espagne',
+            },
+        })
+    })
+
+    it('clears a fournisseur given as undefined', async () => {
+        const update = mockGristForUpdate()
+
+        await createGristApprovisionnementPort().update(12, {
+            fournisseur: undefined,
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 12,
+            fields: { Fournisseur: 0 },
+        })
+    })
+    it.each([
+        ['fournisseur', { fournisseur: '99999999999999' }, /Entreprise/],
+        ['ressource', { ressource: 'XX' }, /Meta_Ressource/],
+        [
+            'département',
+            { provenance: { source: DEPARTEMENT_FRANCAIS, code: '99' } },
+            /INSEE_Departement/,
+        ],
+        ['document', { source: 999 }, /Piece_jointe/],
+    ] as const)(
+        'refuses a %s the document does not hold',
+        async (_, approvisionnement, table) => {
+            const update = mockGristForUpdate()
+
+            await expect(
+                createGristApprovisionnementPort().update(12, approvisionnement)
+            ).rejects.toThrow(table)
+            expect(update).not.toHaveBeenCalled()
+        }
+    )
+
+    it('writes a blank département back without a Ref', async () => {
+        const update = mockGristForUpdate()
+
+        await createGristApprovisionnementPort().update(12, {
+            provenance: { source: DEPARTEMENT_FRANCAIS, code: '' },
+        })
+
+        expect(update).toHaveBeenCalledWith({
+            id: 12,
+            fields: {
+                Departement_de_provenance: 0,
+                Pays_de_provenance: 'France',
+            },
+        })
+    })
+})
+
+describe('createGristApprovisionnementPort().delete', () => {
+    it('deletes the row of the approvisionnement', async () => {
+        const destroy = vi.fn(() => Promise.resolve())
+        vi.stubGlobal('grist', {
+            getTable: (tableId: string) => {
+                expect(tableId).toBe(TABLE.approvisionnement)
+                return { destroy }
+            },
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        await createGristApprovisionnementPort().delete(12)
+
+        expect(destroy).toHaveBeenCalledWith([12])
+    })
+})
+
+describe('createGristApprovisionnementPort().listPaysDeProvenance', () => {
+    it('says which column holds options it cannot read', async () => {
+        vi.stubGlobal('grist', {
+            docApi: {
+                fetchTable: vi.fn((tableId: string) =>
+                    Promise.resolve(
+                        {
+                            _grist_Tables: {
+                                id: [3],
+                                tableId: [TABLE.approvisionnement],
+                            },
+                            _grist_Tables_column: {
+                                parentId: [3],
+                                colId: ['Pays_de_provenance'],
+                                widgetOptions: ['{not json'],
+                            },
+                        }[tableId]
+                    )
+                ),
+            },
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        await expect(
+            createGristApprovisionnementPort().listPaysDeProvenance()
+        ).rejects.toThrow(/Pays_de_provenance/)
     })
 })
 

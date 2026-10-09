@@ -16,6 +16,7 @@ function compare(a: string | number, b: string | number): number {
 
 export default function DataTable<T>({
     caption,
+    hideCaption = false,
     description,
     showResultCount = false,
     expandable,
@@ -116,7 +117,9 @@ export default function DataTable<T>({
                 rows and puts the scrollbar alongside the title. Named through
                 `aria-labelledby` instead, so the heading is still the table's
                 accessible name without the text existing twice. */}
-            <div className="shared-data-table__header">
+            <div
+                className={`shared-data-table__header${hideCaption ? ' fr-sr-only' : ''}`}
+            >
                 <div className="shared-data-table__header-title">
                     <span id={titleId}>{caption}</span>
                     {showResultCount && (

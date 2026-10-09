@@ -56,6 +56,7 @@ export const FAKE_PORTS: PlanViewPorts & {
     },
     attachments: {
         list: () => Promise.resolve(FAKE_ATTACHMENTS),
+        download: () => Promise.resolve(new Blob()),
         // Égletons fails to download once, then works.
         getFileUrl: (id) =>
             id === 501 && egletonsDownloads++ === 0
@@ -93,9 +94,23 @@ export const FAKE_PORTS: PlanViewPorts & {
     approvisionnements: {
         list: () => Promise.resolve(createdApprovisionnements),
         create: (approvisionnements) => {
-            createdApprovisionnements.push(...approvisionnements)
-            return Promise.resolve()
+            const created = approvisionnements.map(
+                (approvisionnement, index) => ({
+                    ...approvisionnement,
+                    id: createdApprovisionnements.length + index + 1,
+                })
+            )
+            createdApprovisionnements.push(...created)
+            return Promise.resolve(created.map(({ id }) => id))
         },
+        update: () =>
+            Promise.reject(
+                new Error('This widget changes no approvisionnement.')
+            ),
+        delete: () =>
+            Promise.reject(
+                new Error('This widget deletes no approvisionnement.')
+            ),
         listPaysDeProvenance: () => Promise.resolve([...paysDeProvenance]),
         addPaysDeProvenance: (pays) => {
             paysDeProvenance.push(pays)

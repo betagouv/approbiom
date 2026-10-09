@@ -2,13 +2,13 @@ import './Extraction.css'
 
 import { useEffect, useEffectEvent, useState } from 'react'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { SelectablePlan } from '../selection'
 import type { ExtractionStatus } from './extraction.types'
 import ImportContext from '../import-context'
 import ExtractionFailure from './ExtractionFailure'
 import ExtractionLoading from './ExtractionLoading'
 import ExtractionSuccess from './ExtractionSuccess'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type ExtractionProps<L extends ExtractedLine> = {
     plan: SelectablePlan

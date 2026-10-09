@@ -8,7 +8,7 @@ import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type {
     ExtractedLineChanges,
-    StoredExtractedLine,
+    ExtractedApprovisionnement,
 } from '../extracted-approvisionnement-port'
 import type { ImportProgress } from '../import-progress'
 import type { SiretLookup } from '../find-entreprise-by-siret'
@@ -17,7 +17,7 @@ import Extraction from './extraction'
 import Verification from './verification'
 
 type ExtractedData = {
-    lines: readonly StoredExtractedLine[]
+    lines: readonly ExtractedApprovisionnement[]
     date: Date
 }
 
@@ -36,11 +36,11 @@ export type ScreenProps = {
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     extractDocument: (attachment: Attachment) => Promise<ExtractedData>
     updateExtractedLine: (
-        id: StoredExtractedLine['id'],
+        id: ExtractedApprovisionnement['id'],
         changes: ExtractedLineChanges
     ) => Promise<void>
     importLine: (
-        approvisionnements: readonly Approvisionnement[]
+        approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
     ) => Promise<void>
 }
 
@@ -120,7 +120,7 @@ export default function Screen({
     }
 
     async function updateLine(
-        id: StoredExtractedLine['id'],
+        id: ExtractedApprovisionnement['id'],
         changes: ExtractedLineChanges
     ) {
         setExtracted(
@@ -143,7 +143,7 @@ export default function Screen({
     // Grist decides which lines are imported, and one import can change
     // several of them: the lines are read again.
     async function importReviewedLine(
-        approvisionnements: readonly Approvisionnement[]
+        approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
     ) {
         await importLine(approvisionnements)
         if (attachment) setExtracted(await extractDocument(attachment))

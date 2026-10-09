@@ -2,13 +2,13 @@ import { useId, useState } from 'react'
 import Select, { type SelectProps } from '@shared/react/components/Select'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Ressource } from '@shared/core/domain/entities/ressource'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type { ExtractedLineChanges } from '../../extracted-approvisionnement-port'
 import ProvenanceEditor from './ProvenanceEditor'
 import FournisseurField from './FournisseurField'
 import type { SiretLookup } from '../../find-entreprise-by-siret'
 import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type FoundDataProps = {
     line: ExtractedLine

@@ -1,4 +1,4 @@
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type ExtractionStatus =
     | { status: 'loading' }

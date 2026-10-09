@@ -41,25 +41,23 @@ describe('AttachmentPicker', () => {
             attachmentId: ATTACHMENT.id,
             extractedAt: null,
             lineCount: 0,
-            createdCount: 0,
+            verifiedCount: 0,
         })
 
-        expect(badgesOf(card)).toEqual([
-            'Lignes importées dans Approbiom : 0/0',
-        ])
+        expect(badgesOf(card)).toEqual(['Lignes vérifiées : 0/0'])
     })
 
-    it('shows when an extracted document was extracted and its imported lines', () => {
+    it('shows when an extracted document was extracted and its verified lines', () => {
         const card = renderCard({
             attachmentId: ATTACHMENT.id,
             extractedAt: new Date(2026, 8, 27, 15, 36),
             lineCount: 4,
-            createdCount: 1,
+            verifiedCount: 1,
         })
 
         expect(badgesOf(card)).toEqual([
             'Extraction faite le 27/09/2026 à 15h36',
-            'Lignes importées dans Approbiom : 1/4',
+            'Lignes vérifiées : 1/4',
         ])
     })
 })

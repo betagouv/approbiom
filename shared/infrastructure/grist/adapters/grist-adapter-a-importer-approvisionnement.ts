@@ -1,11 +1,11 @@
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import { gristReady } from '../helpers/grist-ready'
 import { createRows } from '../helpers/grist-helpers'
 import {
     TABLE,
     type AImporterApprovisionnementColumn,
 } from '../types/grist-tables'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type ApprovisionnementAImporter = ExtractedLine & {
     planDApprovisionnement: Attachment['planDApprovisionnement']

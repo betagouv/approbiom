@@ -133,20 +133,36 @@ export async function updateRow(
 export async function createRows(
     tableId: string,
     rows: readonly GristCells[]
-): Promise<void> {
+): Promise<number[]> {
     try {
         const records = rows.map((fields) => ({
             fields,
         }))
         const table = grist.getTable(tableId)
 
-        await table.create(records)
-        return
+        const created = await table.create(records)
+        return created.map(({ id }) => id)
     } catch (cause) {
         const message = cause instanceof Error ? cause.message : String(cause)
 
         throw new Error(
             `Grist rows of table "${tableId}" could not be created: ${message}`,
+            { cause }
+        )
+    }
+}
+
+export async function deleteRows(
+    tableId: string,
+    rowIds: readonly number[]
+): Promise<void> {
+    try {
+        await grist.getTable(tableId).destroy([...rowIds])
+    } catch (cause) {
+        const message = cause instanceof Error ? cause.message : String(cause)
+
+        throw new Error(
+            `Grist rows ${rowIds.join(', ')} of table "${tableId}" could not be deleted: ${message}`,
             { cause }
         )
     }
