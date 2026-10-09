@@ -104,6 +104,11 @@ export default function ScreenPlanApprovisionnement({
                                     await onUpdate(id, fields)
                                     setSuccess('Approvisionnement modifié.')
                                 }}
+                                onDuplicate={async (fields) => {
+                                    setSuccess(null)
+                                    await onCreate(fields)
+                                    setSuccess('Approvisionnement dupliqué.')
+                                }}
                                 onDelete={async (id) => {
                                     setSuccess(null)
                                     await onDelete(id)

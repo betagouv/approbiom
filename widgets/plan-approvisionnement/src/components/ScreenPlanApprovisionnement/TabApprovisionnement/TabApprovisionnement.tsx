@@ -2,8 +2,10 @@ import './TabApprovisionnement.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-design/icons-design.main.min.css'
+import '@gouvfr/dsfr/dist/utility/icons/icons-business/icons-business.main.min.css'
 
 import { useState, type ReactNode } from 'react'
+import Alert from '@shared/react/components/Alert'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
@@ -73,8 +75,8 @@ const DATA_COLUMNS: readonly Column<ApprovisionnementRow>[] = [
     },
 ]
 
-// What a screen reader hears after « Modifier » or « Supprimer »: the buttons
-// of every row read the same otherwise.
+// What a screen reader hears after an action: the buttons of every row read
+// the same otherwise.
 const describe = ({
     fournisseur,
     ressource,
@@ -92,6 +94,7 @@ export type TabApprovisionnementProps = Referentiels & {
         fields: EditableFields
     ) => Promise<void>
     onDelete: (id: Approvisionnement['id']) => Promise<void>
+    onDuplicate: (fields: EditableFields) => Promise<void>
     onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     onCreatePays: (pays: Pays) => Promise<void>
@@ -106,6 +109,7 @@ export default function TabApprovisionnement({
     onCreate,
     onUpdate,
     onDelete,
+    onDuplicate,
     onCreateEntreprise,
     findEntrepriseBySiret,
     onCreatePays,
@@ -121,6 +125,10 @@ export default function TabApprovisionnement({
     const [deletedId, setDeletedId] = useState<Approvisionnement['id'] | null>(
         null
     )
+    const [duplicatingId, setDuplicatingId] = useState<
+        Approvisionnement['id'] | null
+    >(null)
+    const [duplicateFailed, setDuplicateFailed] = useState(false)
 
     const rows = toApprovisionnementRows(approvisionnements, referentiels)
     const duplicateCount = new Set(
@@ -135,7 +143,6 @@ export default function TabApprovisionnement({
     const deleted = rows.find(({ id }) => id === deletedId)
 
     const columns: readonly Column<ApprovisionnementRow>[] = [
-        ...DATA_COLUMNS,
         {
             id: 'actions',
             header: 'Actions',
@@ -143,24 +150,57 @@ export default function TabApprovisionnement({
                 <div className="tab-approvisionnement__actions">
                     <button
                         type="button"
-                        className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-edit-line"
+                        className="fr-btn fr-btn--tertiary fr-btn--sm fr-icon-edit-line"
+                        title="Modifier"
                         onClick={() => setEditedId(row.id)}
                     >
-                        Modifier
-                        <span className="fr-sr-only">{describe(row)}</span>
+                        Modifier{describe(row)}
                     </button>
                     <button
                         type="button"
-                        className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-delete-line"
+                        className="fr-btn fr-btn--tertiary fr-btn--sm fr-icon-stack-line"
+                        title="Dupliquer"
+                        disabled={duplicatingId !== null}
+                        onClick={() => void duplicate(row.id)}
+                    >
+                        Dupliquer{describe(row)}
+                    </button>
+                    <button
+                        type="button"
+                        className="fr-btn fr-btn--tertiary fr-btn--sm fr-icon-delete-line"
+                        title="Supprimer"
                         onClick={() => setDeletedId(row.id)}
                     >
-                        Supprimer
-                        <span className="fr-sr-only">{describe(row)}</span>
+                        Supprimer{describe(row)}
                     </button>
                 </div>
             ),
         },
+        ...DATA_COLUMNS,
     ]
+
+    async function duplicate(id: Approvisionnement['id']) {
+        const original = approvisionnements.find(
+            (approvisionnement) => approvisionnement.id === id
+        )
+        if (!original) return
+
+        const { fournisseur, ressource, provenance, tonnageTotal } = original
+        setDuplicatingId(id)
+        setDuplicateFailed(false)
+        try {
+            await onDuplicate({
+                fournisseur,
+                ressource,
+                provenance,
+                tonnageTotal,
+            })
+        } catch {
+            setDuplicateFailed(true)
+        } finally {
+            setDuplicatingId(null)
+        }
+    }
 
     const formProps = {
         ...referentiels,
@@ -212,6 +252,13 @@ export default function TabApprovisionnement({
                     Ajouter des approvisionnements
                 </button>
             </div>
+
+            {duplicateFailed && (
+                <Alert severity="error" size="sm">
+                    La duplication a échoué. Aucun approvisionnement n&apos;a
+                    été ajouté au plan. Réessayez.
+                </Alert>
+            )}
 
             {rows.length === 0 ? (
                 <EmptyPlan hasAttachments={hasAttachments} />

@@ -55,10 +55,12 @@ function renderTab(
     approvisionnements: readonly Approvisionnement[],
     hasAttachments = true,
     {
+        onDuplicate = vi.fn(() => Promise.resolve()),
         onUpdate = vi.fn(() => Promise.resolve()),
         onDelete = vi.fn(() => Promise.resolve()),
         onCreatePays = vi.fn(() => Promise.resolve()),
     }: {
+        onDuplicate?: TabApprovisionnementProps['onDuplicate']
         onUpdate?: TabApprovisionnementProps['onUpdate']
         onDelete?: TabApprovisionnementProps['onDelete']
         onCreatePays?: TabApprovisionnementProps['onCreatePays']
@@ -70,6 +72,7 @@ function renderTab(
             pays={[{ libelle: 'Espagne' }]}
             hasAttachments={hasAttachments}
             onCreate={() => Promise.resolve()}
+            onDuplicate={onDuplicate}
             onUpdate={onUpdate}
             onDelete={onDelete}
             onCreateEntreprise={() => Promise.resolve()}
@@ -102,12 +105,12 @@ describe('TabApprovisionnement', () => {
                 .getAllByRole('cell')
                 .map((cell) => cell.textContent.replace(/\s/g, ' '))
         ).toEqual([
+            "Modifier l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)Dupliquer l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)Supprimer l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)",
             'Pas de doublon',
             'BOIS FICTIF ENERGIE',
             '1A-PFA · Plaquettes forestières',
             'Corrèze (19)',
             '1 200,5',
-            "Modifier l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)Supprimer l'approvisionnement BOIS FICTIF ENERGIE, 1A-PFA · Plaquettes forestières, Corrèze (19)",
         ])
     })
 
@@ -173,6 +176,42 @@ describe('TabApprovisionnement', () => {
         expect(
             screen.getByText(/Aucune pièce jointe n'est liée à ce plan/)
         ).toBeTruthy()
+    })
+
+    describe('dupliquer', () => {
+        it('creates a copy at once, leaving the approvisionnement as it is', async () => {
+            const onDuplicate = vi.fn(() => Promise.resolve())
+            const onUpdate = vi.fn(() => Promise.resolve())
+            renderTab([approvisionnement(1, '19')], true, {
+                onDuplicate,
+                onUpdate,
+            })
+
+            fireEvent.click(screen.getByRole('button', { name: /^Dupliquer/ }))
+
+            await waitFor(() =>
+                expect(onDuplicate).toHaveBeenCalledWith({
+                    fournisseur: '00000000000001',
+                    ressource: '1A-PFA',
+                    provenance: { source: DEPARTEMENT_FRANCAIS, code: '19' },
+                    tonnageTotal: 1200.5,
+                })
+            )
+            expect(screen.queryByRole('dialog')).toBeNull()
+            expect(onUpdate).not.toHaveBeenCalled()
+        })
+
+        it('says when the copy could not be created', async () => {
+            renderTab([approvisionnement(1, '19')], true, {
+                onDuplicate: () => Promise.reject(new Error('Grist')),
+            })
+
+            fireEvent.click(screen.getByRole('button', { name: /^Dupliquer/ }))
+
+            expect((await screen.findByRole('alert')).textContent).toMatch(
+                /La duplication a échoué/
+            )
+        })
     })
 
     describe('modifier', () => {
