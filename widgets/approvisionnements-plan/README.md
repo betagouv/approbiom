@@ -147,19 +147,20 @@ Je souhaite créer des approvisionnements à partir d'un document.
 ###### 5.2 Vérifier les lignes
 
 - **5.2.1** Regarder l'écran de vérification → le nom du document, cliquable pour le télécharger, un badge « N lignes extraites le … » et « x sur y vérifiées »
-- **5.2.2** Regarder le tableau → colonnes Contrôle, Ligne, Fournisseur, Ressource, Tonnage total (t MV/an), Répartition par provenance, Action
+- **5.2.2** Regarder le tableau → colonnes Contrôle, Ligne, Fournisseur, Ressource, Tonnage total (t MV/an), Répartition par provenance, Action ; chaque ligne a un interrupteur dans Contrôle et un bouton « Modifier »
 - **5.2.3** Déplier la répartition d'une ligne → le détail de chaque provenance, avec son pourcentage
 - **5.2.4** Regarder une ligne dont la répartition ne fait pas 100 % → badge « Total X % ≠ 100 % »
 - **5.2.5** Tant qu'il reste des lignes non vérifiées → pas de bouton d'import, et la phrase « Vérifiez toutes les lignes pour pouvoir les importer (x/y). »
-- **5.2.6** Cliquer sur « Vérifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource et la répartition par provenance
-- **5.2.7** Regarder la ressource → « Correspondance trouvée » si le document a été reconnu, sinon « Aucune correspondance trouvée »
-- **5.2.8** Changer le fournisseur, la ressource ou un pourcentage, puis fermer et rouvrir la ligne → les changements sont gardés, sans avoir eu à enregistrer
-- **5.2.9** Saisir un pourcentage → le tonnage de la provenance se recalcule ; saisir un tonnage → le pourcentage se recalcule
-- **5.2.10** Ajouter puis supprimer une provenance → la répartition se met à jour
-- **5.2.11** Faire une répartition qui ne fait pas 100 % → « La répartition ne fait pas 100 %. », mais la vérification reste possible
-- **5.2.12** Retirer la ressource, ou toutes les provenances → « Marquer la ligne comme vérifiée » est désactivé, avec « Choisissez une ressource et au moins une provenance. »
-- **5.2.13** Cliquer sur « Marquer la ligne comme vérifiée » → la modale se ferme ; la ligne passe en « Vérifiée » et son action devient « Voir »
-- **5.2.14** Modifier une ligne déjà vérifiée → elle repasse en « Non vérifiée »
+- **5.2.6** Activer l'interrupteur d'une ligne → elle passe en « Vérifiée » ; le désactiver → elle repasse en « Non vérifiée »
+- **5.2.7** Regarder une ligne sans ressource ou sans provenance → son interrupteur est désactivé, avec « Ressource ou provenance manquante »
+- **5.2.8** Cliquer sur « Modifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource et la répartition par provenance
+- **5.2.9** Regarder la ressource → « Correspondance trouvée » si le document a été reconnu, sinon « Aucune correspondance trouvée »
+- **5.2.10** Saisir un pourcentage → le tonnage de la provenance se recalcule ; saisir un tonnage → le pourcentage se recalcule
+- **5.2.11** Ajouter puis supprimer une provenance → la répartition se met à jour
+- **5.2.12** Faire une répartition qui ne fait pas 100 % → « La répartition ne fait pas 100 %. », mais l'enregistrement reste possible
+- **5.2.13** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Annuler » → rien n'est enregistré
+- **5.2.14** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Modifier » → la modale se ferme et les changements sont enregistrés ; le bouton « Modifier » n'est jamais grisé pendant la saisie
+- **5.2.15** Enregistrer une modification sur une ligne vérifiée → elle repasse en « Non vérifiée » et doit être vérifiée de nouveau avec l'interrupteur
 
 ###### 5.3 Importer
 

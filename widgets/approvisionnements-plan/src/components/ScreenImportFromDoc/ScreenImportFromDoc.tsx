@@ -139,9 +139,12 @@ export default function ScreenImportFromDoc({
 
     async function updateLine(
         line: ExtractedApprovisionnement,
-        changes: ExtractedLineChanges
+        { controle: asked, ...derived }: ExtractedLineChanges
     ) {
-        const updated = await updateExtractedApprovisionnement(line, changes)
+        const { controle } = await updateExtractedApprovisionnement(line, {
+            ...derived,
+            controle: asked,
+        })
         setStep((previous) =>
             previous.name === 'verify'
                 ? {
@@ -149,7 +152,16 @@ export default function ScreenImportFromDoc({
                       extracted: {
                           ...previous.extracted,
                           lines: previous.extracted.lines.map((candidate) =>
-                              candidate.id === line.id ? updated : candidate
+                              candidate.id === line.id
+                                  ? {
+                                        ...candidate,
+                                        controle,
+                                        derived: {
+                                            ...candidate.derived,
+                                            ...derived,
+                                        },
+                                    }
+                                  : candidate
                           ),
                       },
                   }

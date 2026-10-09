@@ -245,7 +245,9 @@ describe('ScreenImportFromDoc', () => {
         fireEvent.click(
             screen.getByRole('button', { name: 'Reprendre la vérification' })
         )
-        fireEvent.click(await screen.findByRole('button', { name: /^Voir/ }))
+        fireEvent.click(
+            await screen.findByRole('button', { name: /^Modifier/ })
+        )
         const list = within(screen.getByRole('dialog')).getByRole('combobox', {
             name: /Ressource/,
         })
@@ -255,6 +257,11 @@ describe('ScreenImportFromDoc', () => {
         fireEvent.change(list, {
             target: { value: option.getAttribute('value') },
         })
+        fireEvent.click(
+            within(screen.getByRole('dialog')).getByRole('button', {
+                name: 'Modifier',
+            })
+        )
 
         await waitFor(() =>
             expect(updateExtractedApprovisionnement).toHaveBeenCalledWith(

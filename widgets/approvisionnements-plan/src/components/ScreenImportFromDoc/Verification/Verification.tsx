@@ -3,7 +3,9 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useState } from 'react'
+import Alert from '@shared/react/components/Alert'
 import Badge from '@shared/react/components/Badge'
+import Toggle from '@shared/react/components/Toggle'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import type { ExtractedLineChanges } from '@shared/core/application/ports/extracted-approvisionnement'
@@ -26,6 +28,7 @@ import {
     countVerified,
     distributionTotal,
     isNot100,
+    isVerifiable,
     toApprovisionnements,
     type ExtractedApprovisionnement,
 } from '@shared/core/domain/entities/extracted-approvisionnement'
@@ -69,6 +72,19 @@ export default function Verification({
     >(null)
     const reviewed = lines.find(({ id }) => id === reviewedId)
     const [confirmingImport, setConfirmingImport] = useState(false)
+    const [controlFailed, setControlFailed] = useState(false)
+
+    async function control(
+        line: ExtractedApprovisionnement,
+        controle: ExtractedApprovisionnement['controle']
+    ) {
+        setControlFailed(false)
+        try {
+            await onUpdateLine(line, { controle })
+        } catch {
+            setControlFailed(true)
+        }
+    }
 
     const departementLabels = new Map(
         referentiels.departementsByRegion.flatMap(({ departements }) =>
@@ -85,14 +101,28 @@ export default function Verification({
         {
             id: 'controle',
             header: 'Contrôle',
-            render: ({ controle }) =>
-                controle === VERIFIEE ? (
-                    <Badge size="sm" status="success">
-                        {VERIFIEE}
-                    </Badge>
-                ) : (
-                    <Badge size="sm">{NON_VERIFIEE}</Badge>
-                ),
+            render: (line) => {
+                const verified = line.controle === VERIFIEE
+
+                return (
+                    <Toggle
+                        label={line.controle}
+                        checked={verified}
+                        disabled={!verified && !isVerifiable(line)}
+                        description={
+                            !verified && !isVerifiable(line)
+                                ? 'Ressource ou provenance manquante'
+                                : undefined
+                        }
+                        onChange={(checked) =>
+                            void control(
+                                line,
+                                checked ? VERIFIEE : NON_VERIFIEE
+                            )
+                        }
+                    />
+                )
+            },
         },
         {
             id: 'ligne',
@@ -158,7 +188,7 @@ export default function Verification({
                     className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
                     onClick={() => setReviewedId(line.id)}
                 >
-                    {line.controle === VERIFIEE ? 'Voir' : 'Vérifier'}
+                    Modifier
                     <span className="fr-sr-only">
                         {' '}
                         la ligne {line.read.excelRow}
@@ -226,6 +256,13 @@ export default function Verification({
                 )}
             </div>
 
+            {controlFailed && (
+                <Alert severity="error" size="sm">
+                    Le contrôle de la ligne n&apos;a pas pu être enregistré.
+                    Réessayez.
+                </Alert>
+            )}
+
             <DataTable
                 caption="Lignes extraites"
                 hideCaption
@@ -258,11 +295,7 @@ export default function Verification({
                     {...referentiels}
                     line={reviewed}
                     pays={pays}
-                    onChange={(changes) => onUpdateLine(reviewed, changes)}
-                    onVerify={async () => {
-                        await onUpdateLine(reviewed, { controle: VERIFIEE })
-                        setReviewedId(null)
-                    }}
+                    onSave={(changes) => onUpdateLine(reviewed, changes)}
                     onClose={() => setReviewedId(null)}
                     onCreateEntreprise={onCreateEntreprise}
                     findEntrepriseBySiret={findEntrepriseBySiret}

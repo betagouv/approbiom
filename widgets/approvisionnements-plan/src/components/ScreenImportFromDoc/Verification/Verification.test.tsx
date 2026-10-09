@@ -115,8 +115,8 @@ describe('Verification', () => {
             .map((cells) => [cells[0].textContent, cells.at(-1)?.textContent])
 
         expect(lastCells).toEqual([
-            [NON_VERIFIEE, 'Vérifier la ligne 17'],
-            [VERIFIEE, 'Voir la ligne 18'],
+            [NON_VERIFIEE, 'Modifier la ligne 17'],
+            [VERIFIEE, 'Modifier la ligne 18'],
         ])
     })
 
@@ -149,55 +149,120 @@ describe('Verification', () => {
         expect(screen.getByText('Total 90 % ≠ 100 %')).toBeTruthy()
     })
 
-    it('marks a line as verified', async () => {
+    it('marks a line as verified with the switch', async () => {
         const onUpdateLine = renderVerification([line(1, NON_VERIFIEE)])
 
-        fireEvent.click(screen.getByRole('button', { name: /^Vérifier/ }))
-        fireEvent.click(
-            within(dialog()).getByRole('button', {
-                name: 'Marquer la ligne comme vérifiée',
-            })
-        )
+        fireEvent.click(screen.getByRole('checkbox', { name: NON_VERIFIEE }))
 
-        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
-        expect(onUpdateLine).toHaveBeenCalledWith(
-            expect.objectContaining({ id: 1 }),
-            { controle: VERIFIEE }
+        await waitFor(() =>
+            expect(onUpdateLine).toHaveBeenCalledWith(
+                expect.objectContaining({ id: 1 }),
+                { controle: VERIFIEE }
+            )
+        )
+    })
+
+    it('puts a verified line back with the switch', async () => {
+        const onUpdateLine = renderVerification([line(1, VERIFIEE)])
+
+        fireEvent.click(screen.getByRole('checkbox', { name: VERIFIEE }))
+
+        await waitFor(() =>
+            expect(onUpdateLine).toHaveBeenCalledWith(
+                expect.objectContaining({ id: 1 }),
+                { controle: NON_VERIFIEE }
+            )
         )
     })
 
     it('cannot verify a line without ressource', () => {
         renderVerification([line(1, NON_VERIFIEE, [100], false)])
 
-        fireEvent.click(screen.getByRole('button', { name: /^Vérifier/ }))
-
         expect(
-            within(dialog()).getByRole<HTMLButtonElement>('button', {
-                name: 'Marquer la ligne comme vérifiée',
+            screen.getByRole<HTMLInputElement>('checkbox', {
+                name: NON_VERIFIEE,
             }).disabled
         ).toBe(true)
         expect(
-            within(dialog()).getByText(
-                'Choisissez une ressource et au moins une provenance.'
-            )
+            screen.getByText('Ressource ou provenance manquante')
         ).toBeTruthy()
     })
 
-    it('says when the verification could not be saved', async () => {
+    it('says when the switch could not be saved', async () => {
         renderVerification([line(1, NON_VERIFIEE)], () =>
             Promise.reject(new Error('Grist'))
         )
 
-        fireEvent.click(screen.getByRole('button', { name: /^Vérifier/ }))
+        fireEvent.click(screen.getByRole('checkbox', { name: NON_VERIFIEE }))
+
+        expect((await screen.findByRole('alert')).textContent).toMatch(
+            /Le contrôle de la ligne n'a pas pu être enregistré/
+        )
+    })
+
+    it('saves the changes only with « Modifier »', async () => {
+        const onUpdateLine = renderVerification([line(1, VERIFIEE)])
+
+        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        const percentage = within(dialog()).getByRole('textbox', {
+            name: 'Répartition (%)',
+        })
+        fireEvent.change(percentage, { target: { value: '50' } })
+        fireEvent.blur(percentage)
+
+        expect(onUpdateLine).not.toHaveBeenCalled()
+
         fireEvent.click(
-            within(dialog()).getByRole('button', {
-                name: 'Marquer la ligne comme vérifiée',
-            })
+            within(dialog()).getByRole('button', { name: 'Modifier' })
+        )
+
+        await waitFor(() => expect(screen.queryByRole('dialog')).toBeNull())
+        expect(onUpdateLine).toHaveBeenCalledOnce()
+        expect(onUpdateLine).toHaveBeenCalledWith(
+            expect.objectContaining({ id: 1 }),
+            {
+                parsedProvenance: expect.objectContaining({
+                    distribution: [expect.objectContaining({ percentage: 50 })],
+                }) as unknown,
+            }
+        )
+    })
+
+    it('saves nothing when the modal is cancelled', () => {
+        const onUpdateLine = renderVerification([line(1, VERIFIEE)])
+
+        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        const percentage = within(dialog()).getByRole('textbox', {
+            name: 'Répartition (%)',
+        })
+        fireEvent.change(percentage, { target: { value: '50' } })
+        fireEvent.blur(percentage)
+        fireEvent.click(
+            within(dialog()).getByRole('button', { name: 'Annuler' })
+        )
+
+        expect(screen.queryByRole('dialog')).toBeNull()
+        expect(onUpdateLine).not.toHaveBeenCalled()
+    })
+
+    it('says when the changes could not be saved', async () => {
+        renderVerification([line(1, NON_VERIFIEE)], () =>
+            Promise.reject(new Error('Grist'))
+        )
+
+        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        const percentage = within(dialog()).getByRole('textbox', {
+            name: 'Répartition (%)',
+        })
+        fireEvent.change(percentage, { target: { value: '50' } })
+        fireEvent.blur(percentage)
+        fireEvent.click(
+            within(dialog()).getByRole('button', { name: 'Modifier' })
         )
 
         expect(
             (await within(dialog()).findByRole('alert')).textContent
-        ).toMatch(/La vérification n'a pas pu être enregistrée/)
+        ).toMatch(/Les modifications n'ont pas pu être enregistrées/)
     })
 
     describe('import', () => {
