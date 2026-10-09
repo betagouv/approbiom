@@ -65,6 +65,29 @@ const optionTexts = () =>
 afterEach(cleanup)
 
 describe('FournisseurField', () => {
+    it('leaves the fournisseur out once cleared, and says so when left', () => {
+        const { onChange } = renderField(VALLON.siret)
+
+        fireEvent.click(screen.getByRole('button', { name: /^Effacer « / }))
+
+        expect(onChange).not.toHaveBeenCalled()
+        expect(input().value).toBe('')
+
+        fireEvent.blur(input())
+
+        expect(onChange).toHaveBeenLastCalledWith(undefined)
+        expect(input().value).toBe('Non renseigné')
+    })
+
+    it('keeps the fournisseur while another one is searched for', () => {
+        const { onChange } = renderField(VALLON.siret)
+
+        type('BOIS')
+
+        expect(input().value).toBe('BOIS')
+        expect(onChange).not.toHaveBeenCalled()
+    })
+
     it('lists the fournisseurs by denomination, with their SIRET', () => {
         renderField()
 

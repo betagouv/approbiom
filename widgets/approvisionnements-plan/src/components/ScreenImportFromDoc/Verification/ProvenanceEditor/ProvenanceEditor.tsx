@@ -111,7 +111,7 @@ export default function ProvenanceEditor({
     function type(row: Row, field: Draft['field'], text: string) {
         setDraft({ key: row.key, field, text })
 
-        const value = Number(text.replace(',', '.'))
+        const value = Number(text.replace(/\s/g, '').replace(',', '.'))
         if (text === '' || Number.isNaN(value)) return
 
         setRows(
@@ -131,7 +131,7 @@ export default function ProvenanceEditor({
                     ? row.percentage
                     : tonnageOf(row.percentage)
             )
-        )
+        ).replace('.', ',')
     }
 
     function leave() {

@@ -44,7 +44,11 @@ export default function ImportModal({
         <Modal
             open
             onClose={onClose}
-            title={'Importer les lignes vérifiées ?'}
+            title={
+                lineCount > 1
+                    ? 'Importer les lignes vérifiées ?'
+                    : 'Importer la ligne vérifiée ?'
+            }
             titleIcon="fr-icon-warning-line"
             actions={
                 <ul className="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">

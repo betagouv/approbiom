@@ -35,6 +35,7 @@ export default function FournisseurField({
         annuaireQuery: string
     } | null>(null)
     const [created, setCreated] = useState<Entreprise | null>(null)
+    const [cleared, setCleared] = useState(false)
 
     // Rows of the Entreprise table without a name cannot be told apart, and
     // may share a SIRET with a named one.
@@ -66,7 +67,13 @@ export default function FournisseurField({
 
     function choose(entreprise: Entreprise | undefined) {
         setCreated(null)
+        setCleared(false)
         onChange(entreprise)
+    }
+
+    function leaveEmpty() {
+        setCleared(false)
+        if (value !== undefined) choose(undefined)
     }
 
     const shownMessage: ComboboxMessage | undefined =
@@ -79,42 +86,59 @@ export default function FournisseurField({
 
     return (
         <>
-            <Combobox
-                ref={comboboxRef}
-                label="Fournisseur"
-                hint="Recherchez par dénomination ou par SIRET. S'il n'existe pas, vous pouvez l'ajouter."
-                options={options}
-                value={value}
-                onChange={(siret) => {
-                    if (siret === null) return
-
-                    choose(
-                        entreprises.find(
-                            (entreprise) => entreprise.siret === siret
-                        )
+            <div
+                onBlur={(event) => {
+                    if (event.currentTarget.contains(event.relatedTarget))
+                        return
+                    if (
+                        cleared &&
+                        event.target instanceof HTMLInputElement &&
+                        event.target.value.trim() === ''
                     )
+                        leaveEmpty()
                 }}
-                action={{
-                    label: (query) =>
-                        isNumericQuery(query)
-                            ? `Ajouter le fournisseur avec le SIRET ${formatSiret(digitsOf(query).slice(0, 14))}`
-                            : 'Ajouter un nouveau fournisseur',
-                    hidden: isKnownSiret,
-                    onActivate: (query) =>
-                        setCreating(
+            >
+                <Combobox
+                    ref={comboboxRef}
+                    label="Fournisseur"
+                    hint="Recherchez par dénomination ou par SIRET. S'il n'existe pas, vous pouvez l'ajouter."
+                    options={options}
+                    value={cleared ? null : value}
+                    onChange={(siret) => {
+                        if (siret === null) {
+                            setCleared(true)
+                            return
+                        }
+
+                        choose(
+                            entreprises.find(
+                                (entreprise) => entreprise.siret === siret
+                            )
+                        )
+                    }}
+                    action={{
+                        label: (query) =>
                             isNumericQuery(query)
-                                ? {
-                                      siret: digitsOf(query).slice(0, 14),
-                                      annuaireQuery: documentSupplier,
-                                  }
-                                : {
-                                      siret: '',
-                                      annuaireQuery: query || documentSupplier,
-                                  }
-                        ),
-                }}
-                message={shownMessage}
-            />
+                                ? `Ajouter le fournisseur avec le SIRET ${formatSiret(digitsOf(query).slice(0, 14))}`
+                                : 'Ajouter un nouveau fournisseur',
+                        hidden: isKnownSiret,
+                        onActivate: (query) =>
+                            setCreating(
+                                isNumericQuery(query)
+                                    ? {
+                                          siret: digitsOf(query).slice(0, 14),
+                                          annuaireQuery: documentSupplier,
+                                      }
+                                    : {
+                                          siret: '',
+                                          annuaireQuery:
+                                              query || documentSupplier,
+                                      }
+                            ),
+                    }}
+                    message={shownMessage}
+                />
+            </div>
             {creating && (
                 <NewFournisseurPanel
                     initialSiret={creating.siret}
