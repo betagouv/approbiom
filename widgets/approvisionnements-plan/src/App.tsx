@@ -127,7 +127,7 @@ export default function App() {
     )
 
     return (
-        <main className="plan-approvisionnement">
+        <main className="approvisionnements-plan">
             <AsyncGate state={state}>
                 {(data) => <Screen {...data} />}
             </AsyncGate>

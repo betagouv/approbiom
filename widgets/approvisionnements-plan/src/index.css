@@ -6,7 +6,7 @@ body {
     margin: 0;
 }
 
-.plan-approvisionnement {
+.approvisionnements-plan {
     display: flex;
     flex-direction: column;
     gap: 1rem;
