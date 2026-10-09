@@ -1,5 +1,5 @@
 import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 const NUMBER = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 

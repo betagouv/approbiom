@@ -56,6 +56,7 @@ export const FAKE_PORTS: PlanViewPorts & {
     },
     attachments: {
         list: () => Promise.resolve(FAKE_ATTACHMENTS),
+        download: () => Promise.resolve(new Blob()),
         // Égletons fails to download once, then works.
         getFileUrl: (id) =>
             id === 501 && egletonsDownloads++ === 0

@@ -1,8 +1,12 @@
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import type {
     ExtractedApprovisionnementPort,
-    StoredExtractedLine,
+    ExtractedApprovisionnement,
 } from '../extracted-approvisionnement-port'
+import {
+    NON_VERIFIEE,
+    VERIFIEE,
+} from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 // Stands in for the table « Approvisionnement extrait d'un document », in
 // memory: it lasts as long as the page. `isCreated` stands in for the Grist
@@ -10,7 +14,7 @@ import type {
 export function createFakeExtractedApprovisionnements(
     isCreated: (line: ExtractedLine) => boolean = () => false
 ): ExtractedApprovisionnementPort {
-    const rows = new Map<number, StoredExtractedLine[]>()
+    const rows = new Map<number, ExtractedApprovisionnement[]>()
     let nextId = 1
 
     return {
@@ -18,7 +22,7 @@ export function createFakeExtractedApprovisionnements(
             Promise.resolve(
                 (rows.get(attachment.id) ?? []).map((row) => ({
                     ...row,
-                    state: isCreated(row) ? 'Créés' : 'Pas créés',
+                    controle: isCreated(row) ? VERIFIEE : row.controle,
                     read: { ...row.read, document: attachment.name },
                 }))
             ),
@@ -28,7 +32,7 @@ export function createFakeExtractedApprovisionnements(
                     attachmentId,
                     extractedAt: lines[0].extractedAt,
                     lineCount: lines.length,
-                    createdCount: lines.filter(isCreated).length,
+                    verifiedCount: lines.filter(isCreated).length,
                 }))
             ),
         create: (attachment, lines, extractedAt) => {
@@ -37,7 +41,7 @@ export function createFakeExtractedApprovisionnements(
                 ...lines.map((line) => ({
                     ...line,
                     id: nextId++,
-                    state: 'Pas créés' as const,
+                    controle: NON_VERIFIEE,
                     extractedAt,
                 })),
             ])
@@ -60,5 +64,11 @@ export function createFakeExtractedApprovisionnements(
 
             return Promise.resolve()
         },
+        deleteByDocument: (attachment) => {
+            rows.delete(attachment.id)
+
+            return Promise.resolve()
+        },
+        deleteLines: () => Promise.resolve(),
     }
 }

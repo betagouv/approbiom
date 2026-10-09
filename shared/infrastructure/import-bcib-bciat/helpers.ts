@@ -1,9 +1,7 @@
 import * as XLSX from 'xlsx'
 import { normalize } from './transform-provenance/reference-data'
-import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
-import type { ProvenanceParseResults } from './transform-provenance/transform-provenance'
 import type { CellValue } from 'grist/GristData'
+import type { ReadLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 // - - - - - Configurations - - - - - - //
 
@@ -31,30 +29,6 @@ const MAX_ROW_HEADER_SEARCH = 40
 // Output
 
 type ColumnName = 'Fournisseur' | keyof typeof COLUMN_HEADER_PREFIXES
-
-export type ReadLine = {
-    document: string
-    excelRow: number
-    supplier: string
-    resource: string
-    tonnage: number
-    rawProvenance: string
-    additionalData: string
-}
-
-export type ExtractedLine = {
-    read: ReadLine
-    derived: {
-        parsedProvenance: ProvenanceParseResults
-        matchedFournisseur: Entreprise | null
-        matchedRessource: Ressource | null
-    }
-}
-
-export type MatchReferences = {
-    entreprises: readonly Entreprise[]
-    ressources: readonly Ressource[]
-}
 
 // - - - - - utils - - - - - - //
 

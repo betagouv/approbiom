@@ -2,10 +2,8 @@ import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import type {
-    ExtractedLine,
-    MatchReferences,
-} from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { MatchReferences } from '@shared/core/application/ports/document-extractor-approvisionnement'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type DownloadAndExtractDependencies = {
     getFileUrl: AttachmentPort['getFileUrl']

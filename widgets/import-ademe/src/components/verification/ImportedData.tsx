@@ -1,7 +1,7 @@
 import { useId } from 'react'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import DistributionList from './DistributionList'
 import { FOURNISSEUR_NOT_GIVEN } from '../../constant'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export type ImportedDataProps = {
     line: ExtractedLine

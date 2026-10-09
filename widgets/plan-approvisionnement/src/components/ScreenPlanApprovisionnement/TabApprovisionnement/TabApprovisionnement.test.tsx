@@ -78,6 +78,7 @@ function renderTab(
                 Promise.resolve({ status: 'notfound' })
             }
             onCreatePays={onCreatePays}
+            onImportFromDocument={() => {}}
             {...REFERENTIELS}
         />
     )

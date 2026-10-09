@@ -7,6 +7,7 @@ import {
     within,
 } from '@testing-library/react'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/extracted-approvisionnement'
 import { DEPARTEMENT_FRANCAIS } from '@shared/core/domain/value-objects/provenance'
 import Screen from './Screen'
 import type { SelectablePlan } from './ScreenSelectPlan'
@@ -42,6 +43,14 @@ const DATA = {
     findEntrepriseBySiret: () =>
         Promise.resolve({ status: 'notfound' } as const),
     createPays: () => Promise.resolve(),
+    extractions: [],
+    listExtractions: () => Promise.resolve([]),
+    getAttachmentUrl: () => Promise.resolve('data:,'),
+    extractDocument: () => Promise.reject(new Error('Pas de document.')),
+    deleteExtraction: () => Promise.resolve(),
+    updateExtractedApprovisionnement: (line: ExtractedApprovisionnement) =>
+        Promise.resolve(line),
+    importExtractedApprovisionnements: () => Promise.resolve([]),
 }
 
 // Picks an option of a native list by what it shows.
@@ -221,6 +230,51 @@ describe('Screen', () => {
 
         expect(
             screen.getByRole('heading', { name: 'Plan appro scierie Ussel' })
+        ).toBeTruthy()
+    })
+
+    it('goes to the import of a document, and back', () => {
+        render(
+            <Screen
+                plans={PLANS}
+                {...DATA}
+                attachments={[
+                    {
+                        id: 20,
+                        planDApprovisionnement: 1,
+                        type: 'excel ademe',
+                        name: 'plan.xlsx',
+                        sizeInBytes: 2048,
+                    },
+                ]}
+            />
+        )
+        choose('Plan appro chaufferie Tulle 2024')
+
+        fireEvent.click(
+            screen.getByRole('button', {
+                name: 'Ajouter des approvisionnements',
+            })
+        )
+        fireEvent.click(screen.getByRole('radio', { name: /document/ }))
+        fireEvent.click(screen.getByRole('button', { name: 'Continuer' }))
+
+        expect(
+            screen.getByRole('heading', {
+                name: 'Ajouter des approvisionnements depuis un document BCIB/BCIAT',
+            })
+        ).toBeTruthy()
+        expect(
+            screen.queryByRole('button', { name: 'Changer de plan' })
+        ).toBeNull()
+
+        fireEvent.click(
+            screen.getByRole('button', {
+                name: 'Retour aux approvisionnements du plan',
+            })
+        )
+        expect(
+            screen.getByRole('button', { name: 'Changer de plan' })
         ).toBeTruthy()
     })
 })

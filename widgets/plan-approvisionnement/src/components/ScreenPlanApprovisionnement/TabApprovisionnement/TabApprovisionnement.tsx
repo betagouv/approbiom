@@ -97,6 +97,7 @@ export type TabApprovisionnementProps = Referentiels & {
     onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     onCreatePays: (pays: Pays) => Promise<void>
+    onImportFromDocument: () => void
 }
 
 export default function TabApprovisionnement({
@@ -109,6 +110,7 @@ export default function TabApprovisionnement({
     onCreateEntreprise,
     findEntrepriseBySiret,
     onCreatePays,
+    onImportFromDocument,
     ...referentiels
 }: TabApprovisionnementProps) {
     const [duplicatesOnly, setDuplicatesOnly] = useState(false)
@@ -232,6 +234,7 @@ export default function TabApprovisionnement({
                 <AddApprovisionnementModal
                     hasAttachments={hasAttachments}
                     onManual={() => setAdding('manual')}
+                    onDocument={onImportFromDocument}
                     onClose={() => setAdding(null)}
                 />
             )}

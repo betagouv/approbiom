@@ -1,5 +1,5 @@
 import { useId } from 'react'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 const TONNAGE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
 

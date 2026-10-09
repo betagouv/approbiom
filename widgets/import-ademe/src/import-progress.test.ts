@@ -39,7 +39,8 @@ describe('loadImportProgress', () => {
             attachmentId: 20,
             extractedAt: new Date('2026-09-27'),
             lineCount: 4,
-            createdCount: 1,
+            verifiedCount: 0,
+            importedCount: 1,
         }
 
         const { extractions } = await loadImportProgress({

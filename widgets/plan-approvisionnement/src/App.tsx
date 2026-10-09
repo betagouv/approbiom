@@ -4,6 +4,8 @@ import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/a
 import { createGristAttachmentPort } from '@shared/infrastructure/grist/adapters/grist-adapter-attachment'
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
+import { createGristExtractedApprovisionnementAdapter } from '@shared/infrastructure/grist/adapters/grist-adapter-extracted-approvisionnement/grist-adapter-extracted-approvisionnement'
+import { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
 import { createGristReferentielGeoPort } from '@shared/infrastructure/grist/adapters/grist-adapter-referentiel-geo'
@@ -11,6 +13,11 @@ import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/
 import { createRechercheEntreprisesPort } from '@shared/infrastructure/referentiel-entreprise/recherche-entreprises-adapter'
 import { DataSourceUnavailableError } from '@shared/core/errors'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { ExtractedLineChanges } from '@shared/core/application/ports/extracted-approvisionnement'
+import { extractApprovisionnementFromDocument } from '@shared/core/application/services/extract-approvisionnement-from-document'
+import { importExtractedApprovisionnements } from '@shared/core/application/services/import-extracted-approvisionnements'
+import { updateExtractedApprovisionnement } from '@shared/core/application/services/update-extracted-approvisionnement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import { listPlans } from '@shared/core/application/services/plan-view'
@@ -18,6 +25,7 @@ import { FAKE_PORTS } from './fake-data/ports'
 import type { Ports } from './ports'
 import { findEntrepriseBySiret } from '@shared/core/application/services/find-entreprise-by-siret'
 import Screen from './components/Screen'
+import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 const GRIST_PORTS: Ports = {
     plans: createGristPlanPort(),
@@ -29,6 +37,8 @@ const GRIST_PORTS: Ports = {
     ressources: createGristRessourcePort(),
     referentielGeo: createGristReferentielGeoPort(),
     entrepriseSearch: createRechercheEntreprisesPort(),
+    extractedApprovisionnements: createGristExtractedApprovisionnementAdapter(),
+    documentExtractorApprovisionnement: { extract: importRows },
 }
 
 async function load(ports: Ports) {
@@ -40,6 +50,7 @@ async function load(ports: Ports) {
         ressources,
         departementsByRegion,
         pays,
+        extractions,
     ] = await Promise.all([
         listPlans(
             ['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'],
@@ -51,6 +62,7 @@ async function load(ports: Ports) {
         ports.ressources.list(),
         ports.referentielGeo.listDepartementsByRegion(),
         ports.approvisionnements.listPaysDeProvenance(),
+        ports.extractedApprovisionnements.listSummaries(),
     ])
 
     return {
@@ -61,6 +73,29 @@ async function load(ports: Ports) {
         ressources,
         departementsByRegion,
         pays,
+        extractions,
+        listExtractions: () =>
+            ports.extractedApprovisionnements.listSummaries(),
+        getAttachmentUrl: (id: Attachment['id']) =>
+            ports.attachments.getFileUrl(id),
+        extractDocument: (attachment: Attachment) =>
+            extractApprovisionnementFromDocument(attachment, ports),
+        deleteExtraction: (attachment: Attachment) =>
+            ports.extractedApprovisionnements.deleteByDocument(attachment),
+        updateExtractedApprovisionnement: (
+            line: ExtractedApprovisionnement,
+            changes: ExtractedLineChanges
+        ) =>
+            updateExtractedApprovisionnement(
+                line,
+                changes,
+                ports.extractedApprovisionnements
+            ),
+        importExtractedApprovisionnements: (
+            lines: readonly ExtractedApprovisionnement[],
+            plan: Approvisionnement['planDApprovisionnement'],
+            source: Attachment['id']
+        ) => importExtractedApprovisionnements(lines, plan, source, ports),
         createApprovisionnements: (
             approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
         ) => ports.approvisionnements.create(approvisionnements),

@@ -1,12 +1,10 @@
-import {
-    extractRows,
-    type ExtractedLine,
-    type MatchReferences,
-} from './helpers'
+import { extractRows } from './helpers'
+import type { MatchReferences } from '@shared/core/application/ports/document-extractor-approvisionnement'
 import { matchFournisseur } from './match-fournisseur'
 import { matchRessource } from './match-ressource'
 import { loadReferenceData } from './transform-provenance/reference-data'
 import { transformProvenance } from './transform-provenance/transform-provenance'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 export async function importRows(
     file: Blob,

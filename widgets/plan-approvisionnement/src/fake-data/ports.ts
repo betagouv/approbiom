@@ -8,6 +8,11 @@ import { FAKE_ENTREPRISES } from './entreprises'
 import { FAKE_ENTREPRISE_SEARCH } from './entreprise-search'
 import { FAKE_RESSOURCES } from './ressources'
 import { FAKE_DEPARTEMENTS_BY_REGION } from './departements'
+import { createFakeExtractedApprovisionnements } from './extracted-approvisionnements'
+import { fakeExtractDataFromDocument } from './extract-data'
+
+// An empty file: the fake extraction only looks at the document's name.
+const EMPTY_FILE_URL = 'data:,'
 
 // What the widget runs on outside Grist.
 export const FAKE_PORTS: Ports = {
@@ -20,7 +25,11 @@ export const FAKE_PORTS: Ports = {
         update: () => Promise.reject(new Error('Fake data is read-only.')),
     },
     approvisionnements: createFakeApprovisionnementPort(),
-    attachments: { list: () => Promise.resolve(FAKE_ATTACHMENTS) },
+    attachments: {
+        list: () => Promise.resolve(FAKE_ATTACHMENTS),
+        getFileUrl: () => Promise.resolve(EMPTY_FILE_URL),
+        download: () => Promise.resolve(new Blob()),
+    },
     entreprises: {
         list: () => Promise.resolve(FAKE_ENTREPRISES),
         create: () => Promise.resolve(),
@@ -30,5 +39,9 @@ export const FAKE_PORTS: Ports = {
     referentielGeo: {
         listDepartementsByRegion: () =>
             Promise.resolve(FAKE_DEPARTEMENTS_BY_REGION),
+    },
+    extractedApprovisionnements: createFakeExtractedApprovisionnements(),
+    documentExtractorApprovisionnement: {
+        extract: fakeExtractDataFromDocument,
     },
 }

@@ -31,7 +31,7 @@ function ExtractionState({
             </Badge>
         )
 
-    const { extractedAt, lineCount, createdCount } = summary
+    const { extractedAt, lineCount, verifiedCount } = summary
 
     return (
         <>
@@ -42,7 +42,7 @@ function ExtractionState({
             )}
 
             <Badge size="sm" status="info" noIcon>
-                Lignes importées dans Approbiom : {createdCount}/{lineCount}
+                Lignes vérifiées : {verifiedCount}/{lineCount}
             </Badge>
         </>
     )

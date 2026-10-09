@@ -107,7 +107,7 @@ export const COLUMNS = {
     attachment: ['id', 'Plan_d_approvisionnement', 'piece_jointe', 'type'],
     extractedApprovisionnement: [
         'id',
-        'Etat',
+        'Controle',
         'Document',
         'Plan_d_approvisionnement',
         'Ligne_Excel',
@@ -120,12 +120,29 @@ export const COLUMNS = {
         'Fournisseur',
         'Ressource',
         'Repartition_par_provenance',
-    ],
+    ] as const satisfies readonly (keyof ExtractedApprovisionnementColumn)[],
 } as const satisfies Record<string, readonly string[]>
 
 export type InstructionColumn = (typeof COLUMNS)['instruction'][number]
 
 export type ProgrammeAideColumn = (typeof COLUMNS)['programmeAide'][number]
+
+export type ExtractedApprovisionnementColumn = {
+    id: number
+    Controle: string
+    Document: number
+    Plan_d_approvisionnement: number
+    Ligne_Excel: number
+    Date_d_extraction: number | null
+    Document_fournisseur: string
+    Document_ressource: string
+    Document_tonnage: string
+    Document_repartition_par_provenance: string
+    Document_donnees_additionnelles: string
+    Fournisseur: number
+    Ressource: number
+    Repartition_par_provenance: string
+}
 
 export type AImporterApprovisionnementColumn = {
     Plan_d_approvisionnement: number

@@ -1,7 +1,8 @@
 import { describe, expect, it, vi } from 'vitest'
-import type { ExtractedLine } from '@shared/infrastructure/import-bcib-bciat/helpers'
 import { extractDocument } from './extract-document'
 import { createFakeExtractedApprovisionnements } from './fake-data/extracted-approvisionnements'
+import { NON_VERIFIEE } from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
+import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
 const attachment = { id: 1, name: 'plan.xlsx' }
 
@@ -38,7 +39,9 @@ describe('extractDocument', () => {
         })
 
         expect(downloadAndExtract).toHaveBeenCalledOnce()
-        expect(lines).toMatchObject([{ state: 'Pas créés', read: line.read }])
+        expect(lines).toMatchObject([
+            { controle: NON_VERIFIEE, read: line.read },
+        ])
     })
 
     it('reads back a document already in the table, without extracting it again', async () => {

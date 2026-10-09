@@ -19,6 +19,8 @@ export type ScreenPlanApprovisionnementProps = Referentiels & {
     approvisionnements: readonly Approvisionnement[]
     attachments: readonly Attachment[]
     pays: readonly Pays[]
+    // What the last import did, shown until the next change.
+    notice?: string | null
     onChangePlan: () => void
     onCreate: (fields: EditableFields) => Promise<void>
     onUpdate: (
@@ -29,6 +31,7 @@ export type ScreenPlanApprovisionnementProps = Referentiels & {
     onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     onCreatePays: (pays: Pays) => Promise<void>
+    onImportFromDocument: () => void
 }
 
 export default function ScreenPlanApprovisionnement({
@@ -36,6 +39,7 @@ export default function ScreenPlanApprovisionnement({
     approvisionnements,
     attachments,
     pays,
+    notice = null,
     onChangePlan,
     onCreate,
     onUpdate,
@@ -43,10 +47,11 @@ export default function ScreenPlanApprovisionnement({
     onCreateEntreprise,
     findEntrepriseBySiret,
     onCreatePays,
+    onImportFromDocument,
     ...referentiels
 }: ScreenPlanApprovisionnementProps) {
     // What the last change did, until the next one.
-    const [success, setSuccess] = useState<string | null>(null)
+    const [success, setSuccess] = useState<string | null>(notice)
 
     const planApprovisionnements = approvisionnements.filter(
         ({ planDApprovisionnement }) => planDApprovisionnement === plan.id
@@ -96,6 +101,7 @@ export default function ScreenPlanApprovisionnement({
                                 onCreateEntreprise={onCreateEntreprise}
                                 findEntrepriseBySiret={findEntrepriseBySiret}
                                 onCreatePays={onCreatePays}
+                                onImportFromDocument={onImportFromDocument}
                                 {...referentiels}
                             />
                         ),

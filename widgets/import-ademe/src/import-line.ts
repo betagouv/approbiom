@@ -7,8 +7,8 @@ import {
     PAYS_ETRANGER,
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
-import type { ProvenanceRepartition } from '@shared/infrastructure/import-bcib-bciat/transform-provenance/transform-provenance'
-import type { StoredExtractedLine } from './extracted-approvisionnement-port'
+import type { ExtractedApprovisionnement } from './extracted-approvisionnement-port'
+import type { ProvenanceRepartition } from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
 
 function toProvenance({
     source,
@@ -23,7 +23,7 @@ function toProvenance({
 // misses a fournisseur, a ressource or a provenance, or has a provenance left
 // blank: it cannot be imported.
 export function toApprovisionnements(
-    line: StoredExtractedLine,
+    line: ExtractedApprovisionnement,
     plan: PlanDApprovisionnement['id'],
     source: Attachment['id']
 ): Omit<Approvisionnement, 'id'>[] {
