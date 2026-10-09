@@ -123,6 +123,15 @@ export const COLUMNS = {
     ] as const satisfies readonly (keyof ExtractedApprovisionnementColumn)[],
 } as const satisfies Record<string, readonly string[]>
 
+type EveryColumnListed<Missing extends never> = Missing
+
+export type ExtractedApprovisionnementColumnsListed = EveryColumnListed<
+    Exclude<
+        keyof ExtractedApprovisionnementColumn,
+        (typeof COLUMNS)['extractedApprovisionnement'][number]
+    >
+>
+
 export type InstructionColumn = (typeof COLUMNS)['instruction'][number]
 
 export type ProgrammeAideColumn = (typeof COLUMNS)['programmeAide'][number]
