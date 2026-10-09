@@ -338,9 +338,10 @@ describe('ScreenImportFromDoc', () => {
             })
 
             await waitFor(() =>
-                expect(onImported).toHaveBeenCalledWith(
-                    '2 approvisionnements importés depuis 1 ligne du document.'
-                )
+                expect(onImported).toHaveBeenCalledWith({
+                    severity: 'success',
+                    text: '2 approvisionnements importés depuis 1 ligne du document.',
+                })
             )
             expect(importExtractedApprovisionnements).toHaveBeenCalledWith(
                 [expect.objectContaining({ id: 8 })],
@@ -363,18 +364,21 @@ describe('ScreenImportFromDoc', () => {
             expect(onImported).not.toHaveBeenCalled()
         })
 
-        it('warns not to import again when the lines cannot be deleted', async () => {
-            await importAll({
+        it('goes back to the plan, warning not to import again, when the lines cannot be deleted', async () => {
+            const { onImported, onExtractionsChanged } = await importAll({
                 importExtractedApprovisionnements: () =>
                     Promise.reject(new ExtractedLinesNotDeletedError(created)),
             })
 
-            expect(
-                (await within(screen.getByRole('dialog')).findByRole('alert'))
-                    .textContent
-            ).toMatch(
-                /2 approvisionnements créés.*N'importez pas une seconde fois/
+            await waitFor(() =>
+                expect(onImported).toHaveBeenCalledWith({
+                    severity: 'warning',
+                    text: expect.stringMatching(
+                        /^2 approvisionnements créés.*Ne les importez pas une seconde fois/
+                    ) as string,
+                })
             )
+            expect(onExtractionsChanged).toHaveBeenCalled()
         })
     })
 })

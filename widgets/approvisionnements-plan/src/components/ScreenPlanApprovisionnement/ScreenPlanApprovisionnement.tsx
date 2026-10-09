@@ -15,13 +15,19 @@ import ExtractionsInProgress from './ExtractionsInProgress'
 import TabApprovisionnement from './TabApprovisionnement'
 import TabSynthese from './TabSynthese'
 
+export type AlertMessage = { severity: 'success' | 'warning'; text: string }
+
+const success = (text: string): AlertMessage => ({ severity: 'success', text })
+
 export type ScreenPlanApprovisionnementProps = Referentiels & {
     plan: SelectablePlan
     approvisionnements: readonly Approvisionnement[]
     attachments: readonly Attachment[]
     extractions: readonly ExtractionSummary[]
     pays: readonly Pays[]
-    notice?: string | null
+    // Shown at the top of the page when it opens, such as what the last import
+    // from a document did.
+    alert?: AlertMessage | null
     onChangePlan: () => void
     onCreate: (fields: EditableFields) => Promise<void>
     onUpdate: (
@@ -42,7 +48,7 @@ export default function ScreenPlanApprovisionnement({
     attachments,
     extractions,
     pays,
-    notice = null,
+    alert = null,
     onChangePlan,
     onCreate,
     onUpdate,
@@ -54,7 +60,7 @@ export default function ScreenPlanApprovisionnement({
     onResumeExtraction,
     ...referentiels
 }: ScreenPlanApprovisionnementProps) {
-    const [success, setSuccess] = useState<string | null>(notice)
+    const [shownAlert, setShownAlert] = useState<AlertMessage | null>(alert)
 
     const planApprovisionnements = approvisionnements.filter(
         ({ planDApprovisionnement }) => planDApprovisionnement === plan.id
@@ -75,9 +81,9 @@ export default function ScreenPlanApprovisionnement({
     return (
         <>
             <PlanHeader plan={plan} onChangePlan={onChangePlan} />
-            {success && (
-                <Alert severity="success" size="sm">
-                    {success}
+            {shownAlert && (
+                <Alert severity={shownAlert.severity} size="sm">
+                    {shownAlert.text}
                 </Alert>
             )}
             <Tabs
@@ -95,24 +101,32 @@ export default function ScreenPlanApprovisionnement({
                                 pays={pays}
                                 hasAttachments={hasAttachments}
                                 onCreate={async (fields) => {
-                                    setSuccess(null)
+                                    setShownAlert(null)
                                     await onCreate(fields)
-                                    setSuccess('Approvisionnement créé.')
+                                    setShownAlert(
+                                        success('Approvisionnement créé.')
+                                    )
                                 }}
                                 onUpdate={async (id, fields) => {
-                                    setSuccess(null)
+                                    setShownAlert(null)
                                     await onUpdate(id, fields)
-                                    setSuccess('Approvisionnement modifié.')
+                                    setShownAlert(
+                                        success('Approvisionnement modifié.')
+                                    )
                                 }}
                                 onDuplicate={async (fields) => {
-                                    setSuccess(null)
+                                    setShownAlert(null)
                                     await onCreate(fields)
-                                    setSuccess('Approvisionnement dupliqué.')
+                                    setShownAlert(
+                                        success('Approvisionnement dupliqué.')
+                                    )
                                 }}
                                 onDelete={async (id) => {
-                                    setSuccess(null)
+                                    setShownAlert(null)
                                     await onDelete(id)
-                                    setSuccess('Approvisionnement supprimé.')
+                                    setShownAlert(
+                                        success('Approvisionnement supprimé.')
+                                    )
                                 }}
                                 onCreateEntreprise={onCreateEntreprise}
                                 findEntrepriseBySiret={findEntrepriseBySiret}

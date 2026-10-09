@@ -22,6 +22,7 @@ import type { ExtractedDocument } from '@shared/core/application/services/extrac
 import type { Referentiels } from '../../referentiels'
 import PlanHeader from '../PlanHeader'
 import type { SelectablePlan } from '../ScreenSelectPlan'
+import type { AlertMessage } from '../ScreenPlanApprovisionnement'
 import DocumentContext from './DocumentContext'
 import DocumentPicker from './DocumentPicker'
 import Extraction from './Extraction'
@@ -57,7 +58,7 @@ export type ScreenImportFromDocProps = Referentiels & {
         source: Attachment['id']
     ) => Promise<Approvisionnement[]>
     onExtractionsChanged: () => void
-    onImported: (notice: string) => void
+    onImported: (alert: AlertMessage) => void
     onBack: () => void
     resumedId?: Attachment['id']
 }
@@ -116,14 +117,19 @@ export default function ScreenImportFromDoc({
                 attachment.id
             )
             onExtractionsChanged()
-            onImported(
-                `${created(approvisionnements.length, 'importé')} depuis ${plural(lines.length, 'ligne')} du document.`
-            )
+            onImported({
+                severity: 'success',
+                text: `${created(approvisionnements.length, 'importé')} depuis ${plural(lines.length, 'ligne')} du document.`,
+            })
         } catch (error) {
-            if (error instanceof ExtractedLinesNotDeletedError)
-                throw new Error(
-                    `${created(error.created.length, 'créé')}, mais les lignes n'ont pas pu être retirées des lignes à vérifier. N'importez pas une seconde fois : revenez aux approvisionnements du plan.`
-                )
+            if (error instanceof ExtractedLinesNotDeletedError) {
+                onExtractionsChanged()
+                onImported({
+                    severity: 'warning',
+                    text: `${created(error.created.length, 'créé')}, mais les lignes du document n'ont pas pu être retirées des lignes à vérifier. Ne les importez pas une seconde fois : relancez l'extraction du document.`,
+                })
+                return
+            }
             if (error instanceof ApprovisionnementsNotCreatedError)
                 throw new Error(
                     "L'import a échoué. Aucun approvisionnement n'a été créé. Réessayez."

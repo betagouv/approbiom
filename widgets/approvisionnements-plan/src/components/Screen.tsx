@@ -11,7 +11,9 @@ import type { Referentiels } from '../referentiels'
 import type { EditableFields } from '../approvisionnement-form'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import ScreenSelectPlan, { type SelectablePlan } from './ScreenSelectPlan'
-import ScreenPlanApprovisionnement from './ScreenPlanApprovisionnement'
+import ScreenPlanApprovisionnement, {
+    type AlertMessage,
+} from './ScreenPlanApprovisionnement'
 import ScreenImportFromDoc from './ScreenImportFromDoc'
 import type { ExtractedDocument } from '@shared/core/application/services/extract-approvisionnement-from-document'
 import { ExtractedLinesNotDeletedError } from '@shared/core/application/services/import-extracted-approvisionnements'
@@ -79,7 +81,7 @@ export default function Screen({
     const [importing, setImporting] = useState<
         { resumedId?: Attachment['id'] } | false
     >(false)
-    const [notice, setNotice] = useState<string | null>(null)
+    const [alert, setAlert] = useState<AlertMessage | null>(null)
     const [extractions, setExtractions] = useState(initialExtractions)
 
     const plan = plans.find(({ id }) => id === planId)
@@ -206,7 +208,7 @@ export default function Screen({
                 }
                 onExtractionsChanged={refreshExtractions}
                 onImported={(imported) => {
-                    setNotice(imported)
+                    setAlert(imported)
                     setImporting(false)
                 }}
                 onBack={() => setImporting(false)}
@@ -228,14 +230,14 @@ export default function Screen({
             onCreateEntreprise={addEntreprise}
             findEntrepriseBySiret={findEntrepriseBySiret}
             onCreatePays={addPays}
-            notice={notice}
+            alert={alert}
             extractions={extractions}
             onImportFromDocument={() => {
-                setNotice(null)
+                setAlert(null)
                 setImporting({})
             }}
             onResumeExtraction={(resumedId) => {
-                setNotice(null)
+                setAlert(null)
                 setImporting({ resumedId })
             }}
             {...data}
