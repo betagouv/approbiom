@@ -269,13 +269,13 @@ describe('TabApprovisionnement', () => {
             ).toMatch(/L'enregistrement a échoué/)
         })
 
-        it('cannot save a tonnage that is not above zero', () => {
+        it('cannot save a negative tonnage', () => {
             renderTab([approvisionnement(1, '19')])
 
             fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
             fireEvent.change(
                 within(dialog()).getByRole('textbox', { name: /Tonnage/ }),
-                { target: { value: '0' } }
+                { target: { value: '-3' } }
             )
 
             expect(
@@ -285,7 +285,7 @@ describe('TabApprovisionnement', () => {
             ).toBe(true)
             expect(
                 within(dialog()).getByText(
-                    'Saisissez un tonnage supérieur à 0.'
+                    'Saisissez un tonnage supérieur ou égal à 0.'
                 )
             ).toBeTruthy()
         })

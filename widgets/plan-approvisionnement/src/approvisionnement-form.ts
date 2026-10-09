@@ -4,6 +4,7 @@ import {
     PAYS_ETRANGER,
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
+import { isValidTonnage } from '@shared/core/domain/value-objects/tonnage'
 
 export type ApprovisionnementForm = {
     fournisseur: string | undefined
@@ -33,9 +34,7 @@ function toProvenance(key: string): Provenance {
 export function parseTonnage(text: string): number | null {
     const tonnage = Number(text.replace(/\s/g, '').replace(',', '.'))
 
-    return text.trim() !== '' && Number.isFinite(tonnage) && tonnage > 0
-        ? tonnage
-        : null
+    return text.trim() !== '' && isValidTonnage(tonnage) ? tonnage : null
 }
 
 const NUMBER = new Intl.NumberFormat('fr-FR', {

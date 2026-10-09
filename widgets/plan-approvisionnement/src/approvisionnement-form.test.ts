@@ -26,11 +26,12 @@ describe('parseTonnage', () => {
         ['1 200,5', 1200.5],
         ['1200.5', 1200.5],
         [' 0,25 ', 0.25],
+        ['0', 0],
     ])('reads « %s »', (text, tonnage) => {
         expect(parseTonnage(text)).toBe(tonnage)
     })
 
-    it.each(['', '0', '-3', 'abc', '1,2,3'])('refuses « %s »', (text) => {
+    it.each(['', '-3', 'abc', '1,2,3'])('refuses « %s »', (text) => {
         expect(parseTonnage(text)).toBeNull()
     })
 })
@@ -99,7 +100,7 @@ describe('toEditableFields', () => {
     it.each([
         ['ressource', null],
         ['provenance', null],
-        ['tonnage', '0'],
+        ['tonnage', ''],
     ])('cannot be saved without a %s', (field, value) => {
         expect(
             toEditableFields({ ...toForm(APPROVISIONNEMENT), [field]: value })

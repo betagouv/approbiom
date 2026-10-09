@@ -98,7 +98,8 @@ export default function ApprovisionnementModal({
     const missing = [
         form.ressource === null && 'la ressource',
         form.provenance === null && 'la provenance',
-        parseTonnage(form.tonnage) === null && 'un tonnage supérieur à 0',
+        parseTonnage(form.tonnage) === null &&
+            'un tonnage supérieur ou égal à 0',
     ].filter(Boolean)
 
     async function submit() {
@@ -239,7 +240,7 @@ export default function ApprovisionnementModal({
                                 id={`${tonnageId}-message`}
                             >
                                 <p className="fr-message fr-message--error">
-                                    Saisissez un tonnage supérieur à 0.
+                                    Saisissez un tonnage supérieur ou égal à 0.
                                 </p>
                             </div>
                         )}
