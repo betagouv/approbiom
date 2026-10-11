@@ -118,6 +118,23 @@ describe('extractRows, header row', () => {
         expect(line.rawProvenance).toBe('100% 19')
     })
 
+    it('finds the ressource column when its header reads « Nature combustible »', async () => {
+        const [line] = await extractRows(
+            workbook([
+                [
+                    'Fournisseur',
+                    'Nature combustible',
+                    'Tonnage / an',
+                    'Répartition approximative par provenance',
+                ],
+                LINE,
+            ]),
+            'plan.xlsx'
+        )
+
+        expect(line.resource).toBe('Plaquettes')
+    })
+
     it('says which columns the closest header lacks', async () => {
         await expect(
             suppliersOf([

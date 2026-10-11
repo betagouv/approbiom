@@ -12,8 +12,8 @@ const EXPECTED_HEADER_COLUMN_FOURNISSEUR =
     /(?<![a-z])(?:fournisseurs?|clients?)(?![a-z])/
 
 const COLUMN_HEADER_PREFIXES = {
-    Ressource: 'sous categorie',
-    Tonnage: 'tonnage',
+    Ressource: ['sous categorie', 'nature combustible'],
+    Tonnage: ['tonnage'],
 } as const
 
 const EXPECTED_WORDS_IN_HEADER_COLUMN_PROVENANCE = 'repartition approximative'
@@ -98,9 +98,11 @@ function locateColumns(row: CellValue[]): [ColumnName, number][] {
     return [
         ['Fournisseur', headers.findIndex(mentionsFournisseur)],
         ...Object.entries(COLUMN_HEADER_PREFIXES).map(
-            ([name, prefix]): [ColumnName, number] => [
+            ([name, prefixes]): [ColumnName, number] => [
                 name as ColumnName,
-                headers.findIndex((header) => header.startsWith(prefix)),
+                headers.findIndex((header) =>
+                    prefixes.some((prefix) => header.startsWith(prefix))
+                ),
             ]
         ),
         [
