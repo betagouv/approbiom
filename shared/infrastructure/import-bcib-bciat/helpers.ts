@@ -14,8 +14,9 @@ const EXPECTED_HEADER_COLUMN_FOURNISSEUR =
 const COLUMN_HEADER_PREFIXES = {
     Ressource: 'sous categorie',
     Tonnage: 'tonnage',
-    Provenance: 'repartition approximative',
 } as const
+
+const EXPECTED_WORDS_IN_HEADER_COLUMN_PROVENANCE = 'repartition approximative'
 
 const ADDITIONAL_COLUMN_HEADER_PREFIXES = {
     PCI: 'pci',
@@ -29,7 +30,8 @@ const MAX_ROW_HEADER_SEARCH = 40
 
 // Output
 
-type ColumnName = 'Fournisseur' | keyof typeof COLUMN_HEADER_PREFIXES
+type ColumnName =
+    'Fournisseur' | keyof typeof COLUMN_HEADER_PREFIXES | 'Provenance'
 
 // - - - - - utils - - - - - - //
 
@@ -101,6 +103,12 @@ function locateColumns(row: CellValue[]): [ColumnName, number][] {
                 headers.findIndex((header) => header.startsWith(prefix)),
             ]
         ),
+        [
+            'Provenance',
+            headers.findIndex((header) =>
+                header.includes(EXPECTED_WORDS_IN_HEADER_COLUMN_PROVENANCE)
+            ),
+        ],
     ]
 }
 

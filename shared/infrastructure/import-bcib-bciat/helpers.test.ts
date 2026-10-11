@@ -101,6 +101,23 @@ describe('extractRows, header row', () => {
         )
     })
 
+    it('finds the provenance column when its header does not start with « Répartition approximative »', async () => {
+        const [line] = await extractRows(
+            workbook([
+                [
+                    'Fournisseur',
+                    'Sous catégorie de combustible',
+                    'Tonnage / an',
+                    "A titre d'information, répartition approximative du combustible par département",
+                ],
+                LINE,
+            ]),
+            'plan.xlsx'
+        )
+
+        expect(line.rawProvenance).toBe('100% 19')
+    })
+
     it('says which columns the closest header lacks', async () => {
         await expect(
             suppliersOf([
