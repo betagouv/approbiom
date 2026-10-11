@@ -97,7 +97,7 @@ describe('extractRows, header row', () => {
         await expect(
             suppliersOf([['Fournisseurie', ...COLUMNS], LINE])
         ).rejects.toThrow(
-            'aucune des 40 premières lignes de la feuille « Fournisseurs » ne porte le mot « fournisseur » ou « client » dans la colonne A'
+            "aucune des 40 premières lignes de la feuille « Fournisseurs » n'est une ligne d'en-tête : le mot « fournisseur » ou « client » en colonne A, et au moins une colonne Ressource, Tonnage ou Provenance"
         )
     })
 
@@ -133,6 +133,19 @@ describe('extractRows, header row', () => {
         )
 
         expect(line.resource).toBe('Plaquettes')
+    })
+
+    it('does not take a title mentioning fournisseurs for the header', async () => {
+        await expect(
+            suppliersOf([
+                ['Aire d’approvisionnement et fournisseurs'],
+                ['Prévoir une ligne par fournisseur et sous-catégorie'],
+                ['Société', ...COLUMNS],
+                LINE,
+            ])
+        ).rejects.toThrow(
+            "aucune des 40 premières lignes de la feuille « Fournisseurs » n'est une ligne d'en-tête : le mot « fournisseur » ou « client » en colonne A, et au moins une colonne Ressource, Tonnage ou Provenance"
+        )
     })
 
     it('says which columns the closest header lacks', async () => {
@@ -172,4 +185,81 @@ describe('extractRows, tonnage', () => {
             ])
         }
     )
+})
+
+describe('extractRows, end of the table', () => {
+    const HEADER = ['Fournisseur', ...COLUMNS]
+    const linesOf = async (rows: unknown[][]) =>
+        (await extractRows(workbook(rows), 'plan.xlsx')).map(
+            ({ excelRow, supplier, tonnage }) => [excelRow, supplier, tonnage]
+        )
+
+    it('keeps reading past a line whose fournisseur is empty', async () => {
+        expect(
+            await linesOf([
+                HEADER,
+                LINE,
+                [null, 'Bois fin de vie', 700, '100% 87'],
+                ['Scierie Voisine', 'Écorces', 14930, '100% 23'],
+            ])
+        ).toEqual([
+            [2, 'Scierie Fictive', 1000],
+            [3, '', 700],
+            [4, 'Scierie Voisine', 14930],
+        ])
+    })
+
+    it('keeps reading past blank lines', async () => {
+        expect(
+            await linesOf([
+                HEADER,
+                LINE,
+                [],
+                [],
+                ['Scierie Voisine', 'Écorces', 14930, '100% 23'],
+            ])
+        ).toEqual([
+            [2, 'Scierie Fictive', 1000],
+            [5, 'Scierie Voisine', 14930],
+        ])
+    })
+
+    it.each(['TOTAL', 'Total', 'Total général'])(
+        'stops at the « %s » line',
+        async (total) => {
+            expect(
+                await linesOf([
+                    HEADER,
+                    LINE,
+                    [total, null, 1000],
+                    ['Scierie Après', 'Écorces', 500, '100% 23'],
+                ])
+            ).toEqual([[2, 'Scierie Fictive', 1000]])
+        }
+    )
+
+    it('stops at the header of another table', async () => {
+        expect(
+            await linesOf([
+                HEADER,
+                LINE,
+                [],
+                ['Atelier Granulation'],
+                HEADER,
+                ['Scierie Après', 'Écorces', 500, '100% 23'],
+            ])
+        ).toEqual([[2, 'Scierie Fictive', 1000]])
+    })
+
+    it('skips a line with neither ressource nor tonnage', async () => {
+        expect(
+            await linesOf([
+                HEADER,
+                LINE,
+                ['Atelier Granulation'],
+                ['* PCI sur brut'],
+                [null, null, 0],
+            ])
+        ).toEqual([[2, 'Scierie Fictive', 1000]])
+    })
 })

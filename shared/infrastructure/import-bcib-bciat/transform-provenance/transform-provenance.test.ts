@@ -44,4 +44,25 @@ describe('transformProvenance', () => {
             ['54', 20],
         ])
     })
+
+    it.each([
+        ['Pyrénées-Atlantique', '64'],
+        ['Haute-Pyrénée', '65'],
+        ['Vosge', '88'],
+    ])('reads « %s » without its final s', (name, code) => {
+        expect(sharesOf(`100% ${name}`)).toEqual([[code, 100]])
+    })
+
+    it('keeps each share on its place when a name lacks its final s', () => {
+        expect(
+            sharesOf(
+                'Pyrénées-Atlantique (25%), Landes (40%), Gers (25%), Hautes-Pyrénées (10%)'
+            )
+        ).toEqual([
+            ['64', 25],
+            ['40', 40],
+            ['32', 25],
+            ['65', 10],
+        ])
+    })
 })

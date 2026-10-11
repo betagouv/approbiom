@@ -117,11 +117,20 @@ function locateColumns(row: CellValue[]): [ColumnName, number][] {
 const missingIn = (columns: [ColumnName, number][]) =>
     columns.filter(([, at]) => at === -1).map(([name]) => name)
 
+const namesAnotherColumn = (row: CellValue[]) =>
+    locateColumns(row).some(([name, at]) => name !== 'Fournisseur' && at !== -1)
+
+const isHeaderRow = (row: CellValue[]) =>
+    mentionsFournisseur(normalize(toText(row[0]))) && namesAnotherColumn(row)
+
+const isTotalRow = (row: CellValue[]) =>
+    /^total(?![a-z])/.test(normalize(toText(row[0])))
+
 function findHeaderRow(rows: CellValue[][]): number {
     const candidates = rows
         .slice(0, MAX_ROW_HEADER_SEARCH)
         .map((row, at) => ({ row, at }))
-        .filter(({ row }) => mentionsFournisseur(normalize(toText(row[0]))))
+        .filter(({ row }) => isHeaderRow(row))
         .map(({ row, at }) => ({
             at,
             missing: missingIn(locateColumns(row)).length,
@@ -129,7 +138,7 @@ function findHeaderRow(rows: CellValue[][]): number {
 
     if (candidates.length === 0) {
         throw new Error(
-            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » ne porte le mot « fournisseur » ou « client » dans la colonne A`
+            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » n'est une ligne d'en-tête : le mot « fournisseur » ou « client » en colonne A, et au moins une colonne Ressource, Tonnage ou Provenance`
         )
     }
 
@@ -180,11 +189,22 @@ export async function extractRows(
     const additionalColumns = findAdditionalColumns(rows, headerRow)
 
     const dataRows = rows.slice(headerRow + 1)
-    const endsAt = dataRows.findIndex((row) => (row[0] ?? null) === null)
+    const endsAt = dataRows.findIndex(
+        (row) => isTotalRow(row) || isHeaderRow(row)
+    )
     const table = endsAt === -1 ? dataRows : dataRows.slice(0, endsAt)
 
-    return table.map((row, offset) => {
+    const tonnageOf = (row: CellValue[]) => {
         const tonnage = row[columns.Tonnage] ?? null
+
+        return isTonnage(tonnage) ? tonnage : 0
+    }
+
+    const isFilled = (row: CellValue[]) =>
+        toText(row[columns.Ressource]).trim() !== '' || tonnageOf(row) !== 0
+
+    return table.flatMap((row, offset) => {
+        if (!isFilled(row)) return []
 
         return {
             document,
@@ -192,7 +212,7 @@ export async function extractRows(
             excelRow: headerRow + 2 + offset,
             supplier: toText(row[columns.Fournisseur]),
             resource: toText(row[columns.Ressource]),
-            tonnage: isTonnage(tonnage) ? tonnage : 0,
+            tonnage: tonnageOf(row),
             rawProvenance: toText(row[columns.Provenance]),
             additionalData: additionalColumns
                 .map(([label, at]) => `${label}: ${toText(row[at])}`)

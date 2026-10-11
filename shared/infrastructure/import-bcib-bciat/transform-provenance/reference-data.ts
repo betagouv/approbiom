@@ -71,7 +71,9 @@ export function normalize(text: string): string {
  * disqualify it, digits do not, so "Vosges88" names the Vosges twice.
  */
 function namePattern(name: string): RegExp {
-    const escaped = name.replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+    const escaped = name
+        .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
+        .replace(/(?<=[a-z]{4})s(?![a-z])/g, 's?')
 
     return new RegExp(`(?<![a-z])${escaped}(?![a-z])`, 'g')
 }
