@@ -183,39 +183,20 @@ export async function extractRows(
     const endsAt = dataRows.findIndex((row) => (row[0] ?? null) === null)
     const table = endsAt === -1 ? dataRows : dataRows.slice(0, endsAt)
 
-    const lines: ReadLine[] = []
-    const invalidTonnages: string[] = []
-
-    table.forEach((row, offset) => {
-        // Excel numbers rows from 1, and the first data row follows the header.
-        const excelRow = headerRow + 2 + offset
+    return table.map((row, offset) => {
         const tonnage = row[columns.Tonnage] ?? null
 
-        if (!isTonnage(tonnage)) {
-            invalidTonnages.push(
-                `ligne ${excelRow} (${tonnage === null ? 'vide' : `« ${toText(tonnage)} »`})`
-            )
-            return
-        }
-
-        lines.push({
+        return {
             document,
-            excelRow,
+            // Excel numbers rows from 1, and the first data row follows the header.
+            excelRow: headerRow + 2 + offset,
             supplier: toText(row[columns.Fournisseur]),
             resource: toText(row[columns.Ressource]),
-            tonnage,
+            tonnage: isTonnage(tonnage) ? tonnage : 0,
             rawProvenance: toText(row[columns.Provenance]),
             additionalData: additionalColumns
                 .map(([label, at]) => `${label}: ${toText(row[at])}`)
                 .join(', '),
-        })
+        }
     })
-
-    if (invalidTonnages.length > 0) {
-        throw new Error(
-            `la colonne « Tonnage » de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » doit contenir un nombre : ${invalidTonnages.join(', ')}`
-        )
-    }
-
-    return lines
 }

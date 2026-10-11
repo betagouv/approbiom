@@ -147,3 +147,29 @@ describe('extractRows, header row', () => {
         )
     })
 })
+
+describe('extractRows, tonnage', () => {
+    it.each([
+        ['vide', null],
+        ['du texte', 'à définir'],
+    ])(
+        'reads 0 t when the tonnage cell is %s and keeps the other lines',
+        async (_, cell) => {
+            const lines = await extractRows(
+                workbook([
+                    ['Fournisseur', ...COLUMNS],
+                    LINE,
+                    ['Scierie Secours', 'Plaquettes', cell, '100% 24'],
+                ]),
+                'plan.xlsx'
+            )
+
+            expect(
+                lines.map(({ supplier, tonnage }) => [supplier, tonnage])
+            ).toEqual([
+                ['Scierie Fictive', 1000],
+                ['Scierie Secours', 0],
+            ])
+        }
+    )
+})
