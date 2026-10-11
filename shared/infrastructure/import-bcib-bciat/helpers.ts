@@ -8,7 +8,8 @@ import type { ReadLine } from '@shared/core/domain/entities/extracted-approvisio
 // Input - Workbook structure
 const EXPECTED_WORD_CONTAINED_IN_SHEETNAME = 'Fournisseurs'
 
-const EXPECTED_HEADER_COLUMN_FOURNISSEUR = /(?<![a-z])fournisseurs?(?![a-z])/
+const EXPECTED_HEADER_COLUMN_FOURNISSEUR =
+    /(?<![a-z])(?:fournisseurs?|clients?)(?![a-z])/
 
 const COLUMN_HEADER_PREFIXES = {
     Ressource: 'sous categorie',
@@ -118,7 +119,7 @@ function findHeaderRow(rows: CellValue[][]): number {
 
     if (candidates.length === 0) {
         throw new Error(
-            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » ne porte le mot « fournisseur » dans la colonne A`
+            `aucune des ${MAX_ROW_HEADER_SEARCH} premières lignes de la feuille « ${EXPECTED_WORD_CONTAINED_IN_SHEETNAME} » ne porte le mot « fournisseur » ou « client » dans la colonne A`
         )
     }
 

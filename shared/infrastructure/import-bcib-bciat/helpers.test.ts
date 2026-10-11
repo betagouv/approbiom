@@ -53,6 +53,8 @@ describe('extractRows, header row', () => {
         'Nom du fournisseur',
         'Fournisseurs (raison sociale)',
         'Fournisseurs eventuels (non selectionnés à date)',
+        'Client',
+        'Clients',
     ])('finds the header row when column A reads « %s »', async (header) => {
         expect(await suppliersOf([[header, ...COLUMNS], LINE])).toEqual([
             'Scierie Fictive',
@@ -71,6 +73,17 @@ describe('extractRows, header row', () => {
         ).toEqual(['Scierie Fictive'])
     })
 
+    it('skips a title mentioning fournisseurs above a header reading « Client »', async () => {
+        expect(
+            await suppliersOf([
+                ['Aire d’approvisionnement et fournisseurs'],
+                ['Prévoir une ligne par fournisseur et sous-catégorie'],
+                ['Client', ...COLUMNS],
+                LINE,
+            ])
+        ).toEqual(['Scierie Fictive'])
+    })
+
     it('numbers the lines from the real header row', async () => {
         const [line] = await extractRows(
             workbook([['Fournisseurs'], ['Fournisseur', ...COLUMNS], LINE]),
@@ -84,7 +97,7 @@ describe('extractRows, header row', () => {
         await expect(
             suppliersOf([['Fournisseurie', ...COLUMNS], LINE])
         ).rejects.toThrow(
-            'aucune des 40 premières lignes de la feuille « Fournisseurs » ne porte le mot « fournisseur » dans la colonne A'
+            'aucune des 40 premières lignes de la feuille « Fournisseurs » ne porte le mot « fournisseur » ou « client » dans la colonne A'
         )
     })
 
