@@ -102,7 +102,7 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 ##### 4. Importer
 
 - **4.1** Vérifier toutes les lignes → le bouton « Importer les N lignes vérifiées » apparaît en bas à droite du tableau
-- **4.2** Confirmer → retour sur l'onglet « 1. Sélection du document », avec le message « M approvisionnements importés depuis N lignes du document. »
+- **4.2** Cliquer sur ce bouton → modale « Avez-vous pensé à vérifier chaque approvisionnement ? », qui explique qu'en cliquant sur « Importer ces M approvisionnements » ils seront sauvegardés dans la base de données, et qu'on pourra toujours les modifier ou supprimer dans l'onglet Corrections ; confirmer → retour sur l'onglet « 1. Sélection du document », avec le message « M approvisionnements importés depuis N lignes du document. »
 - **4.3** Regarder la table Approvisionnement dans Grist → un approvisionnement par provenance de chaque ligne, avec un tonnage égal au tonnage de la ligne multiplié par le pourcentage ; chaque approvisionnement a la pièce jointe en source et les données additionnelles du document
 - **4.4** Regarder la table temporaire des lignes extraites dans Grist → les lignes importées en ont été supprimées
 - **4.5** Regarder la carte du document dans l'onglet 1 → elle affiche « Déjà importé · M approvisionnements » et plus « Vérification en cours » ; « Extraire les données » est de nouveau proposé

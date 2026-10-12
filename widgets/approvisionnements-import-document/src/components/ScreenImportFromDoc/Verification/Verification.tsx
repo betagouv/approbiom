@@ -283,7 +283,6 @@ export default function Verification({
 
             {confirmingImport && (
                 <ImportModal
-                    lineCount={lines.length}
                     approvisionnementCount={approvisionnementCount}
                     onConfirm={() => onImport(lines)}
                     onClose={() => setConfirmingImport(false)}

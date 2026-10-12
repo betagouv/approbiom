@@ -4,23 +4,25 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 import { useState } from 'react'
 import Alert from '@shared/react/components/Alert'
 import Modal from '@shared/react/components/Modal'
-import { plural } from '@shared/react/format'
 
 export type ImportModalProps = {
-    lineCount: number
     approvisionnementCount: number
     onConfirm: () => Promise<void>
     onClose: () => void
 }
 
 export default function ImportModal({
-    lineCount,
     approvisionnementCount,
     onConfirm,
     onClose,
 }: ImportModalProps) {
     const [importing, setImporting] = useState(false)
     const [failure, setFailure] = useState<string | null>(null)
+
+    const one = approvisionnementCount === 1
+    const importLabel = one
+        ? 'Importer cet approvisionnement'
+        : `Importer ces ${approvisionnementCount} approvisionnements`
 
     async function confirm() {
         setImporting(true)
@@ -41,11 +43,7 @@ export default function ImportModal({
         <Modal
             open
             onClose={onClose}
-            title={
-                lineCount > 1
-                    ? 'Importer les lignes vérifiées'
-                    : 'Importer la ligne vérifiée'
-            }
+            title="Avez-vous pensé à vérifier chaque approvisionnement ?"
             titleIcon="fr-icon-warning-line"
             actions={
                 <ul className="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
@@ -56,11 +54,7 @@ export default function ImportModal({
                             disabled={importing}
                             onClick={() => void confirm()}
                         >
-                            Importer{' '}
-                            {plural(
-                                approvisionnementCount,
-                                'approvisionnement'
-                            )}
+                            {importLabel}
                         </button>
                     </li>
                     <li>
@@ -80,13 +74,14 @@ export default function ImportModal({
                     {failure}
                 </Alert>
             )}
+            <p className="fr-text--md">
+                En cliquant sur « {importLabel} »,{' '}
+                {one ? 'il sera sauvegardé' : 'ils seront sauvegardés'} dans la
+                base de données.
+            </p>
             <p className="fr-text--md fr-m-0">
-                Attention : {plural(lineCount, 'ligne')} du document{' '}
-                {lineCount > 1 ? 'vont' : 'va'} créer{' '}
-                {plural(approvisionnementCount, 'approvisionnement')} dans la
-                table Approvisionnement de ce plan. Les approvisionnements créés
-                pourront ensuite être modifiés ou supprimés dans le widget «
-                Saisir des approvisionnements ».
+                Vous pourrez toujours {one ? 'le' : 'les'} modifier ou supprimer
+                dans l&apos;onglet Corrections.
             </p>
         </Modal>
     )

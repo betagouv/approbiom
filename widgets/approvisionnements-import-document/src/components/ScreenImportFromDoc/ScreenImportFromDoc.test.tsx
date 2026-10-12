@@ -410,7 +410,7 @@ describe('ScreenImportFromDoc', () => {
             )
             fireEvent.click(
                 within(screen.getByRole('dialog')).getByRole('button', {
-                    name: 'Importer 2 approvisionnements',
+                    name: 'Importer ces 2 approvisionnements',
                 })
             )
 

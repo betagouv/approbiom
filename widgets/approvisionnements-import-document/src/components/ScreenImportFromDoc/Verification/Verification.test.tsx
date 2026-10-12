@@ -367,14 +367,9 @@ describe('Verification', () => {
                     name: 'Importer les 2 lignes vérifiées',
                 })
             )
-            expect(
-                within(dialog()).getByText(
-                    'Attention : 2 lignes du document vont créer 3 approvisionnements dans la table Approvisionnement de ce plan. Les approvisionnements créés pourront ensuite être modifiés ou supprimés dans le widget « Saisir des approvisionnements ».'
-                )
-            ).toBeTruthy()
             fireEvent.click(
                 within(dialog()).getByRole('button', {
-                    name: 'Importer 3 approvisionnements',
+                    name: 'Importer ces 3 approvisionnements',
                 })
             )
 
@@ -398,7 +393,7 @@ describe('Verification', () => {
             )
             fireEvent.click(
                 within(dialog()).getByRole('button', {
-                    name: 'Importer 1 approvisionnement',
+                    name: 'Importer cet approvisionnement',
                 })
             )
 
