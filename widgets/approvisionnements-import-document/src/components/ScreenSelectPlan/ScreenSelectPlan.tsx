@@ -36,7 +36,7 @@ export default function ScreenSelectPlan({
         <div className="screen-select-plan">
             <header className="screen-select-plan__header">
                 <h1 className="fr-h5 fr-mb-0">
-                    Approvisionnements d&apos;un plan
+                    Importer des approvisionnements depuis un document
                 </h1>
                 <p className="fr-text--sm fr-m-0 screen-select-plan__mention">
                     Choisissez le plan sur lequel vous travaillez.

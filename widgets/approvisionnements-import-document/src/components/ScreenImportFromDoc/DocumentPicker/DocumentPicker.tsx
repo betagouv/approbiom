@@ -59,7 +59,7 @@ export default function DocumentPicker({
                     <Alert severity="info" size="sm">
                         Aucune pièce jointe n&apos;est liée à ce plan. Ajoutez
                         le document BCIB/BCIAT dans la table Piece_jointe, ou
-                        créez les approvisionnements par saisie manuelle.
+                        changez de plan.
                     </Alert>
                 </div>
             ) : (

@@ -4,7 +4,7 @@ import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Referentiels } from '../referentiels'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import ScreenSelectPlan, { type SelectablePlan } from './ScreenSelectPlan'
-import ScreenImportFromDoc from './ScreenImportFromDoc'
+import ScreenImportFromDoc, { type AlertMessage } from './ScreenImportFromDoc'
 import { usePlanData, type PlanDataSources } from './usePlanData'
 import type { ExtractedDocument } from '@shared/core/application/services/extract-approvisionnement-from-document'
 import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/extracted-approvisionnement'
@@ -39,12 +39,14 @@ export default function Screen({
     const [planId, setPlanId] = useState<SelectablePlan['id'] | null>(null)
     const [picking, setPicking] = useState(false)
     const [imports, setImports] = useState(0)
+    const [alert, setAlert] = useState<AlertMessage | null>(null)
 
     const plan = plans.find(({ id }) => id === planId)
 
     function selectPlan(id: SelectablePlan['id']) {
         setPlanId(id)
         setPicking(false)
+        setAlert(null)
     }
 
     if (!plan || picking)
@@ -88,8 +90,15 @@ export default function Screen({
                 data.importLines(lines, plan.id, source)
             }
             onExtractionsChanged={data.refreshExtractions}
-            onImported={() => setImports((count) => count + 1)}
-            onBack={() => setPicking(true)}
+            onImported={(imported) => {
+                setAlert(imported)
+                setImports((count) => count + 1)
+            }}
+            onChangePlan={() => {
+                setAlert(null)
+                setPicking(true)
+            }}
+            alert={alert}
         />
     )
 }

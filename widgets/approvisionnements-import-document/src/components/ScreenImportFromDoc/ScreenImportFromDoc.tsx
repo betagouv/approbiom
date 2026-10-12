@@ -5,6 +5,7 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useState } from 'react'
+import Alert from '@shared/react/components/Alert'
 import type {
     ExtractedLineChanges,
     ExtractionSummary,
@@ -58,7 +59,8 @@ export type ScreenImportFromDocProps = Referentiels & {
     ) => Promise<Approvisionnement[]>
     onExtractionsChanged: () => void
     onImported: (alert: AlertMessage) => void
-    onBack: () => void
+    onChangePlan: () => void
+    alert?: AlertMessage | null
     resumedId?: Attachment['id']
 }
 
@@ -77,7 +79,8 @@ export default function ScreenImportFromDoc({
     importExtractedApprovisionnements,
     onExtractionsChanged,
     onImported,
-    onBack,
+    onChangePlan,
+    alert = null,
     resumedId,
     ...referentiels
 }: ScreenImportFromDocProps) {
@@ -90,18 +93,21 @@ export default function ScreenImportFromDoc({
         resumedId ?? null
     )
     const [reextracting, setReextracting] = useState(false)
+    const [shownAlert, setShownAlert] = useState(alert)
 
     const selected = attachments.find(({ id }) => id === selectedId)
     const alreadyExtracted =
         selected !== undefined &&
         (extractions.get(selected.id)?.lineCount ?? 0) > 0
 
-    const extract = (resumed: boolean) =>
+    function extract(resumed: boolean) {
+        setShownAlert(null)
         setStep((previous) => ({
             name: 'extract',
             run: previous.name === 'extract' ? previous.run + 1 : 0,
             resumed,
         }))
+    }
 
     async function importLines(
         attachment: Attachment,
@@ -173,24 +179,31 @@ export default function ScreenImportFromDoc({
 
     return (
         <>
-            <PlanHeader plan={plan} />
+            <PlanHeader plan={plan} onChangePlan={onChangePlan} />
 
             <div className="screen-import">
-                <div>
-                    <button
-                        type="button"
-                        className="fr-link fr-link--sm fr-link--icon-left fr-icon-arrow-left-line"
-                        onClick={onBack}
-                    >
-                        Retour aux approvisionnements du plan
-                    </button>
-                </div>
+                {step.name !== 'choose' && (
+                    <div>
+                        <button
+                            type="button"
+                            className="fr-link fr-link--sm fr-link--icon-left fr-icon-arrow-left-line"
+                            onClick={() => setStep({ name: 'choose' })}
+                        >
+                            Retour aux documents du plan
+                        </button>
+                    </div>
+                )}
                 <h2 className="fr-h6 fr-mb-0">
                     Ajouter des approvisionnements depuis un document BCIB/BCIAT
                 </h2>
 
                 {step.name === 'choose' && (
                     <>
+                        {shownAlert && (
+                            <Alert severity={shownAlert.severity} size="sm">
+                                {shownAlert.text}
+                            </Alert>
+                        )}
                         <DocumentPicker
                             attachments={attachments}
                             extractions={extractions}

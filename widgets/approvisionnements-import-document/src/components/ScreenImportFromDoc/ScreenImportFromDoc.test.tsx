@@ -80,7 +80,7 @@ function renderScreen(props: Partial<ScreenImportFromDocProps> = {}) {
         importExtractedApprovisionnements: () => Promise.resolve([]),
         onExtractionsChanged: vi.fn(),
         onImported: vi.fn(),
-        onBack: vi.fn(),
+        onChangePlan: vi.fn(),
     }
     const all = { ...defaults, ...props }
     render(<ScreenImportFromDoc {...all} />)
@@ -189,16 +189,60 @@ describe('ScreenImportFromDoc', () => {
         expect(extractDocument).toHaveBeenCalledWith(STARTED)
     })
 
-    it('goes back to the approvisionnements of the plan', () => {
-        const { onBack } = renderScreen()
+    it('offers to change the plan', () => {
+        const { onChangePlan } = renderScreen()
 
+        fireEvent.click(screen.getByRole('button', { name: 'Changer de plan' }))
+
+        expect(onChangePlan).toHaveBeenCalled()
+    })
+
+    it('goes back to the documents of the plan from an extraction', async () => {
+        renderScreen()
+
+        expect(
+            screen.queryByRole('button', {
+                name: 'Retour aux documents du plan',
+            })
+        ).toBeNull()
+
+        fireEvent.click(card('nouveau'))
         fireEvent.click(
-            screen.getByRole('button', {
-                name: 'Retour aux approvisionnements du plan',
+            screen.getByRole('button', { name: 'Extraire les données' })
+        )
+        fireEvent.click(
+            await screen.findByRole('button', {
+                name: 'Retour aux documents du plan',
             })
         )
 
-        expect(onBack).toHaveBeenCalled()
+        expect(card('nouveau')).toBeTruthy()
+    })
+
+    it('shows the result of the last import above the documents, until the next extraction', () => {
+        renderScreen({
+            alert: {
+                severity: 'success',
+                text: '2 approvisionnements importés depuis 1 ligne du document.',
+            },
+        })
+
+        expect(
+            screen.getByText(
+                '2 approvisionnements importés depuis 1 ligne du document.'
+            )
+        ).toBeTruthy()
+
+        fireEvent.click(card('nouveau'))
+        fireEvent.click(
+            screen.getByRole('button', { name: 'Extraire les données' })
+        )
+
+        expect(
+            screen.queryByText(
+                '2 approvisionnements importés depuis 1 ligne du document.'
+            )
+        ).toBeNull()
     })
 
     it('saves a change made to a line', async () => {
