@@ -65,7 +65,7 @@ export default function ProvenanceEditor({
             label: region.libelle,
             options: departements.map(({ dep, libelle }) => ({
                 value: `${DEPARTEMENT_FRANCAIS}|${dep}`,
-                label: `${libelle} (${dep})`,
+                label: `${dep} – ${libelle}`,
             })),
         })),
         {

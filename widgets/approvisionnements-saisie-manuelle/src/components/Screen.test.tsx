@@ -103,7 +103,7 @@ describe('Screen', () => {
             form.getByRole('combobox', { name: /Ressource/ }),
             '1A-PFA · Plaquettes forestières'
         )
-        pick(form.getByRole('combobox', { name: /Provenance/ }), 'Corrèze (19)')
+        pick(form.getByRole('combobox', { name: /Provenance/ }), '19 – Corrèze')
         fireEvent.change(form.getByRole('textbox', { name: /Tonnage/ }), {
             target: { value: '450' },
         })

@@ -15,7 +15,12 @@ function renderEditor() {
                 },
             ]}
             tonnage={22056}
-            departementsByRegion={[]}
+            departementsByRegion={[
+                {
+                    region: { reg: '44', libelle: 'Grand Est' },
+                    departements: [{ dep: '57', libelle: 'Moselle' }],
+                },
+            ]}
             pays={[{ libelle: 'Espagne' }]}
             onChange={onChange}
         />
@@ -30,6 +35,14 @@ const tonnageField = () =>
 afterEach(cleanup)
 
 describe('ProvenanceEditor', () => {
+    it('starts each département with its number, so that typing it finds it', () => {
+        renderEditor()
+
+        expect(
+            screen.getByRole('option', { name: '57 – Moselle' })
+        ).toBeTruthy()
+    })
+
     it('writes a tonnage with a decimal comma', () => {
         renderEditor()
 

@@ -269,13 +269,37 @@ describe('Verification', () => {
         expect(onUpdateLine).not.toHaveBeenCalled()
     })
 
-    it('saves with « Modifier » even when nothing was changed', async () => {
+    it('names the button « Valider » until something is changed, then « Modifier »', () => {
+        renderVerification([line(1, NON_VERIFIEE)])
+
+        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        expect(
+            within(dialog()).getByRole('button', { name: 'Valider' })
+        ).toBeTruthy()
+
+        const percentage = within(dialog()).getByRole('textbox', {
+            name: 'Répartition (%)',
+        })
+        fireEvent.change(percentage, { target: { value: '50' } })
+        fireEvent.blur(percentage)
+        expect(
+            within(dialog()).getByRole('button', { name: 'Modifier' })
+        ).toBeTruthy()
+
+        fireEvent.change(percentage, { target: { value: '100' } })
+        fireEvent.blur(percentage)
+        expect(
+            within(dialog()).getByRole('button', { name: 'Valider' })
+        ).toBeTruthy()
+    })
+
+    it('saves with « Valider » when nothing was changed', async () => {
         const onUpdateLine = vi.fn(() => Promise.resolve())
         renderVerification([line(1, NON_VERIFIEE)], onUpdateLine)
 
         fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
         fireEvent.click(
-            within(dialog()).getByRole('button', { name: 'Modifier' })
+            within(dialog()).getByRole('button', { name: 'Valider' })
         )
 
         await waitFor(() =>

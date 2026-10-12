@@ -83,13 +83,13 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 - **3.5** Tant qu'il reste des lignes non vérifiées → pas de bouton d'import, et la phrase « Vérifiez toutes les lignes pour pouvoir les importer (x/y). »
 - **3.6** Activer l'interrupteur d'une ligne → elle passe en « Vérifiée » ; le désactiver → elle repasse en « Non vérifiée »
 - **3.7** Regarder une ligne sans ressource ou sans provenance → son interrupteur est désactivé, avec « Ressource ou provenance manquante »
-- **3.8** Cliquer sur « Modifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource, la répartition par provenance et un avertissement toujours affiché : si le document ne donne pas de provenance, il faut indiquer le département de l'installation
+- **3.8** Cliquer sur « Modifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource, la répartition par provenance et un avertissement toujours affiché : si le document ne donne pas de provenance, il faut indiquer le département de l'installation ; tant que rien n'est changé, le bouton s'appelle « Valider », et cliquer dessus passe la ligne en « Vérifiée » si elle a une ressource et une provenance
 - **3.9** Regarder la ressource → « Correspondance trouvée » si le document a été reconnu, sinon « Aucune correspondance trouvée »
 - **3.10** Saisir un pourcentage → le tonnage de la provenance se recalcule ; saisir un tonnage → le pourcentage se recalcule
 - **3.11** Ajouter puis supprimer une provenance → la répartition se met à jour
 - **3.12** Faire une répartition qui ne fait pas 100 % → « La répartition ne fait pas 100 %. », mais l'enregistrement reste possible
 - **3.13** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Annuler » → rien n'est enregistré
-- **3.14** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Modifier » → la modale se ferme, les changements sont enregistrés et la ligne passe en « Vérifiée » ; le bouton « Modifier » n'est jamais grisé pendant la saisie
+- **3.14** Changer le fournisseur, la ressource ou un pourcentage → le bouton « Valider » devient « Modifier », et redevient « Valider » si on remet les valeurs d'origine ; cliquer sur « Modifier » → la modale se ferme, les changements sont enregistrés et la ligne passe en « Vérifiée » ; le bouton « Modifier » n'est jamais grisé pendant la saisie
 - **3.15** Cliquer sur « Modifier » en laissant la ligne sans ressource ou sans provenance → les changements sont enregistrés, mais la ligne reste « Non vérifiée », avec « Ressource ou provenance manquante »
 
 **Fournisseur et provenance**
@@ -97,7 +97,7 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 - **3.16** Sans fournisseur, cliquer dans « Fournisseur » → le champ est vide, « Non renseigné » n'y est affiché qu'en indication grisée ; taper une partie d'une dénomination ou d'un SIRET → les fournisseurs correspondants sont proposés, sans option « Non renseigné »
 - **3.17** Choisir « Ajouter un nouveau fournisseur », puis saisir un SIRET valide → la dénomination est trouvée automatiquement dans l'Annuaire des Entreprises ; « Ajouter le fournisseur » l'ajoute et le sélectionne
 - **3.18** Saisir un SIRET incomplet, avec des lettres, déjà utilisé ou inconnu de l'Annuaire → le message correspondant s'affiche, et le fournisseur n'est pas ajouté
-- **3.19** Ajouter une provenance → la liste propose les départements et les pays étrangers déjà connus du document ; le widget ne permet pas de créer un pays
+- **3.19** Ajouter une provenance → la liste propose les départements, écrits numéro en premier (« 57 – Moselle »), et les pays étrangers déjà connus du document ; liste ouverte, taper « 57 » sélectionne « 57 – Moselle », et taper le début d'un pays le sélectionne ; le widget ne permet pas de créer un pays
 
 ##### 4. Importer
 

@@ -11,14 +11,26 @@ import type { SiretLookup } from '@shared/core/application/services/find-entrepr
 import type { ExtractedLineChanges } from '@shared/core/application/ports/extracted-approvisionnement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
+import type { ProvenanceRepartition } from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
 import type { Referentiels } from '../../../../referentiels'
 import FournisseurField from '@shared/react/components/FournisseurField'
 import ProvenanceEditor from '../ProvenanceEditor'
 import {
-    isVerifiable,
     type ExtractedApprovisionnement,
     type ExtractedLine,
 } from '@shared/core/domain/entities/extracted-approvisionnement'
+
+const sameDistribution = (
+    a: readonly ProvenanceRepartition[],
+    b: readonly ProvenanceRepartition[]
+) =>
+    a.length === b.length &&
+    a.every(
+        (repartition, index) =>
+            repartition.source === b[index].source &&
+            repartition.provenance === b[index].provenance &&
+            repartition.percentage === b[index].percentage
+    )
 
 export type ReviewModalProps = Referentiels & {
     line: ExtractedApprovisionnement
@@ -46,6 +58,13 @@ export default function ReviewModal({
     const [failed, setFailed] = useState(false)
 
     const { matchedFournisseur, matchedRessource, parsedProvenance } = draft
+    const changed =
+        matchedFournisseur?.siret !== line.derived.matchedFournisseur?.siret ||
+        matchedRessource?.code !== line.derived.matchedRessource?.code ||
+        !sameDistribution(
+            parsedProvenance.distribution,
+            line.derived.parsedProvenance.distribution
+        )
 
     function change(changed: Partial<ExtractedLine['derived']>) {
         setDraft((previous) => ({ ...previous, ...changed }))
@@ -72,12 +91,6 @@ export default function ReviewModal({
             size="lg"
             actions={
                 <div className="review-modal__actions">
-                    {!isVerifiable({ read: line.read, derived: draft }) && (
-                        <p className="fr-text--sm fr-m-0 review-modal__mention">
-                            Pour pouvoir vérifier la ligne, choisissez une
-                            ressource et au moins une provenance.
-                        </p>
-                    )}
                     <ul className="fr-btns-group fr-btns-group--right fr-btns-group--inline-reverse fr-btns-group--inline-lg fr-btns-group--icon-left">
                         <li>
                             <button
@@ -86,7 +99,7 @@ export default function ReviewModal({
                                 disabled={saving}
                                 onClick={() => void save()}
                             >
-                                Modifier
+                                {changed ? 'Modifier' : 'Valider'}
                             </button>
                         </li>
                         <li>
@@ -156,7 +169,7 @@ export default function ReviewModal({
                     <legend className="fr-fieldset__legend fr-text--regular fr-text--sm fr-p-0 fr-mb-1v">
                         Répartition par provenance
                     </legend>
-                    <Alert severity="warning" size="sm">
+                    <Alert severity="info" size="sm">
                         Si le document ne donne pas de provenance, indiquez le
                         département de l&apos;installation.
                     </Alert>
