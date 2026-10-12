@@ -46,8 +46,9 @@
     white-space: nowrap;
 }
 
-.verification__import {
-    margin-left: auto;
+.verification__footer {
+    display: flex;
+    justify-content: flex-end;
 }
 
 .verification__number {

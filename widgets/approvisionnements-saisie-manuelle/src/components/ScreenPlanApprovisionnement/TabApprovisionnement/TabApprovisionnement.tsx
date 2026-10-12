@@ -198,45 +198,36 @@ export default function TabApprovisionnement({
 
     return (
         <div className="tab-approvisionnement">
-            <div className="tab-approvisionnement__toolbar">
-                {duplicateCount > 0 && (
-                    <div className="tab-approvisionnement__duplicates">
-                        <p className="fr-text--sm fr-m-0 tab-approvisionnement__duplicates-title">
-                            <span
-                                className="fr-icon-error-fill fr-icon--sm"
-                                aria-hidden="true"
-                            />
-                            {plural(duplicateCount, 'doublon')} à corriger
-                        </p>
-                        <p className="fr-text--sm fr-m-0">
-                            Deux lignes ou plus ont le même fournisseur, la même
-                            ressource et la même provenance (badges de même
-                            lettre). Un plan ne doit pas contenir deux fois le
-                            même approvisionnement : modifiez ou supprimez les
-                            lignes en trop.
-                        </p>
-                        <div>
-                            <button
-                                type="button"
-                                className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-filter-line"
-                                aria-pressed={filtered}
-                                onClick={() => setDuplicatesOnly(!filtered)}
-                            >
-                                {filtered
-                                    ? 'Afficher toutes les lignes'
-                                    : 'Afficher uniquement les doublons'}
-                            </button>
-                        </div>
+            {duplicateCount > 0 && (
+                <div className="tab-approvisionnement__duplicates">
+                    <p className="fr-text--sm fr-m-0 tab-approvisionnement__duplicates-title">
+                        <span
+                            className="fr-icon-error-fill fr-icon--sm"
+                            aria-hidden="true"
+                        />
+                        {plural(duplicateCount, 'doublon')} à corriger
+                    </p>
+                    <p className="fr-text--sm fr-m-0">
+                        Deux lignes ou plus ont le même fournisseur, la même
+                        ressource et la même provenance (badges de même lettre).
+                        Un plan ne doit pas contenir deux fois le même
+                        approvisionnement : modifiez ou supprimez les lignes en
+                        trop.
+                    </p>
+                    <div>
+                        <button
+                            type="button"
+                            className="fr-btn fr-btn--tertiary fr-btn--sm fr-btn--icon-left fr-icon-filter-line"
+                            aria-pressed={filtered}
+                            onClick={() => setDuplicatesOnly(!filtered)}
+                        >
+                            {filtered
+                                ? 'Afficher toutes les lignes'
+                                : 'Afficher uniquement les doublons'}
+                        </button>
                     </div>
-                )}
-                <button
-                    type="button"
-                    className="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-add-line tab-approvisionnement__add"
-                    onClick={() => setAdding(true)}
-                >
-                    Ajouter des approvisionnements
-                </button>
-            </div>
+                </div>
+            )}
 
             {duplicateFailed && (
                 <Alert severity="error" size="sm">
@@ -257,6 +248,16 @@ export default function TabApprovisionnement({
                     columns={columns}
                 />
             )}
+
+            <div className="tab-approvisionnement__footer">
+                <button
+                    type="button"
+                    className="fr-btn fr-btn--sm fr-btn--icon-left fr-icon-add-line"
+                    onClick={() => setAdding(true)}
+                >
+                    Ajouter des approvisionnements
+                </button>
+            </div>
 
             {adding && (
                 <ApprovisionnementModal

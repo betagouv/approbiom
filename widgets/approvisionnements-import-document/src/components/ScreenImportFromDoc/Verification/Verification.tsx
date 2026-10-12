@@ -231,17 +231,6 @@ export default function Verification({
                 <p className="fr-text--sm fr-m-0 verification__mention">
                     {verifiedCount} sur {lines.length} vérifiées
                 </p>
-                {canImport && (
-                    <button
-                        type="button"
-                        className="fr-btn fr-btn--icon-left fr-icon-download-line verification__import"
-                        onClick={() => setConfirmingImport(true)}
-                    >
-                        {lines.length > 1
-                            ? `Importer les ${lines.length} lignes vérifiées`
-                            : 'Importer la ligne vérifiée'}
-                    </button>
-                )}
                 {verifiedCount < lines.length && (
                     <p className="fr-text--sm fr-m-0 verification__mention verification__hint">
                         <span
@@ -278,6 +267,20 @@ export default function Verification({
                     ),
                 }}
             />
+
+            {canImport && (
+                <div className="verification__footer">
+                    <button
+                        type="button"
+                        className="fr-btn fr-btn--icon-left fr-icon-download-line"
+                        onClick={() => setConfirmingImport(true)}
+                    >
+                        {lines.length > 1
+                            ? `Importer les ${lines.length} lignes vérifiées`
+                            : 'Importer la ligne vérifiée'}
+                    </button>
+                </div>
+            )}
 
             {confirmingImport && (
                 <ImportModal

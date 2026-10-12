@@ -77,7 +77,7 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 
 **Ajouter**
 
-- **3.1** Cliquer sur « Ajouter des approvisionnements » → le formulaire de saisie manuelle s'ouvre directement, sans choix entre saisie manuelle et document
+- **3.1** Cliquer sur « Ajouter des approvisionnements », en bas à droite du tableau → le formulaire de saisie manuelle s'ouvre directement, sans choix entre saisie manuelle et document
 - **3.2** Regarder le formulaire → un avertissement toujours affiché : si le document ne donne pas de provenance, il faut indiquer le département de l'installation ; la provenance se choisit parmi les départements et les pays existants, sans bouton pour créer un pays
 - **3.3** Remplir ressource, provenance et tonnage, puis « Créer l'approvisionnement » → la ligne apparaît dans le tableau, avec le message « Approvisionnement créé. »
 - **3.4** Laisser la ressource, la provenance ou le tonnage vide → le bouton de création reste désactivé, et la modale dit ce qui manque
