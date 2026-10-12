@@ -162,7 +162,7 @@ export default function ApprovisionnementModal({
                     value={form.ressource}
                     onChange={(ressource) => set({ ressource })}
                 />
-                <Alert severity="warning" size="sm">
+                <Alert severity="info" size="sm">
                     Si le document ne donne pas de provenance, indiquez le
                     département de l&apos;installation.
                 </Alert>
