@@ -1,0 +1,14 @@
+import type { PlanViewPorts } from '@shared/core/application/services/plan-view'
+import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
+import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
+import type { EntrepriseSearchPort } from '@shared/core/application/ports/entreprise-search'
+import type { RessourcePort } from '@shared/core/application/ports/ressource'
+import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
+
+export type Ports = PlanViewPorts & {
+    approvisionnements: ApprovisionnementPort
+    entreprises: EntreprisePort
+    entrepriseSearch: EntrepriseSearchPort
+    ressources: RessourcePort
+    referentielGeo: Pick<ReferentielGeoPort, 'listDepartementsByRegion'>
+}

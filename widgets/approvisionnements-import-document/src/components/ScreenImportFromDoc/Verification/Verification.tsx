@@ -17,7 +17,7 @@ import {
     VERIFIEE,
 } from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
 import type { Referentiels } from '../../../referentiels'
-import { FOURNISSEUR_NOT_GIVEN } from '../../../constant'
+import { FOURNISSEUR_NOT_GIVEN } from '@shared/react/components/FournisseurField'
 import { formatExtractedAt } from '../../../format-extracted-at'
 import DocumentContext from '../DocumentContext'
 import DistributionList from './DistributionList'

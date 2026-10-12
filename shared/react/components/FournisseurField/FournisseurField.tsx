@@ -7,8 +7,9 @@ import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import { digitsOf, formatSiret } from '@shared/core/domain/value-objects/siret'
 import { isNumericQuery } from './siret'
-import { FOURNISSEUR_NOT_GIVEN } from '../../constant'
 import NewFournisseurPanel from './NewFournisseurPanel'
+
+export const FOURNISSEUR_NOT_GIVEN = 'Non renseigné'
 
 export type FournisseurFieldProps = {
     entreprises: readonly Entreprise[]

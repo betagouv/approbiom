@@ -2,7 +2,7 @@ import type { ExtractedLineChanges } from '@shared/core/application/ports/extrac
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Referentiels } from '../referentiels'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
-import type { SelectablePlan } from './PlanHeader'
+import type { SelectablePlan } from '@shared/react/components/PlanHeader'
 import ScreenImportFromDoc from './ScreenImportFromDoc'
 import { usePlanData, type PlanDataSources } from './usePlanData'
 import type { ExtractedDocument } from '@shared/core/application/services/extract-approvisionnement-from-document'

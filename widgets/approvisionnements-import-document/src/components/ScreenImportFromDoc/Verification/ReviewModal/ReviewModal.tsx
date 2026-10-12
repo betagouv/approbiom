@@ -12,7 +12,7 @@ import type { ExtractedLineChanges } from '@shared/core/application/ports/extrac
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { Referentiels } from '../../../../referentiels'
-import FournisseurField from '../../../FournisseurField'
+import FournisseurField from '@shared/react/components/FournisseurField'
 import ProvenanceEditor from '../ProvenanceEditor'
 import {
     isVerifiable,

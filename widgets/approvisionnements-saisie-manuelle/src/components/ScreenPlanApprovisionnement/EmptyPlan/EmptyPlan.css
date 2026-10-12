@@ -1,0 +1,17 @@
+.empty-plan {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    gap: 0.25rem;
+    padding: 1.25rem;
+    border: 1px dashed var(--border-default-grey);
+    text-align: center;
+}
+
+.empty-plan__title {
+    font-weight: 700;
+}
+
+.empty-plan__hint {
+    color: var(--text-mention-grey);
+}

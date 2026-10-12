@@ -40,6 +40,8 @@ Aucune action de vérification supplémentaire en dehors de ce custom widget ne 
 
 ### Tests E2E
 
+Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "editeur".
+
 #### Parcours
 
 1. Dans l'onglet « 1. Sélection du document », je cherche le plan d'approvisionnement : son résumé et la liste de ses documents s'affichent. Je vois quels documents ont déjà été importés, et lesquels ont une extraction en cours, que je peux reprendre.

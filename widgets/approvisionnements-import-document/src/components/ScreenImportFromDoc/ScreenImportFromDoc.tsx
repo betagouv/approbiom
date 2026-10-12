@@ -23,7 +23,9 @@ import {
 } from '@shared/core/application/services/import-extracted-approvisionnements'
 import type { ExtractedDocument } from '@shared/core/application/services/extract-approvisionnement-from-document'
 import type { Referentiels } from '../../referentiels'
-import PlanHeader, { type SelectablePlan } from '../PlanHeader'
+import PlanHeader, {
+    type SelectablePlan,
+} from '@shared/react/components/PlanHeader'
 import DocumentContext from './DocumentContext'
 import DocumentPicker from './DocumentPicker'
 import Extraction from './Extraction'
