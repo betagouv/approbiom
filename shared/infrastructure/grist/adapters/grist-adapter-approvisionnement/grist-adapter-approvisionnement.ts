@@ -18,6 +18,7 @@ import {
     readPaysDeProvenanceColumn,
     readReferencedTables,
     ressourceCode,
+    sourceFile,
     toCells,
     toGroup,
     toProvenance,
@@ -39,7 +40,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
         async list() {
             await gristReady()
 
-            const [rows, ressources, entreprises, departements] =
+            const [rows, ressources, entreprises, departements, attachments] =
                 await Promise.all([
                     fetchRowsOnce(
                         TABLE.approvisionnement,
@@ -48,6 +49,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                     fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
                     fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise),
                     fetchRowsOnce(TABLE.departement, COLUMNS.departement),
+                    fetchRowsOnce(TABLE.attachment, COLUMNS.attachment),
                 ])
 
             const ressourceById = byRowId(ressources)
@@ -62,6 +64,7 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                 provenance: toProvenance(row, departementById),
                 fournisseur: fournisseurSiret(entrepriseById, row.Fournisseur),
                 tonnageTotal: asNumber(row.Total_en_tMv_an_) ?? 0,
+                source: sourceFile(attachments, row.Source),
             }))
         },
 

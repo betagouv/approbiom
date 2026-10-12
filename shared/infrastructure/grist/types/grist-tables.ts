@@ -52,6 +52,7 @@ export const COLUMNS = {
         'Provenance', // type texte, soit le code du département, soit le libellé du pays
         'Fournisseur',
         'Total_en_tMv_an_',
+        'Source',
     ],
     totalByPlanAndRessource: TOTAL_COLUMNS,
     totalByRegionOuPays: [

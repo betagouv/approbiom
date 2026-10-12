@@ -89,6 +89,18 @@ export type ReferencedTables = {
     attachmentIdByFile: ReadonlyMap<number, number>
 }
 
+// A Piece_jointe row may hold several files: the source file is known only when it holds one.
+export function sourceFile(
+    attachments: readonly GristRow[],
+    source: unknown
+): number | undefined {
+    const files = asIdList(
+        attachments.find(({ id }) => id === asNumber(source))?.piece_jointe
+    )
+
+    return files.length === 1 ? files[0] : undefined
+}
+
 export async function readReferencedTables(): Promise<ReferencedTables> {
     const [entreprises, ressources, departements, attachments] =
         await Promise.all([

@@ -4,6 +4,8 @@ import {
     NON_VERIFIEE,
     VERIFIEE,
 } from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
+import type { ProvenanceRepartition } from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
+import { DEPARTEMENT_FRANCAIS } from '@shared/core/domain/value-objects/provenance'
 import { updateExtractedApprovisionnement } from './update-extracted-approvisionnement'
 
 const RESSOURCE = {
@@ -12,6 +14,10 @@ const RESSOURCE = {
     title: 'Plaquettes forestières',
     description: '',
 }
+
+const DISTRIBUTION: ProvenanceRepartition[] = [
+    { source: DEPARTEMENT_FRANCAIS, provenance: '19', percentage: 100 },
+]
 
 const line = (
     controle: ExtractedApprovisionnement['controle']
@@ -25,13 +31,13 @@ const line = (
         supplier: 'Scierie',
         resource: 'Plaquettes',
         tonnage: 100,
-        rawProvenance: '',
+        rawProvenance: '19',
         additionalData: '',
     },
     derived: {
         parsedProvenance: {
-            distribution: [],
-            confidence: 'Non résolu',
+            distribution: DISTRIBUTION,
+            confidence: 'Explicite',
             unrecognized: [],
         },
         matchedFournisseur: null,
@@ -40,49 +46,74 @@ const line = (
 })
 
 describe('updateExtractedApprovisionnement', () => {
-    it('puts a verified line back to « Non vérifiée » when it changes', async () => {
+    it('verifies the line once its changes give it a ressource and a provenance', async () => {
         const port = { update: vi.fn(() => Promise.resolve()) }
 
         const updated = await updateExtractedApprovisionnement(
-            line(VERIFIEE),
+            line(NON_VERIFIEE),
             { matchedRessource: RESSOURCE },
             port
         )
 
         expect(port.update).toHaveBeenCalledWith(7, {
             matchedRessource: RESSOURCE,
-            controle: NON_VERIFIEE,
+            controle: VERIFIEE,
         })
         expect(updated).toMatchObject({
-            controle: NON_VERIFIEE,
+            controle: VERIFIEE,
             derived: { matchedRessource: RESSOURCE },
         })
     })
 
-    it('leaves the controle of a line not verified yet', async () => {
+    it('verifies the line even when nothing was changed', async () => {
         const port = { update: vi.fn(() => Promise.resolve()) }
-
-        await updateExtractedApprovisionnement(
-            line(NON_VERIFIEE),
-            { matchedRessource: RESSOURCE },
-            port
-        )
-
-        expect(port.update).toHaveBeenCalledWith(7, {
-            matchedRessource: RESSOURCE,
-        })
-    })
-
-    it('verifies a line', async () => {
-        const port = { update: vi.fn(() => Promise.resolve()) }
+        const complete = line(NON_VERIFIEE)
 
         const updated = await updateExtractedApprovisionnement(
-            line(NON_VERIFIEE),
-            { controle: VERIFIEE },
+            {
+                ...complete,
+                derived: { ...complete.derived, matchedRessource: RESSOURCE },
+            },
+            {},
             port
         )
 
         expect(port.update).toHaveBeenCalledWith(7, { controle: VERIFIEE })
         expect(updated.controle).toBe(VERIFIEE)
+    })
+
+    it('leaves the line « Non vérifiée » while it lacks a ressource or a provenance', async () => {
+        const port = { update: vi.fn(() => Promise.resolve()) }
+
+        const updated = await updateExtractedApprovisionnement(
+            line(VERIFIEE),
+            {
+                parsedProvenance: {
+                    distribution: [],
+                    confidence: 'Non résolu',
+                    unrecognized: [],
+                },
+            },
+            port
+        )
+
+        expect(port.update).toHaveBeenCalledWith(
+            7,
+            expect.objectContaining({ controle: NON_VERIFIEE })
+        )
+        expect(updated.controle).toBe(NON_VERIFIEE)
+    })
+
+    it('applies the controle given by the switch', async () => {
+        const port = { update: vi.fn(() => Promise.resolve()) }
+
+        const updated = await updateExtractedApprovisionnement(
+            line(VERIFIEE),
+            { controle: NON_VERIFIEE },
+            port
+        )
+
+        expect(port.update).toHaveBeenCalledWith(7, { controle: NON_VERIFIEE })
+        expect(updated.controle).toBe(NON_VERIFIEE)
     })
 })

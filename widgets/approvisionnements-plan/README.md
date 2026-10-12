@@ -159,8 +159,9 @@ Je souhaite créer des approvisionnements à partir d'un document.
 - **5.2.11** Ajouter puis supprimer une provenance → la répartition se met à jour
 - **5.2.12** Faire une répartition qui ne fait pas 100 % → « La répartition ne fait pas 100 %. », mais l'enregistrement reste possible
 - **5.2.13** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Annuler » → rien n'est enregistré
-- **5.2.14** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Modifier » → la modale se ferme et les changements sont enregistrés ; le bouton « Modifier » n'est jamais grisé pendant la saisie
-- **5.2.15** Enregistrer une modification sur une ligne vérifiée → elle repasse en « Non vérifiée » et doit être vérifiée de nouveau avec l'interrupteur
+- **5.2.14** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Modifier » → la modale se ferme, les changements sont enregistrés et la ligne passe en « Vérifiée » ; le bouton « Modifier » n'est jamais grisé pendant la saisie
+- **5.2.15** Enregistrer une modification qui laisse la ligne sans ressource ou sans provenance → les changements sont enregistrés, mais la ligne reste « Non vérifiée », avec « Ressource ou provenance manquante »
+- **5.2.16** Cliquer sur « Modifier » sans rien changer → la modale se ferme, rien n'est enregistré et le contrôle de la ligne ne change pas
 
 ###### 5.3 Importer
 

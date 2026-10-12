@@ -1,0 +1,41 @@
+* {
+    box-sizing: border-box;
+}
+
+body {
+    margin: 0;
+}
+
+.approvisionnements-import-document {
+    display: flex;
+    flex-direction: column;
+    gap: 1rem;
+    min-height: 100vh;
+    padding: 1rem 1.5rem 1.5rem;
+    color: var(--text-default-grey);
+}
+
+/* DSFR overlaps the frame (::before) and the open panel on a flex line; a grid row lets them fill the height left. */
+.approvisionnements-import-document > .fr-tabs {
+    flex: 1;
+    display: grid;
+    grid-template-columns: 100%;
+    grid-template-rows: auto 1fr;
+}
+
+.approvisionnements-import-document > .fr-tabs::before {
+    grid-row: 2;
+    grid-column: 1;
+    height: auto;
+}
+
+.approvisionnements-import-document > .fr-tabs > .fr-tabs__panel {
+    grid-row: 2;
+    grid-column: 1;
+    left: 0;
+    margin-right: 0;
+}
+
+.fr-modal__title > [class*='fr-icon-'] {
+    margin-right: 0.5rem;
+}
