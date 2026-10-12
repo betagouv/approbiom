@@ -22,6 +22,13 @@
     color: var(--text-mention-grey);
 }
 
+.tab-approvisionnement__source {
+    display: block;
+    max-width: 10rem;
+    overflow-x: auto;
+    white-space: nowrap;
+}
+
 .tab-approvisionnement__number {
     display: block;
     font-variant-numeric: tabular-nums;

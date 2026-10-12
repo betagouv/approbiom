@@ -34,6 +34,7 @@ const DATA = {
     ressources: [],
     departementsByRegion: [],
     pays: [],
+    listAttachments: () => Promise.resolve([]),
     createApprovisionnements: () => Promise.resolve([]),
     updateApprovisionnement: () => Promise.resolve(),
     deleteApprovisionnement: () => Promise.resolve(),

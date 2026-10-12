@@ -62,8 +62,8 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 
 ##### 2. Consulter les approvisionnements
 
-- **2.1** Regarder le tableau → colonnes Actions, Contrôle, Fournisseur, Ressource, Provenance, Tonnage (t MV/an)
-- **2.2** Regarder une ligne → ressource sous la forme « code · description » ; provenance « Corrèze (19) » pour un département ou le nom du pays ; tonnage aligné à droite au format français (« 1 200,5 »)
+- **2.1** Regarder le tableau → colonnes Actions, Contrôle, Fournisseur, Ressource, Provenance, Tonnage (t MV/an), Source
+- **2.2** Regarder une ligne → ressource sous la forme « code · description » ; provenance « Corrèze (19) » pour un département ou le nom du pays ; tonnage aligné à droite au format français (« 1 200,5 ») ; source : le nom du document pour un approvisionnement importé depuis un document, « Saisie manuelle » sinon
 - **2.3** Regarder une ligne sans fournisseur → « Non renseigné »
 - **2.4** Survoler les icônes d'actions → infobulles « Modifier », « Dupliquer », « Supprimer »
 - **2.5** Ouvrir un plan sans doublon → chaque ligne affiche « Pas de doublon », sans bloc d'erreur

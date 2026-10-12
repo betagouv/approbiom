@@ -1,4 +1,5 @@
 import { useState } from 'react'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { Referentiels } from '../referentiels'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
@@ -10,6 +11,9 @@ export type ScreenProps = Referentiels &
     PlanDataSources & {
         plans: readonly SelectablePlan[]
         pays: readonly Pays[]
+        listAttachments: (
+            plan: Attachment['planDApprovisionnement']
+        ) => Promise<readonly Attachment[]>
         findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
     }
 
@@ -18,6 +22,7 @@ export default function Screen({
     ressources,
     departementsByRegion,
     pays,
+    listAttachments,
     findEntrepriseBySiret,
     ...sources
 }: ScreenProps) {
@@ -51,6 +56,7 @@ export default function Screen({
             ressources={ressources}
             departementsByRegion={departementsByRegion}
             pays={pays}
+            listAttachments={listAttachments}
             onChangePlan={() => setPicking(true)}
             onCreate={(fields) => data.create(plan.id, fields)}
             onUpdate={data.update}

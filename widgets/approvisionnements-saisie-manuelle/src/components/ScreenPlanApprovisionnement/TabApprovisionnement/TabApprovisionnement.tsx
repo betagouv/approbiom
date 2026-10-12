@@ -9,6 +9,7 @@ import Alert from '@shared/react/components/Alert'
 import Badge from '@shared/react/components/Badge'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import {
@@ -68,6 +69,18 @@ const DATA_COLUMNS: readonly Column<ApprovisionnementRow>[] = [
             </span>
         ),
     },
+    {
+        id: 'source',
+        header: 'Source',
+        render: ({ source }) =>
+            source === null ? (
+                <span className="tab-approvisionnement__mention">
+                    Saisie manuelle
+                </span>
+            ) : (
+                <span className="tab-approvisionnement__source">{source}</span>
+            ),
+    },
 ]
 
 // What a screen reader hears after an action: the buttons of every row read
@@ -81,6 +94,7 @@ const describe = ({
 
 export type TabApprovisionnementProps = Referentiels & {
     approvisionnements: readonly Approvisionnement[]
+    documentNames: ReadonlyMap<Attachment['id'], string>
     pays: readonly Pays[]
     onCreate: (fields: EditableFields) => Promise<void>
     onUpdate: (
@@ -95,6 +109,7 @@ export type TabApprovisionnementProps = Referentiels & {
 
 export default function TabApprovisionnement({
     approvisionnements,
+    documentNames,
     pays,
     onCreate,
     onUpdate,
@@ -117,7 +132,11 @@ export default function TabApprovisionnement({
     >(null)
     const [duplicateFailed, setDuplicateFailed] = useState(false)
 
-    const rows = toApprovisionnementRows(approvisionnements, referentiels)
+    const rows = toApprovisionnementRows(
+        approvisionnements,
+        referentiels,
+        documentNames
+    )
     const duplicateCount = new Set(
         rows.flatMap(({ duplicate }) => (duplicate ? [duplicate] : []))
     ).size

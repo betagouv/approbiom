@@ -1,6 +1,7 @@
 import AsyncGate from '@shared/react/components/AsyncGate'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/adapters/grist-adapter-approvisionnement/grist-adapter-approvisionnement'
+import { createGristAttachmentPort } from '@shared/infrastructure/grist/adapters/grist-adapter-attachment'
 import { createGristDemandeSubventionPort } from '@shared/infrastructure/grist/adapters/grist-adapter-demande-subvention'
 import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters/grist-adapter-entreprise'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
@@ -10,6 +11,7 @@ import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/
 import { createRechercheEntreprisesPort } from '@shared/infrastructure/referentiel-entreprise/recherche-entreprises-adapter'
 import { DataSourceUnavailableError } from '@shared/core/errors'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import { listPlans } from '@shared/core/application/services/plan-view'
 import { FAKE_PORTS } from './fake-data/ports'
@@ -22,6 +24,7 @@ const GRIST_PORTS: Ports = {
     demandesSubvention: createGristDemandeSubventionPort(),
     programmesAide: createGristProgrammeAidePort(),
     approvisionnements: createGristApprovisionnementPort(),
+    attachments: createGristAttachmentPort(),
     entreprises: createGristEntreprisePort(),
     ressources: createGristRessourcePort(),
     referentielGeo: createGristReferentielGeoPort(),
@@ -55,6 +58,8 @@ async function load(ports: Ports) {
         ressources,
         departementsByRegion,
         pays,
+        listAttachments: (plan: Attachment['planDApprovisionnement']) =>
+            ports.attachments.listByPlan(plan),
         createApprovisionnements: (
             approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
         ) => ports.approvisionnements.create(approvisionnements),

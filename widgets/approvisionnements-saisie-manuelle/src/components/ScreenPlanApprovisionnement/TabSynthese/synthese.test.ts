@@ -13,6 +13,7 @@ const row = (
     ressource: '1A-PFA · Plaquettes forestières',
     provenance,
     tonnage,
+    source: null,
     duplicate: null,
 })
 

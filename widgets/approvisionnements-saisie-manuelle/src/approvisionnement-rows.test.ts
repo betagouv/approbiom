@@ -83,6 +83,44 @@ describe('toApprovisionnementRows', () => {
         })
     })
 
+    it('names the document an approvisionnement was imported from', () => {
+        const imported = {
+            ...approvisionnement('00000000000001', '1A-PFA', departement('19')),
+            source: 341,
+        }
+
+        const [row] = toApprovisionnementRows(
+            [imported],
+            REFERENTIELS,
+            new Map([[341, 'plan-bcib-2023.xlsx']])
+        )
+
+        expect(row.source).toBe('plan-bcib-2023.xlsx')
+    })
+
+    it('says « Document » for a source whose name is not known', () => {
+        const [row] = rowsOf([
+            {
+                ...approvisionnement(
+                    '00000000000001',
+                    '1A-PFA',
+                    departement('19')
+                ),
+                source: 999,
+            },
+        ])
+
+        expect(row.source).toBe('Document')
+    })
+
+    it('gives no source to an approvisionnement typed in by hand', () => {
+        const [row] = rowsOf([
+            approvisionnement('00000000000001', '1A-PFA', departement('19')),
+        ])
+
+        expect(row.source).toBeNull()
+    })
+
     it('names a foreign provenance by its country', () => {
         const [row] = rowsOf([
             approvisionnement('00000000000001', '1A-PFA', {

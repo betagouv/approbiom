@@ -18,6 +18,7 @@ export const FAKE_PORTS: Ports = {
         update: () => Promise.reject(new Error('Fake data is read-only.')),
     },
     approvisionnements: createFakeApprovisionnementPort(),
+    attachments: { listByPlan: () => Promise.resolve([]) },
     entreprises: {
         list: () => Promise.resolve(FAKE_ENTREPRISES),
         create: () => Promise.resolve(),

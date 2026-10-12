@@ -1,7 +1,9 @@
 import { useState } from 'react'
 import Alert from '@shared/react/components/Alert'
 import Tabs from '@shared/react/components/Tabs'
+import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import type { Referentiels } from '../../referentiels'
@@ -20,6 +22,9 @@ export type ScreenPlanApprovisionnementProps = Referentiels & {
     plan: SelectablePlan
     approvisionnements: readonly Approvisionnement[]
     pays: readonly Pays[]
+    listAttachments: (
+        plan: Attachment['planDApprovisionnement']
+    ) => Promise<readonly Attachment[]>
     onChangePlan: () => void
     onCreate: (fields: EditableFields) => Promise<void>
     onUpdate: (
@@ -35,6 +40,7 @@ export default function ScreenPlanApprovisionnement({
     plan,
     approvisionnements,
     pays,
+    listAttachments,
     onChangePlan,
     onCreate,
     onUpdate,
@@ -44,6 +50,11 @@ export default function ScreenPlanApprovisionnement({
     ...referentiels
 }: ScreenPlanApprovisionnementProps) {
     const [shownAlert, setShownAlert] = useState<AlertMessage | null>(null)
+
+    const attachments = useAsyncState(() => listAttachments(plan.id))
+    const documentNames = new Map(
+        (attachments.data ?? []).map(({ id, name }) => [id, name])
+    )
 
     const planApprovisionnements = approvisionnements.filter(
         ({ planDApprovisionnement }) => planDApprovisionnement === plan.id
@@ -70,6 +81,7 @@ export default function ScreenPlanApprovisionnement({
                         content: (
                             <TabApprovisionnement
                                 approvisionnements={planApprovisionnements}
+                                documentNames={documentNames}
                                 pays={pays}
                                 onCreate={async (fields) => {
                                     setShownAlert(null)

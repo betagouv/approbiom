@@ -3,6 +3,7 @@ import {
     duplicatedKeys,
     type Approvisionnement,
 } from '@shared/core/domain/entities/approvisionnement'
+import type { Attachment } from '@shared/core/domain/entities/attachment'
 import { PAYS_ETRANGER } from '@shared/core/domain/value-objects/provenance'
 import type { Referentiels } from './referentiels'
 
@@ -12,8 +13,12 @@ export type ApprovisionnementRow = {
     ressource: string
     provenance: string
     tonnage: number
+    // Null for an approvisionnement typed in by hand.
+    source: string | null
     duplicate: string | null
 }
+
+const UNNAMED_DOCUMENT = 'Document'
 
 function letterOf(index: number): string {
     const letter = String.fromCharCode(65 + (index % 26))
@@ -26,7 +31,8 @@ const compare = (a: string, b: string) =>
 
 export function toApprovisionnementRows(
     approvisionnements: readonly Approvisionnement[],
-    { entreprises, ressources, departementsByRegion }: Referentiels
+    { entreprises, ressources, departementsByRegion }: Referentiels,
+    documentNames: ReadonlyMap<Attachment['id'], string> = new Map()
 ): ApprovisionnementRow[] {
     const denominations = new Map(
         entreprises.map(({ siret, denomination }) => [siret, denomination])
@@ -44,8 +50,14 @@ export function toApprovisionnementRows(
 
     const rows = approvisionnements
         .map((approvisionnement) => {
-            const { id, fournisseur, ressource, provenance, tonnageTotal } =
-                approvisionnement
+            const {
+                id,
+                fournisseur,
+                ressource,
+                provenance,
+                tonnageTotal,
+                source,
+            } = approvisionnement
 
             return {
                 key: duplicateKey(approvisionnement),
@@ -62,6 +74,10 @@ export function toApprovisionnementRows(
                             : (departementLabels.get(provenance.code) ??
                               provenance.code),
                     tonnage: tonnageTotal,
+                    source:
+                        source === undefined
+                            ? null
+                            : (documentNames.get(source) ?? UNNAMED_DOCUMENT),
                     duplicate: null as string | null,
                 },
             }

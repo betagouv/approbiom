@@ -66,6 +66,7 @@ function renderTab(
     render(
         <TabApprovisionnement
             approvisionnements={approvisionnements}
+            documentNames={new Map([[341, 'plan-bcib-2023.xlsx']])}
             pays={[{ libelle: 'Espagne' }]}
             onCreate={() => Promise.resolve()}
             onDuplicate={onDuplicate}
@@ -105,7 +106,16 @@ describe('TabApprovisionnement', () => {
             '1A-PFA · Plaquettes forestières',
             'Corrèze (19)',
             '1 200,5',
+            'Saisie manuelle',
         ])
+    })
+
+    it('names the document an approvisionnement was imported from', () => {
+        renderTab([{ ...approvisionnement(1, '19'), source: 341 }])
+
+        expect(
+            screen.getByRole('cell', { name: 'plan-bcib-2023.xlsx' })
+        ).toBeTruthy()
     })
 
     it('says when the plan does not give the fournisseur', () => {
