@@ -73,6 +73,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         crbs: { list: rows([]) },
         attachments: {
             list: rows([]),
+            listByPlan: rows([]),
             getFileUrl: () => Promise.resolve(''),
             download: () => Promise.resolve(new Blob()),
             findOne: () =>

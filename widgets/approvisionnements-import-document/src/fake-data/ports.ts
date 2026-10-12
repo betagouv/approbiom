@@ -24,7 +24,13 @@ export const FAKE_PORTS: Ports = {
     },
     approvisionnements: createFakeApprovisionnementPort(),
     attachments: {
-        list: () => Promise.resolve(FAKE_ATTACHMENTS),
+        listByPlan: (plan) =>
+            Promise.resolve(
+                FAKE_ATTACHMENTS.filter(
+                    ({ planDApprovisionnement }) =>
+                        planDApprovisionnement === plan
+                )
+            ),
         getFileUrl: () => Promise.resolve(EMPTY_FILE_URL),
         download: () => Promise.resolve(new Blob()),
     },

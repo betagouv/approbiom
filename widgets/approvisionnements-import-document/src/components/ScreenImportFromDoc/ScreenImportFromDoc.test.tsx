@@ -72,13 +72,13 @@ function choosePlan() {
 const tab = (name: string) =>
     screen.getByRole<HTMLButtonElement>('tab', { name })
 
-function renderScreen(
+async function renderScreen(
     props: Partial<ScreenImportFromDocProps> = {},
     { planChosen = true } = {}
 ) {
     const defaults: ScreenImportFromDocProps = {
         plans: [PLAN],
-        attachments: [NEW, STARTED],
+        listAttachments: () => Promise.resolve([NEW, STARTED]),
         extractions: new Map([[STARTED.id, summary(STARTED.id, 2)]]),
         imported: new Map(),
         getAttachmentUrl: () => Promise.resolve('data:,'),
@@ -102,7 +102,14 @@ function renderScreen(
     }
     const all = { ...defaults, ...props }
     render(<ScreenImportFromDoc {...all} />)
-    if (planChosen) choosePlan()
+    if (planChosen) {
+        choosePlan()
+        await waitFor(() =>
+            expect(
+                screen.queryByText('Chargement des pièces jointes…')
+            ).toBeNull()
+        )
+    }
 
     return all
 }
@@ -113,8 +120,8 @@ const card = (name: string) =>
 afterEach(cleanup)
 
 describe('ScreenImportFromDoc', () => {
-    it('asks for a plan first, with the later steps closed', () => {
-        renderScreen({}, { planChosen: false })
+    it('asks for a plan first, with the later steps closed', async () => {
+        await renderScreen({}, { planChosen: false })
 
         expect(
             screen.getByText(
@@ -125,16 +132,16 @@ describe('ScreenImportFromDoc', () => {
         expect(tab('3. Vérification et import').disabled).toBe(true)
     })
 
-    it('shows the plan chosen, then its documents', () => {
-        renderScreen()
+    it('shows the plan chosen, then its documents', async () => {
+        await renderScreen()
 
         expect(screen.getByRole('heading', { name: PLAN.nom })).toBeTruthy()
         expect(card('nouveau')).toBeTruthy()
         expect(card('commence')).toBeTruthy()
     })
 
-    it('tells where each document stands', () => {
-        renderScreen({ imported: new Map([[STARTED.id, 4]]) })
+    it('tells where each document stands', async () => {
+        await renderScreen({ imported: new Map([[STARTED.id, 4]]) })
 
         expect(card('nouveau').querySelector('.fr-badge')).toBeNull()
         expect(
@@ -146,8 +153,8 @@ describe('ScreenImportFromDoc', () => {
         ).toBe('Déjà importé · 4 approvisionnements')
     })
 
-    it('says when the plan has no attachment', () => {
-        renderScreen({ attachments: [] })
+    it('says when the plan has no attachment', async () => {
+        await renderScreen({ listAttachments: () => Promise.resolve([]) })
 
         expect(
             screen.getByText(/Aucune pièce jointe n'est liée à ce plan/)
@@ -159,8 +166,29 @@ describe('ScreenImportFromDoc', () => {
         ).toBe(true)
     })
 
-    it('offers to resume a document already extracted', () => {
-        renderScreen()
+    it('loads the documents of the plan chosen', async () => {
+        const listAttachments = vi.fn(() => Promise.resolve([NEW]))
+        await renderScreen({ listAttachments })
+
+        expect(listAttachments).toHaveBeenCalledWith(PLAN.id)
+        expect(card('nouveau')).toBeTruthy()
+        expect(screen.queryByRole('button', { name: /commence/ })).toBeNull()
+    })
+
+    it('says when the documents of the plan cannot be loaded', async () => {
+        await renderScreen({
+            listAttachments: () => Promise.reject(new Error('Grist')),
+        })
+
+        expect(
+            screen.getByText(
+                /Les pièces jointes du plan n'ont pas pu être chargées/
+            )
+        ).toBeTruthy()
+    })
+
+    it('offers to resume a document already extracted', async () => {
+        await renderScreen()
 
         fireEvent.click(card('commence'))
 
@@ -173,7 +201,7 @@ describe('ScreenImportFromDoc', () => {
     })
 
     it('extracts the document chosen', async () => {
-        const { onExtractionsChanged } = renderScreen()
+        const { onExtractionsChanged } = await renderScreen()
 
         fireEvent.click(card('nouveau'))
         fireEvent.click(
@@ -192,7 +220,7 @@ describe('ScreenImportFromDoc', () => {
     })
 
     it('says why an extraction failed, and lets another document be chosen', async () => {
-        renderScreen({
+        await renderScreen({
             extractDocument: () =>
                 Promise.reject(
                     new Error("la feuille « Fournisseurs » n'existe pas")
@@ -219,7 +247,7 @@ describe('ScreenImportFromDoc', () => {
         const extractDocument = vi.fn(() =>
             Promise.resolve({ lines: [], date: new Date() })
         )
-        renderScreen({ deleteExtraction, extractDocument })
+        await renderScreen({ deleteExtraction, extractDocument })
 
         fireEvent.click(card('commence'))
         fireEvent.click(
@@ -237,7 +265,7 @@ describe('ScreenImportFromDoc', () => {
     })
 
     it('goes back to the documents, then closes the later steps when another document is chosen', async () => {
-        renderScreen()
+        await renderScreen()
 
         fireEvent.click(card('nouveau'))
         fireEvent.click(
@@ -288,7 +316,7 @@ describe('ScreenImportFromDoc', () => {
                 matchedRessource: null,
             },
         }
-        renderScreen({
+        await renderScreen({
             updateExtractedApprovisionnement,
             ressources: [RESSOURCE],
             extractDocument: () =>
@@ -365,7 +393,7 @@ describe('ScreenImportFromDoc', () => {
         })
 
         async function importAll(props: Partial<ScreenImportFromDocProps>) {
-            const all = renderScreen({
+            const all = await renderScreen({
                 extractDocument: () =>
                     Promise.resolve({ lines: [verified()], date: new Date() }),
                 ...props,

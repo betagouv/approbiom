@@ -12,7 +12,9 @@ import type { Approvisionnement } from '@shared/core/domain/entities/approvision
 export type ScreenProps = Referentiels &
     PlanDataSources & {
         plans: readonly SelectablePlan[]
-        attachments: readonly Attachment[]
+        listAttachments: (
+            plan: Attachment['planDApprovisionnement']
+        ) => Promise<readonly Attachment[]>
         findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
         getAttachmentUrl: (id: Attachment['id']) => Promise<string>
         extractDocument: (attachment: Attachment) => Promise<ExtractedDocument>
@@ -30,7 +32,7 @@ export type ScreenProps = Referentiels &
 
 export default function Screen({
     plans,
-    attachments,
+    listAttachments,
     ressources,
     departementsByRegion,
     findEntrepriseBySiret,
@@ -50,7 +52,7 @@ export default function Screen({
             </h1>
             <ScreenImportFromDoc
                 plans={plans}
-                attachments={attachments}
+                listAttachments={listAttachments}
                 extractions={
                     new Map(
                         data.extractions.map((summary) => [

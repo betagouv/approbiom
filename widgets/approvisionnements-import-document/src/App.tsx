@@ -45,7 +45,6 @@ const GRIST_PORTS: Ports = {
 async function load(ports: Ports) {
     const [
         plans,
-        attachments,
         entreprises,
         ressources,
         departementsByRegion,
@@ -57,7 +56,6 @@ async function load(ports: Ports) {
             ['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'],
             ports
         ),
-        ports.attachments.list(),
         ports.entreprises.list(),
         ports.ressources.list(),
         ports.referentielGeo.listDepartementsByRegion(),
@@ -68,7 +66,6 @@ async function load(ports: Ports) {
 
     return {
         plans,
-        attachments,
         entreprises,
         ressources,
         departementsByRegion,
@@ -78,6 +75,8 @@ async function load(ports: Ports) {
         listExtractions: () =>
             ports.extractedApprovisionnements.listSummaries(),
         countImported: () => countImportedApprovisionnementsByDocument(ports),
+        listAttachments: (plan: Attachment['planDApprovisionnement']) =>
+            ports.attachments.listByPlan(plan),
         getAttachmentUrl: (id: Attachment['id']) =>
             ports.attachments.getFileUrl(id),
         extractDocument: (attachment: Attachment) =>

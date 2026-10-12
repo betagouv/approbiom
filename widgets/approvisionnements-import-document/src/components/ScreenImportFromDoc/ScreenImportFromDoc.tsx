@@ -40,9 +40,19 @@ type ExtractionRequest = { run: number; resumed: boolean }
 
 type ExtractedStep = { document: ExtractedDocument; resumed: boolean }
 
+type PlanDocuments =
+    | { plan: SelectablePlan['id']; status: 'loading' | 'failed' }
+    | {
+          plan: SelectablePlan['id']
+          status: 'loaded'
+          attachments: readonly Attachment[]
+      }
+
 export type ScreenImportFromDocProps = Referentiels & {
     plans: readonly SelectablePlan[]
-    attachments: readonly Attachment[]
+    listAttachments: (
+        plan: SelectablePlan['id']
+    ) => Promise<readonly Attachment[]>
     extractions: ReadonlyMap<Attachment['id'], ExtractionSummary>
     imported: ReadonlyMap<Attachment['id'], number>
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
@@ -67,7 +77,7 @@ export type ScreenImportFromDocProps = Referentiels & {
 
 export default function ScreenImportFromDoc({
     plans,
-    attachments,
+    listAttachments,
     extractions,
     imported,
     getAttachmentUrl,
@@ -90,11 +100,11 @@ export default function ScreenImportFromDoc({
     const [extracted, setExtracted] = useState<ExtractedStep | null>(null)
     const [reextracting, setReextracting] = useState(false)
     const [shownAlert, setShownAlert] = useState<AlertMessage | null>(null)
+    const [documents, setDocuments] = useState<PlanDocuments | null>(null)
 
     const plan = plans.find(({ id }) => id === planId)
-    const planAttachments = attachments.filter(
-        ({ planDApprovisionnement }) => planDApprovisionnement === planId
-    )
+    const planAttachments =
+        documents?.status === 'loaded' ? documents.attachments : []
     const selected = planAttachments.find(({ id }) => id === selectedId)
     const alreadyExtracted =
         selected !== undefined &&
@@ -110,6 +120,17 @@ export default function ScreenImportFromDoc({
         setSelectedId(null)
         setShownAlert(null)
         closeSteps()
+
+        const settle = (settled: PlanDocuments) =>
+            setDocuments((previous) =>
+                previous?.plan === id ? settled : previous
+            )
+        setDocuments({ plan: id, status: 'loading' })
+        listAttachments(id).then(
+            (attachments) =>
+                settle({ plan: id, status: 'loaded', attachments }),
+            () => settle({ plan: id, status: 'failed' })
+        )
     }
 
     function selectDocument(id: Attachment['id']) {
@@ -233,43 +254,67 @@ export default function ScreenImportFromDoc({
                                                 {shownAlert.text}
                                             </Alert>
                                         )}
-                                        <DocumentPicker
-                                            attachments={planAttachments}
-                                            extractions={extractions}
-                                            imported={imported}
-                                            selectedId={selectedId}
-                                            onSelect={selectDocument}
-                                        />
-                                        <div className="screen-import__footer">
+                                        {documents?.status === 'loading' && (
                                             <p className="fr-text--sm fr-m-0 screen-import__mention">
-                                                {selected
-                                                    ? `Document sélectionné : ${selected.name}`
-                                                    : 'Sélectionnez le document BCIB/BCIAT.'}
+                                                Chargement des pièces jointes…
                                             </p>
-                                            {alreadyExtracted && (
-                                                <button
-                                                    type="button"
-                                                    className="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-refresh-line"
-                                                    onClick={() =>
-                                                        setReextracting(true)
+                                        )}
+                                        {documents?.status === 'failed' && (
+                                            <Alert severity="error" size="sm">
+                                                Les pièces jointes du plan
+                                                n&apos;ont pas pu être chargées.
+                                                Choisissez de nouveau le plan
+                                                pour réessayer.
+                                            </Alert>
+                                        )}
+                                        {documents?.status === 'loaded' && (
+                                            <>
+                                                <DocumentPicker
+                                                    attachments={
+                                                        planAttachments
                                                     }
-                                                >
-                                                    Relancer l&apos;extraction
-                                                </button>
-                                            )}
-                                            <button
-                                                type="button"
-                                                className="fr-btn fr-btn--icon-right fr-icon-arrow-right-line"
-                                                disabled={!selected}
-                                                onClick={() =>
-                                                    extract(alreadyExtracted)
-                                                }
-                                            >
-                                                {alreadyExtracted
-                                                    ? 'Reprendre la vérification'
-                                                    : 'Extraire les données'}
-                                            </button>
-                                        </div>
+                                                    extractions={extractions}
+                                                    imported={imported}
+                                                    selectedId={selectedId}
+                                                    onSelect={selectDocument}
+                                                />
+                                                <div className="screen-import__footer">
+                                                    <p className="fr-text--sm fr-m-0 screen-import__mention">
+                                                        {selected
+                                                            ? `Document sélectionné : ${selected.name}`
+                                                            : 'Sélectionnez le document BCIB/BCIAT.'}
+                                                    </p>
+                                                    {alreadyExtracted && (
+                                                        <button
+                                                            type="button"
+                                                            className="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-refresh-line"
+                                                            onClick={() =>
+                                                                setReextracting(
+                                                                    true
+                                                                )
+                                                            }
+                                                        >
+                                                            Relancer
+                                                            l&apos;extraction
+                                                        </button>
+                                                    )}
+                                                    <button
+                                                        type="button"
+                                                        className="fr-btn fr-btn--icon-right fr-icon-arrow-right-line"
+                                                        disabled={!selected}
+                                                        onClick={() =>
+                                                            extract(
+                                                                alreadyExtracted
+                                                            )
+                                                        }
+                                                    >
+                                                        {alreadyExtracted
+                                                            ? 'Reprendre la vérification'
+                                                            : 'Extraire les données'}
+                                                    </button>
+                                                </div>
+                                            </>
+                                        )}
                                     </>
                                 ) : (
                                     <p className="fr-text--sm fr-m-0 screen-import__empty">

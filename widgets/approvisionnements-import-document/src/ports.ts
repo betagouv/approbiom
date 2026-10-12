@@ -13,7 +13,7 @@ export type Ports = PlanViewPorts & {
         ApprovisionnementPort,
         'list' | 'create' | 'listPaysDeProvenance' | 'addPaysDeProvenance'
     >
-    attachments: Pick<AttachmentPort, 'list' | 'getFileUrl' | 'download'>
+    attachments: Pick<AttachmentPort, 'listByPlan' | 'getFileUrl' | 'download'>
     entreprises: EntreprisePort
     entrepriseSearch: EntrepriseSearchPort
     ressources: RessourcePort
