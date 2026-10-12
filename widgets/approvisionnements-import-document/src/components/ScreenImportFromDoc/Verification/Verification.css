@@ -12,7 +12,6 @@
     margin-left: auto;
 }
 
-.verification__resumed,
 .verification__hint {
     display: flex;
     align-items: center;

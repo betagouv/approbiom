@@ -202,10 +202,13 @@ export default function Verification({
                 attachment={attachment}
                 getAttachmentUrl={getAttachmentUrl}
             >
-                <Badge size="sm" status="success">
-                    {plural(lines.length, 'ligne')} extraite
-                    {lines.length > 1 ? 's' : ''} le {formatExtractedAt(date)}
-                </Badge>
+                {!resumed && (
+                    <Badge size="sm" status="success">
+                        {plural(lines.length, 'ligne')} extraite
+                        {lines.length > 1 ? 's' : ''} le{' '}
+                        {formatExtractedAt(date)}
+                    </Badge>
+                )}
                 <button
                     type="button"
                     className="fr-btn fr-btn--tertiary-no-outline fr-btn--sm fr-btn--icon-left fr-icon-refresh-line verification__reextract"
@@ -216,14 +219,10 @@ export default function Verification({
             </DocumentContext>
 
             {resumed && (
-                <p className="fr-text--sm fr-m-0 verification__mention verification__resumed">
-                    <span
-                        className="fr-icon-time-line fr-icon--sm"
-                        aria-hidden="true"
-                    />
-                    Reprise de l&apos;extraction du {formatExtractedAt(date)} ·
-                    vérification en cours
-                </p>
+                <Alert severity="warning" size="sm">
+                    Approvisionnements extraits de ce document le{' '}
+                    {formatExtractedAt(date)}
+                </Alert>
             )}
 
             <div className="verification__head">

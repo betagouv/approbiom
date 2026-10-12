@@ -76,7 +76,7 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 
 ##### 3. Vérifier les lignes
 
-- **3.1** Regarder l'écran de vérification → le nom du document, cliquable pour le télécharger, un badge « N lignes extraites le … » et « x sur y vérifiées »
+- **3.1** Regarder l'écran de vérification après une nouvelle extraction → le nom du document, cliquable pour le télécharger, un badge « N lignes extraites le … » et « x sur y vérifiées »
 - **3.2** Regarder le tableau → colonnes Contrôle, Ligne, Fournisseur, Ressource, Tonnage total (t MV/an), Répartition par provenance, Action ; chaque ligne a un interrupteur dans Contrôle et un bouton « Modifier »
 - **3.3** Déplier la répartition d'une ligne → le détail de chaque provenance, avec son pourcentage
 - **3.4** Regarder une ligne dont la répartition ne fait pas 100 % → badge « Total X % ≠ 100 % »
@@ -112,7 +112,7 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 
 - **5.1** Extraire un document, vérifier une partie des lignes, puis revenir sur l'onglet 1 → le document affiche « Vérification en cours · x/y »
 - **5.2** Avoir deux documents en cours sur le même plan → chacun affiche son propre « Vérification en cours · x/y »
-- **5.3** Choisir le document en cours, puis « Reprendre la vérification » → ouverture de la vérification de ce document, avec « Reprise de l'extraction du … · vérification en cours » ; les lignes déjà vérifiées le sont toujours
+- **5.3** Choisir le document en cours, puis « Reprendre la vérification » → ouverture de la vérification de ce document, avec une alerte « Approvisionnements extraits de ce document le … à … », donnant la date et l'heure de l'extraction, à la place du badge « N lignes extraites le … » ; les lignes déjà vérifiées le sont toujours
 - **5.4** Recharger la page Grist au milieu d'une vérification, puis rechoisir le même plan → le document est toujours « Vérification en cours », et la reprise retrouve les lignes et leur vérification
 - **5.5** Ouvrir un plan dont aucun document n'est en cours, ou dont tout a été importé → aucun document n'affiche « Vérification en cours »
 

@@ -59,7 +59,7 @@ export default function DocumentPicker({
         <fieldset className="fr-fieldset fr-mb-0 document-picker">
             <legend className="fr-fieldset__legend fr-text--regular">
                 <span className="fr-text--md document-picker__title">
-                    Document BCIB/BCIAT
+                    Documents
                 </span>
                 <span className="fr-hint-text">
                     Sélectionnez la pièce jointe du plan à extraire

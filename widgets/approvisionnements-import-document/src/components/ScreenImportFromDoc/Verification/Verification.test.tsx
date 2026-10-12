@@ -62,7 +62,8 @@ function renderVerification(
     onUpdateLine: VerificationProps['onUpdateLine'] = vi.fn(() =>
         Promise.resolve()
     ),
-    onImport: VerificationProps['onImport'] = vi.fn(() => Promise.resolve())
+    onImport: VerificationProps['onImport'] = vi.fn(() => Promise.resolve()),
+    resumed = true
 ) {
     render(
         <Verification
@@ -75,7 +76,7 @@ function renderVerification(
             }}
             lines={lines}
             date={new Date('2026-10-02T14:30:00')}
-            resumed
+            resumed={resumed}
             entreprises={[]}
             ressources={[RESSOURCE]}
             departementsByRegion={[
@@ -139,11 +140,28 @@ describe('Verification', () => {
                 /Vérifiez toutes les lignes pour pouvoir les importer/
             )
         ).toBeTruthy()
+    })
+
+    it('warns that a resumed document was already extracted, and when', () => {
+        renderVerification([line(1, NON_VERIFIEE)])
+
         expect(
             screen.getByText(
-                /Reprise de l'extraction du .* · vérification en cours/
+                'Approvisionnements extraits de ce document le 02/10/2026 à 14h30'
             )
         ).toBeTruthy()
+        expect(screen.queryByText(/ligne extraite le/)).toBeNull()
+    })
+
+    it('shows when a new extraction was made, without a warning', () => {
+        renderVerification([line(1, NON_VERIFIEE)], undefined, undefined, false)
+
+        expect(
+            screen.getByText(/1 ligne extraite le 02\/10\/2026 à 14h30/)
+        ).toBeTruthy()
+        expect(
+            screen.queryByText(/Approvisionnements extraits de ce document le/)
+        ).toBeNull()
     })
 
     it('says when the distribution is off 100 %', () => {
@@ -198,9 +216,11 @@ describe('Verification', () => {
 
         fireEvent.click(screen.getByRole('checkbox', { name: NON_VERIFIEE }))
 
-        expect((await screen.findByRole('alert')).textContent).toMatch(
-            /Le contrôle de la ligne n'a pas pu être enregistré/
-        )
+        expect(
+            await screen.findByText(
+                /Le contrôle de la ligne n'a pas pu être enregistré/
+            )
+        ).toBeTruthy()
     })
 
     it('saves the changes only with « Modifier »', async () => {
