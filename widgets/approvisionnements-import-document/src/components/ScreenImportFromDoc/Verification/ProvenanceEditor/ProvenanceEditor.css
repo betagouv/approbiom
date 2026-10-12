@@ -46,10 +46,6 @@
     font-variant-numeric: tabular-nums;
 }
 
-.provenance-editor__extra {
-    grid-column: 1 / -1;
-}
-
 .provenance-editor__foot {
     display: flex;
     flex-wrap: wrap;

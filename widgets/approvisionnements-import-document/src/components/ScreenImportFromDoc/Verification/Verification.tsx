@@ -49,7 +49,6 @@ export type VerificationProps = Referentiels & {
     onImport: (lines: readonly ExtractedApprovisionnement[]) => Promise<void>
     onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
-    onCreatePays: (pays: Pays) => Promise<void>
 }
 
 export default function Verification({
@@ -64,7 +63,6 @@ export default function Verification({
     onImport,
     onCreateEntreprise,
     findEntrepriseBySiret,
-    onCreatePays,
     ...referentiels
 }: VerificationProps) {
     const [reviewedId, setReviewedId] = useState<
@@ -299,7 +297,6 @@ export default function Verification({
                     onClose={() => setReviewedId(null)}
                     onCreateEntreprise={onCreateEntreprise}
                     findEntrepriseBySiret={findEntrepriseBySiret}
-                    onCreatePays={onCreatePays}
                 />
             )}
         </div>

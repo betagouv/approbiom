@@ -65,7 +65,6 @@ export type ScreenImportFromDocProps = Referentiels & {
     pays: readonly Pays[]
     onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
-    onCreatePays: (pays: Pays) => Promise<void>
     importExtractedApprovisionnements: (
         lines: readonly ExtractedApprovisionnement[],
         plan: SelectablePlan['id'],
@@ -87,7 +86,6 @@ export default function ScreenImportFromDoc({
     pays,
     onCreateEntreprise,
     findEntrepriseBySiret,
-    onCreatePays,
     importExtractedApprovisionnements,
     onExtractionsChanged,
     onImported,
@@ -371,7 +369,6 @@ export default function ScreenImportFromDoc({
                                 }
                                 onCreateEntreprise={onCreateEntreprise}
                                 findEntrepriseBySiret={findEntrepriseBySiret}
-                                onCreatePays={onCreatePays}
                             />
                         ),
                     },

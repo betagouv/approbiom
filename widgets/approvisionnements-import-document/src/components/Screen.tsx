@@ -74,7 +74,6 @@ export default function Screen({
                 pays={data.pays}
                 onCreateEntreprise={data.addEntreprise}
                 findEntrepriseBySiret={findEntrepriseBySiret}
-                onCreatePays={data.addPays}
                 importExtractedApprovisionnements={
                     importExtractedApprovisionnements
                 }

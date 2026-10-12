@@ -19,7 +19,6 @@ import { extractApprovisionnementFromDocument } from '@shared/core/application/s
 import { importExtractedApprovisionnements } from '@shared/core/application/services/import-extracted-approvisionnements'
 import { updateExtractedApprovisionnement } from '@shared/core/application/services/update-extracted-approvisionnement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { Pays } from '@shared/core/domain/value-objects/pays'
 import { listPlans } from '@shared/core/application/services/plan-view'
 import { countImportedApprovisionnementsByDocument } from '@shared/core/application/services/count-imported-approvisionnements'
 import { FAKE_PORTS } from './fake-data/ports'
@@ -103,8 +102,6 @@ async function load(ports: Ports) {
             findEntrepriseBySiret(siret, (query) =>
                 ports.entrepriseSearch.getEntrepriseFromQuery(query)
             ),
-        createPays: (pays: Pays) =>
-            ports.approvisionnements.addPaysDeProvenance(pays),
     }
 }
 

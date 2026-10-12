@@ -10,7 +10,6 @@ function renderData(sources: Partial<PlanDataSources> = {}) {
             extractions: [],
             imported: new Map(),
             createEntreprise: () => Promise.resolve(),
-            createPays: () => Promise.resolve(),
             listExtractions: () => Promise.resolve([]),
             countImported: () => Promise.resolve(new Map()),
             ...sources,
@@ -19,7 +18,7 @@ function renderData(sources: Partial<PlanDataSources> = {}) {
 }
 
 describe('usePlanData', () => {
-    it('adds a created entreprise and a created pays', async () => {
+    it('adds a created entreprise', async () => {
         const { result } = renderData()
         const entreprise = {
             denomination: 'SCIERIE FICTIVE DU VALLON',
@@ -27,10 +26,8 @@ describe('usePlanData', () => {
         }
 
         await act(() => result.current.addEntreprise(entreprise))
-        await act(() => result.current.addPays({ libelle: 'Espagne' }))
 
         expect(result.current.entreprises).toEqual([entreprise])
-        expect(result.current.pays).toEqual([{ libelle: 'Espagne' }])
     })
 
     it('reads the extractions again', async () => {

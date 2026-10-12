@@ -46,9 +46,5 @@ export function createFakeApprovisionnementPort(
             return Promise.resolve(created.map(({ id }) => id))
         },
         listPaysDeProvenance: () => Promise.resolve([...paysDeProvenance]),
-        addPaysDeProvenance: (created) => {
-            paysDeProvenance.push(created)
-            return Promise.resolve()
-        },
     }
 }

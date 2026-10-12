@@ -18,7 +18,6 @@ function renderEditor() {
             departementsByRegion={[]}
             pays={[{ libelle: 'Espagne' }]}
             onChange={onChange}
-            onCreatePays={() => Promise.resolve()}
         />
     )
 

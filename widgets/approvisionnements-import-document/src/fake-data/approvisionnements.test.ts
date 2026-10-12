@@ -19,14 +19,4 @@ describe('createFakeApprovisionnementPort', () => {
         expect(await port.create([APPROVISIONNEMENT])).toEqual([3])
         expect((await port.list()).map(({ id }) => id)).toEqual([1, 2, 3])
     })
-
-    it('lists a pays once it is added', async () => {
-        const port = createFakeApprovisionnementPort()
-
-        await port.addPaysDeProvenance({ libelle: 'Belgique' })
-
-        expect(await port.listPaysDeProvenance()).toContainEqual({
-            libelle: 'Belgique',
-        })
-    })
 })

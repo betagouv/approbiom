@@ -81,7 +81,7 @@ Aucune action de vérification supplémentaire en dehors de ce custom widget ne 
 - **3.5** Tant qu'il reste des lignes non vérifiées → pas de bouton d'import, et la phrase « Vérifiez toutes les lignes pour pouvoir les importer (x/y). »
 - **3.6** Activer l'interrupteur d'une ligne → elle passe en « Vérifiée » ; le désactiver → elle repasse en « Non vérifiée »
 - **3.7** Regarder une ligne sans ressource ou sans provenance → son interrupteur est désactivé, avec « Ressource ou provenance manquante »
-- **3.8** Cliquer sur « Modifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource et la répartition par provenance
+- **3.8** Cliquer sur « Modifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource, la répartition par provenance et un avertissement toujours affiché : si le document ne donne pas de provenance, il faut indiquer le département de l'installation
 - **3.9** Regarder la ressource → « Correspondance trouvée » si le document a été reconnu, sinon « Aucune correspondance trouvée »
 - **3.10** Saisir un pourcentage → le tonnage de la provenance se recalcule ; saisir un tonnage → le pourcentage se recalcule
 - **3.11** Ajouter puis supprimer une provenance → la répartition se met à jour
@@ -90,23 +90,21 @@ Aucune action de vérification supplémentaire en dehors de ce custom widget ne 
 - **3.14** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Modifier » → la modale se ferme, les changements sont enregistrés et la ligne passe en « Vérifiée » ; le bouton « Modifier » n'est jamais grisé pendant la saisie
 - **3.15** Cliquer sur « Modifier » en laissant la ligne sans ressource ou sans provenance → les changements sont enregistrés, mais la ligne reste « Non vérifiée », avec « Ressource ou provenance manquante »
 
-**Fournisseur et pays**
+**Fournisseur et provenance**
 
 - **3.16** Taper une partie d'une dénomination ou d'un SIRET dans « Fournisseur » → les fournisseurs correspondants sont proposés
 - **3.17** Choisir « Ajouter un nouveau fournisseur », puis saisir un SIRET valide → la dénomination est trouvée automatiquement dans l'Annuaire des Entreprises ; « Ajouter le fournisseur » l'ajoute et le sélectionne
 - **3.18** Saisir un SIRET incomplet, avec des lettres, déjà utilisé ou inconnu de l'Annuaire → le message correspondant s'affiche, et le fournisseur n'est pas ajouté
-- **3.19** Cliquer sur « Pays absent de la liste ? Créer un pays », puis saisir un nouveau pays → le pays est créé et sélectionné comme provenance
-- **3.20** Saisir un pays qui existe déjà, même avec d'autres majuscules ou sans accents → « Ce pays existe déjà : … », avec le bouton « Choisir ce pays »
+- **3.19** Ajouter une provenance → la liste propose les départements et les pays étrangers déjà connus du document ; le widget ne permet pas de créer un pays
 
 ##### 4. Importer
 
 - **4.1** Vérifier toutes les lignes → le bouton « Importer les N lignes vérifiées » apparaît
-- **4.2** Cliquer dessus → modale « Importer les lignes vérifiées ? », avec « Attention : N lignes du document vont créer M approvisionnements dans la table Approvisionnement de ce plan. » et l'indication qu'ils pourront ensuite être modifiés ou supprimés dans le widget « Saisir des approvisionnements »
-- **4.3** Confirmer → retour sur l'onglet « 1. Sélection du document », avec le message « M approvisionnements importés depuis N lignes du document. »
-- **4.4** Regarder la table Approvisionnement dans Grist → un approvisionnement par provenance de chaque ligne, avec un tonnage égal au tonnage de la ligne multiplié par le pourcentage ; chaque approvisionnement a la pièce jointe en source et les données additionnelles du document
-- **4.5** Regarder la table temporaire des lignes extraites dans Grist → les lignes importées en ont été supprimées
-- **4.6** Regarder la carte du document dans l'onglet 1 → elle affiche « Déjà importé · M approvisionnements » et plus « Vérification en cours » ; « Extraire les données » est de nouveau proposé
-- **4.7** Importer des lignes identiques à des approvisionnements existants → l'import n'est pas bloqué ; les doublons se corrigent dans le widget `approvisionnements-saisie-manuelle`
+- **4.2** Confirmer → retour sur l'onglet « 1. Sélection du document », avec le message « M approvisionnements importés depuis N lignes du document. »
+- **4.3** Regarder la table Approvisionnement dans Grist → un approvisionnement par provenance de chaque ligne, avec un tonnage égal au tonnage de la ligne multiplié par le pourcentage ; chaque approvisionnement a la pièce jointe en source et les données additionnelles du document
+- **4.4** Regarder la table temporaire des lignes extraites dans Grist → les lignes importées en ont été supprimées
+- **4.5** Regarder la carte du document dans l'onglet 1 → elle affiche « Déjà importé · M approvisionnements » et plus « Vérification en cours » ; « Extraire les données » est de nouveau proposé
+- **4.6** Importer des lignes identiques à des approvisionnements existants → l'import n'est pas bloqué ; les doublons se corrigent dans le widget `approvisionnements-saisie-manuelle`
 
 ##### 5. Reprendre une extraction en cours
 

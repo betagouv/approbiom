@@ -95,7 +95,6 @@ async function renderScreen(
         pays: [],
         onCreateEntreprise: () => Promise.resolve(),
         findEntrepriseBySiret: () => Promise.resolve({ status: 'notfound' }),
-        onCreatePays: () => Promise.resolve(),
         importExtractedApprovisionnements: () => Promise.resolve([]),
         onExtractionsChanged: vi.fn(),
         onImported: vi.fn(),

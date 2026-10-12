@@ -93,7 +93,6 @@ function renderVerification(
             findEntrepriseBySiret={() =>
                 Promise.resolve({ status: 'notfound' })
             }
-            onCreatePays={() => Promise.resolve()}
         />
     )
 

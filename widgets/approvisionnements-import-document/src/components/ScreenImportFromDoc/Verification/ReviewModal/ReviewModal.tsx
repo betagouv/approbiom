@@ -27,7 +27,6 @@ export type ReviewModalProps = Referentiels & {
     onClose: () => void
     onCreateEntreprise: (entreprise: Entreprise) => Promise<void>
     findEntrepriseBySiret: (siret: string) => Promise<SiretLookup>
-    onCreatePays: (pays: Pays) => Promise<void>
 }
 
 export default function ReviewModal({
@@ -40,7 +39,6 @@ export default function ReviewModal({
     onClose,
     onCreateEntreprise,
     findEntrepriseBySiret,
-    onCreatePays,
 }: ReviewModalProps) {
     const [draft, setDraft] = useState<ExtractedLine['derived']>(line.derived)
     const [changes, setChanges] = useState<ExtractedLineChanges>({})
@@ -167,7 +165,6 @@ export default function ReviewModal({
                         tonnage={line.read.tonnage}
                         departementsByRegion={departementsByRegion}
                         pays={pays}
-                        onCreatePays={onCreatePays}
                         onChange={(distribution) =>
                             change({
                                 parsedProvenance: {

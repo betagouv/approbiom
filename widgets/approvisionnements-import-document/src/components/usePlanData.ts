@@ -10,23 +10,20 @@ export type PlanDataSources = {
     extractions: readonly ExtractionSummary[]
     imported: ReadonlyMap<Attachment['id'], number>
     createEntreprise: (entreprise: Entreprise) => Promise<void>
-    createPays: (pays: Pays) => Promise<void>
     listExtractions: () => Promise<readonly ExtractionSummary[]>
     countImported: () => Promise<ReadonlyMap<Attachment['id'], number>>
 }
 
 export function usePlanData({
     entreprises: initialEntreprises,
-    pays: initialPays,
+    pays,
     extractions: initialExtractions,
     imported: initialImported,
     createEntreprise,
-    createPays,
     listExtractions,
     countImported,
 }: PlanDataSources) {
     const [entreprises, setEntreprises] = useState(initialEntreprises)
-    const [pays, setPays] = useState(initialPays)
     const [extractions, setExtractions] = useState(initialExtractions)
     const [imported, setImported] = useState(initialImported)
 
@@ -47,11 +44,6 @@ export function usePlanData({
         addEntreprise: async (entreprise: Entreprise) => {
             await createEntreprise(entreprise)
             setEntreprises((previous) => [...previous, entreprise])
-        },
-
-        addPays: async (created: Pays) => {
-            await createPays(created)
-            setPays((previous) => [...previous, created])
         },
     }
 }
