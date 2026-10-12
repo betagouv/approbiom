@@ -94,7 +94,7 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 
 **Fournisseur et provenance**
 
-- **3.16** Taper une partie d'une dénomination ou d'un SIRET dans « Fournisseur » → les fournisseurs correspondants sont proposés
+- **3.16** Sans fournisseur, cliquer dans « Fournisseur » → le champ est vide, « Non renseigné » n'y est affiché qu'en indication grisée ; taper une partie d'une dénomination ou d'un SIRET → les fournisseurs correspondants sont proposés, sans option « Non renseigné »
 - **3.17** Choisir « Ajouter un nouveau fournisseur », puis saisir un SIRET valide → la dénomination est trouvée automatiquement dans l'Annuaire des Entreprises ; « Ajouter le fournisseur » l'ajoute et le sélectionne
 - **3.18** Saisir un SIRET incomplet, avec des lettres, déjà utilisé ou inconnu de l'Annuaire → le message correspondant s'affiche, et le fournisseur n'est pas ajouté
 - **3.19** Ajouter une provenance → la liste propose les départements et les pays étrangers déjà connus du document ; le widget ne permet pas de créer un pays

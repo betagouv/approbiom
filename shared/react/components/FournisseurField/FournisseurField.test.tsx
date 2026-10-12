@@ -76,7 +76,8 @@ describe('FournisseurField', () => {
         fireEvent.blur(input())
 
         expect(onChange).toHaveBeenLastCalledWith(undefined)
-        expect(input().value).toBe('Non renseigné')
+        expect(input().value).toBe('')
+        expect(input().placeholder).toBe('Non renseigné')
     })
 
     it('keeps the fournisseur while another one is searched for', () => {
@@ -91,12 +92,9 @@ describe('FournisseurField', () => {
     it('lists the fournisseurs by denomination, with their SIRET', () => {
         renderField()
 
-        fireEvent.click(
-            screen.getByRole('button', { name: 'Effacer « Fournisseur »' })
-        )
+        fireEvent.click(input())
 
         expect(optionTexts()).toEqual([
-            'Non renseigné',
             'BOIS FICTIF DU PLATEAU — 00000000000007',
             'SCIERIE FICTIVE DU VALLON — 00000000000003',
             'Ajouter un nouveau fournisseur',
@@ -142,21 +140,11 @@ describe('FournisseurField', () => {
         expect(onChange).toHaveBeenLastCalledWith(VALLON)
     })
 
-    it('accepts a fournisseur not given', () => {
-        const { onChange } = renderField(VALLON.siret)
-
-        type('non renseigne')
-        fireEvent.keyDown(input(), { key: 'Enter' })
-
-        expect(onChange).toHaveBeenLastCalledWith(undefined)
-        expect(input().value).toBe('Non renseigné')
-        expect(screen.queryByText('Aucune correspondance trouvée')).toBeNull()
-    })
-
-    it('shows a fournisseur not given as such', () => {
+    it('shows a fournisseur not given as an empty field, ready to search', () => {
         renderField()
 
-        expect(input().value).toBe('Non renseigné')
+        expect(input().value).toBe('')
+        expect(input().placeholder).toBe('Non renseigné')
     })
 
     it('opens the new fournisseur panel with the SIRET typed', () => {

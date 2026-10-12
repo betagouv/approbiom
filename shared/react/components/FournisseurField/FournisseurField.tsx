@@ -44,18 +44,12 @@ export default function FournisseurField({
         denomination.trim()
     )
 
-    const options: { value: Entreprise['siret'] | undefined; label: string }[] =
-        [
-            { value: undefined, label: FOURNISSEUR_NOT_GIVEN },
-            ...[...entreprises]
-                .sort((a, b) =>
-                    a.denomination.localeCompare(b.denomination, 'fr')
-                )
-                .map((entreprise) => ({
-                    value: entreprise.siret,
-                    label: `${entreprise.denomination} — ${entreprise.siret}`,
-                })),
-        ]
+    const options = [...entreprises]
+        .sort((a, b) => a.denomination.localeCompare(b.denomination, 'fr'))
+        .map((entreprise) => ({
+            value: entreprise.siret,
+            label: `${entreprise.denomination} — ${entreprise.siret}`,
+        }))
 
     const isKnownSiret = (query: string) =>
         isNumericQuery(query) &&
@@ -103,8 +97,9 @@ export default function FournisseurField({
                     ref={comboboxRef}
                     label="Fournisseur"
                     hint="Recherchez par dénomination ou par SIRET. S'il n'existe pas, vous pouvez l'ajouter."
+                    placeholder={FOURNISSEUR_NOT_GIVEN}
                     options={options}
-                    value={cleared ? null : value}
+                    value={cleared ? null : (value ?? null)}
                     onChange={(siret) => {
                         if (siret === null) {
                             setCleared(true)

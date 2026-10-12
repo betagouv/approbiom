@@ -86,8 +86,8 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 
 **Fournisseur**
 
-- **3.7** Taper une partie d'une dénomination ou d'un SIRET dans « Fournisseur » → les fournisseurs correspondants sont proposés
-- **3.8** Effacer le fournisseur → la ligne est enregistrée avec « Non renseigné »
+- **3.7** Sans fournisseur, cliquer dans « Fournisseur » → le champ est vide, « Non renseigné » n'y est affiché qu'en indication grisée ; taper une partie d'une dénomination ou d'un SIRET → les fournisseurs correspondants sont proposés, sans option « Non renseigné »
+- **3.8** Effacer le fournisseur avec la croix → l'indication « Non renseigné » réapparaît, et la ligne est enregistrée avec « Non renseigné »
 - **3.9** Choisir « Ajouter un nouveau fournisseur », puis saisir un SIRET valide → la dénomination est trouvée automatiquement dans l'Annuaire des Entreprises ; « Ajouter le fournisseur » l'ajoute et le sélectionne
 - **3.10** Saisir un SIRET incomplet ou avec des lettres → message sur le nombre de chiffres, ou « Le SIRET ne doit contenir que des chiffres. »
 - **3.11** Saisir un SIRET déjà utilisé → « Ce SIRET est déjà utilisé par le fournisseur « … ». »
