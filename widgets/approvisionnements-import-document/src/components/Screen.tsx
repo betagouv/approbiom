@@ -8,6 +8,7 @@ import ScreenImportFromDoc, { type AlertMessage } from './ScreenImportFromDoc'
 import { usePlanData, type PlanDataSources } from './usePlanData'
 import type { ExtractedDocument } from '@shared/core/application/services/extract-approvisionnement-from-document'
 import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/extracted-approvisionnement'
+import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 
 export type ScreenProps = Referentiels &
     PlanDataSources & {
@@ -21,6 +22,11 @@ export type ScreenProps = Referentiels &
             line: ExtractedApprovisionnement,
             changes: ExtractedLineChanges
         ) => Promise<ExtractedApprovisionnement>
+        importExtractedApprovisionnements: (
+            lines: readonly ExtractedApprovisionnement[],
+            plan: Approvisionnement['planDApprovisionnement'],
+            source: Attachment['id']
+        ) => Promise<Approvisionnement[]>
     }
 
 export default function Screen({
@@ -33,6 +39,7 @@ export default function Screen({
     extractDocument,
     deleteExtraction,
     updateExtractedApprovisionnement,
+    importExtractedApprovisionnements,
     ...sources
 }: ScreenProps) {
     const data = usePlanData(sources)
@@ -87,7 +94,7 @@ export default function Screen({
             findEntrepriseBySiret={findEntrepriseBySiret}
             onCreatePays={data.addPays}
             importExtractedApprovisionnements={(lines, source) =>
-                data.importLines(lines, plan.id, source)
+                importExtractedApprovisionnements(lines, plan.id, source)
             }
             onExtractionsChanged={data.refreshExtractions}
             onImported={(imported) => {

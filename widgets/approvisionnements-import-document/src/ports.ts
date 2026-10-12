@@ -9,7 +9,10 @@ import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 
 export type Ports = PlanViewPorts & {
-    approvisionnements: ApprovisionnementPort
+    approvisionnements: Pick<
+        ApprovisionnementPort,
+        'create' | 'listPaysDeProvenance' | 'addPaysDeProvenance'
+    >
     attachments: Pick<AttachmentPort, 'list' | 'getFileUrl' | 'download'>
     entreprises: EntreprisePort
     entrepriseSearch: EntrepriseSearchPort

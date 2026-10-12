@@ -44,7 +44,6 @@ const GRIST_PORTS: Ports = {
 async function load(ports: Ports) {
     const [
         plans,
-        approvisionnements,
         attachments,
         entreprises,
         ressources,
@@ -56,7 +55,6 @@ async function load(ports: Ports) {
             ['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'],
             ports
         ),
-        ports.approvisionnements.list(),
         ports.attachments.list(),
         ports.entreprises.list(),
         ports.ressources.list(),
@@ -67,7 +65,6 @@ async function load(ports: Ports) {
 
     return {
         plans,
-        approvisionnements,
         attachments,
         entreprises,
         ressources,
@@ -96,15 +93,6 @@ async function load(ports: Ports) {
             plan: Approvisionnement['planDApprovisionnement'],
             source: Attachment['id']
         ) => importExtractedApprovisionnements(lines, plan, source, ports),
-        createApprovisionnements: (
-            approvisionnements: readonly Omit<Approvisionnement, 'id'>[]
-        ) => ports.approvisionnements.create(approvisionnements),
-        updateApprovisionnement: (
-            id: Approvisionnement['id'],
-            approvisionnement: Partial<Approvisionnement>
-        ) => ports.approvisionnements.update(id, approvisionnement),
-        deleteApprovisionnement: (id: Approvisionnement['id']) =>
-            ports.approvisionnements.delete(id),
         createEntreprise: (entreprise: Entreprise) =>
             ports.entreprises.create(entreprise),
         findEntrepriseBySiret: (siret: string) =>
