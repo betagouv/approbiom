@@ -1,4 +1,3 @@
-import './ImportModal.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
@@ -44,8 +43,8 @@ export default function ImportModal({
             onClose={onClose}
             title={
                 lineCount > 1
-                    ? 'Importer les lignes vérifiées ?'
-                    : 'Importer la ligne vérifiée ?'
+                    ? 'Importer les lignes vérifiées'
+                    : 'Importer la ligne vérifiée'
             }
             titleIcon="fr-icon-warning-line"
             actions={
@@ -81,15 +80,13 @@ export default function ImportModal({
                     {failure}
                 </Alert>
             )}
-            <p className="fr-text--md">
+            <p className="fr-text--md fr-m-0">
                 Attention : {plural(lineCount, 'ligne')} du document{' '}
                 {lineCount > 1 ? 'vont' : 'va'} créer{' '}
                 {plural(approvisionnementCount, 'approvisionnement')} dans la
-                table Approvisionnement de ce plan.
-            </p>
-            <p className="fr-text--sm fr-m-0 import-modal__mention">
-                Les approvisionnements créés pourront ensuite être modifiés ou
-                supprimés dans le widget « Saisir des approvisionnements ».
+                table Approvisionnement de ce plan. Les approvisionnements créés
+                pourront ensuite être modifiés ou supprimés dans le widget «
+                Saisir des approvisionnements ».
             </p>
         </Modal>
     )

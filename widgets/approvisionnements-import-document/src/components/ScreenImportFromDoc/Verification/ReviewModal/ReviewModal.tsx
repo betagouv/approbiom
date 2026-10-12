@@ -158,6 +158,10 @@ export default function ReviewModal({
                     <legend className="fr-fieldset__legend fr-text--regular fr-text--sm fr-p-0 fr-mb-1v">
                         Répartition par provenance
                     </legend>
+                    <Alert severity="warning" size="sm">
+                        Si le document ne donne pas de provenance, indiquez le
+                        département de l&apos;installation.
+                    </Alert>
                     <ProvenanceEditor
                         distribution={parsedProvenance.distribution}
                         tonnage={line.read.tonnage}

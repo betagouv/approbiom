@@ -35,3 +35,7 @@ body {
     left: 0;
     margin-right: 0;
 }
+
+.fr-modal__title > [class*='fr-icon-'] {
+    margin-right: 0.5rem;
+}

@@ -283,8 +283,22 @@ describe('Verification', () => {
         )
 
         expect(
-            (await within(dialog()).findByRole('alert')).textContent
-        ).toMatch(/Les modifications n'ont pas pu être enregistrées/)
+            await within(dialog()).findByText(
+                /Les modifications n'ont pas pu être enregistrées/
+            )
+        ).toBeTruthy()
+    })
+
+    it('reminds to give the département of the installation when the document gives no provenance', () => {
+        renderVerification([line(1, NON_VERIFIEE)])
+
+        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+
+        expect(
+            within(dialog()).getByText(
+                "Si le document ne donne pas de provenance, indiquez le département de l'installation."
+            )
+        ).toBeTruthy()
     })
 
     describe('import', () => {
@@ -312,7 +326,7 @@ describe('Verification', () => {
             )
             expect(
                 within(dialog()).getByText(
-                    'Attention : 2 lignes du document vont créer 3 approvisionnements dans la table Approvisionnement de ce plan.'
+                    'Attention : 2 lignes du document vont créer 3 approvisionnements dans la table Approvisionnement de ce plan. Les approvisionnements créés pourront ensuite être modifiés ou supprimés dans le widget « Saisir des approvisionnements ».'
                 )
             ).toBeTruthy()
             fireEvent.click(

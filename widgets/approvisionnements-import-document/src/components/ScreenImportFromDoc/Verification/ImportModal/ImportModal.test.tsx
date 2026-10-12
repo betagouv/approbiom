@@ -20,7 +20,7 @@ describe('ImportModal', () => {
 
         expect(
             screen.getByRole('heading', {
-                name: 'Importer la ligne vérifiée ?',
+                name: 'Importer la ligne vérifiée',
             })
         ).toBeTruthy()
     })
@@ -30,7 +30,7 @@ describe('ImportModal', () => {
 
         expect(
             screen.getByRole('heading', {
-                name: 'Importer les lignes vérifiées ?',
+                name: 'Importer les lignes vérifiées',
             })
         ).toBeTruthy()
     })
