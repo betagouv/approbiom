@@ -140,7 +140,11 @@ describe('Verification', () => {
                 /Vérifiez toutes les lignes pour pouvoir les importer/
             )
         ).toBeTruthy()
-        expect(screen.getByText(/1\/2 lignes déjà vérifiées/)).toBeTruthy()
+        expect(
+            screen.getByText(
+                /Reprise de l'extraction du .* · vérification en cours/
+            )
+        ).toBeTruthy()
     })
 
     it('says when the distribution is off 100 %', () => {
@@ -229,7 +233,8 @@ describe('Verification', () => {
     })
 
     it('saves nothing when the modal is cancelled', () => {
-        const onUpdateLine = renderVerification([line(1, VERIFIEE)])
+        const onUpdateLine = vi.fn(() => Promise.resolve())
+        renderVerification([line(1, VERIFIEE)], onUpdateLine)
 
         fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
         const percentage = within(dialog()).getByRole('textbox', {
@@ -243,6 +248,23 @@ describe('Verification', () => {
 
         expect(screen.queryByRole('dialog')).toBeNull()
         expect(onUpdateLine).not.toHaveBeenCalled()
+    })
+
+    it('saves with « Modifier » even when nothing was changed', async () => {
+        const onUpdateLine = vi.fn(() => Promise.resolve())
+        renderVerification([line(1, NON_VERIFIEE)], onUpdateLine)
+
+        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        fireEvent.click(
+            within(dialog()).getByRole('button', { name: 'Modifier' })
+        )
+
+        await waitFor(() =>
+            expect(onUpdateLine).toHaveBeenCalledWith(
+                expect.objectContaining({ id: 1 }),
+                {}
+            )
+        )
     })
 
     it('says when the changes could not be saved', async () => {

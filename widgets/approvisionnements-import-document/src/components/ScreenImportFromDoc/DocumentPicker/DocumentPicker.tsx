@@ -7,7 +7,7 @@ import Badge from '@shared/react/components/Badge'
 import type { ExtractionSummary } from '@shared/core/application/ports/extracted-approvisionnement'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import { documentIconOf } from '@shared/react/components/document-icon'
-import { formatNumber } from '@shared/react/format'
+import { formatNumber, plural } from '@shared/react/format'
 
 const KO = 1024
 const MO = KO * KO
@@ -18,6 +18,16 @@ function formatSize(bytes: number): string {
     return bytes < MO
         ? `${formatNumber(Math.round(bytes / KO))} Ko`
         : `${formatNumber(bytes / MO)} Mo`
+}
+
+function ImportedState({ count = 0 }: { count?: number }) {
+    if (count === 0) return null
+
+    return (
+        <Badge size="sm" status="success" noIcon>
+            Déjà importé · {plural(count, 'approvisionnement')}
+        </Badge>
+    )
 }
 
 function ExtractionState({ summary }: { summary?: ExtractionSummary }) {
@@ -33,6 +43,7 @@ function ExtractionState({ summary }: { summary?: ExtractionSummary }) {
 export type DocumentPickerProps = {
     attachments: readonly Attachment[]
     extractions: ReadonlyMap<Attachment['id'], ExtractionSummary>
+    imported: ReadonlyMap<Attachment['id'], number>
     selectedId: Attachment['id'] | null
     onSelect: (id: Attachment['id']) => void
 }
@@ -40,6 +51,7 @@ export type DocumentPickerProps = {
 export default function DocumentPicker({
     attachments,
     extractions,
+    imported,
     selectedId,
     onSelect,
 }: DocumentPickerProps) {
@@ -89,6 +101,9 @@ export default function DocumentPicker({
                                             {attachment.type ||
                                                 'type non renseigné'}
                                         </span>
+                                        <ImportedState
+                                            count={imported.get(attachment.id)}
+                                        />
                                         <ExtractionState
                                             summary={extractions.get(
                                                 attachment.id

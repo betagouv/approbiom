@@ -11,7 +11,7 @@ import type { ReferentielGeoPort } from '@shared/core/application/ports/referent
 export type Ports = PlanViewPorts & {
     approvisionnements: Pick<
         ApprovisionnementPort,
-        'create' | 'listPaysDeProvenance' | 'addPaysDeProvenance'
+        'list' | 'create' | 'listPaysDeProvenance' | 'addPaysDeProvenance'
     >
     attachments: Pick<AttachmentPort, 'list' | 'getFileUrl' | 'download'>
     entreprises: EntreprisePort

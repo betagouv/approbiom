@@ -55,8 +55,6 @@ export default function ReviewModal({
     }
 
     async function save() {
-        if (Object.keys(changes).length === 0) return onClose()
-
         setSaving(true)
         setFailed(false)
         try {

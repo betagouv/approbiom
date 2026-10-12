@@ -18,3 +18,15 @@
     min-width: 12rem;
     color: var(--text-mention-grey);
 }
+
+.screen-import__search {
+    max-width: 45rem;
+}
+
+.screen-import__empty {
+    max-width: 45rem;
+    padding: 2rem;
+    border: 1px dashed var(--border-default-grey);
+    color: var(--text-mention-grey);
+    text-align: center;
+}

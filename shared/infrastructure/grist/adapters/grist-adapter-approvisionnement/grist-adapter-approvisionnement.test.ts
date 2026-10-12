@@ -69,6 +69,7 @@ function drawnFrom(
         Provenance: cells.map(([, provenance]) => provenance),
         Fournisseur: cells.map(() => 1),
         Total_en_tMv_an_: cells.map(() => 120),
+        Source: cells.map(() => 0),
     }
 }
 
@@ -96,6 +97,22 @@ describe('createGristApprovisionnementPort', () => {
         )
 
         expect(ids).toEqual([12, 30])
+    })
+
+    it('reads the file an imported approvisionnement comes from', async () => {
+        mockGrist({
+            ...drawnFrom([
+                [1, '87'],
+                [1, '87'],
+            ]),
+            Source: [4, 0],
+        })
+
+        const sources = (await createGristApprovisionnementPort().list()).map(
+            ({ source }) => source
+        )
+
+        expect(sources).toEqual([20, undefined])
     })
 
     it('reads a fournisseur left empty as undefined', async () => {

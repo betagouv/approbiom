@@ -21,6 +21,7 @@ import { updateExtractedApprovisionnement } from '@shared/core/application/servi
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import { listPlans } from '@shared/core/application/services/plan-view'
+import { countImportedApprovisionnementsByDocument } from '@shared/core/application/services/count-imported-approvisionnements'
 import { FAKE_PORTS } from './fake-data/ports'
 import type { Ports } from './ports'
 import { findEntrepriseBySiret } from '@shared/core/application/services/find-entreprise-by-siret'
@@ -50,6 +51,7 @@ async function load(ports: Ports) {
         departementsByRegion,
         pays,
         extractions,
+        imported,
     ] = await Promise.all([
         listPlans(
             ['id', 'nom', 'typeDePlan', 'statut', 'appelsAProjet'],
@@ -61,6 +63,7 @@ async function load(ports: Ports) {
         ports.referentielGeo.listDepartementsByRegion(),
         ports.approvisionnements.listPaysDeProvenance(),
         ports.extractedApprovisionnements.listSummaries(),
+        countImportedApprovisionnementsByDocument(ports),
     ])
 
     return {
@@ -71,8 +74,10 @@ async function load(ports: Ports) {
         departementsByRegion,
         pays,
         extractions,
+        imported,
         listExtractions: () =>
             ports.extractedApprovisionnements.listSummaries(),
+        countImported: () => countImportedApprovisionnementsByDocument(ports),
         getAttachmentUrl: (id: Attachment['id']) =>
             ports.attachments.getFileUrl(id),
         extractDocument: (attachment: Attachment) =>

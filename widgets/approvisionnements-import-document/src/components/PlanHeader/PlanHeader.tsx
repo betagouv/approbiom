@@ -2,7 +2,12 @@ import './PlanHeader.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 
-import type { SelectablePlan } from '../ScreenSelectPlan'
+import type { PlanView } from '@shared/core/application/services/plan-view'
+
+export type SelectablePlan = Pick<
+    PlanView,
+    'id' | 'nom' | 'typeDePlan' | 'statut' | 'appelsAProjet'
+>
 
 const UNKNOWN = 'Inconnu'
 

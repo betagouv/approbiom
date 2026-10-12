@@ -11,12 +11,13 @@ const APPROVISIONNEMENT = {
 
 describe('createFakeApprovisionnementPort', () => {
     it('gives each created approvisionnement the next id', async () => {
-        const port = createFakeApprovisionnementPort()
+        const port = createFakeApprovisionnementPort([])
 
         expect(
             await port.create([APPROVISIONNEMENT, APPROVISIONNEMENT])
         ).toEqual([1, 2])
         expect(await port.create([APPROVISIONNEMENT])).toEqual([3])
+        expect((await port.list()).map(({ id }) => id)).toEqual([1, 2, 3])
     })
 
     it('lists a pays once it is added', async () => {

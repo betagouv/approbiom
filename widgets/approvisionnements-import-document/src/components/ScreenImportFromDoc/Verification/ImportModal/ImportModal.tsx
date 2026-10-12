@@ -89,7 +89,7 @@ export default function ImportModal({
             </p>
             <p className="fr-text--sm fr-m-0 import-modal__mention">
                 Les approvisionnements créés pourront ensuite être modifiés ou
-                supprimés depuis la page du plan.
+                supprimés dans le widget « Saisir des approvisionnements ».
             </p>
         </Modal>
     )

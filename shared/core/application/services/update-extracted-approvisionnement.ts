@@ -2,7 +2,10 @@ import type {
     ExtractedApprovisionnementPort,
     ExtractedLineChanges,
 } from '@shared/core/application/ports/extracted-approvisionnement'
-import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/extracted-approvisionnement'
+import {
+    isVerifiable,
+    type ExtractedApprovisionnement,
+} from '@shared/core/domain/entities/extracted-approvisionnement'
 import {
     NON_VERIFIEE,
     VERIFIEE,
@@ -10,20 +13,18 @@ import {
 
 export async function updateExtractedApprovisionnement(
     line: ExtractedApprovisionnement,
-    { controle, ...derived }: ExtractedLineChanges,
+    { controle, ...changes }: ExtractedLineChanges,
     extractedApprovisionnements: Pick<ExtractedApprovisionnementPort, 'update'>
 ): Promise<ExtractedApprovisionnement> {
+    const derived = { ...line.derived, ...changes }
     const nextControle =
-        controle ?? (line.controle === VERIFIEE ? NON_VERIFIEE : undefined)
+        controle ??
+        (isVerifiable({ read: line.read, derived }) ? VERIFIEE : NON_VERIFIEE)
 
     await extractedApprovisionnements.update(line.id, {
-        ...derived,
-        ...(nextControle && { controle: nextControle }),
+        ...changes,
+        controle: nextControle,
     })
 
-    return {
-        ...line,
-        controle: nextControle ?? line.controle,
-        derived: { ...line.derived, ...derived },
-    }
+    return { ...line, controle: nextControle, derived }
 }

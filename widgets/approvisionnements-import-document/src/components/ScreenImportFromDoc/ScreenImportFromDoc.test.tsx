@@ -14,7 +14,10 @@ import {
     ExtractedLinesNotDeletedError,
 } from '@shared/core/application/services/import-extracted-approvisionnements'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-import { VERIFIEE } from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
+import {
+    NON_VERIFIEE,
+    VERIFIEE,
+} from '@shared/core/domain/value-objects/extracted-approvisionnement-controle'
 import { DEPARTEMENT_FRANCAIS } from '@shared/core/domain/value-objects/provenance'
 import ScreenImportFromDoc, {
     type ScreenImportFromDocProps,
@@ -57,11 +60,27 @@ const summary = (
     verifiedCount,
 })
 
-function renderScreen(props: Partial<ScreenImportFromDocProps> = {}) {
+const MESSAGE = '2 approvisionnements importés depuis 1 ligne du document.'
+
+function choosePlan() {
+    fireEvent.change(screen.getByRole('combobox', { name: /Plan/ }), {
+        target: { value: 'Tulle' },
+    })
+    fireEvent.click(screen.getByRole('option', { name: /Tulle/ }))
+}
+
+const tab = (name: string) =>
+    screen.getByRole<HTMLButtonElement>('tab', { name })
+
+function renderScreen(
+    props: Partial<ScreenImportFromDocProps> = {},
+    { planChosen = true } = {}
+) {
     const defaults: ScreenImportFromDocProps = {
-        plan: PLAN,
+        plans: [PLAN],
         attachments: [NEW, STARTED],
         extractions: new Map([[STARTED.id, summary(STARTED.id, 2)]]),
+        imported: new Map(),
         getAttachmentUrl: () => Promise.resolve('data:,'),
         extractDocument: () =>
             Promise.resolve({
@@ -80,10 +99,10 @@ function renderScreen(props: Partial<ScreenImportFromDocProps> = {}) {
         importExtractedApprovisionnements: () => Promise.resolve([]),
         onExtractionsChanged: vi.fn(),
         onImported: vi.fn(),
-        onChangePlan: vi.fn(),
     }
     const all = { ...defaults, ...props }
     render(<ScreenImportFromDoc {...all} />)
+    if (planChosen) choosePlan()
 
     return all
 }
@@ -94,14 +113,37 @@ const card = (name: string) =>
 afterEach(cleanup)
 
 describe('ScreenImportFromDoc', () => {
-    it('tells where each document stands', () => {
+    it('asks for a plan first, with the later steps closed', () => {
+        renderScreen({}, { planChosen: false })
+
+        expect(
+            screen.getByText(
+                'Choisissez un plan pour afficher ses pièces jointes.'
+            )
+        ).toBeTruthy()
+        expect(tab('2. Extraction').disabled).toBe(true)
+        expect(tab('3. Vérification et import').disabled).toBe(true)
+    })
+
+    it('shows the plan chosen, then its documents', () => {
         renderScreen()
+
+        expect(screen.getByRole('heading', { name: PLAN.nom })).toBeTruthy()
+        expect(card('nouveau')).toBeTruthy()
+        expect(card('commence')).toBeTruthy()
+    })
+
+    it('tells where each document stands', () => {
+        renderScreen({ imported: new Map([[STARTED.id, 4]]) })
 
         expect(card('nouveau').querySelector('.fr-badge')).toBeNull()
         expect(
             within(card('commence')).getByText(/Vérification en cours/)
                 .textContent
         ).toBe('Vérification en cours · 2/3')
+        expect(
+            within(card('commence')).getByText(/Déjà importé/).textContent
+        ).toBe('Déjà importé · 4 approvisionnements')
     })
 
     it('says when the plan has no attachment', () => {
@@ -138,10 +180,14 @@ describe('ScreenImportFromDoc', () => {
             screen.getByRole('button', { name: 'Extraire les données' })
         )
 
+        expect(tab('2. Extraction').getAttribute('aria-selected')).toBe('true')
         expect(screen.getByText('Extraction en cours…')).toBeTruthy()
         expect(
             await screen.findByText(/0 ligne extraite le 09\/10\/2026 à 10h05/)
         ).toBeTruthy()
+        expect(
+            tab('3. Vérification et import').getAttribute('aria-selected')
+        ).toBe('true')
         expect(onExtractionsChanged).toHaveBeenCalled()
     })
 
@@ -165,6 +211,7 @@ describe('ScreenImportFromDoc', () => {
             screen.getByRole('button', { name: 'Choisir un autre document' })
         )
         expect(card('nouveau')).toBeTruthy()
+        expect(tab('3. Vérification et import').disabled).toBe(true)
     })
 
     it('drops the lines before extracting again', async () => {
@@ -189,69 +236,32 @@ describe('ScreenImportFromDoc', () => {
         expect(extractDocument).toHaveBeenCalledWith(STARTED)
     })
 
-    it('offers to change the plan', () => {
-        const { onChangePlan } = renderScreen()
-
-        fireEvent.click(screen.getByRole('button', { name: 'Changer de plan' }))
-
-        expect(onChangePlan).toHaveBeenCalled()
-    })
-
-    it('goes back to the documents of the plan from an extraction', async () => {
+    it('goes back to the documents, then closes the later steps when another document is chosen', async () => {
         renderScreen()
 
-        expect(
-            screen.queryByRole('button', {
-                name: 'Retour aux documents du plan',
-            })
-        ).toBeNull()
-
         fireEvent.click(card('nouveau'))
         fireEvent.click(
             screen.getByRole('button', { name: 'Extraire les données' })
         )
-        fireEvent.click(
-            await screen.findByRole('button', {
-                name: 'Retour aux documents du plan',
-            })
-        )
+        await screen.findByText(/0 ligne extraite/)
 
+        fireEvent.click(tab('1. Sélection du document'))
         expect(card('nouveau')).toBeTruthy()
+        expect(tab('3. Vérification et import').disabled).toBe(false)
+
+        fireEvent.click(card('commence'))
+        expect(tab('2. Extraction').disabled).toBe(true)
+        expect(tab('3. Vérification et import').disabled).toBe(true)
     })
 
-    it('shows the result of the last import above the documents, until the next extraction', () => {
-        renderScreen({
-            alert: {
-                severity: 'success',
-                text: '2 approvisionnements importés depuis 1 ligne du document.',
-            },
-        })
-
-        expect(
-            screen.getByText(
-                '2 approvisionnements importés depuis 1 ligne du document.'
-            )
-        ).toBeTruthy()
-
-        fireEvent.click(card('nouveau'))
-        fireEvent.click(
-            screen.getByRole('button', { name: 'Extraire les données' })
-        )
-
-        expect(
-            screen.queryByText(
-                '2 approvisionnements importés depuis 1 ligne du document.'
-            )
-        ).toBeNull()
-    })
-
-    it('saves a change made to a line', async () => {
+    it('verifies a line saved with « Modifier »', async () => {
         const updateExtractedApprovisionnement = vi.fn(
-            (line: ExtractedApprovisionnement) => Promise.resolve(line)
+            (line: ExtractedApprovisionnement) =>
+                Promise.resolve({ ...line, controle: VERIFIEE })
         )
-        const verifiedLine: ExtractedApprovisionnement = {
+        const reviewedLine: ExtractedApprovisionnement = {
             id: 7,
-            controle: VERIFIEE,
+            controle: NON_VERIFIEE,
             extractedAt: new Date(),
             read: {
                 document: 'commence.xlsx',
@@ -282,7 +292,7 @@ describe('ScreenImportFromDoc', () => {
             updateExtractedApprovisionnement,
             ressources: [RESSOURCE],
             extractDocument: () =>
-                Promise.resolve({ lines: [verifiedLine], date: new Date() }),
+                Promise.resolve({ lines: [reviewedLine], date: new Date() }),
         })
 
         fireEvent.click(card('commence'))
@@ -309,10 +319,13 @@ describe('ScreenImportFromDoc', () => {
 
         await waitFor(() =>
             expect(updateExtractedApprovisionnement).toHaveBeenCalledWith(
-                verifiedLine,
+                reviewedLine,
                 { matchedRessource: RESSOURCE }
             )
         )
+        expect(
+            await screen.findByRole('checkbox', { name: VERIFIEE })
+        ).toBeTruthy()
     })
 
     describe('import', () => {
@@ -388,14 +401,16 @@ describe('ScreenImportFromDoc', () => {
                 importExtractedApprovisionnements,
             })
 
-            await waitFor(() =>
-                expect(onImported).toHaveBeenCalledWith({
-                    severity: 'success',
-                    text: '2 approvisionnements importés depuis 1 ligne du document.',
-                })
-            )
+            expect(await screen.findByText(MESSAGE)).toBeTruthy()
+            expect(
+                tab('1. Sélection du document').getAttribute('aria-selected')
+            ).toBe('true')
+            expect(tab('2. Extraction').disabled).toBe(true)
+            expect(tab('3. Vérification et import').disabled).toBe(true)
+            expect(onImported).toHaveBeenCalled()
             expect(importExtractedApprovisionnements).toHaveBeenCalledWith(
                 [expect.objectContaining({ id: 8 })],
+                PLAN.id,
                 STARTED.id
             )
         })
@@ -415,20 +430,18 @@ describe('ScreenImportFromDoc', () => {
             expect(onImported).not.toHaveBeenCalled()
         })
 
-        it('goes back to the plan, warning not to import again, when the lines cannot be deleted', async () => {
+        it('goes back to the documents, warning not to import again, when the lines cannot be deleted', async () => {
             const { onImported, onExtractionsChanged } = await importAll({
                 importExtractedApprovisionnements: () =>
                     Promise.reject(new ExtractedLinesNotDeletedError(created)),
             })
 
-            await waitFor(() =>
-                expect(onImported).toHaveBeenCalledWith({
-                    severity: 'warning',
-                    text: expect.stringMatching(
-                        /^2 approvisionnements créés.*Ne les importez pas une seconde fois/
-                    ) as string,
-                })
-            )
+            expect(
+                await screen.findByText(
+                    /^2 approvisionnements créés.*Ne les importez pas une seconde fois/
+                )
+            ).toBeTruthy()
+            expect(onImported).toHaveBeenCalled()
             expect(onExtractionsChanged).toHaveBeenCalled()
         })
     })

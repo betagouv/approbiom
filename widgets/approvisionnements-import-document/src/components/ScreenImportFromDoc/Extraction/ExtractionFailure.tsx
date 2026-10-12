@@ -32,12 +32,12 @@ export default function ExtractionFailure({
                     Structure attendue du document ADEME
                 </h3>
                 <p className="fr-callout__text fr-text--md">
-                    Un classeur Excel (.xlsx) avec une feuille dont le nom
-                    contient « Fournisseurs ». Dans les 40 premières lignes, une
-                    ligne d&apos;en-tête porte le mot « fournisseur » en colonne
-                    A et contient les colonnes Sous catégorie, Tonnage et
-                    Répartition approximative. Chaque ligne doit avoir un
-                    tonnage numérique.
+                    Un classeur Excel (.xlsx ou .xls) avec une feuille dont le
+                    nom contient « Fournisseurs ». Dans les 40 premières lignes,
+                    une ligne d&apos;en-tête porte le mot « fournisseur » ou «
+                    client » en colonne A, et contient les colonnes Sous
+                    catégorie (ou Nature combustible), Tonnage et Répartition
+                    approximative. Le tableau s&apos;arrête à la ligne TOTAL.
                 </p>
             </div>
 

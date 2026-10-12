@@ -223,8 +223,8 @@ export default function Verification({
                         className="fr-icon-time-line fr-icon--sm"
                         aria-hidden="true"
                     />
-                    Reprise de l&apos;extraction du {formatExtractedAt(date)} ·{' '}
-                    {verifiedCount}/{lines.length} lignes déjà vérifiées
+                    Reprise de l&apos;extraction du {formatExtractedAt(date)} ·
+                    vérification en cours
                 </p>
             )}
 

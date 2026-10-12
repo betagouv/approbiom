@@ -8,9 +8,11 @@ function renderData(sources: Partial<PlanDataSources> = {}) {
             entreprises: [],
             pays: [],
             extractions: [],
+            imported: new Map(),
             createEntreprise: () => Promise.resolve(),
             createPays: () => Promise.resolve(),
             listExtractions: () => Promise.resolve([]),
+            countImported: () => Promise.resolve(new Map()),
             ...sources,
         })
     )
@@ -47,5 +49,16 @@ describe('usePlanData', () => {
         await waitFor(() =>
             expect(result.current.extractions).toEqual([summary])
         )
+    })
+
+    it('counts the imported approvisionnements again', async () => {
+        const counts = new Map([[341, 2]])
+        const { result } = renderData({
+            countImported: () => Promise.resolve(counts),
+        })
+
+        act(() => result.current.refreshImported())
+
+        await waitFor(() => expect(result.current.imported).toEqual(counts))
     })
 })
