@@ -1,0 +1,20 @@
+.screen-import {
+    display: flex;
+    flex-direction: column;
+    gap: 1.25rem;
+}
+
+.screen-import__footer {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 1rem;
+    padding-top: 1rem;
+    border-top: 1px solid var(--border-default-grey);
+}
+
+.screen-import__mention {
+    flex: 1;
+    min-width: 12rem;
+    color: var(--text-mention-grey);
+}
