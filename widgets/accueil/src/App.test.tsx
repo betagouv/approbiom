@@ -240,7 +240,7 @@ describe('App', () => {
 
         expect(
             screen.getByRole('heading', {
-                name: 'Chronologie de l’instruction - BCIAT',
+                name: 'Chronologie de l’instruction - BCIAT 2023',
             })
         ).toBeDefined()
         expect(
@@ -250,7 +250,7 @@ describe('App', () => {
         expect(screen.getByText('Avis favorable')).toBeDefined()
     })
 
-    it('names the appel à projet and the région under the plan’s title', async () => {
+    it('names the région under the plan’s title, and no appel à projet', async () => {
         render(
             <App
                 {...fakePorts({
@@ -267,23 +267,21 @@ describe('App', () => {
 
         await openPlan()
 
-        // The « : » after each term is drawn by the stylesheet, so the text
+        // The « : » after the term is drawn by the stylesheet, so the text
         // here is the term on its own.
-        expect(screen.getByText('Appel à projet')).toBeDefined()
-        expect(screen.getByText('BCIAT (2023)')).toBeDefined()
+        expect(screen.queryByText('Appel à projet')).toBeNull()
         expect(screen.getByText("Région de l'installation")).toBeDefined()
         expect(screen.getByText('Nouvelle-Aquitaine')).toBeDefined()
     })
 
-    it('says as much when neither can be answered', async () => {
-        // No demande de subvention names an appel, and no référentiel names
-        // the région of the plan's département. Both lines stay, so the header
-        // keeps its shape.
+    it('says as much when the région cannot be answered', async () => {
+        // No référentiel names the région of the plan's département. The line
+        // stays, so the header keeps its shape.
         render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openPlan()
 
-        expect(screen.getAllByText('—')).toHaveLength(2)
+        expect(screen.getAllByText('—')).toHaveLength(1)
     })
 
     it('leaves the fil d’instruction empty for a plan with no demande', async () => {

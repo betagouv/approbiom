@@ -8,10 +8,7 @@ import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
 import Ressource from '@shared/react/components/Ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
-import {
-    getAppelsAProjet,
-    type PlanDetail,
-} from '@shared/core/application/services/plan-detail'
+import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 import type { ApprovisionnementByRessourceStats } from '@shared/core/application/services/approvisionnement-stats'
 import FilInstruction from './tabs/FilInstruction/FilInstruction'
@@ -56,8 +53,6 @@ export default function Plan({
 }: PlanProps) {
     const [tab, setTab] = useState(TABS[0].id)
 
-    const appelsAProjet = getAppelsAProjet(plan).join(', ')
-
     return (
         <div className="plan">
             <div className="plan__header">
@@ -72,10 +67,6 @@ export default function Plan({
                     <h1 className="fr-h3 plan__title">{plan.nom}</h1>
 
                     <dl className="plan__meta">
-                        <div className="plan__meta-entry">
-                            <dt>Appel à projet</dt>
-                            <dd>{appelsAProjet || INCONNU}</dd>
-                        </div>
                         <div className="plan__meta-entry">
                             <dt>Région de l&apos;installation</dt>
                             <dd>{plan.installationRegion ?? INCONNU}</dd>

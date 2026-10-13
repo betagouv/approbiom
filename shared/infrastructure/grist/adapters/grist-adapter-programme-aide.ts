@@ -5,6 +5,7 @@ import type {
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import { gristReady } from '../helpers/grist-ready'
 import {
+    asDate,
     asNumber,
     asString,
     fetchRowsOnce,
@@ -21,7 +22,7 @@ const MAPPING_COLUMNS_PROGRAMME_AIDE = {
 function mapFromGristToApplication(row: GristRow): ProgrammeAide {
     return {
         id: asNumber(row.id) ?? 0,
-        year: asNumber(row.Annee) ?? 0,
+        year: asDate(row.Annee)?.getUTCFullYear() ?? 0,
         name: asString(row.Nom_complet),
         shortName: asString(row.Nom_raccourci),
         appelAProjet: asString(row.Appel_a_projet),

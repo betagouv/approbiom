@@ -20,7 +20,8 @@ export default function FilInstruction({ demandes }: FilInstructionProps) {
             {demandes.map(({ id, programmeAide, instructions }) => (
                 <section key={id} className="fil-instruction__programme">
                     <h2 className="fr-h5 fil-instruction__titre">
-                        Chronologie de l’instruction - {programmeAide.shortName}
+                        Chronologie de l’instruction - {programmeAide.shortName}{' '}
+                        {programmeAide.year}
                     </h2>
 
                     {instructions.length === 0 ? (

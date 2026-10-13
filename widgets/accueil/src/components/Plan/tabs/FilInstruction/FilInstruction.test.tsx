@@ -55,7 +55,12 @@ const bciat: DemandeSubventionDetail = {
 
 const bcib: DemandeSubventionDetail = {
     id: 2,
-    programmeAide: programmeAide({ id: 2, shortName: 'BCIB' }),
+    programmeAide: programmeAide({
+        id: 2,
+        year: 2024,
+        shortName: 'BCIB',
+        appelAProjet: 'BCIB (2024)',
+    }),
     instructions: [instruction({ id: 3, name: 'Instruction 3' })],
 }
 
@@ -69,12 +74,12 @@ describe('FilInstruction', () => {
 
         expect(
             screen.getByRole('heading', {
-                name: 'Chronologie de l’instruction - BCIAT',
+                name: 'Chronologie de l’instruction - BCIAT 2023',
             })
         ).toBeDefined()
         expect(
             screen.getByRole('heading', {
-                name: 'Chronologie de l’instruction - BCIB',
+                name: 'Chronologie de l’instruction - BCIB 2024',
             })
         ).toBeDefined()
     })
