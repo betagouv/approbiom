@@ -63,34 +63,34 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 ##### 2. Choisir et extraire un document
 
 - **2.1** Regarder la liste des documents → seules les pièces jointes du plan sont proposées, avec leur nom, leur taille et leur type
-- **2.2** Ouvrir un plan sans pièce jointe → « Aucune pièce jointe n'est liée à ce plan »
+- **2.2** Ouvrir un plan sans pièce jointe → « Aucune pièce jointe n'est liée à ce plan. Ajoutez le document à ses pièces jointes, ou changez de plan. »
 - **2.3** Choisir un document jamais extrait → la carte est cochée, avec « Document sélectionné : … », et le bouton « Extraire les données » devient actif
 - **2.4** Cliquer sur « Extraire les données » → l'onglet « 2. Extraction » s'ouvre avec « Extraction en cours », puis l'onglet « 3. Vérification et import »
 - **2.5** Extraire un document qui n'est pas un tableur BCIB/BCIAT → « L'extraction a échoué », avec le message d'erreur, la structure attendue du document (feuille « Fournisseurs », « fournisseur » ou « client » en colonne A, colonnes Sous catégorie ou Nature combustible, Tonnage et Répartition approximative, tableau arrêté à la ligne TOTAL), « Recommencer l'extraction » et « Choisir un autre document »
 - **2.6** Regarder la table des lignes extraites dans Grist → une ligne par ligne du document, en « Non vérifiée »
 - **2.7** Revenir sur l'onglet 1 → le document extrait affiche « Vérification en cours · x/y »
-- **2.8** Choisir un document déjà extrait → les boutons deviennent « Reprendre la vérification » et « Relancer l'extraction »
-- **2.9** Cliquer sur « Relancer l'extraction », puis confirmer → les lignes et leur vérification sont remplacées par une nouvelle extraction, toutes en « Non vérifiée » ; les approvisionnements déjà importés ne changent pas
+- **2.8** Choisir un document déjà extrait → le bouton devient « Reprendre la vérification », sans bouton pour relancer l'extraction sur cet onglet
+- **2.9** Dans l'onglet « 3. Vérification et import », cliquer sur « Relancer l'extraction », puis confirmer → les lignes et leur vérification sont remplacées par une nouvelle extraction, toutes en « Non vérifiée » ; les approvisionnements déjà importés ne changent pas
 - **2.10** Regarder un document dont des approvisionnements ont été importés → sa carte affiche « Déjà importé · N approvisionnements », où N est le nombre de lignes de la table Approvisionnement qui ont ce document en source
-- **2.11** Relancer l'extraction d'un document déjà importé → sa carte affiche les deux badges, « Déjà importé · N approvisionnements » et « Vérification en cours · x/y »
+- **2.11** Relancer l'extraction d'un document déjà importé, depuis l'onglet « 3. Vérification et import » → sa carte affiche les deux badges, « Déjà importé · N approvisionnements » et « Vérification en cours · x/y »
 
 ##### 3. Vérifier les lignes
 
 - **3.1** Regarder l'écran de vérification après une nouvelle extraction → le nom du document, cliquable pour le télécharger, un badge « N lignes extraites le … » et « x sur y vérifiées »
-- **3.2** Regarder le tableau → colonnes Contrôle, Ligne, Fournisseur, Ressource, Tonnage total (t MV/an), Répartition par provenance, Action ; chaque ligne a un interrupteur dans Contrôle et un bouton « Modifier »
+- **3.2** Regarder le tableau → colonnes Contrôle, Ligne, Fournisseur, Ressource, Tonnage total (t MV/an), Répartition par provenance, Action ; chaque ligne a un interrupteur dans Contrôle et un bouton « Voir/Modifier »
 - **3.3** Déplier la répartition d'une ligne → le détail de chaque provenance, avec son pourcentage
 - **3.4** Regarder une ligne dont la répartition ne fait pas 100 % → badge « Total X % ≠ 100 % »
 - **3.5** Tant qu'il reste des lignes non vérifiées → pas de bouton d'import, et la phrase « Vérifiez toutes les lignes pour pouvoir les importer (x/y). »
 - **3.6** Activer l'interrupteur d'une ligne → elle passe en « Vérifiée » ; le désactiver → elle repasse en « Non vérifiée »
 - **3.7** Regarder une ligne sans ressource ou sans provenance → son interrupteur est désactivé, avec « Ressource ou provenance manquante »
-- **3.8** Cliquer sur « Modifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource, la répartition par provenance et un avertissement toujours affiché : si le document ne donne pas de provenance, il faut indiquer le département de l'installation ; tant que rien n'est changé, le bouton s'appelle « Valider », et cliquer dessus passe la ligne en « Vérifiée » si elle a une ressource et une provenance
+- **3.8** Cliquer sur « Voir/Modifier » → modale « Données retenues dans la ligne N », avec le fournisseur, la ressource, la répartition par provenance et un avertissement toujours affiché : si le document ne donne pas de provenance, il faut indiquer le département de l'installation ; tant que rien n'est changé, le bouton s'appelle « Valider », et cliquer dessus passe la ligne en « Vérifiée » si elle a une ressource et une provenance
 - **3.9** Regarder la ressource → « Correspondance trouvée » si le document a été reconnu, sinon « Aucune correspondance trouvée »
 - **3.10** Saisir un pourcentage → le tonnage de la provenance se recalcule ; saisir un tonnage → le pourcentage se recalcule
 - **3.11** Ajouter puis supprimer une provenance → la répartition se met à jour
 - **3.12** Faire une répartition qui ne fait pas 100 % → « La répartition ne fait pas 100 %. », mais l'enregistrement reste possible
 - **3.13** Changer le fournisseur, la ressource ou un pourcentage, puis cliquer sur « Annuler » → rien n'est enregistré
 - **3.14** Changer le fournisseur, la ressource ou un pourcentage → le bouton « Valider » devient « Modifier », et redevient « Valider » si on remet les valeurs d'origine ; cliquer sur « Modifier » → la modale se ferme, les changements sont enregistrés et la ligne passe en « Vérifiée » ; le bouton « Modifier » n'est jamais grisé pendant la saisie
-- **3.15** Cliquer sur « Modifier » en laissant la ligne sans ressource ou sans provenance → les changements sont enregistrés, mais la ligne reste « Non vérifiée », avec « Ressource ou provenance manquante »
+- **3.15** Cliquer sur « Valider » ou « Modifier » en laissant la ligne sans ressource ou sans provenance → les changements sont enregistrés, mais la ligne reste « Non vérifiée », avec « Ressource ou provenance manquante »
 
 **Fournisseur et provenance**
 
@@ -112,7 +112,7 @@ Les tests E2E sont à faire avec un utilisateur de Grist qui possède le rôle "
 
 - **5.1** Extraire un document, vérifier une partie des lignes, puis revenir sur l'onglet 1 → le document affiche « Vérification en cours · x/y »
 - **5.2** Avoir deux documents en cours sur le même plan → chacun affiche son propre « Vérification en cours · x/y »
-- **5.3** Choisir le document en cours, puis « Reprendre la vérification » → ouverture de la vérification de ce document, avec une alerte « Approvisionnements extraits de ce document le … à … », donnant la date et l'heure de l'extraction, à la place du badge « N lignes extraites le … » ; les lignes déjà vérifiées le sont toujours
+- **5.3** Choisir le document en cours, puis « Reprendre la vérification » → ouverture de la vérification de ce document, avec l'information « L'extraction de ce document a été faite le … à … », donnant la date et l'heure de l'extraction, à la place du badge « N lignes extraites le … » ; les lignes déjà vérifiées le sont toujours
 - **5.4** Recharger la page Grist au milieu d'une vérification, puis rechoisir le même plan → le document est toujours « Vérification en cours », et la reprise retrouve les lignes et leur vérification
 - **5.5** Ouvrir un plan dont aucun document n'est en cours, ou dont tout a été importé → aucun document n'affiche « Vérification en cours »
 
