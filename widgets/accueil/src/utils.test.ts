@@ -23,7 +23,6 @@ function plan(overrides: Partial<PlanDetail> = {}): PlanDetail {
         installationRegion: null,
         demandesSubvention: [],
         fournisseurs: [],
-        attachments: [],
         ...overrides,
     }
 }

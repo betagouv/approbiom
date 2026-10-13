@@ -1,5 +1,4 @@
 import { describe, expect, it } from 'vitest'
-import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
@@ -131,25 +130,7 @@ function sources(
         crbs,
         approvisionnementsByFournisseur: [],
         entreprises: [scieriePicard, cooperativeDuBois],
-        attachments: [],
         ...overrides,
-    }
-}
-
-const attachmentsOf = (plans: readonly PlanDetail[], id: Plan['id']) =>
-    plans.find((plan) => plan.id === id)?.attachments ?? []
-
-function attachment(
-    planDApprovisionnement: Plan['id'],
-    id: number,
-    name = `document-${id}.pdf`
-): Attachment {
-    return {
-        id,
-        planDApprovisionnement,
-        type: 'Formulaire',
-        name,
-        sizeInBytes: 1024,
     }
 }
 
@@ -307,29 +288,6 @@ describe('composePlanDetails', () => {
                 valFleuri.id
             )[0].instructions
         ).toEqual([])
-    })
-})
-
-describe('composePlanDetails, on the attachments', () => {
-    it('hangs every document on the plan it is attached to', () => {
-        const formulaire = attachment(valFleuri.id, 1)
-        const plan = attachment(valFleuri.id, 2)
-        const voisin = attachment(clairVillage.id, 3)
-
-        const plans = composePlanDetails(
-            sources({ attachments: [formulaire, plan, voisin] })
-        )
-
-        expect(attachmentsOf(plans, valFleuri.id)).toEqual([formulaire, plan])
-        expect(attachmentsOf(plans, clairVillage.id)).toEqual([voisin])
-    })
-
-    it('leaves a plan nothing is attached to with nothing', () => {
-        const plans = composePlanDetails(
-            sources({ attachments: [attachment(clairVillage.id, 1)] })
-        )
-
-        expect(attachmentsOf(plans, valFleuri.id)).toEqual([])
     })
 })
 

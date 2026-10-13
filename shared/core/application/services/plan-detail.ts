@@ -1,4 +1,3 @@
-import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Crb } from '@shared/core/domain/entities/crb'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 import {
@@ -15,7 +14,6 @@ import type { ApprovisionnementGroupedByPlanRessourceAndFournisseur } from '@sha
 import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { ApprovisionnementPort } from '@shared/core/application/ports/approvisionnement'
-import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { CrbPort } from '@shared/core/application/ports/crb'
 import type { DemandeSubventionPort } from '@shared/core/application/ports/demande-subvention'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
@@ -45,7 +43,6 @@ export type PlanDetail = Plan & {
     installationRegion: Region['libelle'] | null
     demandesSubvention: readonly DemandeSubventionDetail[]
     fournisseurs: readonly Entreprise[]
-    attachments: readonly Attachment[]
 }
 
 export type PlanDetailSources = {
@@ -58,7 +55,6 @@ export type PlanDetailSources = {
     crbs: readonly Crb[]
     approvisionnementsByFournisseur: readonly ApprovisionnementGroupedByPlanRessourceAndFournisseur[]
     entreprises: readonly Entreprise[]
-    attachments: readonly Attachment[]
 }
 
 function getInstructionsBySubvention(
@@ -173,22 +169,6 @@ function getFournisseursByPlan({
     return fournisseursByPlan
 }
 
-function getAttachmentsByPlan(
-    attachments: readonly Attachment[]
-): Map<Plan['id'], Attachment[]> {
-    const attachmentsByPlan = new Map<Plan['id'], Attachment[]>()
-
-    for (const attachment of attachments) {
-        const attached =
-            attachmentsByPlan.get(attachment.planDApprovisionnement) ?? []
-        attached.push(attachment)
-
-        attachmentsByPlan.set(attachment.planDApprovisionnement, attached)
-    }
-
-    return attachmentsByPlan
-}
-
 export function getAppelsAProjet(
     plan: PlanDetail
 ): ProgrammeAide['appelAProjet'][] {
@@ -209,7 +189,6 @@ export function composePlanDetails({
     crbs,
     approvisionnementsByFournisseur,
     entreprises,
-    attachments,
 }: PlanDetailSources): PlanDetail[] {
     const communeByInstallation = new Map(
         installations.map(({ id, commune }) => [id, commune] as const)
@@ -232,8 +211,6 @@ export function composePlanDetails({
         entreprises,
     })
 
-    const attachmentsByPlan = getAttachmentsByPlan(attachments)
-
     return plans.map((plan) => {
         const commune = communeByInstallation.get(plan.installation) ?? ''
         const departementDeSituation = codeDepartementOf(commune) ?? null
@@ -248,7 +225,6 @@ export function composePlanDetails({
                     : (regionByDepartement.get(departementDeSituation) ?? null),
             demandesSubvention: demandesByPlan.get(plan.id) ?? [],
             fournisseurs: fournisseursByPlan.get(plan.id) ?? [],
-            attachments: attachmentsByPlan.get(plan.id) ?? [],
         }
     })
 }
@@ -264,7 +240,6 @@ export type PlanDetailPorts = {
     crbs: CrbPort
     approvisionnements: ApprovisionnementPort
     entreprises: EntreprisePort
-    attachments: AttachmentPort
 }
 
 /**
@@ -287,7 +262,6 @@ export async function getPlanDetails(
         crbs,
         approvisionnementsByFournisseur,
         entreprises,
-        attachments,
     ] = await Promise.all([
         ports.plans.list(),
         ports.installations.list(),
@@ -298,7 +272,6 @@ export async function getPlanDetails(
         ports.crbs.list(),
         ports.approvisionnements.listGroupedByPlanRessourceAndFournisseur(),
         ports.entreprises.list(),
-        ports.attachments.list(),
     ])
 
     return composePlanDetails({
@@ -311,6 +284,5 @@ export async function getPlanDetails(
         crbs,
         approvisionnementsByFournisseur,
         entreprises,
-        attachments,
     })
 }

@@ -30,6 +30,7 @@ const INCONNU = '—'
 export type PlanProps = {
     approvisionnementStatsByRessource: ApprovisionnementByRessourceStats
     plan: PlanDetail
+    listAttachments: () => Promise<readonly Attachment[]>
     getFileUrl: (id: Attachment['id']) => Promise<string>
     getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
     getDepartementContour: ReferentielGeoPort['getDepartementContour']
@@ -43,6 +44,7 @@ export type PlanProps = {
 export default function Plan({
     plan,
     approvisionnementStatsByRessource,
+    listAttachments,
     getFileUrl,
     getCommuneCenterPosition,
     getDepartementContour,
@@ -106,7 +108,7 @@ export default function Plan({
             )}
             {tab === 'pieces-jointes' && (
                 <PiecesJointes
-                    attachments={plan.attachments}
+                    listAttachments={listAttachments}
                     getFileUrl={getFileUrl}
                 />
             )}

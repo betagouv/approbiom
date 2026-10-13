@@ -47,6 +47,9 @@ export default function App(ports: AccueilPorts) {
                                     selectedPlan.id
                                 ) ?? []
                             }
+                            listAttachments={() =>
+                                ports.attachments.listByPlan(selectedPlan.id)
+                            }
                             getFileUrl={(id) =>
                                 ports.attachments.getFileUrl(id)
                             }

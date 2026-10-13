@@ -30,14 +30,15 @@ function mockGrist(visibleFiles: readonly number[]) {
         },
     }
 
+    const getAccessToken = vi.fn(() =>
+        Promise.resolve({ baseUrl: 'https://grist/api', token: 't' })
+    )
     vi.stubGlobal('grist', {
         docApi: {
             fetchTable: vi.fn((tableId: string) =>
                 Promise.resolve(tables[tableId])
             ),
-            getAccessToken: vi.fn(() =>
-                Promise.resolve({ baseUrl: 'https://grist/api', token: 't' })
-            ),
+            getAccessToken,
         },
         ready: vi.fn(),
         onOptions: (
@@ -60,7 +61,7 @@ function mockGrist(visibleFiles: readonly number[]) {
     })
     vi.stubGlobal('fetch', fetchFile)
 
-    return fetchFile
+    return { fetchFile, getAccessToken }
 }
 
 afterEach(() => {
@@ -85,7 +86,7 @@ describe('createGristAttachmentPort', () => {
     })
 
     it('reads the metadata table without asking the API when it shows the files', async () => {
-        const fetchFile = mockGrist([341, 342])
+        const { fetchFile } = mockGrist([341, 342])
 
         await createGristAttachmentPort().listByPlan(30)
 
@@ -93,7 +94,7 @@ describe('createGristAttachmentPort', () => {
     })
 
     it('asks the API for the files the metadata table hides', async () => {
-        const fetchFile = mockGrist([])
+        const { fetchFile } = mockGrist([])
 
         const attachments = await createGristAttachmentPort().listByPlan(30)
 
@@ -104,5 +105,22 @@ describe('createGristAttachmentPort', () => {
         expect(fetchFile).toHaveBeenCalledWith(
             'https://grist/api/attachments/341?auth=t'
         )
+    })
+
+    it('asks for one access token for all the files the metadata table hides', async () => {
+        const { fetchFile, getAccessToken } = mockGrist([])
+
+        await createGristAttachmentPort().list()
+
+        expect(fetchFile).toHaveBeenCalledTimes(2)
+        expect(getAccessToken).toHaveBeenCalledOnce()
+    })
+
+    it('asks for no access token when the metadata table shows every file', async () => {
+        const { getAccessToken } = mockGrist([341, 342])
+
+        await createGristAttachmentPort().list()
+
+        expect(getAccessToken).not.toHaveBeenCalled()
     })
 })

@@ -1,3 +1,4 @@
+import type { AccessTokenResult } from 'grist/GristAPI'
 import { METADATA_TABLE } from '../types/grist-tables'
 import { getAccessToken } from './grist-get-access-token'
 import { asNumber, asString, fetchRowsOnce } from './grist-helpers'
@@ -24,8 +25,10 @@ async function readAllMetadata(): Promise<Map<number, AttachmentMetadata>> {
     )
 }
 
-async function fetchMetadata(id: number): Promise<AttachmentMetadata | null> {
-    const { baseUrl, token } = await getAccessToken()
+async function fetchMetadata(
+    { baseUrl, token }: AccessTokenResult,
+    id: number
+): Promise<AttachmentMetadata | null> {
     const response = await fetch(`${baseUrl}/attachments/${id}?auth=${token}`)
     if (!response.ok) return null
 
@@ -49,11 +52,16 @@ export async function getAttachmentsMetadata(
     if (ids.length === 0) return new Map()
 
     const metadata = await readAllMetadata()
-    const fetched = await Promise.all(
-        ids
-            .filter((id) => !metadata.has(id))
-            .map(async (id) => [id, await fetchMetadata(id)] as const)
-    )
+    const missing = ids.filter((id) => !metadata.has(id))
+    const credentials = missing.length > 0 ? await getAccessToken() : null
+    const fetched = credentials
+        ? await Promise.all(
+              missing.map(
+                  async (id) =>
+                      [id, await fetchMetadata(credentials, id)] as const
+              )
+          )
+        : []
 
     return new Map([
         ...ids.flatMap((id) => {

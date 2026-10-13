@@ -1,5 +1,5 @@
 import { cleanup, fireEvent, render, screen } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
     AccessDeniedError,
     DataSourceUnavailableError,
@@ -72,14 +72,8 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         instructions: instructionPort(),
         crbs: { list: rows([]) },
         attachments: {
-            list: rows([]),
             listByPlan: rows([]),
             getFileUrl: () => Promise.resolve(''),
-            download: () => Promise.resolve(new Blob()),
-            findOne: () =>
-                Promise.reject(
-                    new Error('no attachment is read one by one by these tests')
-                ),
         },
         ...overrides,
     }
@@ -355,5 +349,38 @@ describe('App', () => {
 
         expect(await screen.findByText('Plaquettes forestières')).toBeDefined()
         expect(screen.queryByRole('combobox')).toBeNull()
+    })
+
+    it('reads the attachments of the opened plan only, once its tab is opened', async () => {
+        const listByPlan = vi.fn(
+            rows([
+                {
+                    id: 341,
+                    planDApprovisionnement: saintJunien.id,
+                    type: 'excel ademe',
+                    name: 'plan-saint-junien.xlsx',
+                    sizeInBytes: 2048,
+                },
+            ])
+        )
+        render(
+            <App
+                {...fakePorts({
+                    plans: planPort(rows([saintJunien])),
+                    attachments: {
+                        listByPlan,
+                        getFileUrl: () => Promise.resolve(''),
+                    },
+                })}
+            />
+        )
+
+        await openPlan()
+        expect(listByPlan).not.toHaveBeenCalled()
+
+        fireEvent.click(screen.getByRole('button', { name: 'Pièces jointes' }))
+
+        expect(await screen.findByText('plan-saint-junien.xlsx')).toBeDefined()
+        expect(listByPlan).toHaveBeenCalledWith(saintJunien.id)
     })
 })

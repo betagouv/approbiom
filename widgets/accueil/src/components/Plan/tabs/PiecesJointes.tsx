@@ -3,7 +3,9 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-document/icons-document.main.min.c
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import './PiecesJointes.css'
+import AsyncGate from '@shared/react/components/AsyncGate'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
+import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 
 const TAILLE = new Intl.NumberFormat('fr-FR', { maximumFractionDigits: 1 })
@@ -65,14 +67,18 @@ function getColumns(
 }
 
 export type PiecesJointesProps = {
-    attachments: readonly Attachment[]
+    // Read when the tab is opened, for this plan only: an editor does not see
+    // Grist's attachment table, so each file costs one request (ADR 0004).
+    listAttachments: () => Promise<readonly Attachment[]>
     getFileUrl: (id: Attachment['id']) => Promise<string>
 }
 
 export default function PiecesJointes({
-    attachments,
+    listAttachments,
     getFileUrl,
 }: PiecesJointesProps) {
+    const state = useAsyncState(listAttachments)
+
     async function download(attachment: Attachment) {
         const url = await getFileUrl(attachment.id)
 
@@ -82,22 +88,26 @@ export default function PiecesJointes({
         link.click()
     }
 
-    if (attachments.length === 0) {
-        return (
-            <p className="fr-text--sm">
-                Aucune pièce jointe n’est rattachée à ce plan.
-            </p>
-        )
-    }
-
     return (
-        <div className="pieces-jointes">
-            <DataTable
-                caption="Pièces jointes du plan"
-                rows={attachments}
-                columns={getColumns((attachment) => void download(attachment))}
-                bordered
-            />
-        </div>
+        <AsyncGate state={state}>
+            {(attachments) =>
+                attachments.length === 0 ? (
+                    <p className="fr-text--sm">
+                        Aucune pièce jointe n’est rattachée à ce plan.
+                    </p>
+                ) : (
+                    <div className="pieces-jointes">
+                        <DataTable
+                            caption="Pièces jointes du plan"
+                            rows={attachments}
+                            columns={getColumns(
+                                (attachment) => void download(attachment)
+                            )}
+                            bordered
+                        />
+                    </div>
+                )
+            }
+        </AsyncGate>
     )
 }

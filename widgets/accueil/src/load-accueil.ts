@@ -1,4 +1,5 @@
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
+import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type {
     DepartementsByRegion,
     ReferentielGeoPort,
@@ -31,6 +32,7 @@ export type AccueilPorts = PlanDetailPorts &
         getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
         getDepartementContour: ReferentielGeoPort['getDepartementContour']
         getCountryContour: ReferentielGeoPort['getCountryContour']
+        attachments: Pick<AttachmentPort, 'listByPlan' | 'getFileUrl'>
     }
 
 export type AccueilScreen = {
