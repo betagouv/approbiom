@@ -156,7 +156,9 @@ describe('ScreenImportFromDoc', () => {
         await renderScreen({ listAttachments: () => Promise.resolve([]) })
 
         expect(
-            screen.getByText(/Aucune pièce jointe n'est liée à ce plan/)
+            screen.getByText(
+                "Aucune pièce jointe n'est liée à ce plan. Ajoutez le document à ses pièces jointes, ou changez de plan."
+            )
         ).toBeTruthy()
         expect(
             screen.getByRole<HTMLButtonElement>('button', {
@@ -195,8 +197,8 @@ describe('ScreenImportFromDoc', () => {
             screen.getByRole('button', { name: 'Reprendre la vérification' })
         ).toBeTruthy()
         expect(
-            screen.getByRole('button', { name: "Relancer l'extraction" })
-        ).toBeTruthy()
+            screen.queryByRole('button', { name: "Relancer l'extraction" })
+        ).toBeNull()
     })
 
     it('extracts the document chosen', async () => {
@@ -250,7 +252,10 @@ describe('ScreenImportFromDoc', () => {
 
         fireEvent.click(card('commence'))
         fireEvent.click(
-            screen.getByRole('button', { name: "Relancer l'extraction" })
+            screen.getByRole('button', { name: 'Reprendre la vérification' })
+        )
+        fireEvent.click(
+            await screen.findByRole('button', { name: "Relancer l'extraction" })
         )
         fireEvent.click(
             within(screen.getByRole('dialog')).getByRole('button', {
@@ -327,7 +332,7 @@ describe('ScreenImportFromDoc', () => {
             screen.getByRole('button', { name: 'Reprendre la vérification' })
         )
         fireEvent.click(
-            await screen.findByRole('button', { name: /^Modifier/ })
+            await screen.findByRole('button', { name: /^Voir\/Modifier/ })
         )
         const list = within(screen.getByRole('dialog')).getByRole('combobox', {
             name: /Ressource/,

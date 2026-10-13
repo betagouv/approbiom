@@ -284,20 +284,6 @@ export default function ScreenImportFromDoc({
                                                             ? `Document sélectionné : ${selected.name}`
                                                             : 'Sélectionnez le document BCIB/BCIAT.'}
                                                     </p>
-                                                    {alreadyExtracted && (
-                                                        <button
-                                                            type="button"
-                                                            className="fr-btn fr-btn--secondary fr-btn--icon-left fr-icon-refresh-line"
-                                                            onClick={() =>
-                                                                setReextracting(
-                                                                    true
-                                                                )
-                                                            }
-                                                        >
-                                                            Relancer
-                                                            l&apos;extraction
-                                                        </button>
-                                                    )}
                                                     <button
                                                         type="button"
                                                         className="fr-btn fr-btn--icon-right fr-icon-arrow-right-line"

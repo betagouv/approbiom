@@ -38,6 +38,11 @@ export type VerificationProps = Referentiels & {
     attachment: Attachment
     lines: readonly ExtractedApprovisionnement[]
     date: Date
+    // True when the user resumes the verification of a document extracted
+    // before (« Reprendre la vérification »): the lines are read back from the
+    // table of extracted lines, with their controle and their corrections, and
+    // `date` is the date of that earlier extraction. False right after a new
+    // extraction (« Extraire les données », « Relancer l'extraction »).
     resumed: boolean
     pays: readonly Pays[]
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>
@@ -186,7 +191,7 @@ export default function Verification({
                     className="fr-btn fr-btn--secondary fr-btn--sm verification__action"
                     onClick={() => setReviewedId(line.id)}
                 >
-                    Modifier
+                    Voir/Modifier
                     <span className="fr-sr-only">
                         {' '}
                         la ligne {line.read.excelRow}
@@ -219,8 +224,8 @@ export default function Verification({
             </DocumentContext>
 
             {resumed && (
-                <Alert severity="warning" size="sm">
-                    Approvisionnements extraits de ce document le{' '}
+                <Alert severity="info" size="sm">
+                    L&apos;extraction de ce document a été faite le{' '}
                     {formatExtractedAt(date)}
                 </Alert>
             )}

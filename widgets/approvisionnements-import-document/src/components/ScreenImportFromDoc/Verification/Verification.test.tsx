@@ -115,8 +115,8 @@ describe('Verification', () => {
             .map((cells) => [cells[0].textContent, cells.at(-1)?.textContent])
 
         expect(lastCells).toEqual([
-            [NON_VERIFIEE, 'Modifier la ligne 17'],
-            [VERIFIEE, 'Modifier la ligne 18'],
+            [NON_VERIFIEE, 'Voir/Modifier la ligne 17'],
+            [VERIFIEE, 'Voir/Modifier la ligne 18'],
         ])
     })
 
@@ -142,25 +142,25 @@ describe('Verification', () => {
         ).toBeTruthy()
     })
 
-    it('warns that a resumed document was already extracted, and when', () => {
+    it('tells when a resumed document was extracted', () => {
         renderVerification([line(1, NON_VERIFIEE)])
 
         expect(
             screen.getByText(
-                'Approvisionnements extraits de ce document le 02/10/2026 à 14h30'
+                "L'extraction de ce document a été faite le 02/10/2026 à 14h30"
             )
         ).toBeTruthy()
         expect(screen.queryByText(/ligne extraite le/)).toBeNull()
     })
 
-    it('shows when a new extraction was made, without a warning', () => {
+    it('shows when a new extraction was made, without the resume message', () => {
         renderVerification([line(1, NON_VERIFIEE)], undefined, undefined, false)
 
         expect(
             screen.getByText(/1 ligne extraite le 02\/10\/2026 à 14h30/)
         ).toBeTruthy()
         expect(
-            screen.queryByText(/Approvisionnements extraits de ce document le/)
+            screen.queryByText(/L'extraction de ce document a été faite le/)
         ).toBeNull()
     })
 
@@ -226,7 +226,7 @@ describe('Verification', () => {
     it('saves the changes only with « Modifier »', async () => {
         const onUpdateLine = renderVerification([line(1, VERIFIEE)])
 
-        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        fireEvent.click(screen.getByRole('button', { name: /^Voir\/Modifier/ }))
         const percentage = within(dialog()).getByRole('textbox', {
             name: 'Répartition (%)',
         })
@@ -255,7 +255,7 @@ describe('Verification', () => {
         const onUpdateLine = vi.fn(() => Promise.resolve())
         renderVerification([line(1, VERIFIEE)], onUpdateLine)
 
-        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        fireEvent.click(screen.getByRole('button', { name: /^Voir\/Modifier/ }))
         const percentage = within(dialog()).getByRole('textbox', {
             name: 'Répartition (%)',
         })
@@ -272,7 +272,7 @@ describe('Verification', () => {
     it('names the button « Valider » until something is changed, then « Modifier »', () => {
         renderVerification([line(1, NON_VERIFIEE)])
 
-        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        fireEvent.click(screen.getByRole('button', { name: /^Voir\/Modifier/ }))
         expect(
             within(dialog()).getByRole('button', { name: 'Valider' })
         ).toBeTruthy()
@@ -297,7 +297,7 @@ describe('Verification', () => {
         const onUpdateLine = vi.fn(() => Promise.resolve())
         renderVerification([line(1, NON_VERIFIEE)], onUpdateLine)
 
-        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        fireEvent.click(screen.getByRole('button', { name: /^Voir\/Modifier/ }))
         fireEvent.click(
             within(dialog()).getByRole('button', { name: 'Valider' })
         )
@@ -315,7 +315,7 @@ describe('Verification', () => {
             Promise.reject(new Error('Grist'))
         )
 
-        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        fireEvent.click(screen.getByRole('button', { name: /^Voir\/Modifier/ }))
         const percentage = within(dialog()).getByRole('textbox', {
             name: 'Répartition (%)',
         })
@@ -335,7 +335,7 @@ describe('Verification', () => {
     it('reminds to give the département of the installation when the document gives no provenance', () => {
         renderVerification([line(1, NON_VERIFIEE)])
 
-        fireEvent.click(screen.getByRole('button', { name: /^Modifier/ }))
+        fireEvent.click(screen.getByRole('button', { name: /^Voir\/Modifier/ }))
 
         expect(
             within(dialog()).getByText(

@@ -70,8 +70,7 @@ export default function DocumentPicker({
                 <div className="document-picker__empty">
                     <Alert severity="info" size="sm">
                         Aucune pièce jointe n&apos;est liée à ce plan. Ajoutez
-                        le document BCIB/BCIAT dans la table Piece_jointe, ou
-                        changez de plan.
+                        le document à ses pièces jointes, ou changez de plan.
                     </Alert>
                 </div>
             ) : (
