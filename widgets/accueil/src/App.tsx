@@ -29,42 +29,58 @@ export default function App(ports: AccueilPorts) {
                             (plan) => plan.id === selectedPlanId
                         ) ?? null
 
-                    return selectedPlan === null ? (
-                        <PageAccueil
-                            plansApprovisionnement={plansApprovisionnement}
-                            departementsByRegion={departementsByRegion}
-                            programmesAide={programmesAide}
-                            onOpenPlan={(plan) => setSelectedPlanId(plan.id)}
-                        />
-                    ) : (
-                        <Plan
-                            // Keyed by plan: opening another plan mounts
-                            // another one, which reads its own statistics.
-                            key={selectedPlan.id}
-                            plan={selectedPlan}
-                            approvisionnementStatsByRessource={
-                                approvisionnementByRessourceStatsList.get(
-                                    selectedPlan.id
-                                ) ?? []
-                            }
-                            listAttachments={() =>
-                                ports.attachments.listByPlan(selectedPlan.id)
-                            }
-                            getFileUrl={(id) =>
-                                ports.attachments.getFileUrl(id)
-                            }
-                            getCommuneCenterPosition={
-                                ports.getCommuneCenterPosition
-                            }
-                            getDepartementContour={ports.getDepartementContour}
-                            getCountryContour={ports.getCountryContour}
-                            updateInstruction={updateInstruction}
-                            updateIsPlanLaureatForProgrammeAide={
-                                updateIsPlanLaureatForProgrammeAide
-                            }
-                            refresh={state.refresh}
-                            onClose={() => setSelectedPlanId(null)}
-                        />
+                    return (
+                        <>
+                            {/* Hidden rather than unmounted while a plan is open,
+                            so the search and the filters are still there when
+                            the user comes back. */}
+                            <div hidden={selectedPlan !== null}>
+                                <PageAccueil
+                                    plansApprovisionnement={
+                                        plansApprovisionnement
+                                    }
+                                    departementsByRegion={departementsByRegion}
+                                    programmesAide={programmesAide}
+                                    onOpenPlan={(plan) =>
+                                        setSelectedPlanId(plan.id)
+                                    }
+                                />
+                            </div>
+                            {selectedPlan !== null && (
+                                <Plan
+                                    // Keyed by plan: opening another plan mounts
+                                    // another one, which reads its own statistics.
+                                    key={selectedPlan.id}
+                                    plan={selectedPlan}
+                                    approvisionnementStatsByRessource={
+                                        approvisionnementByRessourceStatsList.get(
+                                            selectedPlan.id
+                                        ) ?? []
+                                    }
+                                    listAttachments={() =>
+                                        ports.attachments.listByPlan(
+                                            selectedPlan.id
+                                        )
+                                    }
+                                    getFileUrl={(id) =>
+                                        ports.attachments.getFileUrl(id)
+                                    }
+                                    getCommuneCenterPosition={
+                                        ports.getCommuneCenterPosition
+                                    }
+                                    getDepartementContour={
+                                        ports.getDepartementContour
+                                    }
+                                    getCountryContour={ports.getCountryContour}
+                                    updateInstruction={updateInstruction}
+                                    updateIsPlanLaureatForProgrammeAide={
+                                        updateIsPlanLaureatForProgrammeAide
+                                    }
+                                    refresh={state.refresh}
+                                    onClose={() => setSelectedPlanId(null)}
+                                />
+                            )}
+                        </>
                     )
                 }}
             </AsyncGate>

@@ -223,6 +223,40 @@ describe('App', () => {
         ).toBeDefined()
     })
 
+    it('keeps the search when the user comes back from a plan', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planPort(
+                        rows([
+                            saintJunien,
+                            { ...saintJunien, id: 2, nom: 'RC Limoges' },
+                        ])
+                    ),
+                })}
+            />
+        )
+        const search = () =>
+            screen.getByRole<HTMLInputElement>('combobox', {
+                name: 'Rechercher un plan',
+            })
+
+        fireEvent.change(
+            await screen.findByRole('combobox', { name: 'Rechercher un plan' }),
+            {
+                target: { value: 'Saint' },
+            }
+        )
+        fireEvent.click(screen.getByRole('button', { name: 'Rechercher' }))
+        await openPlan()
+        fireEvent.click(screen.getByRole('button', { name: 'Accueil' }))
+
+        expect(search().value).toBe('Saint')
+        expect(
+            screen.getAllByRole('button', { name: 'Voir le plan' })
+        ).toHaveLength(1)
+    })
+
     it('opens the plan on the chronologies of its instructions', async () => {
         render(
             <App
@@ -269,9 +303,12 @@ describe('App', () => {
 
         // The « : » after the term is drawn by the stylesheet, so the text
         // here is the term on its own.
-        expect(screen.queryByText('Appel à projet')).toBeNull()
-        expect(screen.getByText("Région de l'installation")).toBeDefined()
-        expect(screen.getByText('Nouvelle-Aquitaine')).toBeDefined()
+        expect(
+            screen.getAllByRole('term').map((term) => term.textContent)
+        ).toEqual(["Région de l'installation"])
+        expect(
+            screen.getAllByRole('definition').map((value) => value.textContent)
+        ).toEqual(['Nouvelle-Aquitaine'])
     })
 
     it('says as much when the région cannot be answered', async () => {
