@@ -15,6 +15,7 @@ type Etablissement = {
     siret: string
     // A: actif, F: fermé.
     etat_administratif: 'A' | 'F'
+    // Always sent, here as on the unité légale: null while still open.
     date_fermeture: string | null
     adresse: string
 }
@@ -44,11 +45,11 @@ function etatOf(
     etablissement: Etablissement
 ): EtatAdministratif {
     if (result.etat_administratif === 'C')
-        return { etat: 'cessee', depuis: result.date_fermeture ?? null }
+        return { etat: 'cessee', depuis: result.date_fermeture }
     if (etablissement.etat_administratif === 'F')
         return {
             etat: 'etablissement-ferme',
-            depuis: etablissement.date_fermeture ?? null,
+            depuis: etablissement.date_fermeture,
         }
 
     return { etat: 'en-activite' }

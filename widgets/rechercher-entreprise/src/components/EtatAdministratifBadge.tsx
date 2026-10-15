@@ -1,12 +1,14 @@
 import Badge from '@shared/react/components/Badge'
 import type { EtatAdministratif } from '@shared/core/application/ports/entreprise-search'
 
-// SIRENE dates carry no time, so they parse as midnight UTC: formatted in UTC,
-// they show the same day east and west of Greenwich alike.
-const DAY = new Intl.DateTimeFormat('fr-FR', { timeZone: 'UTC' })
+// SIRENE dates come as YYYY-MM-DD. Rearranged rather than parsed as a Date,
+// they show the same day in every time zone, and one that does not read as a
+// date is left out instead of bringing the widget down.
+function since(date: string | null): string {
+    const [, year, month, day] = date?.match(/^(\d{4})-(\d{2})-(\d{2})$/) ?? []
 
-const since = (date: string | null) =>
-    date ? ` le ${DAY.format(new Date(date))}` : ''
+    return year ? ` le ${day}/${month}/${year}` : ''
+}
 
 export type EtatAdministratifBadgeProps = {
     etatAdministratif: EtatAdministratif

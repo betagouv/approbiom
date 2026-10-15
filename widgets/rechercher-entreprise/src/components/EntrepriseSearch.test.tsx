@@ -108,6 +108,18 @@ describe('EntrepriseSearch', () => {
         expect(screen.getByText('Cessée')).toBeDefined()
     })
 
+    it('leaves out a closing date it cannot read', async () => {
+        await searchFor(
+            'vallon',
+            searchFinding({
+                ...ENTREPRISES[0],
+                etatAdministratif: { etat: 'cessee', depuis: '2003' },
+            })
+        )
+
+        expect(screen.getByText('Cessée')).toBeDefined()
+    })
+
     it('says when the établissement found has closed, though its entreprise is active', async () => {
         await searchFor(
             '00000000000003',
