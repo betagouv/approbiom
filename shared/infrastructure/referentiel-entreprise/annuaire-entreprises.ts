@@ -11,7 +11,7 @@ export const annuaireSearchUrl = (query: string) =>
 export function annuaireEntrepriseUrl({
     denomination,
     siret,
-}: FoundEntreprise): string {
+}: Pick<FoundEntreprise, 'denomination' | 'siret'>): string {
     const name = denomination
         .normalize('NFD')
         .replace(/\p{M}/gu, '')

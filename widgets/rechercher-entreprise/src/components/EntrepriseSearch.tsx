@@ -3,7 +3,12 @@ import './EntrepriseSearch.css'
 import { useId, useState } from 'react'
 import Alert from '@shared/react/components/Alert'
 import SearchBar from '@shared/react/components/SearchBar'
-import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-search'
+import { formatNumber } from '@shared/react/format'
+import type {
+    EntrepriseSearchResult,
+    EntrepriseSearchTotal,
+    FoundEntreprise,
+} from '@shared/core/application/ports/entreprise-search'
 import AnnuaireSearchLink from './AnnuaireSearchLink'
 import EntrepriseResult from './EntrepriseResult'
 
@@ -14,12 +19,37 @@ type SearchStatus =
     | { kind: 'idle' }
     | { kind: 'too-short' }
     | { kind: 'loading' }
-    | { kind: 'found'; query: string; entreprises: FoundEntreprise[] }
+    | {
+          kind: 'found'
+          query: string
+          entreprises: FoundEntreprise[]
+          total: EntrepriseSearchTotal
+      }
     | { kind: 'not-found'; query: string }
     | { kind: 'failed' }
 
 export type EntrepriseSearchProps = {
-    getEntrepriseFromQuery: (query: string) => Promise<FoundEntreprise[]>
+    getEntrepriseFromQuery: (query: string) => Promise<EntrepriseSearchResult>
+}
+
+function foundTitle({ count, atLeast }: EntrepriseSearchTotal) {
+    if (count === 1) return '1 entreprise trouvée'
+
+    return `${atLeast ? 'Au moins ' : ''}${formatNumber(count)} entreprises trouvées`
+}
+
+// Only the first entreprises are listed: say how many others match, so that a
+// search too broad to hold the right one shows as such. Null when every one
+// is listed.
+function notShown(
+    { count, atLeast }: EntrepriseSearchTotal,
+    shown: number
+): string | null {
+    const others = count - shown
+    if (others <= 0) return null
+    if (others === 1) return "1 autre entreprise n'est pas affichée."
+
+    return `${atLeast ? 'Au moins ' : ''}${formatNumber(others)} autres entreprises ne sont pas affichées.`
 }
 
 export default function EntrepriseSearch({
@@ -27,6 +57,10 @@ export default function EntrepriseSearch({
 }: EntrepriseSearchProps) {
     const resultsTitleId = useId()
     const [status, setStatus] = useState<SearchStatus>({ kind: 'idle' })
+    const notShownSentence =
+        status.kind === 'found'
+            ? notShown(status.total, status.entreprises.length)
+            : null
 
     async function search(query: string) {
         const terms = query.trim()
@@ -38,11 +72,11 @@ export default function EntrepriseSearch({
 
         setStatus({ kind: 'loading' })
         try {
-            const entreprises = await getEntrepriseFromQuery(terms)
+            const { entreprises, total } = await getEntrepriseFromQuery(terms)
 
             setStatus(
                 entreprises.length > 0
-                    ? { kind: 'found', query: terms, entreprises }
+                    ? { kind: 'found', query: terms, entreprises, total }
                     : { kind: 'not-found', query: terms }
             )
         } catch {
@@ -71,10 +105,11 @@ export default function EntrepriseSearch({
                 {status.kind === 'found' && (
                     <section aria-labelledby={resultsTitleId}>
                         <h2 id={resultsTitleId} className="fr-h6 fr-mb-1w">
-                            {status.entreprises.length > 1
-                                ? `${status.entreprises.length} entreprises trouvées`
-                                : '1 entreprise trouvée'}
+                            {foundTitle(status.total)}
                         </h2>
+                        {notShownSentence && (
+                            <p className="fr-mb-1w">{notShownSentence}</p>
+                        )}
                         <p className="fr-mb-2w">
                             <AnnuaireSearchLink query={status.query} />
                         </p>

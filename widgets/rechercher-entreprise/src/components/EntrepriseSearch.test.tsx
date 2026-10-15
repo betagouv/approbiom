@@ -7,21 +7,42 @@ import {
     within,
 } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-search'
+import type {
+    EntrepriseSearchResult,
+    FoundEntreprise,
+} from '@shared/core/application/ports/entreprise-search'
 import EntrepriseSearch from './EntrepriseSearch'
 
 const ENTREPRISES: FoundEntreprise[] = [
-    { denomination: 'SCIERIE FICTIVE DU VALLON', siret: '00000000000003' },
-    { denomination: 'SCIERIE FICTIVE DU PLATEAU', siret: '00000000000004' },
+    {
+        denomination: 'SCIERIE FICTIVE DU VALLON',
+        siret: '00000000000003',
+        etatAdministratif: { etat: 'en-activite' },
+        adresse: '1 RUE FICTIVE 00000 VALLON-FICTIF',
+    },
+    {
+        denomination: 'SCIERIE FICTIVE DU PLATEAU',
+        siret: '00000000000004',
+        etatAdministratif: { etat: 'cessee', depuis: '2003-04-01' },
+        adresse: '2 CHEMIN FICTIF 00000 PLATEAU-FICTIF',
+    },
 ]
+
+// A search answering these entreprises, out of `total` in all — by default,
+// just them.
+const searchFinding = (
+    entreprises: FoundEntreprise[],
+    total = { count: entreprises.length, atLeast: false }
+) =>
+    vi.fn((): Promise<EntrepriseSearchResult> =>
+        Promise.resolve({ entreprises, total })
+    )
 
 afterEach(cleanup)
 
 async function searchFor(
     query: string,
-    getEntrepriseFromQuery = vi.fn((): Promise<FoundEntreprise[]> =>
-        Promise.resolve(ENTREPRISES)
-    )
+    getEntrepriseFromQuery = searchFinding(ENTREPRISES)
 ) {
     render(<EntrepriseSearch getEntrepriseFromQuery={getEntrepriseFromQuery} />)
     fireEvent.change(screen.getByRole('searchbox', { name: /^Entreprise/ }), {
@@ -54,6 +75,134 @@ describe('EntrepriseSearch', () => {
         ])
         expect(results.textContent).toContain('00000000000003')
         expect(results.textContent).toContain('00000000000004')
+    })
+
+    it('gives the address of each entreprise found', async () => {
+        await searchFor('scierie')
+
+        const results = screen.getByRole('region', {
+            name: '2 entreprises trouvées',
+        })
+        expect(results.textContent).toContain(
+            '1 RUE FICTIVE 00000 VALLON-FICTIF'
+        )
+        expect(results.textContent).toContain(
+            '2 CHEMIN FICTIF 00000 PLATEAU-FICTIF'
+        )
+        expect(
+            screen.getByRole('button', {
+                name: "Copier l'adresse de SCIERIE FICTIVE DU VALLON",
+            })
+        ).toBeDefined()
+    })
+
+    it('says which entreprise is still active and which has ceased, and since when', async () => {
+        await searchFor('scierie')
+
+        const [vallon, plateau] = screen.getAllByRole('listitem')
+        expect(within(vallon).getByText('En activité')).toBeDefined()
+        expect(within(plateau).getByText('Cessée le 01/04/2003')).toBeDefined()
+    })
+
+    it('says the entreprise has ceased, even when SIRENE does not know since when', async () => {
+        await searchFor(
+            'vallon',
+            searchFinding([
+                {
+                    ...ENTREPRISES[0],
+                    etatAdministratif: { etat: 'cessee', depuis: null },
+                },
+            ])
+        )
+
+        expect(screen.getByText('Cessée')).toBeDefined()
+    })
+
+    it('leaves out a closing date it cannot read', async () => {
+        await searchFor(
+            'vallon',
+            searchFinding([
+                {
+                    ...ENTREPRISES[0],
+                    etatAdministratif: { etat: 'cessee', depuis: '2003' },
+                },
+            ])
+        )
+
+        expect(screen.getByText('Cessée')).toBeDefined()
+    })
+
+    it('says when the établissement found has closed, though its entreprise is active', async () => {
+        await searchFor(
+            '00000000000003',
+            searchFinding([
+                {
+                    ...ENTREPRISES[0],
+                    etatAdministratif: {
+                        etat: 'etablissement-ferme',
+                        depuis: '2023-07-01',
+                    },
+                },
+            ])
+        )
+
+        expect(
+            screen.getByText('Établissement fermé le 01/07/2023')
+        ).toBeDefined()
+    })
+
+    it('says how many more entreprises match than are listed', async () => {
+        await searchFor(
+            'scierie',
+            searchFinding(ENTREPRISES, { count: 57, atLeast: false })
+        )
+
+        const results = screen.getByRole('region', {
+            name: '57 entreprises trouvées',
+        })
+        expect(results.querySelectorAll('li')).toHaveLength(2)
+        expect(
+            within(results).getByText(
+                '55 autres entreprises ne sont pas affichées.'
+            )
+        ).toBeDefined()
+    })
+
+    it('says when a single entreprise is left out', async () => {
+        await searchFor(
+            'scierie',
+            searchFinding(ENTREPRISES, { count: 3, atLeast: false })
+        )
+
+        expect(
+            screen.getByText("1 autre entreprise n'est pas affichée.")
+        ).toBeDefined()
+    })
+
+    it('says there are at least as many when the search stops counting', async () => {
+        await searchFor(
+            'sarl',
+            searchFinding(ENTREPRISES, { count: 10000, atLeast: true })
+        )
+
+        // fr-FR groups thousands with a narrow no-break space, which \s
+        // matches.
+        expect(
+            screen.getByRole('region', {
+                name: /^Au moins 10\s000 entreprises trouvées$/,
+            })
+        ).toBeDefined()
+        expect(
+            screen.getByText(
+                /^Au moins 9\s998 autres entreprises ne sont pas affichées\.$/
+            )
+        ).toBeDefined()
+    })
+
+    it('says nothing of other entreprises when all of them are listed', async () => {
+        await searchFor('scierie')
+
+        expect(screen.queryByText(/pas affichée/)).toBeNull()
     })
 
     it('says whose value each copy button copies', async () => {
@@ -100,12 +249,7 @@ describe('EntrepriseSearch', () => {
     })
 
     it('says « 1 entreprise trouvée » for a single result', async () => {
-        await searchFor(
-            'vallon',
-            vi.fn((): Promise<FoundEntreprise[]> =>
-                Promise.resolve([ENTREPRISES[0]])
-            )
-        )
+        await searchFor('vallon', searchFinding([ENTREPRISES[0]]))
 
         expect(
             screen.getByRole('region', { name: '1 entreprise trouvée' })
@@ -113,10 +257,7 @@ describe('EntrepriseSearch', () => {
     })
 
     it('says when nothing matches, with a link to the Annuaire des Entreprises', async () => {
-        await searchFor(
-            'scierie introuvable',
-            vi.fn((): Promise<FoundEntreprise[]> => Promise.resolve([]))
-        )
+        await searchFor('scierie introuvable', searchFinding([]))
 
         expect(
             screen.getByText(
@@ -135,7 +276,7 @@ describe('EntrepriseSearch', () => {
     it('says when the search failed', async () => {
         await searchFor(
             'scierie',
-            vi.fn((): Promise<FoundEntreprise[]> =>
+            vi.fn((): Promise<EntrepriseSearchResult> =>
                 Promise.reject(new Error('réseau'))
             )
         )
