@@ -10,6 +10,10 @@ const SEARCH_URL = 'https://recherche-entreprises.api.gouv.fr/search'
 // Only the first answers are shown.
 const RESULT_COUNT = 3
 
+// Where the API stops counting: on a query as broad as « sarl » or « bois »,
+// total_results is 10 000 flat, so that many means 10 000 or more.
+const TOTAL_CEILING = 10_000
+
 // The fields read from the answer; the API sends many more.
 type Etablissement = {
     siret: string
@@ -29,7 +33,12 @@ type SearchResult = {
     matching_etablissements?: Etablissement[]
 }
 
-type SearchResponse = { results: SearchResult[] }
+type SearchResponse = {
+    results: SearchResult[]
+    // Documented as always sent. Should it ever be missing, the results given
+    // back are all there is to count, rather than a « NaN » shown as the total.
+    total_results?: number
+}
 
 function etablissementOf(result: SearchResult, query: string): Etablissement {
     const digits = query.replace(/\s/g, '')
@@ -86,11 +95,16 @@ export function createRechercheEntreprisesPort(): EntrepriseSearchPort {
             const response = await fetch(url)
             if (!response.ok) throw await errorOf(response)
 
-            const { results } = (await response.json()) as SearchResponse
+            const { results, total_results } =
+                (await response.json()) as SearchResponse
+            const count = total_results ?? results.length
 
-            return results
-                .slice(0, RESULT_COUNT)
-                .map((result) => toEntreprise(result, query))
+            return {
+                entreprises: results
+                    .slice(0, RESULT_COUNT)
+                    .map((result) => toEntreprise(result, query)),
+                total: { count, atLeast: count >= TOTAL_CEILING },
+            }
         },
     }
 }

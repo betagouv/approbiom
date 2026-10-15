@@ -15,7 +15,17 @@ export type FoundEntreprise = Pick<Entreprise, 'siret' | 'denomination'> & {
     adresse: string
 }
 
+// How many entreprises match in all, those not given back included. Past a
+// ceiling the search stops counting: `atLeast` then says there may be more.
+export type EntrepriseSearchTotal = { count: number; atLeast: boolean }
+
+export type EntrepriseSearchResult = {
+    // The first entreprises found, in the order the search ranks them; empty
+    // when nothing matches the query.
+    entreprises: FoundEntreprise[]
+    total: EntrepriseSearchTotal
+}
+
 export interface EntrepriseSearchPort {
-    // Empty when nothing matches the query.
-    getEntrepriseFromQuery(query: string): Promise<FoundEntreprise[]>
+    getEntrepriseFromQuery(query: string): Promise<EntrepriseSearchResult>
 }

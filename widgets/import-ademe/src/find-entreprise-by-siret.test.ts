@@ -1,5 +1,8 @@
 import { describe, expect, it } from 'vitest'
-import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-search'
+import type {
+    EntrepriseSearchResult,
+    FoundEntreprise,
+} from '@shared/core/application/ports/entreprise-search'
 import { findEntrepriseBySiret } from './find-entreprise-by-siret'
 
 const SIRET = '00000000000042'
@@ -11,13 +14,20 @@ const found = (siret: string, denomination: string): FoundEntreprise => ({
     adresse: '1 RUE FICTIVE 00000 COMMUNE-FICTIVE',
 })
 
+const answer = (...entreprises: FoundEntreprise[]): EntrepriseSearchResult => ({
+    entreprises,
+    total: { count: entreprises.length, atLeast: false },
+})
+
 describe('findEntrepriseBySiret', () => {
     it('finds the establishment carrying the SIRET', async () => {
         const result = await findEntrepriseBySiret(SIRET, () =>
-            Promise.resolve([
-                found('00000000000001', 'AUTRE FICTIVE'),
-                found(SIRET, 'SCIERIE FICTIVE'),
-            ])
+            Promise.resolve(
+                answer(
+                    found('00000000000001', 'AUTRE FICTIVE'),
+                    found(SIRET, 'SCIERIE FICTIVE')
+                )
+            )
         )
 
         expect(result).toEqual({
@@ -28,7 +38,7 @@ describe('findEntrepriseBySiret', () => {
 
     it('finds nothing when no answer carries the SIRET', async () => {
         const result = await findEntrepriseBySiret(SIRET, () =>
-            Promise.resolve([found('00000000000001', 'AUTRE FICTIVE')])
+            Promise.resolve(answer(found('00000000000001', 'AUTRE FICTIVE')))
         )
 
         expect(result).toEqual({ status: 'notfound' })

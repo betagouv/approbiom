@@ -24,8 +24,8 @@ export async function findEntrepriseBySiret(
     })
 
     try {
-        const results = await Promise.race([search(siret), timeout])
-        const found = results.find((result) => result.siret === siret)
+        const { entreprises } = await Promise.race([search(siret), timeout])
+        const found = entreprises.find((result) => result.siret === siret)
 
         return found
             ? { status: 'found', denomination: found.denomination }

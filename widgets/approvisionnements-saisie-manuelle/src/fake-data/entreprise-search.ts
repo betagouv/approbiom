@@ -17,20 +17,28 @@ export const FAKE_ENTREPRISE_SEARCH: EntrepriseSearchPort = {
                 const siret = query.replace(/\s/g, '')
                 if (siret === '99999999999999')
                     return reject(new Error('Service indisponible'))
-                if (siret.startsWith('000')) return resolve([])
+                if (siret.startsWith('000'))
+                    return resolve({
+                        entreprises: [],
+                        total: { count: 0, atLeast: false },
+                    })
 
                 const sum = [...siret].reduce(
                     (total, digit) => total + +digit,
                     0
                 )
-                resolve([
-                    {
-                        siret,
-                        denomination: FICTIVE_NAMES[sum % FICTIVE_NAMES.length],
-                        etatAdministratif: { etat: 'en-activite' },
-                        adresse: '1 RUE FICTIVE 00000 COMMUNE FICTIVE',
-                    },
-                ])
+                resolve({
+                    entreprises: [
+                        {
+                            siret,
+                            denomination:
+                                FICTIVE_NAMES[sum % FICTIVE_NAMES.length],
+                            etatAdministratif: { etat: 'en-activite' },
+                            adresse: '1 RUE FICTIVE 00000 COMMUNE FICTIVE',
+                        },
+                    ],
+                    total: { count: 1, atLeast: false },
+                })
             }, 900)
         ),
 }

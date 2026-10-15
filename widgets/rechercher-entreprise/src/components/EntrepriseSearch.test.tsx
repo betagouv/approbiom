@@ -7,7 +7,10 @@ import {
     within,
 } from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
-import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-search'
+import type {
+    EntrepriseSearchResult,
+    FoundEntreprise,
+} from '@shared/core/application/ports/entreprise-search'
 import EntrepriseSearch from './EntrepriseSearch'
 
 const ENTREPRISES: FoundEntreprise[] = [
@@ -25,16 +28,21 @@ const ENTREPRISES: FoundEntreprise[] = [
     },
 ]
 
-const searchFinding = (...entreprises: FoundEntreprise[]) =>
-    vi.fn((): Promise<FoundEntreprise[]> => Promise.resolve(entreprises))
+// A search answering these entreprises, out of `total` in all — by default,
+// just them.
+const searchFinding = (
+    entreprises: FoundEntreprise[],
+    total = { count: entreprises.length, atLeast: false }
+) =>
+    vi.fn((): Promise<EntrepriseSearchResult> =>
+        Promise.resolve({ entreprises, total })
+    )
 
 afterEach(cleanup)
 
 async function searchFor(
     query: string,
-    getEntrepriseFromQuery = vi.fn((): Promise<FoundEntreprise[]> =>
-        Promise.resolve(ENTREPRISES)
-    )
+    getEntrepriseFromQuery = searchFinding(ENTREPRISES)
 ) {
     render(<EntrepriseSearch getEntrepriseFromQuery={getEntrepriseFromQuery} />)
     fireEvent.change(screen.getByRole('searchbox', { name: /^Entreprise/ }), {
@@ -99,10 +107,12 @@ describe('EntrepriseSearch', () => {
     it('says the entreprise has ceased, even when SIRENE does not know since when', async () => {
         await searchFor(
             'vallon',
-            searchFinding({
-                ...ENTREPRISES[0],
-                etatAdministratif: { etat: 'cessee', depuis: null },
-            })
+            searchFinding([
+                {
+                    ...ENTREPRISES[0],
+                    etatAdministratif: { etat: 'cessee', depuis: null },
+                },
+            ])
         )
 
         expect(screen.getByText('Cessée')).toBeDefined()
@@ -111,10 +121,12 @@ describe('EntrepriseSearch', () => {
     it('leaves out a closing date it cannot read', async () => {
         await searchFor(
             'vallon',
-            searchFinding({
-                ...ENTREPRISES[0],
-                etatAdministratif: { etat: 'cessee', depuis: '2003' },
-            })
+            searchFinding([
+                {
+                    ...ENTREPRISES[0],
+                    etatAdministratif: { etat: 'cessee', depuis: '2003' },
+                },
+            ])
         )
 
         expect(screen.getByText('Cessée')).toBeDefined()
@@ -123,18 +135,74 @@ describe('EntrepriseSearch', () => {
     it('says when the établissement found has closed, though its entreprise is active', async () => {
         await searchFor(
             '00000000000003',
-            searchFinding({
-                ...ENTREPRISES[0],
-                etatAdministratif: {
-                    etat: 'etablissement-ferme',
-                    depuis: '2023-07-01',
+            searchFinding([
+                {
+                    ...ENTREPRISES[0],
+                    etatAdministratif: {
+                        etat: 'etablissement-ferme',
+                        depuis: '2023-07-01',
+                    },
                 },
-            })
+            ])
         )
 
         expect(
             screen.getByText('Établissement fermé le 01/07/2023')
         ).toBeDefined()
+    })
+
+    it('says how many more entreprises match than are listed', async () => {
+        await searchFor(
+            'scierie',
+            searchFinding(ENTREPRISES, { count: 57, atLeast: false })
+        )
+
+        const results = screen.getByRole('region', {
+            name: '57 entreprises trouvées',
+        })
+        expect(results.querySelectorAll('li')).toHaveLength(2)
+        expect(
+            within(results).getByText(
+                '55 autres entreprises ne sont pas affichées.'
+            )
+        ).toBeDefined()
+    })
+
+    it('says when a single entreprise is left out', async () => {
+        await searchFor(
+            'scierie',
+            searchFinding(ENTREPRISES, { count: 3, atLeast: false })
+        )
+
+        expect(
+            screen.getByText("1 autre entreprise n'est pas affichée.")
+        ).toBeDefined()
+    })
+
+    it('says there are at least as many when the search stops counting', async () => {
+        await searchFor(
+            'sarl',
+            searchFinding(ENTREPRISES, { count: 10000, atLeast: true })
+        )
+
+        // fr-FR groups thousands with a narrow no-break space, which \s
+        // matches.
+        expect(
+            screen.getByRole('region', {
+                name: /^Au moins 10\s000 entreprises trouvées$/,
+            })
+        ).toBeDefined()
+        expect(
+            screen.getByText(
+                /^Au moins 9\s998 autres entreprises ne sont pas affichées\.$/
+            )
+        ).toBeDefined()
+    })
+
+    it('says nothing of other entreprises when all of them are listed', async () => {
+        await searchFor('scierie')
+
+        expect(screen.queryByText(/pas affichée/)).toBeNull()
     })
 
     it('says whose value each copy button copies', async () => {
@@ -181,7 +249,7 @@ describe('EntrepriseSearch', () => {
     })
 
     it('says « 1 entreprise trouvée » for a single result', async () => {
-        await searchFor('vallon', searchFinding(ENTREPRISES[0]))
+        await searchFor('vallon', searchFinding([ENTREPRISES[0]]))
 
         expect(
             screen.getByRole('region', { name: '1 entreprise trouvée' })
@@ -189,7 +257,7 @@ describe('EntrepriseSearch', () => {
     })
 
     it('says when nothing matches, with a link to the Annuaire des Entreprises', async () => {
-        await searchFor('scierie introuvable', searchFinding())
+        await searchFor('scierie introuvable', searchFinding([]))
 
         expect(
             screen.getByText(
@@ -208,7 +276,7 @@ describe('EntrepriseSearch', () => {
     it('says when the search failed', async () => {
         await searchFor(
             'scierie',
-            vi.fn((): Promise<FoundEntreprise[]> =>
+            vi.fn((): Promise<EntrepriseSearchResult> =>
                 Promise.reject(new Error('réseau'))
             )
         )

@@ -39,6 +39,12 @@ const result = (n: number) => ({
     },
 })
 
+// An answer of the API: these results, out of `total_results` in all.
+const page = (results: unknown[], total_results = results.length) => ({
+    results,
+    total_results,
+})
+
 function mockFetch(response: Response) {
     const fetch = vi.fn<(url: URL) => Promise<Response>>(() =>
         Promise.resolve(response)
@@ -59,7 +65,7 @@ afterEach(() => {
 
 describe('createRechercheEntreprisesPort().getEntrepriseFromQuery', () => {
     it('asks the API for the first 3 results of the query', async () => {
-        const fetch = mockFetch(json({ results: [RESULT] }))
+        const fetch = mockFetch(json(page([RESULT])))
 
         await createRechercheEntreprisesPort().getEntrepriseFromQuery(
             'scierie & vallon'
@@ -74,26 +80,29 @@ describe('createRechercheEntreprisesPort().getEntrepriseFromQuery', () => {
     })
 
     it('takes the dénomination from nom_complet, and the SIRET and address of the siège', async () => {
-        mockFetch(json({ results: [RESULT] }))
+        mockFetch(json(page([RESULT])))
 
         expect(
             await createRechercheEntreprisesPort().getEntrepriseFromQuery(
                 'scierie'
             )
-        ).toEqual([
-            {
-                denomination: 'SCIERIE FICTIVE DU VALLON',
-                siret: '00000000300010',
-                etatAdministratif: { etat: 'en-activite' },
-                adresse: '1 RUE FICTIVE 00000 VALLON-FICTIF',
-            },
-        ])
+        ).toEqual({
+            entreprises: [
+                {
+                    denomination: 'SCIERIE FICTIVE DU VALLON',
+                    siret: '00000000300010',
+                    etatAdministratif: { etat: 'en-activite' },
+                    adresse: '1 RUE FICTIVE 00000 VALLON-FICTIF',
+                },
+            ],
+            total: { count: 1, atLeast: false },
+        })
     })
 
     it('gives back the établissement searched for by its SIRET, with its address', async () => {
-        mockFetch(json({ results: [RESULT] }))
+        mockFetch(json(page([RESULT])))
 
-        const entreprises =
+        const { entreprises } =
             await createRechercheEntreprisesPort().getEntrepriseFromQuery(
                 '000 000 003 00028'
             )
@@ -106,8 +115,8 @@ describe('createRechercheEntreprisesPort().getEntrepriseFromQuery', () => {
 
     it('says since when the entreprise has ceased', async () => {
         mockFetch(
-            json({
-                results: [
+            json(
+                page([
                     {
                         ...RESULT,
                         etat_administratif: 'C',
@@ -118,11 +127,11 @@ describe('createRechercheEntreprisesPort().getEntrepriseFromQuery', () => {
                             date_fermeture: '2003-04-01',
                         },
                     },
-                ],
-            })
+                ])
+            )
         )
 
-        const entreprises =
+        const { entreprises } =
             await createRechercheEntreprisesPort().getEntrepriseFromQuery(
                 'scierie'
             )
@@ -134,9 +143,9 @@ describe('createRechercheEntreprisesPort().getEntrepriseFromQuery', () => {
     })
 
     it('says since when the établissement searched for has closed, though the entreprise is active', async () => {
-        mockFetch(json({ results: [RESULT] }))
+        mockFetch(json(page([RESULT])))
 
-        const entreprises =
+        const { entreprises } =
             await createRechercheEntreprisesPort().getEntrepriseFromQuery(
                 '00000000300028'
             )
@@ -148,13 +157,14 @@ describe('createRechercheEntreprisesPort().getEntrepriseFromQuery', () => {
     })
 
     it('gives back no more than the first 3 results', async () => {
-        mockFetch(json({ results: [1, 2, 3, 4].map(result) }))
+        mockFetch(json(page([1, 2, 3, 4].map(result))))
 
-        expect(
+        const { entreprises } =
             await createRechercheEntreprisesPort().getEntrepriseFromQuery(
                 'fictive'
             )
-        ).toEqual(
+
+        expect(entreprises).toEqual(
             [1, 2, 3].map((n) => ({
                 denomination: `ENTREPRISE FICTIVE ${n}`,
                 siret: `0000000000000${n}`,
@@ -164,14 +174,47 @@ describe('createRechercheEntreprisesPort().getEntrepriseFromQuery', () => {
         )
     })
 
+    it('counts every entreprise that matches, beyond the first 3', async () => {
+        mockFetch(json(page([1, 2, 3].map(result), 6001)))
+
+        const { total } =
+            await createRechercheEntreprisesPort().getEntrepriseFromQuery(
+                'scierie'
+            )
+
+        expect(total).toEqual({ count: 6001, atLeast: false })
+    })
+
+    it('says there may be more when the API stops counting, at 10 000', async () => {
+        mockFetch(json(page([1, 2, 3].map(result), 10000)))
+
+        const { total } =
+            await createRechercheEntreprisesPort().getEntrepriseFromQuery(
+                'sarl'
+            )
+
+        expect(total).toEqual({ count: 10000, atLeast: true })
+    })
+
+    it('counts the results given back when the API leaves the total out', async () => {
+        mockFetch(json({ results: [1, 2].map(result) }))
+
+        const { total } =
+            await createRechercheEntreprisesPort().getEntrepriseFromQuery(
+                'fictive'
+            )
+
+        expect(total).toEqual({ count: 2, atLeast: false })
+    })
+
     it('finds nothing when the API has no result', async () => {
-        mockFetch(json({ results: [], total_results: 0 }))
+        mockFetch(json(page([])))
 
         expect(
             await createRechercheEntreprisesPort().getEntrepriseFromQuery(
                 'introuvable'
             )
-        ).toEqual([])
+        ).toEqual({ entreprises: [], total: { count: 0, atLeast: false } })
     })
 
     it("fails with the API's message when it refuses the query", async () => {
