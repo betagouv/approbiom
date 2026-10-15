@@ -11,9 +11,22 @@ import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-
 import EntrepriseSearch from './EntrepriseSearch'
 
 const ENTREPRISES: FoundEntreprise[] = [
-    { denomination: 'SCIERIE FICTIVE DU VALLON', siret: '00000000000003' },
-    { denomination: 'SCIERIE FICTIVE DU PLATEAU', siret: '00000000000004' },
+    {
+        denomination: 'SCIERIE FICTIVE DU VALLON',
+        siret: '00000000000003',
+        etatAdministratif: { etat: 'en-activite' },
+        adresse: '1 RUE FICTIVE 00000 VALLON-FICTIF',
+    },
+    {
+        denomination: 'SCIERIE FICTIVE DU PLATEAU',
+        siret: '00000000000004',
+        etatAdministratif: { etat: 'cessee', depuis: '2003-04-01' },
+        adresse: '2 CHEMIN FICTIF 00000 PLATEAU-FICTIF',
+    },
 ]
+
+const searchFinding = (...entreprises: FoundEntreprise[]) =>
+    vi.fn((): Promise<FoundEntreprise[]> => Promise.resolve(entreprises))
 
 afterEach(cleanup)
 
@@ -54,6 +67,62 @@ describe('EntrepriseSearch', () => {
         ])
         expect(results.textContent).toContain('00000000000003')
         expect(results.textContent).toContain('00000000000004')
+    })
+
+    it('gives the address of each entreprise found', async () => {
+        await searchFor('scierie')
+
+        const results = screen.getByRole('region', {
+            name: '2 entreprises trouvées',
+        })
+        expect(results.textContent).toContain(
+            '1 RUE FICTIVE 00000 VALLON-FICTIF'
+        )
+        expect(results.textContent).toContain(
+            '2 CHEMIN FICTIF 00000 PLATEAU-FICTIF'
+        )
+        expect(
+            screen.getByRole('button', {
+                name: "Copier l'adresse de SCIERIE FICTIVE DU VALLON",
+            })
+        ).toBeDefined()
+    })
+
+    it('says which entreprise is still active and which has ceased, and since when', async () => {
+        await searchFor('scierie')
+
+        const [vallon, plateau] = screen.getAllByRole('listitem')
+        expect(within(vallon).getByText('En activité')).toBeDefined()
+        expect(within(plateau).getByText('Cessée le 01/04/2003')).toBeDefined()
+    })
+
+    it('says the entreprise has ceased, even when SIRENE does not know since when', async () => {
+        await searchFor(
+            'vallon',
+            searchFinding({
+                ...ENTREPRISES[0],
+                etatAdministratif: { etat: 'cessee', depuis: null },
+            })
+        )
+
+        expect(screen.getByText('Cessée')).toBeDefined()
+    })
+
+    it('says when the établissement found has closed, though its entreprise is active', async () => {
+        await searchFor(
+            '00000000000003',
+            searchFinding({
+                ...ENTREPRISES[0],
+                etatAdministratif: {
+                    etat: 'etablissement-ferme',
+                    depuis: '2023-07-01',
+                },
+            })
+        )
+
+        expect(
+            screen.getByText('Établissement fermé le 01/07/2023')
+        ).toBeDefined()
     })
 
     it('says whose value each copy button copies', async () => {
@@ -100,12 +169,7 @@ describe('EntrepriseSearch', () => {
     })
 
     it('says « 1 entreprise trouvée » for a single result', async () => {
-        await searchFor(
-            'vallon',
-            vi.fn((): Promise<FoundEntreprise[]> =>
-                Promise.resolve([ENTREPRISES[0]])
-            )
-        )
+        await searchFor('vallon', searchFinding(ENTREPRISES[0]))
 
         expect(
             screen.getByRole('region', { name: '1 entreprise trouvée' })
@@ -113,10 +177,7 @@ describe('EntrepriseSearch', () => {
     })
 
     it('says when nothing matches, with a link to the Annuaire des Entreprises', async () => {
-        await searchFor(
-            'scierie introuvable',
-            vi.fn((): Promise<FoundEntreprise[]> => Promise.resolve([]))
-        )
+        await searchFor('scierie introuvable', searchFinding())
 
         expect(
             screen.getByText(

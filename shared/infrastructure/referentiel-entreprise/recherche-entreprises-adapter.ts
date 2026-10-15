@@ -1,5 +1,6 @@
 import type {
     EntrepriseSearchPort,
+    EtatAdministratif,
     FoundEntreprise,
 } from '@shared/core/application/ports/entreprise-search'
 
@@ -10,27 +11,57 @@ const SEARCH_URL = 'https://recherche-entreprises.api.gouv.fr/search'
 const RESULT_COUNT = 3
 
 // The fields read from the answer; the API sends many more.
+type Etablissement = {
+    siret: string
+    // A: actif, F: fermé.
+    etat_administratif: 'A' | 'F'
+    date_fermeture: string | null
+    adresse: string
+}
+
 type SearchResult = {
     nom_complet: string
-    siege: { siret: string }
-    matching_etablissements?: { siret: string }[]
+    // That of the unité légale — A: active, C: cessée.
+    etat_administratif: 'A' | 'C'
+    date_fermeture: string | null
+    siege: Etablissement
+    matching_etablissements?: Etablissement[]
 }
 
 type SearchResponse = { results: SearchResult[] }
 
-function siretOf(result: SearchResult, query: string): string {
+function etablissementOf(result: SearchResult, query: string): Etablissement {
     const digits = query.replace(/\s/g, '')
     const searchedEtablissement = result.matching_etablissements?.find(
         ({ siret }) => siret === digits
     )
 
-    return searchedEtablissement?.siret ?? result.siege.siret
+    return searchedEtablissement ?? result.siege
+}
+
+function etatOf(
+    result: SearchResult,
+    etablissement: Etablissement
+): EtatAdministratif {
+    if (result.etat_administratif === 'C')
+        return { etat: 'cessee', depuis: result.date_fermeture ?? null }
+    if (etablissement.etat_administratif === 'F')
+        return {
+            etat: 'etablissement-ferme',
+            depuis: etablissement.date_fermeture ?? null,
+        }
+
+    return { etat: 'en-activite' }
 }
 
 function toEntreprise(result: SearchResult, query: string): FoundEntreprise {
+    const etablissement = etablissementOf(result, query)
+
     return {
         denomination: result.nom_complet,
-        siret: siretOf(result, query),
+        siret: etablissement.siret,
+        etatAdministratif: etatOf(result, etablissement),
+        adresse: etablissement.adresse,
     }
 }
 

@@ -27,6 +27,8 @@ export const FAKE_ENTREPRISE_SEARCH: EntrepriseSearchPort = {
                     {
                         siret,
                         denomination: FICTIVE_NAMES[sum % FICTIVE_NAMES.length],
+                        etatAdministratif: { etat: 'en-activite' },
+                        adresse: '1 RUE FICTIVE 00000 COMMUNE FICTIVE',
                     },
                 ])
             }, 900)
