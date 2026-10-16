@@ -32,11 +32,15 @@ Pré-requis : installer Grist Desktop.
 
 Voir : https://github.com/gristlabs/grist-desktop/releases
 
-Puis lancer :
+Télécharger le document de production.
+
+Pour servir les widgets du repository, lancer :
 
 ```bash
 pnpm run dev
 ```
+
+Sur Grist Desktop, dans la copie du document de production, créer une vue personnalisé avec l'URL du widget servi en environnement de développement.
 
 ### Création d'un nouveau widget
 
