@@ -1,3 +1,5 @@
+import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
+
 /**
  * Every metadata table id and column list the adapters read, in one place.
  */
@@ -165,3 +167,19 @@ export type AImporterApprovisionnementColumn = {
     Repartition_calculee_par_le_script: string
     Niveau_de_confiance: string
 }
+
+/**
+ * The column each field of a plan is read from. `PlanPort.list` asks Grist only
+ * for the columns of the fields it is given.
+ */
+export const PLAN_COLUMN_BY_FIELD = {
+    id: 'id',
+    nom: 'Nom',
+    installation: 'Installation',
+    typeDePlan: 'Type_de_plan',
+    usage: 'Usage_principal',
+    natureDonnee: 'Nature_Donnee',
+    statut: 'Statut',
+    createdBy: 'Cree_par',
+    createdAt: 'Cree_le',
+} as const satisfies Record<keyof PlanDApprovisionnement, string>

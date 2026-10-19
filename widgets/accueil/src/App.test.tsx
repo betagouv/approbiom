@@ -87,6 +87,8 @@ const saintJunien: Plan = {
     usage: 'énergie',
     natureDonnee: 'prévision',
     statut: 'en fonctionnement',
+    createdBy: null,
+    createdAt: null,
 }
 
 // 87154 is Saint-Junien's commune code. The « 87 » the header's « Région » is
