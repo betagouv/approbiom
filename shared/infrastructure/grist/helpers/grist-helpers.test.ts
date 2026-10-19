@@ -4,6 +4,7 @@ import {
     deleteRows,
     fetchRow,
     fetchRows,
+    fetchRowsOnce,
     indexByKey,
     toRows,
     type ColumnMajorTable,
@@ -87,6 +88,61 @@ describe('fetchRows', () => {
         await expect(
             fetchRows('Plan_d_approvisionnement', ['Nom', 'Usage_principal'])
         ).rejects.toThrow('Nom, Usage_principal')
+    })
+})
+
+describe('fetchRowsOnce', () => {
+    function mockFetchTable(columns: ColumnMajorTable) {
+        const fetchTable = vi.fn().mockResolvedValue(columns)
+        vi.stubGlobal('grist', { docApi: { fetchTable } })
+        return fetchTable
+    }
+
+    afterEach(() => {
+        vi.unstubAllGlobals()
+    })
+
+    // Grist sends every column whatever is asked for: two reads of one table
+    // for different columns are still one fetch.
+    it('fetches a table once for reads of different columns at the same time', async () => {
+        const fetchTable = mockFetchTable({
+            id: [1],
+            Nom: ['RCU Val Fleuri'],
+            Cree_par: ['claire.godel'],
+        })
+
+        const [plans, creations] = await Promise.all([
+            fetchRowsOnce('Plan_d_approvisionnement', ['id', 'Nom']),
+            fetchRowsOnce('Plan_d_approvisionnement', ['id', 'Cree_par']),
+        ])
+
+        expect(fetchTable).toHaveBeenCalledOnce()
+        expect(plans).toEqual([{ id: 1, Nom: 'RCU Val Fleuri' }])
+        expect(creations).toEqual([{ id: 1, Cree_par: 'claire.godel' }])
+    })
+
+    it('fails only the read that asks for a column the table lacks', async () => {
+        mockFetchTable({ id: [1], Nom: ['RCU Val Fleuri'] })
+
+        const [plans, creations] = await Promise.allSettled([
+            fetchRowsOnce('Plan_d_approvisionnement', ['id', 'Nom']),
+            fetchRowsOnce('Plan_d_approvisionnement', ['id', 'Cree_par']),
+        ])
+
+        expect(plans).toEqual({
+            status: 'fulfilled',
+            value: [{ id: 1, Nom: 'RCU Val Fleuri' }],
+        })
+        expect(creations).toMatchObject({ status: 'rejected' })
+    })
+
+    it('fetches the table again once the previous read is over', async () => {
+        const fetchTable = mockFetchTable({ id: [1] })
+
+        await fetchRowsOnce('Plan_d_approvisionnement', ['id'])
+        await fetchRowsOnce('Plan_d_approvisionnement', ['id'])
+
+        expect(fetchTable).toHaveBeenCalledTimes(2)
     })
 })
 

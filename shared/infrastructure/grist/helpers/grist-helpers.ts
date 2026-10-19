@@ -44,16 +44,25 @@ export async function fetchRows(
     tableId: string,
     columnIds?: readonly string[]
 ): Promise<GristRow[]> {
-    let columns: ColumnMajorTable
+    return selectRows(tableId, await fetchColumns(tableId), columnIds)
+}
+
+async function fetchColumns(tableId: string): Promise<ColumnMajorTable> {
     try {
-        columns = (await grist.docApi.fetchTable(tableId)) as ColumnMajorTable
+        return (await grist.docApi.fetchTable(tableId)) as ColumnMajorTable
     } catch (cause) {
         throw new Error(
             `Grist table "${tableId}" could not be read — check it still exists in the document. `,
             { cause }
         )
     }
+}
 
+function selectRows(
+    tableId: string,
+    columns: ColumnMajorTable,
+    columnIds?: readonly string[]
+): GristRow[] {
     if (!columnIds || columnIds.length === 0) {
         return toRows(columns)
     }
@@ -71,26 +80,29 @@ export async function fetchRows(
     return toRows(selectedColumns)
 }
 
-const inFlight = new Map<string, Promise<GristRow[]>>()
+const inFlight = new Map<string, Promise<ColumnMajorTable>>()
 
 /**
  * `fetchRows`, minus the reads a single load duplicates.
+ *
+ * @remark Shared by table, not by columns: Grist sends every column whatever
+ * is asked for, so two adapters reading different columns of one table still
+ * need one fetch. Each then keeps, and checks, only its own columns — a column
+ * one of them needs and the document lacks fails that adapter alone.
  */
-export function fetchRowsOnce(
+export async function fetchRowsOnce(
     tableId: string,
     columnIds: readonly string[]
 ): Promise<GristRow[]> {
-    const key = `${tableId}(${columnIds.join(',')})`
+    let reading = inFlight.get(tableId)
+    if (!reading) {
+        reading = fetchColumns(tableId).finally(() => {
+            inFlight.delete(tableId)
+        })
+        inFlight.set(tableId, reading)
+    }
 
-    const pending = inFlight.get(key)
-    if (pending) return pending
-
-    const reading = fetchRows(tableId, columnIds).finally(() => {
-        inFlight.delete(key)
-    })
-    inFlight.set(key, reading)
-
-    return reading
+    return selectRows(tableId, await reading, columnIds)
 }
 
 /**

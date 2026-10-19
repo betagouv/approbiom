@@ -9,6 +9,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'en fonctionnement',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 2,
@@ -18,6 +20,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'projet',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 3,
@@ -27,6 +31,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'projet',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 4,
@@ -36,6 +42,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'projet',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 5,
@@ -45,6 +53,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'en fonctionnement',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 6,
@@ -54,6 +64,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'obsolète',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 7,
@@ -63,6 +75,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'en fonctionnement',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 8,
@@ -72,6 +86,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'projet',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 9,
@@ -81,6 +97,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'en fonctionnement',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 10,
@@ -90,6 +108,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'abandonné',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 11,
@@ -99,6 +119,8 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'projet',
+        createdBy: null,
+        createdAt: null,
     },
     {
         id: 12,
@@ -108,5 +130,7 @@ export const FAKE_PLANS: readonly PlanDApprovisionnement[] = [
         usage: 'énergie',
         natureDonnee: 'prévision',
         statut: 'obsolète',
+        createdBy: null,
+        createdAt: null,
     },
 ]

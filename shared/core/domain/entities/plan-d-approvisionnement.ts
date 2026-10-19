@@ -9,4 +9,6 @@ export type PlanDApprovisionnement = {
     usage: UsageType | null
     natureDonnee: string
     statut: string
+    createdBy: string | null
+    createdAt: Date | null
 }
