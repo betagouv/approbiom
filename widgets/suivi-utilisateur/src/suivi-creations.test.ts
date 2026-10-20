@@ -1,5 +1,6 @@
 import { describe, expect, it } from 'vitest'
 import {
+    partDesCreateurs,
     semaineDe,
     suivreCreations,
     type Compte,
@@ -242,8 +243,64 @@ describe('suivreCreations, week by week', () => {
             lignes: [],
             semaines: [],
             cetteSemaine: { semaine: '2026-10-19', utilisateurs: 0 },
+            totalPlans: 0,
+            premiereCreation: null,
+            nombreCreateurs: 0,
             nombreUtilisateurs: 4,
         })
+    })
+})
+
+describe('suivreCreations, since the tracking began', () => {
+    it('counts the plans the users created, and who created them', () => {
+        const suivi = suivre([
+            creation(null, null),
+            creation(CAMILLE, '2026-10-05T10:00:00Z'),
+            creation(CAMILLE, '2026-10-16T10:00:00Z'),
+            creation(ALEX, '2026-10-19T10:00:00Z'),
+            creation(ADMIN, '2026-10-19T11:00:00Z'),
+        ])
+
+        expect(suivi.totalPlans).toBe(3)
+        // Someone active over several weeks is still one user.
+        expect(suivi.nombreCreateurs).toBe(2)
+    })
+
+    it('dates the tracking from the first creation of a user', () => {
+        const suivi = suivre([
+            creation(ADMIN, '2026-10-14T10:00:00Z'),
+            creation(ALEX, '2026-10-19T08:58:19Z'),
+            creation(CAMILLE, '2026-10-16T13:39:26Z'),
+        ])
+
+        expect(suivi.premiereCreation).toEqual(new Date('2026-10-16T13:39:26Z'))
+    })
+
+    // Dated before October 2026, a plan counts no more in the totals than in
+    // the weeks.
+    it('leaves a plan dated before the tracking began out of the totals', () => {
+        const suivi = suivre([
+            creation(CAMILLE, '2026-06-01T10:00:00Z'),
+            creation(ALEX, '2026-10-14T10:00:00Z'),
+        ])
+
+        expect(suivi.totalPlans).toBe(1)
+        expect(suivi.nombreCreateurs).toBe(1)
+        expect(suivi.premiereCreation).toEqual(new Date('2026-10-14T10:00:00Z'))
+    })
+})
+
+describe('partDesCreateurs', () => {
+    it('divides the creators by the users', () => {
+        expect(
+            partDesCreateurs({ nombreCreateurs: 1, nombreUtilisateurs: 4 })
+        ).toBe(0.25)
+    })
+
+    it('is unknown while no account is ticked « Utilisateur Approbiom »', () => {
+        expect(
+            partDesCreateurs({ nombreCreateurs: 0, nombreUtilisateurs: 0 })
+        ).toBeNull()
     })
 })
 

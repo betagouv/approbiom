@@ -68,6 +68,11 @@ const cadre = async () =>
         })
     ).closest<HTMLElement>('section')!
 
+const indicateur = async (titre: string) =>
+    (await screen.findByRole('heading', { name: titre })).closest<HTMLElement>(
+        '.fr-tile'
+    )!
+
 const colonnes = (section: HTMLElement) =>
     [...section.querySelectorAll<HTMLElement>('.graphique__semaine')].map(
         (colonne) => ({
@@ -92,7 +97,65 @@ afterEach(() => {
     vi.useRealTimers()
 })
 
-describe('App', () => {
+describe('App, since the tracking began', () => {
+    it('counts the plans the users created', async () => {
+        renderApp()
+
+        const tile = await indicateur('Plans créés')
+
+        // The administrator's plan, the first one made, is left out.
+        expect(within(tile).getByText('4')).toBeDefined()
+        expect(
+            within(tile).getByText('Depuis le 16 octobre 2026')
+        ).toBeDefined()
+    })
+
+    it('gives the share of users who created a plan', async () => {
+        renderApp()
+
+        const tile = await indicateur(
+            'Utilisateurs ayant créé un plan depuis le début du suivi'
+        )
+
+        // Intl separates the figure from « % » with a narrow no-break space.
+        expect(tile.textContent).toMatch(/50\s%/)
+        expect(tile.textContent).toContain('2 utilisateurs sur 4')
+        expect(tile.textContent).toContain(
+            'Les utilisateurs sont les comptes cochés « Utilisateur Approbiom » dans la table Utilisateur : les plans des autres comptes ne sont pas comptés.'
+        )
+    })
+
+    it('draws the share of users as a bar', async () => {
+        renderApp()
+
+        const tile = await indicateur(
+            'Utilisateurs ayant créé un plan depuis le début du suivi'
+        )
+        const barre = tile.querySelector<HTMLElement>(
+            '.indicateur__barre-valeur'
+        )
+
+        expect(barre?.style.width).toBe('50%')
+        // The figure says it in words already.
+        expect(barre?.closest('[aria-hidden="true"]')).not.toBeNull()
+    })
+
+    it('says so when no account is ticked « Utilisateur Approbiom »', async () => {
+        renderApp({ comptes: [compte('admin@example.fr', false)] })
+
+        const tile = await indicateur(
+            'Utilisateurs ayant créé un plan depuis le début du suivi'
+        )
+
+        expect(tile.textContent).toContain('Aucun utilisateur')
+        expect(tile.textContent).toContain(
+            'Aucun compte n’est coché « Utilisateur Approbiom » dans la table Utilisateur.'
+        )
+        expect(tile.querySelector('.indicateur__barre')).toBeNull()
+    })
+})
+
+describe('App, week by week', () => {
     it('gives the users who created a plan this week', async () => {
         renderApp()
 
@@ -107,9 +170,7 @@ describe('App', () => {
                 'Les plans créés avant le 5 octobre 2026, début du suivi, ne sont pas comptés.'
             )
         ).toBeDefined()
-        expect(section.textContent).toContain(
-            'Sur 4 utilisateurs (comptes cochés « Utilisateur Approbiom » dans la table Utilisateur).'
-        )
+        expect(section.textContent).toContain('Sur 4 utilisateurs.')
     })
 
     it('says so when no account is ticked « Utilisateur Approbiom »', async () => {
@@ -120,9 +181,8 @@ describe('App', () => {
         expect(
             section.querySelector('.cadre-semaine__valeur')?.textContent
         ).toBe('0')
-        expect(section.textContent).toContain(
-            'Aucun compte n’est coché « Utilisateur Approbiom » dans la table Utilisateur.'
-        )
+        // The tile above says why: the frame does not say it again.
+        expect(section.querySelector('.cadre-semaine__note')).toBeNull()
     })
 
     it('draws a bar per week, as tall as the users active in it', async () => {

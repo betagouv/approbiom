@@ -42,6 +42,11 @@ export type SuiviCreations = {
     semaines: readonly UtilisateursDeLaSemaine[]
     /** The week under way, even when no one has created a plan in it yet. */
     cetteSemaine: UtilisateursDeLaSemaine
+    /** Plans the users created since the tracking began. */
+    totalPlans: number
+    premiereCreation: Date | null
+    /** Users who created at least one plan since the tracking began. */
+    nombreCreateurs: number
     /** Accounts ticked « Utilisateur Approbiom », each counted once. */
     nombreUtilisateurs: number
 }
@@ -142,7 +147,7 @@ export function suivreCreations(
         const semaine = semaineDe(createdAt)
 
         return semaine >= DEBUT_DU_SUIVI && utilisateurs.has(utilisateur)
-            ? [{ utilisateur, semaine }]
+            ? [{ utilisateur, semaine, createdAt }]
             : []
     })
     if (suivies.length === 0)
@@ -150,6 +155,9 @@ export function suivreCreations(
             lignes: [],
             semaines: [],
             cetteSemaine: { semaine: semaineEnCours, utilisateurs: 0 },
+            totalPlans: 0,
+            premiereCreation: null,
+            nombreCreateurs: 0,
             nombreUtilisateurs: utilisateurs.size,
         }
 
@@ -198,6 +206,23 @@ export function suivreCreations(
             derniere > semaineEnCours ? derniere : semaineEnCours
         ).map(actifs),
         cetteSemaine: actifs(semaineEnCours),
+        totalPlans: suivies.length,
+        premiereCreation: new Date(
+            Math.min(...suivies.map(({ createdAt }) => createdAt.getTime()))
+        ),
+        nombreCreateurs: new Set(suivies.map(({ utilisateur }) => utilisateur))
+            .size,
         nombreUtilisateurs: utilisateurs.size,
     }
 }
+
+/**
+ * Share of the users who created at least one plan since the tracking began,
+ * from 0 to 1. Unknown while no account is ticked « Utilisateur Approbiom ».
+ */
+export const partDesCreateurs = ({
+    nombreCreateurs,
+    nombreUtilisateurs,
+}: Pick<SuiviCreations, 'nombreCreateurs' | 'nombreUtilisateurs'>):
+    number | null =>
+    nombreUtilisateurs === 0 ? null : nombreCreateurs / nombreUtilisateurs
