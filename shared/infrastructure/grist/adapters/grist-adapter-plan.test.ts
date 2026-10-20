@@ -125,7 +125,7 @@ describe('createGristPlanPort', () => {
     it('reads who created a plan, and when', async () => {
         mockGrist(
             planTable({
-                Cree_par: 'claire.godel',
+                Cree_par: 'camille.martin',
                 // 16 October 2026, 15:39:26 in Paris: Grist sends seconds,
                 // not milliseconds, and keeps the fraction.
                 Cree_le: 1792157966.94359,
@@ -136,7 +136,7 @@ describe('createGristPlanPort', () => {
             createGristPlanPort().list(['createdBy', 'createdAt'])
         ).resolves.toEqual([
             {
-                createdBy: 'claire.godel',
+                createdBy: 'camille.martin',
                 createdAt: new Date(1792157966943.59),
             },
         ])

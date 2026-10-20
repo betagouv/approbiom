@@ -108,7 +108,7 @@ describe('fetchRowsOnce', () => {
         const fetchTable = mockFetchTable({
             id: [1],
             Nom: ['RCU Val Fleuri'],
-            Cree_par: ['claire.godel'],
+            Cree_par: ['camille.martin'],
         })
 
         const [plans, creations] = await Promise.all([
@@ -118,7 +118,7 @@ describe('fetchRowsOnce', () => {
 
         expect(fetchTable).toHaveBeenCalledOnce()
         expect(plans).toEqual([{ id: 1, Nom: 'RCU Val Fleuri' }])
-        expect(creations).toEqual([{ id: 1, Cree_par: 'claire.godel' }])
+        expect(creations).toEqual([{ id: 1, Cree_par: 'camille.martin' }])
     })
 
     it('fails only the read that asks for a column the table lacks', async () => {
