@@ -6,32 +6,98 @@ body {
     margin: 0;
 }
 
-/* The figure is what the tile is for: larger than its own title. */
-.indicateur .indicateur__valeur {
-    font-size: 2rem;
+/* One frame, the figure of the week on one side and the weeks on the other:
+   side by side from the DSFR's md breakpoint, one above the other below. */
+.cadre-semaine {
+    display: grid;
+    grid-template-columns: 1fr;
+    border: 1px solid var(--border-default-grey);
+}
+
+.cadre-semaine__chiffre,
+.cadre-semaine__graphique {
+    padding: 1.5rem;
+    min-width: 0;
+}
+
+.cadre-semaine__chiffre {
+    border-bottom: 1px solid var(--border-default-grey);
+}
+
+@media (min-width: 48em) {
+    .cadre-semaine {
+        grid-template-columns: minmax(12rem, 1fr) 3fr;
+    }
+
+    .cadre-semaine__chiffre {
+        border-bottom: none;
+        border-right: 1px solid var(--border-default-grey);
+    }
+}
+
+.cadre-semaine__valeur {
+    font-size: 2.5rem;
     font-weight: 700;
-    line-height: 2.5rem;
+    line-height: 3rem;
     color: var(--text-title-grey);
 }
 
-/* Same bar as the Synthèse tab of approvisionnements-saisie-manuelle. The
-   tile centres its content in a flex column, where a box with nothing of its
-   own to show shrinks to nothing: the width is set rather than left to it.
-   The tile also places its parts by `order`, the figure being 3: the bar takes
-   the same, so that it follows the figure rather than going first. */
-.indicateur__barre {
-    display: flex;
-    order: 3;
-    width: 100%;
-    height: 0.5rem;
-    margin-bottom: 0.75rem;
-    background-color: var(--background-contrast-grey);
+.cadre-semaine__note,
+.graphique__axe {
+    color: var(--text-mention-grey);
 }
 
-.indicateur__barre-valeur {
+/* Weeks pile up as the tracking goes on: past a few months the bars scroll
+   rather than shrink to nothing. */
+.graphique__defilement {
+    overflow-x: auto;
+}
+
+.graphique__barres {
+    display: flex;
+    margin: 0;
+    padding: 0;
+    list-style: none;
+}
+
+.graphique__semaine {
+    display: flex;
+    flex: 1 0 3.5rem;
+    flex-direction: column;
+    max-width: 6rem;
+    padding: 0;
+}
+
+/* The column's bottom border is the axis: it runs on unbroken from one week
+   to the next. */
+.graphique__colonne {
+    display: flex;
+    flex-direction: column;
+    justify-content: flex-end;
+    align-items: center;
+    height: 10rem;
+    padding: 0 0.5rem;
+    border-bottom: 1px solid var(--border-plain-grey);
+}
+
+/* Its line is set, and left out of the scale below: the tallest bar fills
+   what is left of the column, and the others keep their proportion. */
+.graphique__valeur {
+    font-size: 0.875rem;
+    font-weight: 700;
+    line-height: 1.5rem;
+}
+
+.graphique__barre {
+    flex-shrink: 0;
+    width: 100%;
+    height: calc(var(--part) * (100% - 1.5rem));
     background-color: var(--background-action-high-blue-france);
 }
 
-.indicateur .indicateur__note {
+.graphique__lundi {
+    padding-top: 0.25rem;
+    font-size: 0.75rem;
+    text-align: center;
     color: var(--text-mention-grey);
 }

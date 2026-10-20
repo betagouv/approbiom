@@ -22,16 +22,26 @@ export type Creation = Pick<Plan, 'createdBy' | 'createdAt'>
 /** What it reads of an account: its email, and whether its use is tracked. */
 export type Compte = Pick<Utilisateur, 'email' | 'utilisateurApprobiom'>
 
+/** How many users created at least one plan in a week. */
+export type UtilisateursDeLaSemaine = {
+    semaine: Semaine
+    utilisateurs: number
+}
+
 export type SuiviCreations = {
     /**
      * One line per user and per week they created a plan in: the most recent
      * week first, then the most plans.
      */
     lignes: readonly CreationsDeLaSemaine[]
-    totalPlans: number
-    premiereCreation: Date | null
-    /** Users who created at least one plan. */
-    nombreCreateurs: number
+    /**
+     * Every week from the first creation to the current one, the oldest first:
+     * a week without any creation is there too, at 0. Empty until a user
+     * creates a plan.
+     */
+    semaines: readonly UtilisateursDeLaSemaine[]
+    /** The week under way, even when no one has created a plan in it yet. */
+    cetteSemaine: UtilisateursDeLaSemaine
     /** Accounts ticked « Utilisateur Approbiom », each counted once. */
     nombreUtilisateurs: number
 }
@@ -86,39 +96,65 @@ function emailsDesUtilisateurs(comptes: readonly Compte[]): Set<string> {
 }
 
 /**
- * Counts the plans the users created, per user and per week. Left out of every
- * count: the plans created before the tracking began, which carry no date, and
- * those of the accounts not ticked « Utilisateur Approbiom », such as the
- * administrators' and the service accounts', whose use is not what is tracked.
+ * The week the tracking begins, the first week of October 2026: Grist started
+ * recording that month who created a plan, and when. A plan dated earlier did
+ * not get its date from the tracking, and is left out like the plans made
+ * before it, which carry none.
+ */
+export const DEBUT_DU_SUIVI: Semaine = '2026-10-05'
+
+const semaineSuivante = (semaine: Semaine): Semaine =>
+    ajouterJours(new Date(semaine), 7).toISOString().slice(0, 10)
+
+/** Each week from `premiere` to `derniere`, both included, in order. */
+function semainesEntre(premiere: Semaine, derniere: Semaine): Semaine[] {
+    const semaines: Semaine[] = []
+    // ISO dates compare as text, so this is a chronological order.
+    for (
+        let semaine = premiere;
+        semaine <= derniere;
+        semaine = semaineSuivante(semaine)
+    )
+        semaines.push(semaine)
+    return semaines
+}
+
+/**
+ * Counts the plans the users created, per user and per week, and how many
+ * users were active each week, from the start of the tracking up to the week
+ * `maintenant` falls in. Left out of every count: the plans created before the
+ * tracking began, and those of the accounts not ticked « Utilisateur
+ * Approbiom », such as the administrators' and the service accounts', whose
+ * use is not what is tracked.
  */
 export function suivreCreations(
     plans: readonly Creation[],
-    comptes: readonly Compte[]
+    comptes: readonly Compte[],
+    maintenant: Date
 ): SuiviCreations {
     const utilisateurs = emailsDesUtilisateurs(comptes)
+    const semaineEnCours = semaineDe(maintenant)
 
     const suivies = plans.flatMap(({ createdBy, createdAt }) => {
-        const utilisateur =
-            createdBy === null ? null : normaliserEmail(createdBy)
+        if (createdAt === null || createdBy === null) return []
 
-        return createdAt !== null &&
-            utilisateur !== null &&
-            utilisateurs.has(utilisateur)
-            ? [{ utilisateur, createdAt }]
+        const utilisateur = normaliserEmail(createdBy)
+        const semaine = semaineDe(createdAt)
+
+        return semaine >= DEBUT_DU_SUIVI && utilisateurs.has(utilisateur)
+            ? [{ utilisateur, semaine }]
             : []
     })
     if (suivies.length === 0)
         return {
             lignes: [],
-            totalPlans: 0,
-            premiereCreation: null,
-            nombreCreateurs: 0,
+            semaines: [],
+            cetteSemaine: { semaine: semaineEnCours, utilisateurs: 0 },
             nombreUtilisateurs: utilisateurs.size,
         }
 
     const parSemaine = new Map<Semaine, Map<string, number>>()
-    for (const { utilisateur, createdAt } of suivies) {
-        const semaine = semaineDe(createdAt)
+    for (const { utilisateur, semaine } of suivies) {
         const parUtilisateur =
             parSemaine.get(semaine) ?? new Map<string, number>()
         parUtilisateur.set(
@@ -144,25 +180,24 @@ export function suivreCreations(
                 a.utilisateur.localeCompare(b.utilisateur, 'fr')
         )
 
+    // A user counts once in a week, however many plans they created in it.
+    const actifs = (semaine: Semaine): UtilisateursDeLaSemaine => ({
+        semaine,
+        utilisateurs: parSemaine.get(semaine)?.size ?? 0,
+    })
+    // `lignes` holds the weeks with a creation, the most recent first.
+    const premiere = lignes[lignes.length - 1].semaine
+    const derniere = lignes[0].semaine
+
     return {
         lignes,
-        totalPlans: suivies.length,
-        premiereCreation: new Date(
-            Math.min(...suivies.map(({ createdAt }) => createdAt.getTime()))
-        ),
-        nombreCreateurs: new Set(suivies.map(({ utilisateur }) => utilisateur))
-            .size,
+        semaines: semainesEntre(
+            premiere,
+            // A plan dated past this week, by a clock ahead of the widget's,
+            // still shows.
+            derniere > semaineEnCours ? derniere : semaineEnCours
+        ).map(actifs),
+        cetteSemaine: actifs(semaineEnCours),
         nombreUtilisateurs: utilisateurs.size,
     }
 }
-
-/**
- * Share of the users who created at least one plan, from 0 to 1. Unknown while
- * no account is ticked « Utilisateur Approbiom ».
- */
-export const partDesCreateurs = ({
-    nombreCreateurs,
-    nombreUtilisateurs,
-}: Pick<SuiviCreations, 'nombreCreateurs' | 'nombreUtilisateurs'>):
-    number | null =>
-    nombreUtilisateurs === 0 ? null : nombreCreateurs / nombreUtilisateurs

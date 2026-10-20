@@ -15,5 +15,5 @@ export async function loadSuiviUtilisateur(
         ports.utilisateurs.list(),
     ])
 
-    return suivreCreations(creations, comptes)
+    return suivreCreations(creations, comptes, new Date())
 }
