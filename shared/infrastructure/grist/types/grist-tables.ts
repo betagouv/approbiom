@@ -31,6 +31,7 @@ const TABLE = {
     demandeSubvention: 'Demande_subvention',
     instruction: 'Instruction_crb',
     crb: 'Crb',
+    utilisateur: 'Utilisateur',
     programmeAide: 'Prog_aides',
     attachment: 'Piece_jointe',
     aImporterApprovisionnement: 'A_importer_Approvisionnement',
@@ -99,6 +100,7 @@ export const COLUMNS = {
         'Phase_de_l_instruction',
     ],
     crb: ['id', 'Nom'],
+    utilisateur: ['id', 'Email', 'Utilisateur_Approbiom'],
     programmeAide: [
         'id',
         'Annee',

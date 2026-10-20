@@ -1,27 +1,19 @@
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
-import type { OptionsPort } from './options'
+import type { UtilisateurPort } from '@shared/core/application/ports/utilisateur'
 import { suivreCreations, type SuiviCreations } from './suivi-creations'
 
 export type SuiviUtilisateurPorts = {
     plans: Pick<PlanPort, 'list'>
-    options: OptionsPort
-}
-
-export type SuiviUtilisateurScreen = {
-    suivi: SuiviCreations
-    nombreUtilisateurs: number | null
+    utilisateurs: Pick<UtilisateurPort, 'list'>
 }
 
 export async function loadSuiviUtilisateur(
     ports: SuiviUtilisateurPorts
-): Promise<SuiviUtilisateurScreen> {
-    const [creations, { nombreUtilisateurs }] = await Promise.all([
+): Promise<SuiviCreations> {
+    const [creations, comptes] = await Promise.all([
         ports.plans.list(['createdBy', 'createdAt']),
-        ports.options.read(),
+        ports.utilisateurs.list(),
     ])
 
-    return {
-        suivi: suivreCreations(creations),
-        nombreUtilisateurs,
-    }
+    return suivreCreations(creations, comptes)
 }

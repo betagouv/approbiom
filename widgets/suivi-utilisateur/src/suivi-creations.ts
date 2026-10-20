@@ -1,4 +1,5 @@
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
+import type { Utilisateur } from '@shared/core/domain/entities/utilisateur'
 
 /**
  * A week, Monday to Sunday in Paris time, named by its Monday as
@@ -10,24 +11,29 @@ export type Semaine = string
 /** The plans one user created in one week. */
 export type CreationsDeLaSemaine = {
     semaine: Semaine
-    /** null: Grist recorded when the plan was created, but not by whom. */
-    utilisateur: string | null
+    /** The user's email, in lower case. */
+    utilisateur: string
     plans: number
 }
 
 /** What the tracking reads of a plan: who created it, and when. */
 export type Creation = Pick<Plan, 'createdBy' | 'createdAt'>
 
+/** What it reads of an account: its email, and whether its use is tracked. */
+export type Compte = Pick<Utilisateur, 'email' | 'utilisateurApprobiom'>
+
 export type SuiviCreations = {
     /**
      * One line per user and per week they created a plan in: the most recent
-     * week first, then the most plans, the unknown creator last.
+     * week first, then the most plans.
      */
     lignes: readonly CreationsDeLaSemaine[]
     totalPlans: number
     premiereCreation: Date | null
-    /** Users known by name who created at least one plan. */
+    /** Users who created at least one plan. */
     nombreCreateurs: number
+    /** Accounts ticked « Utilisateur Approbiom », each counted once. */
+    nombreUtilisateurs: number
 }
 
 const PARIS = new Intl.DateTimeFormat('en-US', {
@@ -62,31 +68,63 @@ export function semaineDe(date: Date): Semaine {
     return ajouterJours(jour, -joursDepuisLundi).toISOString().slice(0, 10)
 }
 
-const AUCUNE_CREATION: SuiviCreations = {
-    lignes: [],
-    totalPlans: 0,
-    premiereCreation: null,
-    nombreCreateurs: 0,
+/** « Camille.Martin@… » and « camille.martin@… » are the same address. */
+const normaliserEmail = (email: string): string => email.trim().toLowerCase()
+
+/**
+ * The emails of the accounts ticked « Utilisateur Approbiom », each once, in
+ * lower case. A row without an email names no one a plan could be traced back
+ * to, and is left out.
+ */
+function emailsDesUtilisateurs(comptes: readonly Compte[]): Set<string> {
+    return new Set(
+        comptes.flatMap(({ email, utilisateurApprobiom }) => {
+            const adresse = normaliserEmail(email)
+            return utilisateurApprobiom && adresse !== '' ? [adresse] : []
+        })
+    )
 }
 
 /**
- * Counts the plans created per user and per week. Plans created before the
- * tracking began carry no date, and are left out of every count.
+ * Counts the plans the users created, per user and per week. Left out of every
+ * count: the plans created before the tracking began, which carry no date, and
+ * those of the accounts not ticked « Utilisateur Approbiom », such as the
+ * administrators' and the service accounts', whose use is not what is tracked.
  */
-export function suivreCreations(plans: readonly Creation[]): SuiviCreations {
-    const suivies = plans.filter(
-        (plan): plan is Creation & { createdAt: Date } =>
-            plan.createdAt !== null
-    )
-    if (suivies.length === 0) return AUCUNE_CREATION
+export function suivreCreations(
+    plans: readonly Creation[],
+    comptes: readonly Compte[]
+): SuiviCreations {
+    const utilisateurs = emailsDesUtilisateurs(comptes)
 
-    // Keyed by week, then by user: a `Map` keeps `null` apart from any name.
-    const parSemaine = new Map<Semaine, Map<string | null, number>>()
-    for (const { createdBy, createdAt } of suivies) {
+    const suivies = plans.flatMap(({ createdBy, createdAt }) => {
+        const utilisateur =
+            createdBy === null ? null : normaliserEmail(createdBy)
+
+        return createdAt !== null &&
+            utilisateur !== null &&
+            utilisateurs.has(utilisateur)
+            ? [{ utilisateur, createdAt }]
+            : []
+    })
+    if (suivies.length === 0)
+        return {
+            lignes: [],
+            totalPlans: 0,
+            premiereCreation: null,
+            nombreCreateurs: 0,
+            nombreUtilisateurs: utilisateurs.size,
+        }
+
+    const parSemaine = new Map<Semaine, Map<string, number>>()
+    for (const { utilisateur, createdAt } of suivies) {
         const semaine = semaineDe(createdAt)
         const parUtilisateur =
-            parSemaine.get(semaine) ?? new Map<string | null, number>()
-        parUtilisateur.set(createdBy, (parUtilisateur.get(createdBy) ?? 0) + 1)
+            parSemaine.get(semaine) ?? new Map<string, number>()
+        parUtilisateur.set(
+            utilisateur,
+            (parUtilisateur.get(utilisateur) ?? 0) + 1
+        )
         parSemaine.set(semaine, parUtilisateur)
     }
 
@@ -102,17 +140,9 @@ export function suivreCreations(plans: readonly Creation[]): SuiviCreations {
             (a, b) =>
                 // ISO dates sort as text, so this is a chronological order.
                 b.semaine.localeCompare(a.semaine) ||
-                Number(a.utilisateur === null) -
-                    Number(b.utilisateur === null) ||
                 b.plans - a.plans ||
-                (a.utilisateur ?? '').localeCompare(b.utilisateur ?? '', 'fr')
+                a.utilisateur.localeCompare(b.utilisateur, 'fr')
         )
-
-    const createurs = new Set(
-        suivies.flatMap(({ createdBy }) =>
-            createdBy === null ? [] : [createdBy]
-        )
-    )
 
     return {
         lignes,
@@ -120,16 +150,19 @@ export function suivreCreations(plans: readonly Creation[]): SuiviCreations {
         premiereCreation: new Date(
             Math.min(...suivies.map(({ createdAt }) => createdAt.getTime()))
         ),
-        nombreCreateurs: createurs.size,
+        nombreCreateurs: new Set(suivies.map(({ utilisateur }) => utilisateur))
+            .size,
+        nombreUtilisateurs: utilisateurs.size,
     }
 }
 
 /**
- * Share of all users who created at least one plan, from 0 to 1. Unknown until
- * the widget is told how many users there are.
+ * Share of the users who created at least one plan, from 0 to 1. Unknown while
+ * no account is ticked « Utilisateur Approbiom ».
  */
-export const partDesCreateurs = (
-    { nombreCreateurs }: Pick<SuiviCreations, 'nombreCreateurs'>,
-    nombreUtilisateurs: number | null
-): number | null =>
-    nombreUtilisateurs === null ? null : nombreCreateurs / nombreUtilisateurs
+export const partDesCreateurs = ({
+    nombreCreateurs,
+    nombreUtilisateurs,
+}: Pick<SuiviCreations, 'nombreCreateurs' | 'nombreUtilisateurs'>):
+    number | null =>
+    nombreUtilisateurs === 0 ? null : nombreCreateurs / nombreUtilisateurs

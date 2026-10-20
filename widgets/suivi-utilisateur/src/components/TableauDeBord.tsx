@@ -35,8 +35,8 @@ const COLONNES: Column<CreationsDeLaSemaine>[] = [
     {
         id: 'utilisateur',
         header: 'Utilisateur',
-        render: ({ utilisateur }) => utilisateur ?? 'Utilisateur inconnu',
-        sortBy: ({ utilisateur }) => utilisateur ?? '',
+        render: ({ utilisateur }) => utilisateur,
+        sortBy: ({ utilisateur }) => utilisateur,
     },
     {
         id: 'plans',
@@ -48,14 +48,10 @@ const COLONNES: Column<CreationsDeLaSemaine>[] = [
 
 type TableauDeBordProps = {
     suivi: SuiviCreations
-    nombreUtilisateurs: number | null
 }
 
-export default function TableauDeBord({
-    suivi,
-    nombreUtilisateurs,
-}: TableauDeBordProps) {
-    const part = partDesCreateurs(suivi, nombreUtilisateurs)
+export default function TableauDeBord({ suivi }: TableauDeBordProps) {
+    const part = partDesCreateurs(suivi)
 
     return (
         <>
@@ -72,27 +68,27 @@ export default function TableauDeBord({
                     />
                 </div>
                 <div className="fr-col-12 fr-col-md-6">
-                    {part === null || nombreUtilisateurs === null ? (
+                    {part === null ? (
                         <Indicateur
                             titre="Utilisateurs ayant créé un plan"
-                            valeur="Non configuré"
-                            detail="Renseignez le nombre total d’utilisateurs dans la configuration du widget."
+                            valeur="Aucun utilisateur"
+                            detail="Aucun compte n’est coché « Utilisateur Approbiom » dans la table Utilisateur."
                         />
                     ) : (
                         <Indicateur
                             titre="Utilisateurs ayant créé un plan"
                             valeur={POURCENTAGE.format(part)}
                             barre={part}
-                            detail={`${plural(suivi.nombreCreateurs, 'utilisateur')} sur ${formatNumber(nombreUtilisateurs)}`}
-                            note="Le nombre total d’utilisateurs est saisi à la main, dans la configuration du widget."
+                            detail={`${plural(suivi.nombreCreateurs, 'utilisateur')} sur ${formatNumber(suivi.nombreUtilisateurs)}`}
+                            note="Les utilisateurs sont les comptes cochés « Utilisateur Approbiom » dans la table Utilisateur : les plans des autres comptes ne sont pas comptés."
                         />
                     )}
                 </div>
             </div>
             {suivi.lignes.length === 0 ? (
                 <Alert severity="info" title="Aucun plan créé">
-                    Information : aucun plan n’a été créé depuis le début du
-                    suivi.
+                    Information : aucun utilisateur n’a créé de plan depuis le
+                    début du suivi.
                 </Alert>
             ) : (
                 <DataTable

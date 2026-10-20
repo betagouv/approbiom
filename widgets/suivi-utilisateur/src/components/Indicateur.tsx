@@ -30,11 +30,7 @@ export default function Indicateur({
                         <div className="indicateur__barre" aria-hidden="true">
                             <div
                                 className="indicateur__barre-valeur"
-                                // A total of users set too low would push past
-                                // 100 %: the bar stops at full.
-                                style={{
-                                    width: `${Math.min(barre, 1) * 100}%`,
-                                }}
+                                style={{ width: `${barre * 100}%` }}
                             />
                         </div>
                     )}
