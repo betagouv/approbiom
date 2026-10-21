@@ -37,33 +37,44 @@
     min-height: 0;
 }
 
-.concurrence__table {
+.concurrence__list {
+    display: flex;
+    flex-direction: column;
+
     padding: 0.5rem;
     min-width: 0;
     border-right: 1px solid var(--border-default-grey);
 }
 
-.concurrence__table .fr-table {
+.concurrence__list-header {
     display: flex;
-    flex-direction: column;
+    flex-shrink: 0;
 
-    height: 100%;
-    margin: 0;
+    justify-content: space-between;
+    align-items: baseline;
+    gap: 1rem;
+    padding-bottom: 0.5rem;
 }
 
-.concurrence__table .fr-table__wrapper {
-    display: flex;
-    flex: 1;
-    flex-direction: column;
+.concurrence__list-title {
+    margin: 0;
+    font-size: 1rem;
+    line-height: 1.5rem;
+}
 
+.concurrence__result-count {
+    flex-shrink: 0;
+    margin: 0;
+
+    color: var(--text-mention-grey);
+    font-size: 0.875rem;
+}
+
+/* Only the plans scroll: the header above stays in place. */
+.concurrence__plans {
+    flex: 1;
     min-height: 0;
-    margin: 0;
-}
-
-.concurrence__table .fr-table__container {
-    flex: 1;
-    margin: 0;
-    padding-top: 0;
+    overflow-y: auto;
 }
 
 .concurrence__map {
@@ -74,23 +85,4 @@
 .concurrence__map .ressource__map,
 .concurrence__map .map {
     height: 100%;
-}
-
-/* Detail panel of an expanded row: label/value pairs, laid out side by side
-   while there is room and stacked once there is not. */
-.concurrence__detail {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 3rem;
-    margin: 0;
-    padding: 0.5rem 0;
-}
-
-.concurrence__detail dt {
-    color: var(--text-mention-grey);
-    font-size: 0.875rem;
-}
-
-.concurrence__detail dd {
-    margin: 0;
 }

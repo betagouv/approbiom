@@ -1,0 +1,71 @@
+.plan-accordion-item .fr-accordion__btn {
+    gap: 0.75rem;
+    min-height: 0;
+    padding: 0.5rem 0.75rem;
+
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+}
+
+/* Inside the ring rather than around it: the scrolling list clips whatever
+   sticks out of it. */
+.plan-accordion-item .fr-accordion__btn:focus {
+    outline-offset: -2px;
+}
+
+/* Line 1: the plan and its retained tonnage. Line 2: where it sits and where it
+   draws from. */
+.plan-accordion-item__summary {
+    display: grid;
+    flex: 1;
+    grid-template-columns: minmax(0, 1fr) auto;
+    gap: 0.25rem 0.75rem;
+    min-width: 0;
+}
+
+.plan-accordion-item__nom,
+.plan-accordion-item__tonnage {
+    font-weight: 700;
+}
+
+.plan-accordion-item__tonnage {
+    text-align: right;
+    white-space: nowrap;
+}
+
+.plan-accordion-item__provenances {
+    display: flex;
+    flex-wrap: wrap;
+    grid-column: 1 / -1;
+
+    align-items: center;
+    gap: 0.25rem;
+
+    color: var(--text-mention-grey);
+    font-size: 0.75rem;
+    font-weight: 400;
+}
+
+.plan-accordion-item .fr-collapse {
+    margin: 0;
+    padding-right: 0.75rem;
+    padding-left: 0.75rem;
+}
+
+.plan-accordion-item .fr-collapse--expanded {
+    padding-top: 0.5rem;
+    padding-bottom: 0.75rem;
+}
+
+.plan-accordion-item__details {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(12rem, 1fr));
+    gap: 0.5rem 1.5rem;
+
+    font-size: 0.875rem;
+}
+
+.plan-accordion-item__details dt {
+    color: var(--text-mention-grey);
+    font-size: 0.75rem;
+}
