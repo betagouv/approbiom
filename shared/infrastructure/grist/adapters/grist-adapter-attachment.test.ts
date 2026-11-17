@@ -4,18 +4,21 @@ import { METADATA_TABLE, TABLE } from '../types/grist-tables'
 import { createGristAttachmentPort } from './grist-adapter-attachment'
 
 const PIECES_JOINTES: ColumnMajorTable = {
-    id: [1, 2],
-    Plan_d_approvisionnement: [30, 35],
+    id: [1, 2, 3],
+    Plan_d_approvisionnement: [30, 35, 40],
     piece_jointe: [
         ['L', 341],
         ['L', 342],
+        ['L', 343, 344],
     ],
-    type: ['excel ademe', 'excel ademe'],
+    type: ['excel ademe', 'excel ademe', 'excel ademe'],
 }
 
 const FILES: Record<number, { fileName: string; fileSize: number }> = {
     341: { fileName: 'plan-adapei.xlsx', fileSize: 1000 },
     342: { fileName: 'plan-poitiers.xlsx', fileSize: 2000 },
+    343: { fileName: 'plan-exemple-2025.xlsx', fileSize: 3000 },
+    344: { fileName: 'plan-exemple-2026.xlsx', fileSize: 4000 },
 }
 
 // The metadata table holds what Grist shows the user: every file for an
@@ -110,16 +113,16 @@ describe('createGristAttachmentPort', () => {
     it('asks for one access token for all the files the metadata table hides', async () => {
         const { fetchFile, getAccessToken } = mockGrist([])
 
-        await createGristAttachmentPort().list()
+        await createGristAttachmentPort().listByPlan(40)
 
         expect(fetchFile).toHaveBeenCalledTimes(2)
         expect(getAccessToken).toHaveBeenCalledOnce()
     })
 
     it('asks for no access token when the metadata table shows every file', async () => {
-        const { getAccessToken } = mockGrist([341, 342])
+        const { getAccessToken } = mockGrist([341, 342, 343, 344])
 
-        await createGristAttachmentPort().list()
+        await createGristAttachmentPort().listByPlan(40)
 
         expect(getAccessToken).not.toHaveBeenCalled()
     })

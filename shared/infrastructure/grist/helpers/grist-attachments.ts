@@ -40,12 +40,6 @@ async function fetchMetadata(
     return { name: asString(fileName), sizeInBytes: asNumber(fileSize) ?? 0 }
 }
 
-export async function getAttachmentMetadata(
-    id: number
-): Promise<AttachmentMetadata | null> {
-    return (await getAttachmentsMetadata([id])).get(id) ?? null
-}
-
 export async function getAttachmentsMetadata(
     ids: readonly number[]
 ): Promise<Map<number, AttachmentMetadata>> {
