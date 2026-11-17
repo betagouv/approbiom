@@ -30,18 +30,6 @@
             li {
                 margin: 0.5rem 0;
             }
-            a {
-                display: block;
-                padding: 0.75rem 1rem;
-                border: 1px solid #ddd;
-                border-radius: 4px;
-                color: #000091;
-                text-decoration: none;
-            }
-            a:hover {
-                border-color: #000091;
-                background: #f5f5fe;
-            }
             button {
                 display: block;
                 width: 100%;
@@ -77,8 +65,8 @@
     <body>
         <h1>Approbiom — widgets Grist</h1>
         <p>
-            Ouvrez un widget pour le tester, ou copiez son URL dans le champ «
-            Custom URL » d'un widget personnalisé Grist.
+            Copiez l'URL d'un widget dans le champ « Custom URL » d'un widget
+            personnalisé Grist.
         </p>
         <ul>
             <li>
@@ -94,21 +82,6 @@
             <li>
                 <button onclick="copyWidgetUrl('concurrence', event)">
                     Concurrence
-                </button>
-            </li>
-            <li>
-                <button onclick="copyWidgetUrl('import', event)">Import</button>
-            </li>
-            <li>
-                <button onclick="copyWidgetUrl('import-ademe', event)">
-                    Import Ademe
-                </button>
-            </li>
-            <li>
-                <button
-                    onclick="copyWidgetUrl('approvisionnements-plan', event)"
-                >
-                    Approvisionnements d'un plan
                 </button>
             </li>
             <li>
@@ -144,15 +117,6 @@
                 <button onclick="copyWidgetUrl('suivi-utilisateur', event)">
                     Suivi utilisateur
                 </button>
-            </li>
-            <li>
-                <button onclick="copyWidgetUrl('tech', event)">Tech</button>
-            </li>
-            <li>
-                <a href="./playground/"
-                    >Playground pour les devs - composants partagés, hors
-                    Grist</a
-                >
             </li>
         </ul>
 
