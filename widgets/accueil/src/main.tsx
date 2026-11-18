@@ -4,7 +4,7 @@ import { createRoot } from 'react-dom/client'
 // design tokens, icon masks and typography every DSFR component builds on, so
 // it is imported once here; each component imports its own stylesheet.
 import '@gouvfr/dsfr/dist/core/core.main.min.css'
-import './index.css'
+import '@shared/react/base.css'
 import App from './App'
 import { createGristApprovisionnementPort } from '@shared/infrastructure/grist/adapters/grist-adapter-approvisionnement/grist-adapter-approvisionnement'
 import { createGristAttachmentPort } from '@shared/infrastructure/grist/adapters/grist-adapter-attachment'

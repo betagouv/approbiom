@@ -1,6 +1,7 @@
 import { StrictMode } from 'react'
 import { createRoot } from 'react-dom/client'
 import '@gouvfr/dsfr/dist/core/core.main.min.css'
+import '@shared/react/base.css'
 import './index.css'
 import App from './App'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'

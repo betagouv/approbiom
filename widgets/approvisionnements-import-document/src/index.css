@@ -1,12 +1,4 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-}
-
-.approvisionnements-import-document {
+.widget-approvisionnements-import-document {
     display: flex;
     flex-direction: column;
     gap: 1rem;
@@ -16,20 +8,20 @@ body {
 }
 
 /* DSFR overlaps the frame (::before) and the open panel on a flex line; a grid row lets them fill the height left. */
-.approvisionnements-import-document > .fr-tabs {
+.widget-approvisionnements-import-document > .fr-tabs {
     flex: 1;
     display: grid;
     grid-template-columns: 100%;
     grid-template-rows: auto 1fr;
 }
 
-.approvisionnements-import-document > .fr-tabs::before {
+.widget-approvisionnements-import-document > .fr-tabs::before {
     grid-row: 2;
     grid-column: 1;
     height: auto;
 }
 
-.approvisionnements-import-document > .fr-tabs > .fr-tabs__panel {
+.widget-approvisionnements-import-document > .fr-tabs > .fr-tabs__panel {
     grid-row: 2;
     grid-column: 1;
     left: 0;

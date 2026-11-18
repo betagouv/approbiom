@@ -14,7 +14,7 @@ export default function App(ports: AccueilPorts) {
     >(null)
 
     return (
-        <main className="app">
+        <main className="widget-accueil">
             <AsyncGate state={state}>
                 {({
                     plansApprovisionnement,

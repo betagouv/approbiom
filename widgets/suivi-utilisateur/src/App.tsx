@@ -12,7 +12,7 @@ export default function App(ports: SuiviUtilisateurPorts) {
     const state = useAsyncState(() => loadSuiviUtilisateur(ports))
 
     return (
-        <main className="fr-container fr-py-2w">
+        <main className="widget-suivi-utilisateur fr-container fr-py-2w">
             <h1 className="fr-h3">Suivi des interactions utilisateur</h1>
             <p className="fr-text--sm">
                 Les plans créés avant le {lundiLong(DEBUT_DU_SUIVI)}, début du
