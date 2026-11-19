@@ -8,7 +8,7 @@ export default function App(ports: ConcurrencePorts) {
     const state = useAsyncState(() => loadConcurrence(ports))
 
     return (
-        <main className="app">
+        <main className="widget-concurrence">
             <AsyncGate state={state}>
                 {(screen) => (
                     <Concurrence

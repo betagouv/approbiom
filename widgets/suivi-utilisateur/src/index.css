@@ -1,11 +1,3 @@
-* {
-    box-sizing: border-box;
-}
-
-body {
-    margin: 0;
-}
-
 /* The figure is what the tile is for: larger than its own title. */
 .indicateur .indicateur__valeur {
     font-size: 2rem;

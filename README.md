@@ -47,7 +47,7 @@ Sur Grist Desktop, dans la copie du document de production, créer une vue perso
 Pour créer un nouveau widget "mon-widget" :
 
 1. Créer le dossier "mon-widget" dans le dossier `widgets`
-2. Dans le dossier `mon-widget`, créer un fichier `index.html`. Mettre le script de l'API Plugin de Grist :
+2. Dans le dossier `mon-widget`, créer un fichier `index.html`. Si le widget lit ou écrit dans Grist, mettre le script de l'API Plugin de Grist.
 
 ```tsx
 <script src="https://docs.getgrist.com/grist-plugin-api.js"></script>
@@ -55,14 +55,15 @@ Pour créer un nouveau widget "mon-widget" :
 
 3. Rajouter le widget à la liste des widgets disponibles : à la racine du projet, dans le fichier `index.html`, ajouter le lien vers le nouveau widget "mon-widget".
 4. Initialiser le widget : dans le dossier `mon-widget/src`, créer les fichiers `main.tsx` qui appelle le composant `App.tsx`.
-5. Pour communiquer avec Grist, on utilise l'API Plugin de Grist. Dans `App.tsx`, importer le composant `AsyncGate.tsx` et le hook `UseAsyncState` permettant de gérer la communication avec l'API Plugin de Grist.
+5. Pour communiquer avec Grist, on utilise l'API Plugin de Grist. Charger les données dans un fichier `mon-widget/src/load-mon-widget.ts`, qui exporte une fonction `loadMonWidget(ports)`. Dans `App.tsx`, l'appeler via le hook `useAsyncState` et afficher le résultat avec le composant `AsyncGate`.
 
 ### Utiliser le DSFR
 
-Pour importer la couche de style du DSFR : dans le fichier `mon-wdiget/src/main.tsx`, rajouter la ligne d'import suivante :
+Pour importer la couche de style du DSFR et le reset commun à tous les widgets : dans le fichier `mon-widget/src/main.tsx`, rajouter les lignes d'import suivantes :
 
 ```tsx
 import '@gouvfr/dsfr/dist/core/core.main.min.css'
+import '@shared/react/base.css'
 ```
 
 ## Guide de déploiement
