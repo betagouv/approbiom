@@ -52,10 +52,12 @@ export default function Concurrence({
         approvisionnementsByPlanAndRessource,
         (item) => item.ressource
     )
-    const fournisseurOptions = entreprises.map((entreprise) => ({
-        value: entreprise.siret,
-        label: entreprise.denomination || entreprise.siret,
-    }))
+    const fournisseurOptions = entreprises
+        .map((entreprise) => ({
+            value: entreprise.siret,
+            label: entreprise.denomination || entreprise.siret,
+        }))
+        .toSorted((a, b) => byLabel(a.label, b.label))
 
     const denominationBySiret = useMemo(
         () => new Map(entreprises.map((e) => [e.siret, e.denomination])),
@@ -182,7 +184,9 @@ export default function Concurrence({
                                   fournisseur
                         )
                     ),
-                ].join(', '),
+                ]
+                    .toSorted(byLabel)
+                    .join(', '),
                 sumTonnageRetenu: selectedApprovisionnements.reduce(
                     (sum, approvisionnement) =>
                         sum + (approvisionnement.tonnageTotal ?? 0),

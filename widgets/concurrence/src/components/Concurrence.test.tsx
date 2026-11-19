@@ -132,6 +132,25 @@ describe('Concurrence', () => {
 
     // Départements keep their régions, which is what the référentiel is read
     // for; the countries hang under one group of their own.
+    // The entreprises come in the order the document stores them, Scierie
+    // Picard before Forst GmbH.
+    it('offers the fournisseurs in alphabetical order', () => {
+        renderConcurrence()
+        fireEvent.click(screen.getByRole('button', { name: /Fournisseur/ }))
+
+        expect(
+            screen
+                .getAllByRole<HTMLInputElement>('checkbox')
+                .map((checkbox) => checkbox.labels?.[0]?.textContent)
+        ).toEqual(['Forst GmbH', 'Scierie Picard'])
+    })
+
+    it('names the fournisseurs retenus in alphabetical order', () => {
+        renderConcurrence()
+
+        expect(screen.getByText('Forst GmbH, Scierie Picard')).toBeDefined()
+    })
+
     it('offers départements under their région, and pays étrangers apart', () => {
         renderConcurrence()
         openProvenanceFilter()
