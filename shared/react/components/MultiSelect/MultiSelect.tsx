@@ -6,10 +6,13 @@ import '@gouvfr/dsfr/dist/component/form/form.main.min.css'
 import '@gouvfr/dsfr/dist/component/select/select.main.min.css'
 import '@gouvfr/dsfr/dist/component/checkbox/checkbox.main.min.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
+import '@gouvfr/dsfr/dist/component/input/input.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import './MultiSelect.css'
 import { useEffect, useId, useRef, useState } from 'react'
+import { normalizeSearchText } from '@shared/react/search-text'
+import { plural } from '@shared/react/format'
 import type {
     MultiSelectGroup,
     MultiSelectItem,
@@ -21,6 +24,25 @@ function isGroup<T>(item: MultiSelectItem<T>): item is MultiSelectGroup<T> {
     return 'options' in item
 }
 
+function searchItems<T>(
+    items: readonly MultiSelectItem<T>[],
+    query: string
+): MultiSelectItem<T>[] {
+    const needle = normalizeSearchText(query.trim())
+    if (needle === '') return [...items]
+
+    const matches = (label: string) =>
+        normalizeSearchText(label).includes(needle)
+
+    return items.flatMap((item): MultiSelectItem<T>[] => {
+        if (!isGroup(item)) return matches(item.label) ? [item] : []
+        if (matches(item.label)) return [item]
+
+        const options = item.options.filter((option) => matches(option.label))
+        return options.length === 0 ? [] : [{ ...item, options }]
+    })
+}
+
 export default function MultiSelect<T>({
     label,
     description,
@@ -30,20 +52,33 @@ export default function MultiSelect<T>({
     legend,
     hideLegend = false,
     showSelectAll = false,
+    searchable = false,
 }: MultiSelectProps<T>) {
     const id = useId()
     const labelId = `${id}-label`
     const triggerId = `${id}-trigger`
     const panelId = `${id}-panel`
     const descriptionId = `${id}-description`
+    const searchId = `${id}-search`
 
     const [isOpen, setIsOpen] = useState(false)
+    const [query, setQuery] = useState('')
 
     // Wraps the control and the panel both, so "outside" is one containment
     // test rather than two — and clicking the control itself never reaches the
     // handler below, leaving its own toggle to do the closing.
     const rootRef = useRef<HTMLDivElement>(null)
     const triggerRef = useRef<HTMLButtonElement>(null)
+    const searchRef = useRef<HTMLInputElement>(null)
+
+    useEffect(() => {
+        if (isOpen && searchable) searchRef.current?.focus()
+    }, [isOpen, searchable])
+
+    function toggleOpen() {
+        if (!isOpen) setQuery('')
+        setIsOpen(!isOpen)
+    }
 
     // Escape is the keyboard's half of dismissing the panel: the click-outside
     // below is mouse and touch only, and without this a keyboard user would be
@@ -88,6 +123,22 @@ export default function MultiSelect<T>({
     const allOptions = options.flatMap((item) =>
         isGroup(item) ? item.options : [item]
     )
+
+    // What the panel shows. `allOptions` above stays the whole list: it is what
+    // the selection is read from and reported in the order of.
+    const shownItems = searchable ? searchItems(options, query) : options
+    const shownOptions = shownItems.flatMap((item) =>
+        isGroup(item) ? item.options : [item]
+    )
+
+    // Typing leaves the focus in the field, so the list changing under it is
+    // only heard through this. Empty until something is searched.
+    const searchStatus =
+        query.trim() === ''
+            ? ''
+            : shownOptions.length === 0
+              ? 'Aucun résultat'
+              : plural(shownOptions.length, 'résultat')
 
     function selectableIn(candidates: readonly MultiSelectOption<T>[]) {
         return candidates.filter((option) => !option.disabled)
@@ -172,6 +223,14 @@ export default function MultiSelect<T>({
 
     function renderGroup(group: MultiSelectGroup<T>) {
         const groupId = `${id}-${group.id}`
+        // A search hands over the group with some of its options only. Their
+        // ids come from their place in the whole group, so an option keeps its
+        // own id — and React its own node — whatever the search leaves.
+        const wholeGroup =
+            options.find(
+                (item): item is MultiSelectGroup<T> =>
+                    isGroup(item) && item.id === group.id
+            ) ?? group
         const allSelected = isAllSelected(group.options)
         const someSelected = group.options.some((option) =>
             selected.has(option.value)
@@ -215,15 +274,18 @@ export default function MultiSelect<T>({
                     reader should hear — the group checkbox is a shortcut, not
                     a parent node. */}
                 <div className="shared-multi-select__group-options">
-                    {group.options.map((option, index) =>
-                        renderOption(option, `${group.id}-${index}`)
+                    {group.options.map((option) =>
+                        renderOption(
+                            option,
+                            `${group.id}-${wholeGroup.options.indexOf(option)}`
+                        )
                     )}
                 </div>
             </div>
         )
     }
 
-    const allSelected = isAllSelected(allOptions)
+    const allSelected = isAllSelected(shownOptions)
 
     return (
         // The handler sits on the wrapper rather than on the document: Escape
@@ -259,7 +321,7 @@ export default function MultiSelect<T>({
                 // it opens, and whether it is open.
                 aria-expanded={isOpen}
                 aria-controls={panelId}
-                onClick={() => setIsOpen((open) => !open)}
+                onClick={toggleOpen}
             >
                 {summary}
             </button>
@@ -271,6 +333,27 @@ export default function MultiSelect<T>({
                 id={panelId}
                 hidden={!isOpen}
             >
+                {searchable && (
+                    <>
+                        {/* Visually hidden: the placeholder says the same on
+                            screen, but goes away as soon as one types. */}
+                        <label
+                            className="fr-label fr-sr-only"
+                            htmlFor={searchId}
+                        >
+                            Rechercher dans {label}
+                        </label>
+                        <input
+                            ref={searchRef}
+                            id={searchId}
+                            type="search"
+                            className="fr-input shared-multi-select__search"
+                            placeholder="Rechercher"
+                            value={query}
+                            onChange={(event) => setQuery(event.target.value)}
+                        />
+                    </>
+                )}
                 {showSelectAll && (
                     <button
                         type="button"
@@ -279,8 +362,8 @@ export default function MultiSelect<T>({
                                 ? 'fr-icon-close-circle-line'
                                 : 'fr-icon-checkbox-circle-line'
                         }`}
-                        disabled={selectableIn(allOptions).length === 0}
-                        onClick={() => toggleAll(allOptions, !allSelected)}
+                        disabled={selectableIn(shownOptions).length === 0}
+                        onClick={() => toggleAll(shownOptions, !allSelected)}
                     >
                         {allSelected
                             ? 'Tout désélectionner'
@@ -307,10 +390,29 @@ export default function MultiSelect<T>({
                         </legend>
                     )}
                     <div className="fr-fieldset__element shared-multi-select__options">
-                        {options.map((item, index) =>
+                        {shownItems.map((item) =>
                             isGroup(item)
                                 ? renderGroup(item)
-                                : renderOption(item, `option-${index}`)
+                                : renderOption(
+                                      item,
+                                      `option-${options.indexOf(item)}`
+                                  )
+                        )}
+                        {/* Mounted for as long as the field is, so screen
+                            readers already watch it when its text changes.
+                            Heard only, but for « Aucun résultat », which is
+                            also all the list has left to show. */}
+                        {searchable && (
+                            <p
+                                role="status"
+                                className={
+                                    shownItems.length === 0
+                                        ? 'shared-multi-select__no-result'
+                                        : 'fr-sr-only'
+                                }
+                            >
+                                {searchStatus}
+                            </p>
                         )}
                     </div>
                 </fieldset>

@@ -49,4 +49,6 @@ export type MultiSelectProps<T> = {
     // Shows the "Tout sélectionner" / "Tout désélectionner" button. Off by
     // default: it is dead weight on a short list.
     showSelectAll?: boolean
+    // Shows a search field at the top of the panel
+    searchable?: boolean
 }

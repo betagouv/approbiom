@@ -27,8 +27,10 @@ afterEach(() => {
 
 function ControlledMultiSelect({
     initialSelection = [],
+    searchable = false,
 }: {
     initialSelection?: string[]
+    searchable?: boolean
 }) {
     const [selected, setSelected] = useState(initialSelection)
 
@@ -37,6 +39,7 @@ function ControlledMultiSelect({
             label="Départements"
             legend="Départements du Grand Est"
             showSelectAll
+            searchable={searchable}
             options={items}
             selectedValues={selected}
             onSelectionChange={setSelected}
@@ -231,5 +234,160 @@ describe('MultiSelect', () => {
         expect(
             screen.getByRole('button', { name: 'Tout sélectionner' })
         ).toBeDefined()
+    })
+
+    describe('when searchable', () => {
+        const search = (text: string) =>
+            fireEvent.change(
+                screen.getByRole('searchbox', {
+                    name: 'Rechercher dans Départements',
+                }),
+                { target: { value: text } }
+            )
+
+        const shownOptions = () =>
+            screen
+                .getAllByRole<HTMLInputElement>('checkbox')
+                .map((checkbox) => checkbox.labels?.[0]?.textContent)
+
+        it('has no search field unless asked for', () => {
+            render(<ControlledMultiSelect />)
+            open()
+
+            expect(screen.queryByRole('searchbox')).toBeNull()
+        })
+
+        it('puts the focus in the search field when the panel opens', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            expect(document.activeElement).toBe(screen.getByRole('searchbox'))
+        })
+
+        it('narrows the options to the labels holding the query, accents and case aside', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            search('RHIN')
+
+            expect(shownOptions()).toEqual(['Alsace', 'Bas-Rhin', 'Haut-Rhin'])
+        })
+
+        it('keeps a whole group whose own label matches', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            search('alsace')
+
+            expect(shownOptions()).toEqual(['Alsace', 'Bas-Rhin', 'Haut-Rhin'])
+        })
+
+        it('drops a group none of whose options match', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            search('bas')
+
+            expect(shownOptions()).toEqual(['Alsace', 'Bas-Rhin'])
+        })
+
+        it('says so when nothing matches', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            search('introuvable')
+
+            expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
+            expect(screen.getByText('Aucun résultat')).toBeDefined()
+        })
+
+        it('selects only the options shown when everything is selected', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            search('ardennes')
+            fireEvent.click(
+                screen.getByRole('button', { name: 'Tout sélectionner' })
+            )
+            search('')
+
+            expect(getCheckbox('Ardennes').checked).toBe(true)
+            expect(getCheckbox('Vosges').checked).toBe(false)
+            expect(getCheckbox('Bas-Rhin').checked).toBe(false)
+        })
+
+        it('keeps the selection made before searching', () => {
+            render(
+                <ControlledMultiSelect searchable initialSelection={['88']} />
+            )
+            open()
+
+            search('bas')
+            fireEvent.click(getCheckbox('Bas-Rhin'))
+            search('')
+
+            expect(getCheckbox('Bas-Rhin').checked).toBe(true)
+            expect(getCheckbox('Vosges').checked).toBe(true)
+        })
+
+        it('checks only the options shown when a group is checked', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            search('bas')
+            fireEvent.click(getCheckbox('Alsace'))
+            search('')
+
+            expect(getCheckbox('Bas-Rhin').checked).toBe(true)
+            expect(getCheckbox('Haut-Rhin').checked).toBe(false)
+            expect(getCheckbox('Alsace').indeterminate).toBe(true)
+        })
+
+        it('keeps the id of an option whatever the search leaves of its group', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+            const hautRhinId = getCheckbox('Haut-Rhin').id
+
+            search('haut')
+
+            expect(getCheckbox('Haut-Rhin').id).toBe(hautRhinId)
+        })
+
+        it('says nothing until something is searched', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            expect(screen.getByRole('status').textContent).toBe('')
+        })
+
+        it('announces how many options the search leaves', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+
+            search('rhin')
+            expect(screen.getByRole('status').textContent).toBe('2 résultats')
+
+            search('vosges')
+            expect(screen.getByRole('status').textContent).toBe('1 résultat')
+
+            search('introuvable')
+            expect(screen.getByRole('status').textContent).toBe(
+                'Aucun résultat'
+            )
+        })
+
+        it('starts from the whole list each time it opens', () => {
+            render(<ControlledMultiSelect searchable />)
+            open()
+            search('bas')
+
+            open()
+            open()
+
+            expect(screen.getByRole<HTMLInputElement>('searchbox').value).toBe(
+                ''
+            )
+            expect(shownOptions()).toHaveLength(6)
+        })
     })
 })

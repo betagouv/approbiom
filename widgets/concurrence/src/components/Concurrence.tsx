@@ -274,6 +274,7 @@ export default function Concurrence({
                         selectedValues={provenances}
                         onSelectionChange={setProvenances}
                         showSelectAll
+                        searchable
                     />
                 </div>
                 <div className="concurrence__filter">
@@ -282,7 +283,7 @@ export default function Concurrence({
                         options={fournisseurOptions}
                         selectedValues={fournisseurs}
                         onSelectionChange={setFournisseurs}
-                        showSelectAll
+                        searchable
                     />
                 </div>
             </div>

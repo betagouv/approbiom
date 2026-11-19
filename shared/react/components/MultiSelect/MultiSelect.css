@@ -45,6 +45,15 @@
     box-shadow: var(--overlap-shadow);
 }
 
+.shared-multi-select__search {
+    margin-bottom: 1rem;
+}
+
+.shared-multi-select__no-result {
+    margin: 0;
+    color: var(--text-mention-grey);
+}
+
 .shared-multi-select__select-all {
     width: 100% !important;
     justify-content: center;

@@ -18,9 +18,7 @@ import {
     type ReactNode,
 } from 'react'
 import type { ComboboxOption, ComboboxProps } from './Combobox.types'
-
-const normalize = (text: string) =>
-    text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+import { normalizeSearchText as normalize } from '@shared/react/search-text'
 
 function highlighted(label: string, query: string): ReactNode {
     const at = normalize(label).indexOf(normalize(query))
