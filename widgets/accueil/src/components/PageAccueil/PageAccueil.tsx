@@ -23,6 +23,7 @@ import {
     getFournisseurOptions,
     getPlanNames,
     getStatutOptions,
+    getUsageOptions,
 } from '../../utils'
 
 function getColumns(
@@ -59,6 +60,7 @@ function getColumns(
             header: 'Usage principal',
             render: (plan) =>
                 plan.usage === null ? '—' : <TagUsage usage={plan.usage} />,
+            sortBy: (plan) => plan.usage ?? '',
         },
         {
             id: 'nature-donnee',
@@ -88,6 +90,7 @@ export default function PageAccueil({
 }: PageAccueilProps) {
     const [nom, setNom] = useState('')
     const [statuts, setStatuts] = useState<string[]>([])
+    const [usages, setUsages] = useState<string[]>([])
     const [departements, setDepartements] = useState<Departement['dep'][]>([])
     const [appelsAProjet, setAppelsAProjet] = useState<
         ProgrammeAide['appelAProjet'][]
@@ -100,6 +103,8 @@ export default function PageAccueil({
 
     const statutOptions = getStatutOptions(plansApprovisionnement)
 
+    const usageOptions = getUsageOptions(plansApprovisionnement)
+
     const planNames = getPlanNames(plansApprovisionnement)
 
     const departementOptions = getDepartementOptions(departementsByRegion)
@@ -111,6 +116,7 @@ export default function PageAccueil({
     const displayedRows = getFilteredRows(plansApprovisionnement, {
         nom,
         statuts,
+        usages,
         departements,
         appelsAProjet,
         fournisseurs,
@@ -119,6 +125,7 @@ export default function PageAccueil({
     const hasFilters =
         nom !== '' ||
         statuts.length > 0 ||
+        usages.length > 0 ||
         departements.length > 0 ||
         appelsAProjet.length > 0 ||
         fournisseurs.length > 0
@@ -126,6 +133,7 @@ export default function PageAccueil({
     function resetFilters() {
         setNom('')
         setStatuts([])
+        setUsages([])
         setDepartements([])
         setAppelsAProjet([])
         setFournisseurs([])
@@ -155,6 +163,16 @@ export default function PageAccueil({
                         options={statutOptions}
                         selectedValues={statuts}
                         onSelectionChange={setStatuts}
+                        showSelectAll
+                    />
+                </div>
+
+                <div className="accueil__filter">
+                    <MultiSelect
+                        label="Usage principal"
+                        options={usageOptions}
+                        selectedValues={usages}
+                        onSelectionChange={setUsages}
                         showSelectAll
                     />
                 </div>

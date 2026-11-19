@@ -7,6 +7,7 @@ import {
     getDepartementOptions,
     getFilteredRows,
     getStatutOptions,
+    getUsageOptions,
 } from './utils'
 
 function plan(overrides: Partial<PlanDetail> = {}): PlanDetail {
@@ -101,6 +102,17 @@ describe('getFilteredRows', () => {
         expect(
             getFilteredRows(plans, { statuts: ['obsolète', 'projet'] })
         ).toEqual([valFleuri, clairVillage])
+    })
+
+    it('keeps the plans whose usage principal is selected', () => {
+        const chimie = plan({ id: 4, nom: 'Bioraffinerie', usage: 'chimie' })
+        const sansUsage = plan({ id: 5, nom: 'Sans usage', usage: null })
+
+        expect(
+            getFilteredRows([...plans, chimie, sansUsage], {
+                usages: ['chimie'],
+            })
+        ).toEqual([chimie])
     })
 
     it('hands back the very rows it was given, not copies', () => {
@@ -210,5 +222,26 @@ describe('getStatutOptions', () => {
     it('drops a statut the document left empty', () => {
         // An option with no label is a checkbox nobody can read.
         expect(getStatutOptions([plan({ statut: '' })])).toEqual([])
+    })
+})
+
+describe('getUsageOptions', () => {
+    it('offers each usage once, capitalised and in alphabetical order', () => {
+        expect(
+            getUsageOptions([
+                plan({ id: 1, usage: 'matériau' }),
+                plan({ id: 2, usage: 'énergie' }),
+                plan({ id: 3, usage: 'chimie' }),
+                plan({ id: 4, usage: 'énergie' }),
+            ])
+        ).toEqual([
+            { value: 'chimie', label: 'Chimie' },
+            { value: 'énergie', label: 'Énergie' },
+            { value: 'matériau', label: 'Matériau' },
+        ])
+    })
+
+    it('drops the plans with no usage principal', () => {
+        expect(getUsageOptions([plan({ usage: null })])).toEqual([])
     })
 })

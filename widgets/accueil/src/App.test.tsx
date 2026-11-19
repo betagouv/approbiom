@@ -1,4 +1,10 @@
-import { cleanup, fireEvent, render, screen } from '@testing-library/react'
+import {
+    cleanup,
+    fireEvent,
+    render,
+    screen,
+    within,
+} from '@testing-library/react'
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import {
     AccessDeniedError,
@@ -257,6 +263,48 @@ describe('App', () => {
         expect(
             screen.getAllByRole('button', { name: 'Voir le plan' })
         ).toHaveLength(1)
+    })
+
+    it('sorts the plans by usage principal', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planPort(
+                        rows([
+                            { ...saintJunien, id: 1, nom: 'Plan A' },
+                            {
+                                ...saintJunien,
+                                id: 2,
+                                nom: 'Plan B',
+                                usage: 'chimie',
+                            },
+                            {
+                                ...saintJunien,
+                                id: 3,
+                                nom: 'Plan C',
+                                usage: 'matériau',
+                            },
+                        ])
+                    ),
+                })}
+            />
+        )
+        const sortByUsage = within(
+            await screen.findByRole('columnheader', {
+                name: /Usage principal/,
+            })
+        ).getByRole('button', { name: 'Trier' })
+        const planNames = () =>
+            screen
+                .getAllByRole('row')
+                .slice(1)
+                .map((row) => within(row).getAllByRole('cell')[1].textContent)
+
+        fireEvent.click(sortByUsage)
+        expect(planNames()).toEqual(['Plan B', 'Plan A', 'Plan C'])
+
+        fireEvent.click(sortByUsage)
+        expect(planNames()).toEqual(['Plan C', 'Plan A', 'Plan B'])
     })
 
     it('opens the plan on the chronologies of its instructions', async () => {

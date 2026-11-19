@@ -21,6 +21,7 @@ const SANS_APPEL_A_PROJET_VALUE = ''
 export type PlanFilters = {
     nom?: string
     statuts?: readonly string[]
+    usages?: readonly string[]
     departements?: readonly Departement['dep'][]
     appelsAProjet?: readonly ProgrammeAide['appelAProjet'][]
     fournisseurs?: readonly Entreprise['siret'][]
@@ -50,6 +51,7 @@ export function getFilteredRows(
     {
         nom = '',
         statuts = [],
+        usages = [],
         departements = [],
         appelsAProjet = [],
         fournisseurs = [],
@@ -61,6 +63,7 @@ export function getFilteredRows(
         (row) =>
             (query === '' || row.nom.toLowerCase().includes(query)) &&
             matchesSelection(statuts, row.statut) &&
+            matchesSelection(usages, row.usage) &&
             matchesSelection(departements, row.departementDeSituation) &&
             matchesAnySelection(
                 appelsAProjet,
@@ -103,6 +106,14 @@ export function getStatutOptions(
     rows: readonly Plan[]
 ): MultiSelectOption<string>[] {
     return getOptions(rows, (row) => row.statut, capitalize).sort((a, b) =>
+        a.label.localeCompare(b.label, 'fr')
+    )
+}
+
+export function getUsageOptions(
+    rows: readonly Plan[]
+): MultiSelectOption<string>[] {
+    return getOptions(rows, (row) => row.usage ?? '', capitalize).sort((a, b) =>
         a.label.localeCompare(b.label, 'fr')
     )
 }
