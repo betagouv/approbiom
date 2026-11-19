@@ -7,13 +7,13 @@ import PiecesJointes from './tabs/PiecesJointes'
 import TabNav, { type TabNavItem } from '@shared/react/components/TabNav'
 import Ressource from '@shared/react/components/Ressource'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
+import type { InstructionPort } from '@shared/core/application/ports/instruction'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'
 import type { ApprovisionnementByRessourceStats } from '@shared/core/application/services/approvisionnement-stats'
 import FilInstruction from './tabs/FilInstruction/FilInstruction'
 import TabUpdate from './tabs/TabUpdate/TabUpdate'
-import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
 import type { UpdateIsPlanLaureatForProgrammeAide } from '@shared/core/application/services/update-is-plan-laureat-for-programme-aide'
 
 const TABS: readonly TabNavItem[] = [
@@ -33,7 +33,7 @@ export type PlanProps = {
     getDepartementContour: ReferentielGeoPort['getDepartementContour']
     getCountryContour: ReferentielGeoPort['getCountryContour']
     onClose: () => void
-    updateInstruction: UpdateInstruction
+    updateInstruction: InstructionPort['update']
     updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide
     refresh: () => void
 }

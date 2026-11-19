@@ -15,8 +15,10 @@ import {
     AVIS_PREFET,
     type AvisPrefet,
 } from '@shared/core/domain/value-objects/avis-prefet'
-import type { InstructionUpdateData } from '@shared/core/application/ports/instruction'
-import type { UpdateInstruction } from '@shared/core/application/services/get-update-instruction'
+import type {
+    InstructionPort,
+    InstructionUpdateData,
+} from '@shared/core/application/ports/instruction'
 import type { UpdateIsPlanLaureatForProgrammeAide } from '@shared/core/application/services/update-is-plan-laureat-for-programme-aide'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
@@ -40,7 +42,7 @@ type DemandeUpdate = {
 type Props = {
     planId: Plan['id']
     demandesSubvention: readonly DemandeUpdate[]
-    updateInstruction: UpdateInstruction
+    updateInstruction: InstructionPort['update']
     updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide
     refresh: () => void
 }

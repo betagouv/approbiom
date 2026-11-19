@@ -1,5 +1,6 @@
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
+import type { InstructionPort } from '@shared/core/application/ports/instruction'
 import type {
     DepartementsByRegion,
     ReferentielGeoPort,
@@ -15,11 +16,6 @@ import {
     type PlanDetailPorts,
 } from '@shared/core/application/services/plan-detail'
 import {
-    getUpdateInstruction,
-    type UpdateInstruction,
-    type UpdateInstructionPorts,
-} from '@shared/core/application/services/get-update-instruction'
-import {
     getUpdateIsPlanLaureatForProgrammeAide,
     type UpdateIsPlanLaureatForProgrammeAide,
     type UpdateIsPlanLaureatForProgrammeAidePorts,
@@ -27,7 +23,6 @@ import {
 
 export type AccueilPorts = PlanDetailPorts &
     ApprovisionnementByRessourceStatsPorts &
-    UpdateInstructionPorts &
     UpdateIsPlanLaureatForProgrammeAidePorts & {
         getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
         getDepartementContour: ReferentielGeoPort['getDepartementContour']
@@ -40,7 +35,7 @@ export type AccueilScreen = {
     programmesAide: readonly ProgrammeAide[]
     departementsByRegion: readonly DepartementsByRegion[]
     approvisionnementByRessourceStatsList: ApprovisionnementByRessourceStatsByPlan
-    updateInstruction: UpdateInstruction
+    updateInstruction: InstructionPort['update']
     updateIsPlanLaureatForProgrammeAide: UpdateIsPlanLaureatForProgrammeAide
 }
 
@@ -62,7 +57,8 @@ export async function loadAccueil(ports: AccueilPorts): Promise<AccueilScreen> {
         programmesAide,
         departementsByRegion,
         approvisionnementByRessourceStatsList,
-        updateInstruction: getUpdateInstruction(ports),
+        updateInstruction: (instructionId, updateData) =>
+            ports.instructions.update(instructionId, updateData),
         updateIsPlanLaureatForProgrammeAide:
             getUpdateIsPlanLaureatForProgrammeAide(ports),
     }
