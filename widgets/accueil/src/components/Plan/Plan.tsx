@@ -55,16 +55,18 @@ export default function Plan({
 
     return (
         <div className="plan">
-            <div className="plan__header">
+            <div className="plan__back-bar">
                 <button
                     type="button"
-                    className="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-arrow-left-line plan__back"
+                    className="fr-btn fr-btn--tertiary-no-outline fr-btn--icon-left fr-icon-arrow-left-line"
                     onClick={onClose}
                 >
                     Accueil
                 </button>
+            </div>
+            <div className="plan__header">
                 <div className="plan__heading">
-                    <h1 className="fr-h3 plan__title">{plan.nom}</h1>
+                    <h1 className="fr-h5 plan__title">{plan.nom}</h1>
 
                     <dl className="plan__meta">
                         <div className="plan__meta-entry">

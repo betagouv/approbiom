@@ -11,10 +11,14 @@
     min-height: 100vh;
 }
 
-/* Only as wide as its label: a stretched flex item would leave the whole line
-   clickable, well past the words. */
-.plan__back {
-    align-self: flex-start;
+.plan__back-bar {
+    position: sticky;
+    top: 0;
+    z-index: 1001;
+
+    display: flex;
+    margin: -2rem -2rem -1.5rem;
+    background-color: var(--background-default-grey);
 }
 
 /* The gap above already spaces the title; its own margin would double it. */

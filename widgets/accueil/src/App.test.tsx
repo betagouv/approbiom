@@ -294,11 +294,17 @@ describe('App', () => {
                 name: /Usage principal/,
             })
         ).getByRole('button', { name: 'Trier' })
+        const nomColumn = screen
+            .getAllByRole('columnheader')
+            .findIndex((header) => header.textContent?.startsWith('Nom'))
         const planNames = () =>
             screen
                 .getAllByRole('row')
                 .slice(1)
-                .map((row) => within(row).getAllByRole('cell')[1].textContent)
+                .map(
+                    (row) =>
+                        within(row).getAllByRole('cell')[nomColumn].textContent
+                )
 
         fireEvent.click(sortByUsage)
         expect(planNames()).toEqual(['Plan B', 'Plan A', 'Plan C'])
