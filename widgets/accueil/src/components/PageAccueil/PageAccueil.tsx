@@ -45,6 +45,11 @@ function getColumns(
             ),
         },
         {
+            id: 'statut',
+            header: 'Statut',
+            render: (plan) => <TagStatut statut={plan.statut} />,
+        },
+        {
             id: 'nom',
             header: 'Nom',
             render: (plan) => plan.nom,
@@ -66,11 +71,6 @@ function getColumns(
             id: 'nature-donnee',
             header: 'Nature de la donnée',
             render: (plan) => <TagNature nature={plan.natureDonnee} />,
-        },
-        {
-            id: 'statut',
-            header: 'Statut',
-            render: (plan) => <TagStatut statut={plan.statut} />,
         },
     ]
 }
