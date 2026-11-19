@@ -65,6 +65,7 @@
 .shared-multi-select__options {
     max-height: 20rem;
     overflow-y: auto;
+    position: relative;
 }
 
 /* The indent is what says an option belongs to the group above it, so it is
