@@ -1,0 +1,27 @@
+services:
+    grist:
+        image: lasuite/grist:${GRIST_IMAGE_TAG}
+        platform: linux/amd64 # image only published for amd64
+        ports:
+            - '127.0.0.1:8484:8484' # localhost only: no boot key nor sandbox in dev
+        environment:
+            GRIST_SESSION_SECRET: ${GRIST_SESSION_SECRET:?Définir GRIST_SESSION_SECRET dans dev/.env}
+            GRIST_DEFAULT_EMAIL: ${GRIST_DEFAULT_EMAIL:?Définir GRIST_DEFAULT_EMAIL dans dev/.env}
+            APP_HOME_URL: http://localhost:8484
+            GRIST_WIDGET_LIST_URL: http://widgets/manifest.dev.json
+            GRIST_SANDBOX_FLAVOR: ${GRIST_SANDBOX_FLAVOR:-gvisor}
+            GRIST_IN_SERVICE: 'true' # skip boot key check: local dev only
+            # Mirror Grist.gouv config (from window.gristConfig on grist.numerique.gouv.fr)
+            GRIST_MAX_UPLOAD_IMPORT_MB: 30
+            GRIST_MAX_UPLOAD_ATTACHMENT_MB: 10
+            GRIST_WARN_BEFORE_SHARING_PUBLICLY: 'true'
+            GRIST_ANON_PLAYGROUND: 'false'
+        depends_on:
+            - widgets
+
+    widgets:
+        image: nginx:alpine
+        ports:
+            - '127.0.0.1:8585:80' # only for checking manifest via the browser
+        volumes:
+            - ./manifest.dev.json:/usr/share/nginx/html/manifest.dev.json:ro
