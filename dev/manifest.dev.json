@@ -1,0 +1,9 @@
+[
+    {
+        "name": "[DEV] Accueil",
+        "widgetId": "dev-widget-accueil",
+        "url": "http://localhost:5173/accueil/",
+        "accessLevel": "full",
+        "published": true
+    }
+]

@@ -1,3 +1,6 @@
+# Env
+dev/.env
+
 # Logs
 logs
 *.log
