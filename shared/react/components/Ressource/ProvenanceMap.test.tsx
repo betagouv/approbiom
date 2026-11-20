@@ -215,6 +215,62 @@ describe('ProvenanceMap', () => {
         expect(markers(container)).toHaveLength(2)
     })
 
+    it('marks the communes it can when one is not held', () => {
+        const { getDepartementContour, getCountryContour } = contours()
+        const getCommuneCenterPosition = vi
+            .fn<ReferentielGeoPort['getCommuneCenterPosition']>()
+            .mockImplementation((codeCommune) =>
+                codeCommune === '00000'
+                    ? undefined
+                    : { latitude: 44.84, longitude: -0.58 }
+            )
+
+        const { container } = render(
+            <ProvenanceMap
+                approvisionnements={drawnFrom('33')}
+                communes={['33063', '00000']}
+                getCommuneCenterPosition={getCommuneCenterPosition}
+                getDepartementContour={getDepartementContour}
+                getCountryContour={getCountryContour}
+            />
+        )
+
+        expect(markers(container)).toHaveLength(1)
+        expect(polygons(container)).toHaveLength(1)
+    })
+
+    it('says as much when no commune can be placed', () => {
+        const { getDepartementContour, getCountryContour } = contours()
+
+        render(
+            <ProvenanceMap
+                approvisionnements={[]}
+                communes={['00000']}
+                getCommuneCenterPosition={() => undefined}
+                getDepartementContour={getDepartementContour}
+                getCountryContour={getCountryContour}
+            />
+        )
+
+        expect(screen.getByText(NOTHING_DRAWN)).toBeDefined()
+    })
+
+    it('draws what it can when a département is not held', () => {
+        const { getCommuneCenterPosition, getCountryContour } = contours()
+
+        const { container } = render(
+            <ProvenanceMap
+                approvisionnements={drawnFrom('33', '64')}
+                communes={[]}
+                getCommuneCenterPosition={getCommuneCenterPosition}
+                getDepartementContour={(code) => (code === '64' ? [] : contour)}
+                getCountryContour={getCountryContour}
+            />
+        )
+
+        expect(polygons(container)).toHaveLength(1)
+    })
+
     // What the concurrence screen asks for: where these plans are, with no
     // territory drawn under them.
     it('draws a map of markers alone', () => {

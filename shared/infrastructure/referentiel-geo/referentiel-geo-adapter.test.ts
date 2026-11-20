@@ -9,14 +9,14 @@ describe('createReferentielGeoAdapter', () => {
             const position =
                 createReferentielGeoAdapter().getCommuneCenterPosition('64024')
 
-            expect(position.latitude).toBeCloseTo(43.49, 1)
-            expect(position.longitude).toBeCloseTo(-1.52, 1)
+            expect(position?.latitude).toBeCloseTo(43.49, 1)
+            expect(position?.longitude).toBeCloseTo(-1.52, 1)
         })
 
-        it('refuses a code no commune carries', () => {
-            expect(() =>
+        it('gives no position for a code no commune carries', () => {
+            expect(
                 createReferentielGeoAdapter().getCommuneCenterPosition('00000')
-            ).toThrow('00000')
+            ).toBeUndefined()
         })
     })
 
@@ -77,10 +77,10 @@ describe('createReferentielGeoAdapter', () => {
             expect(Math.max(...longitudes)).toBeGreaterThan(-1.52)
         })
 
-        it('refuses a code no département carries', () => {
-            expect(() =>
+        it('gives no outline for a code no département carries', () => {
+            expect(
                 createReferentielGeoAdapter().getDepartementContour('99')
-            ).toThrow('99')
+            ).toEqual([])
         })
     })
 })

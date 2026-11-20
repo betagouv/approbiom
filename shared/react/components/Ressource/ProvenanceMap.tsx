@@ -108,12 +108,16 @@ export default function ProvenanceMap({
             MapProps['polygons']
         >
 
-        const markers = [...new Set(communes)].map(
-            (codeCommune): LatLngTuple => {
-                const { latitude, longitude } =
-                    getCommuneCenterPosition(codeCommune)
+        // A commune the référentiel does not hold is left off the map, as an
+        // outline it does not hold is: one unknown code must not take the
+        // whole page down with it.
+        const markers = [...new Set(communes)].flatMap(
+            (codeCommune): LatLngTuple[] => {
+                const position = getCommuneCenterPosition(codeCommune)
 
-                return [latitude, longitude]
+                return position === undefined
+                    ? []
+                    : [[position.latitude, position.longitude]]
             }
         )
 

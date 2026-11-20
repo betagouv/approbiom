@@ -5,10 +5,18 @@ import type { Region } from '@shared/core/domain/value-objects/region'
 
 export interface ReferentielGeoPort {
     listDepartementsByRegion: () => Promise<readonly DepartementsByRegion[]>
-    getCommuneCenterPosition: (codeCommune: Commune['codeInsee']) => {
-        latitude: number
-        longitude: number
-    }
+    /**
+     * The centre of a commune, or `undefined` when the référentiel does not
+     * hold its code: a document can name a commune the bundled dataset lacks,
+     * and a screen should leave it off the map rather than fail.
+     */
+    getCommuneCenterPosition: (codeCommune: Commune['codeInsee']) =>
+        | {
+              latitude: number
+              longitude: number
+          }
+        | undefined
+    /** The outline of a département, or none when its code is not held. */
     getDepartementContour: (codeDepartement: Departement['dep']) => {
         latitude: number
         longitude: number

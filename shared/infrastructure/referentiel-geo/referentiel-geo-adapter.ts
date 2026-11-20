@@ -91,27 +91,18 @@ export function createReferentielGeoAdapter(): ReferentielGeoDatasetPort {
     return {
         getCommuneCenterPosition(codeCommune) {
             const commune = communes[codeCommune]
-            if (commune === undefined) {
-                throw new Error(
-                    `no commune carries the INSEE code "${codeCommune}"`
-                )
-            }
 
-            return {
-                latitude: commune.latitude,
-                longitude: commune.longitude,
-            }
+            return commune === undefined
+                ? undefined
+                : { latitude: commune.latitude, longitude: commune.longitude }
         },
 
         getDepartementContour(codeDepartement) {
             const departement = departements[codeDepartement]
-            if (departement === undefined) {
-                throw new Error(
-                    `no département carries the code "${codeDepartement}"`
-                )
-            }
 
-            return toPositions(departement.contour)
+            return departement === undefined
+                ? []
+                : toPositions(departement.contour)
         },
 
         getCountryContour(libelle) {
