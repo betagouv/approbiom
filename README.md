@@ -28,19 +28,37 @@ pnpm install
 
 ### Mise en place de l'environnement de développement
 
-Pré-requis : installer Grist Desktop.
+L'environnement de développement lance en local, avec Docker, la même image Grist que Grist.gouv (`lasuite/grist`), ainsi qu'un serveur nginx qui expose la liste des widgets de développement.
 
-Voir : https://github.com/gristlabs/grist-desktop/releases
+Pré-requis : installer Docker ou Docker Desktop.
 
-Télécharger le document de production.
+1. Créer le fichier `dev/.env` à partir du modèle, puis l'adapter :
 
-Pour servir les widgets du repository, lancer :
+```bash
+cp dev/.env.example dev/.env
+```
+
+2. Lancer Grist et le serveur de widgets :
+
+```bash
+docker compose -f dev/docker-compose.yml --env-file dev/.env up -d
+```
+
+Grist est accessible sur http://localhost:8484. Le premier démarrage peut prendre une minute.
+
+3. Servir les widgets du repository :
 
 ```bash
 pnpm run dev
 ```
 
-Sur Grist Desktop, dans la copie du document de production, créer une vue personnalisé avec l'URL du widget servi en environnement de développement.
+4. Dans Grist, importer le document de production (fichier `.grist` téléchargé depuis Grist.gouv), puis ajouter une vue personnalisée et choisir le widget `[DEV] …` dans la liste.
+
+Pour arrêter l'environnement :
+
+```bash
+docker compose -f dev/docker-compose.yml --env-file dev/.env down
+```
 
 ### Création d'un nouveau widget
 
