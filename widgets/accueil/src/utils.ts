@@ -12,6 +12,7 @@ import type {
     MultiSelectOption,
 } from '@shared/react/components/MultiSelect'
 import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
+import { normalizeSearchText } from '@shared/react/search-text'
 
 export const SANS_APPEL_A_PROJET_LABEL =
     "Aucun appel à projet n'est lié à ce plan"
@@ -57,11 +58,11 @@ export function getFilteredRows(
         fournisseurs = [],
     }: PlanFilters = {}
 ): PlanDetail[] {
-    const query = nom.trim().toLowerCase()
+    const query = normalizeSearchText(nom.trim())
 
     return rows.filter(
         (row) =>
-            (query === '' || row.nom.toLowerCase().includes(query)) &&
+            (query === '' || normalizeSearchText(row.nom).includes(query)) &&
             matchesSelection(statuts, row.statut) &&
             matchesSelection(usages, row.usage) &&
             matchesSelection(departements, row.departementDeSituation) &&

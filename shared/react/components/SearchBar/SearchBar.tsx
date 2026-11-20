@@ -6,9 +6,7 @@ import '@gouvfr/dsfr/dist/component/search/search.main.min.css'
 import './SearchBar.css'
 import type { SearchBarProps } from './SearchBar.types'
 import { useEffect, useId, useRef, useState } from 'react'
-
-const normalize = (text: string) =>
-    text.normalize('NFD').replace(/\p{M}/gu, '').toLowerCase()
+import { normalizeSearchText as normalize } from '@shared/react/search-text'
 
 export default function SearchBar({
     label,

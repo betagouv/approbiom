@@ -88,6 +88,20 @@ describe('getFilteredRows', () => {
         expect(getFilteredRows(plans, { nom: 'BOIS' })).toEqual([boisDuNord])
     })
 
+    it('matches a name whatever the accents, on either side', () => {
+        const chaudiere = plan({ id: 4, nom: 'Chaudière RCU Les Prés' })
+
+        expect(
+            getFilteredRows([...plans, chaudiere], { nom: 'Chaudiere rcu' })
+        ).toEqual([chaudiere])
+        expect(
+            getFilteredRows([...plans, chaudiere], { nom: 'CHAUDIÈRE' })
+        ).toEqual([chaudiere])
+        expect(getFilteredRows(plans, { nom: 'clair-villagé' })).toEqual([
+            clairVillage,
+        ])
+    })
+
     it('trims the query before matching', () => {
         expect(getFilteredRows(plans, { nom: '  val fleuri  ' })).toEqual([
             valFleuri,
