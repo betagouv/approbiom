@@ -1,4 +1,4 @@
-import { defineConfig } from 'vite'
+import { defineConfig, loadEnv } from 'vite'
 import react from '@vitejs/plugin-react'
 import { fileURLToPath, URL } from 'node:url'
 import { readdirSync } from 'node:fs'
@@ -54,13 +54,28 @@ function widgetDevUrls() {
     }
 }
 
+function devCustomPrintUrls() {
+    const { GRIST_DEV_URL } = loadEnv('dev', 'dev', 'GRIST_')
+    return {
+        name: 'custom-print-urls',
+        apply: 'serve',
+        configureServer: (server) => {
+            const print = server.printUrls
+            server.printUrls = () => {
+                print()
+                server.config.logger.info(`  ➜  Grist:   ${GRIST_DEV_URL}/`)
+            }
+        },
+    }
+}
+
 export default defineConfig({
     // Relative asset URLs ("./assets/x.js" instead of "/assets/x.js") so the
     // same build works under /staging/widget-a/ AND /prod/widget-a/.
     // This is what lets us promote by copying files instead of rebuilding.
     base: './',
 
-    plugins: [react(), widgetDevUrls()],
+    plugins: [react(), widgetDevUrls(), devCustomPrintUrls()],
 
     test: {
         environment: 'jsdom',

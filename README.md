@@ -41,15 +41,13 @@ cp dev/.env.example dev/.env
 2. Lancer Grist et le serveur de widgets :
 
 ```bash
-docker compose -f dev/docker-compose.yml --env-file dev/.env up -d
+pnpm run dev
 ```
 
-Grist est accessible sur http://localhost:8484. Le premier démarrage peut prendre une minute.
-
-3. Servir les widgets du repository :
+3. Servir uniquement les widgets du repository :
 
 ```bash
-pnpm run dev
+pnpm run dev:vite
 ```
 
 4. Dans Grist, importer le document de production (fichier `.grist` téléchargé depuis Grist.gouv), puis ajouter une vue personnalisée et choisir le widget `[DEV] …` dans la liste.
@@ -57,7 +55,7 @@ pnpm run dev
 Pour arrêter l'environnement :
 
 ```bash
-docker compose -f dev/docker-compose.yml --env-file dev/.env down
+pnpm run dev:docker:down
 ```
 
 ### Création d'un nouveau widget

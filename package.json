@@ -9,7 +9,10 @@
         "pnpm": ">=10"
     },
     "scripts": {
-        "dev": "vite",
+        "dev": "pnpm run dev:docker:up && pnpm run dev:vite",
+        "dev:vite": "vite",
+        "dev:docker:up": "docker compose -f dev/docker-compose.yml --env-file dev/.env up -d",
+        "dev:docker:down": "docker compose -f dev/docker-compose.yml --env-file dev/.env down",
         "build:staging": "node scripts/deploy/build.mjs",
         "build:prod": "node scripts/deploy/promote.mjs",
         "generate:referentiels": "node --experimental-strip-types shared/infrastructure/referentiel-geo/generate-referentiels.ts",
