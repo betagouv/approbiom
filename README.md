@@ -82,6 +82,24 @@ import '@gouvfr/dsfr/dist/core/core.main.min.css'
 import '@shared/react/base.css'
 ```
 
+### Référentiels géographiques
+
+Les widgets placent communes, départements et pays sur leurs cartes à partir de fichiers JSON embarqués dans `shared/infrastructure/referentiel-geo/`, sans appel réseau :
+
+| Fichier                      | Contenu                       | Sources                                                                                    |
+| ---------------------------- | ----------------------------- | ------------------------------------------------------------------------------------------ |
+| `communes.json`              | centre de chaque commune      | table `INSEE_Commune` du document Grist (export CSV) + centres de https://geo.api.gouv.fr/ |
+| `departements-contours.json` | contour de chaque département | Géoplateforme de l'IGN (Admin Express COG Carto)                                           |
+| `countries-contours.json`    | contour de chaque pays        | geoBoundaries                                                                              |
+
+Ils se régénèrent à la main, puis se commitent :
+
+```bash
+pnpm generate:referentiels communes --csv "chemin/vers/INSEE_Commune.csv" --source "Grist Approbiom, table INSEE_Commune (COG 2025)"
+```
+
+**Attention à tenir à jour le référentiel des communes entre Grist et le dépôt.**
+
 ## Guide de déploiement
 
 Les widgets Grist sont hébergés sur GitHub Pages et accessibles via les URLs suivantes
