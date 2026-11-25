@@ -45,7 +45,8 @@ export type DataTableProps<T> = {
     showResultCount?: boolean
     // Controls that act on the rows — a search field, say — drawn on the title
     // line, between the title and the result count, rather than on a line of
-    // their own above the table. Hidden along with the title by `hideCaption`.
+    // their own above the table. They stay on screen under `hideCaption`, on a
+    // line of their own: a control that can take the focus is never hidden.
     headerActions?: ReactNode
     // Opens a detail row under the one that was clicked. Which rows are open is
     // the table's own business — nothing outside it acts on that — so unlike

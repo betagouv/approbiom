@@ -110,8 +110,16 @@ export default function DataTable<T>({
         .filter(Boolean)
         .join(' ')
 
+    // Controls can take the focus, so they never go where `hideCaption` hides
+    // the title: an invisible field would still be tabbed into. With the title
+    // hidden they get a line of their own instead.
+    const actions = headerActions !== undefined && (
+        <div className="shared-data-table__header-actions">{headerActions}</div>
+    )
+
     return (
         <div className={rootClassName}>
+            {hideCaption && actions}
             {/* Deliberately outside `fr-table__wrapper`. Its container is the
                 scrolling box, and a `<caption>` — which the HTML parser will
                 only accept inside `<table>` — therefore scrolls away with the
@@ -123,11 +131,7 @@ export default function DataTable<T>({
             >
                 <div className="shared-data-table__header-title">
                     <span id={titleId}>{caption}</span>
-                    {headerActions !== undefined && (
-                        <div className="shared-data-table__header-actions">
-                            {headerActions}
-                        </div>
-                    )}
+                    {!hideCaption && actions}
                     {showResultCount && (
                         // Announced on change, not on load: a sighted reader
                         // watches the count move as filters are applied, and

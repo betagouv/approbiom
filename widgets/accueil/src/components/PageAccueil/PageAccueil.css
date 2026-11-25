@@ -6,7 +6,7 @@
     padding: 2rem;
 
     /* Exactly the panel's height, not at least: the table below takes what the
-       title, search and filters leave and scrolls inside it, so its sideways
+       title and the filters leave and scrolls inside it, so its sideways
        scrollbar sits at the bottom of the panel rather than under the last row,
        out of reach. */
     height: 100vh;
@@ -14,16 +14,6 @@
 
 .accueil__title {
     margin: 0;
-}
-
-.accueil__account {
-    color: var(--text-title-blue-france);
-}
-
-.accueil__results {
-    margin: 0;
-    white-space: nowrap;
-    color: var(--text-mention-grey);
 }
 
 .accueil__filters {
@@ -55,18 +45,6 @@
 
 .accueil__filter .fr-select-group {
     margin-bottom: 0;
-}
-
-.accueil__table .fr-table__wrapper caption {
-    position: absolute;
-    clip: rect(0, 0, 0, 0);
-    width: 1px;
-    height: 0;
-    margin: -1px;
-    padding: 0;
-    border: 0;
-    overflow: hidden;
-    white-space: nowrap;
 }
 
 /* The table fills the rest of the panel and scrolls inside it, both ways — the
@@ -104,9 +82,4 @@
     flex: 1;
     margin: 0;
     padding-top: 0;
-}
-
-.accueil__version {
-    display: block;
-    margin-top: 0.25rem;
 }

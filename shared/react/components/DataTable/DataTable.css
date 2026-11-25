@@ -94,6 +94,15 @@
     min-width: 0;
 }
 
+/* With the title hidden the controls stand alone above the table, still at the
+   right-hand end of the line. `flex: none` drops the 28rem basis the title-line
+   rule gives them, which would turn into a height in a column-flex table. */
+.fr-table > .shared-data-table__header-actions {
+    flex: none;
+    margin-bottom: 1rem;
+    max-width: 28rem;
+}
+
 /* `flex-shrink: 0` keeps "169 résultats" on one line when a long title competes
    for the width. */
 .fr-table .shared-data-table__result-count {

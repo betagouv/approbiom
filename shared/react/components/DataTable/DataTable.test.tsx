@@ -89,6 +89,26 @@ describe('DataTable', () => {
         ).not.toBeNull()
     })
 
+    it('keeps the header actions on screen when the title is hidden', () => {
+        render(
+            <DataTable
+                caption="Plans d’approvisionnement"
+                hideCaption
+                headerActions={<button type="button">Rechercher</button>}
+                rows={plans}
+                columns={columns}
+            />
+        )
+
+        // A control that takes the focus must not sit inside the visually
+        // hidden title block: it would be tabbed into without being seen.
+        expect(
+            screen
+                .getByRole('button', { name: 'Rechercher' })
+                .closest('.fr-sr-only')
+        ).toBeNull()
+    })
+
     it('renders all column headers', () => {
         render(
             <DataTable
