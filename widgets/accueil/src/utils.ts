@@ -1,3 +1,4 @@
+import type { Crb } from '@shared/core/domain/entities/crb'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
@@ -22,6 +23,12 @@ export const SANS_APPEL_A_PROJET_LABEL =
 
 const SANS_APPEL_A_PROJET_VALUE = ''
 
+export const SANS_CRB_LABEL = "Aucun CRB n'instruit ce plan"
+
+// An empty Ref reads as 0, so no CRB is ever stored under it: free to stand
+// for « none of them ».
+export const SANS_CRB_VALUE: Crb['id'] = 0
+
 export type PlanFilters = {
     nom?: string
     statuts?: readonly string[]
@@ -29,6 +36,7 @@ export type PlanFilters = {
     departements?: readonly Departement['dep'][]
     appelsAProjet?: readonly ProgrammeAide['appelAProjet'][]
     fournisseurs?: readonly Entreprise['siret'][]
+    crbs?: readonly Crb['id'][]
 }
 
 function matchesSelection(
@@ -38,10 +46,10 @@ function matchesSelection(
     return selection.length === 0 || selection.includes(value ?? '')
 }
 
-function matchesAnySelection(
-    selection: readonly string[],
-    values: readonly string[],
-    emptyValue?: string
+function matchesAnySelection<T>(
+    selection: readonly T[],
+    values: readonly T[],
+    emptyValue?: T
 ): boolean {
     if (selection.length === 0) return true
 
@@ -59,6 +67,7 @@ export function getFilteredRows(
         departements = [],
         appelsAProjet = [],
         fournisseurs = [],
+        crbs = [],
     }: PlanFilters = {}
 ): PlanDetail[] {
     const query = normalizeSearchText(nom.trim())
@@ -77,6 +86,11 @@ export function getFilteredRows(
             matchesAnySelection(
                 fournisseurs,
                 row.fournisseurs.map(({ siret }) => siret)
+            ) &&
+            matchesAnySelection(
+                crbs,
+                getCrbsInstructeurs(row).map(({ id }) => id),
+                SANS_CRB_VALUE
             )
     )
 }
@@ -150,6 +164,43 @@ export function getFournisseurOptions(
     return [...labelBySiret]
         .map(([value, label]) => ({ value, label }))
         .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+}
+
+/**
+ * Every CRB that instructs one of the plan's demandes, once each, in the order
+ * they come. An instruction whose CRB Ref is empty names nobody, so it adds
+ * none.
+ */
+export function getCrbsInstructeurs(
+    plan: Pick<PlanDetail, 'demandesSubvention'>
+): Pick<Crb, 'id' | 'name'>[] {
+    const crbs = new Map<Crb['id'], Crb['name']>()
+
+    for (const { instructions } of plan.demandesSubvention)
+        for (const { crb, crbName } of instructions)
+            if (crb !== SANS_CRB_VALUE && !crbs.has(crb)) crbs.set(crb, crbName)
+
+    return [...crbs].map(([id, name]) => ({ id, name }))
+}
+
+export function getCrbOptions(
+    rows: readonly PlanDetail[]
+): MultiSelectOption<Crb['id']>[] {
+    const labelById = new Map<Crb['id'], string>()
+
+    // A CRB the document cannot name still instructs: it is offered under its
+    // number rather than left out, so its plans can still be found.
+    for (const row of rows)
+        for (const { id, name } of getCrbsInstructeurs(row))
+            labelById.set(id, name || `CRB n°${id}`)
+
+    const crbs = [...labelById]
+        .map(([value, label]) => ({ value, label }))
+        .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+
+    // Last, under the named CRB: it is the answer to « none of them », not one
+    // more of them.
+    return [...crbs, { value: SANS_CRB_VALUE, label: SANS_CRB_LABEL }]
 }
 
 /**

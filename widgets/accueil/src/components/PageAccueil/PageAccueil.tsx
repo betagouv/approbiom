@@ -9,6 +9,7 @@ import SearchBar from '@shared/react/components/SearchBar'
 import TagStatut from '../TagStatut'
 import TagType from '../TagType'
 import TagUsage from '../TagUsage'
+import type { Crb } from '@shared/core/domain/entities/crb'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
@@ -24,6 +25,7 @@ import { useMemo, useState } from 'react'
 import {
     getAppelAProjetOptions,
     getCommuneDeSituationLabel,
+    getCrbOptions,
     getDepartementOptions,
     getFilteredRows,
     getFournisseurOptions,
@@ -116,6 +118,7 @@ export default function PageAccueil({
         ProgrammeAide['appelAProjet'][]
     >([])
     const [fournisseurs, setFournisseurs] = useState<Entreprise['siret'][]>([])
+    const [crbs, setCrbs] = useState<Crb['id'][]>([])
 
     const columns = useMemo(
         () => getColumns(onOpenPlan, getCommuneNom),
@@ -134,6 +137,8 @@ export default function PageAccueil({
 
     const fournisseurOptions = getFournisseurOptions(plansApprovisionnement)
 
+    const crbOptions = getCrbOptions(plansApprovisionnement)
+
     const displayedRows = getFilteredRows(plansApprovisionnement, {
         nom,
         statuts,
@@ -141,6 +146,7 @@ export default function PageAccueil({
         departements,
         appelsAProjet,
         fournisseurs,
+        crbs,
     })
 
     return (
@@ -196,6 +202,16 @@ export default function PageAccueil({
                         options={fournisseurOptions}
                         selectedValues={fournisseurs}
                         onSelectionChange={setFournisseurs}
+                        showSelectAll
+                    />
+                </div>
+
+                <div className="accueil__filter">
+                    <MultiSelect
+                        label="CRB instructeur"
+                        options={crbOptions}
+                        selectedValues={crbs}
+                        onSelectionChange={setCrbs}
                         showSelectAll
                     />
                 </div>

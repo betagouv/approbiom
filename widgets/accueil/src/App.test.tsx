@@ -390,6 +390,36 @@ describe('App', () => {
         expect(communeOf('RC Limoges')).toBe('—')
     })
 
+    it('narrows the plans to those the picked CRB instructs', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planPort(
+                        rows([
+                            saintJunien,
+                            { ...saintJunien, id: 2, nom: 'RC Limoges' },
+                        ])
+                    ),
+                    demandesSubvention: { list: rows([demandeBciat]) },
+                    programmesAide: programmeAidePort(rows([bciat])),
+                    instructions: instructionPort(rows([nouvelleAquitaine])),
+                    crbs: { list: rows([crbNouvelleAquitaine]) },
+                })}
+            />
+        )
+
+        fireEvent.click(
+            await screen.findByRole('button', { name: /CRB instructeur/ })
+        )
+        fireEvent.click(
+            screen.getByRole('checkbox', { name: 'Nouvelle Aquitaine' })
+        )
+
+        expect(screen.getByText('1 résultat')).toBeDefined()
+        expect(screen.getByText('RC Saint Junien')).toBeDefined()
+        expect(screen.queryByText('RC Limoges')).toBeNull()
+    })
+
     it('opens the plan on the chronologies of its instructions', async () => {
         render(
             <App
