@@ -5,14 +5,11 @@
     gap: 1.5rem;
     padding: 2rem;
 
-    min-height: 100vh;
-}
-
-.accueil__header {
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
+    /* Exactly the panel's height, not at least: the table below takes what the
+       title, search and filters leave and scrolls inside it, so its sideways
+       scrollbar sits at the bottom of the panel rather than under the last row,
+       out of reach. */
+    height: 100vh;
 }
 
 .accueil__title {
@@ -21,19 +18,6 @@
 
 .accueil__account {
     color: var(--text-title-blue-france);
-}
-
-/* The count sits beside the field rather than under it: it answers what was
-   just typed, and a line of its own would push the table further down. */
-.accueil__search {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.accueil__search .shared-search-bar {
-    flex: 1;
-    min-width: 0;
 }
 
 .accueil__results {
@@ -50,19 +34,27 @@
     gap: 1rem;
 }
 
+/* As wide as its libellé or its selection, whichever is longer, and no wider:
+   the filters take the least room they can. The cap keeps a long selection from
+   stretching one filter across the row — past it the text ends in an ellipsis,
+   and the full selection is still there in the panel. */
 .accueil__filter {
-    flex: 0 1 17rem;
-    min-width: 0;
+    flex: 0 0 auto;
+    max-width: 17rem;
+}
+
+/* The panel would otherwise be exactly as narrow as its control, wrapping every
+   option of a short-labelled filter. It is let out to fit its options instead,
+   never narrower than the control it opens from. */
+.accueil__filter .shared-multi-select__panel {
+    right: auto;
+    width: max-content;
+    min-width: 100%;
+    max-width: 24rem;
 }
 
 .accueil__filter .fr-select-group {
     margin-bottom: 0;
-}
-
-/* At the far end of the row rather than next to the last filter: it acts on all
-   of them, so it does not belong to any one of them. */
-.accueil__reset {
-    margin-left: auto;
 }
 
 .accueil__table .fr-table__wrapper caption {
@@ -77,25 +69,40 @@
     white-space: nowrap;
 }
 
-/* A floor for the table, so a short result set still reads as a table rather
-   than as a strip under the filters. Past it the table takes the height its
-   rows need and carries the page down with it. */
+/* The table fills the rest of the panel and scrolls inside it, both ways — the
+   same frame as the Concurrence widget. The floor keeps a short panel, or one
+   whose filters wrap onto several lines, from squeezing it down to a strip:
+   past it the page scrolls instead. */
 .accueil__table {
-    min-height: 30rem;
+    flex: 1;
+    min-height: 20rem;
 }
 
 /* DSFR's own margins are dropped so the flex `gap` above is the only spacing
-   between the filters and the table. Height is left alone: the container keeps
-   the `overflow: auto` DSFR gives it — which is what scrolls a table too wide
-   for the panel sideways — but is bounded by nothing, so its rows extend the
-   page instead of scrolling inside it. */
-.accueil__table .fr-table,
-.accueil__table .fr-table__wrapper,
-.accueil__table .fr-table__container {
+   between the filters and the table. Each box down to `fr-table__container` —
+   which DSFR already makes the scrolling box (`overflow: auto`) — is a flex
+   column handing its height on, so the container is bounded and its scrollbars
+   stay in view. */
+.accueil__table .fr-table {
+    display: flex;
+    flex-direction: column;
+
+    height: 100%;
+    margin: 0;
+}
+
+.accueil__table .fr-table__wrapper {
+    display: flex;
+    flex: 1;
+    flex-direction: column;
+
+    min-height: 0;
     margin: 0;
 }
 
 .accueil__table .fr-table__container {
+    flex: 1;
+    margin: 0;
     padding-top: 0;
 }
 

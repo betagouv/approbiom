@@ -4,6 +4,7 @@ import type {
     PlanDetail,
 } from '@shared/core/application/services/plan-detail'
 import {
+    getCommuneDeSituationLabel,
     getDepartementOptions,
     getFilteredRows,
     getStatutOptions,
@@ -257,5 +258,32 @@ describe('getUsageOptions', () => {
 
     it('drops the plans with no usage principal', () => {
         expect(getUsageOptions([plan({ usage: null })])).toEqual([])
+    })
+})
+
+describe('getCommuneDeSituationLabel', () => {
+    const getCommuneNom = (code: string) =>
+        code === '87154' ? 'Saint-Junien' : undefined
+
+    it('names the commune, followed by its code INSEE', () => {
+        expect(
+            getCommuneDeSituationLabel(
+                plan({ communeDeSituation: '87154' }),
+                getCommuneNom
+            )
+        ).toBe('Saint-Junien (87154)')
+    })
+
+    it('keeps the code alone when the référentiel cannot name it', () => {
+        expect(
+            getCommuneDeSituationLabel(
+                plan({ communeDeSituation: '00000' }),
+                getCommuneNom
+            )
+        ).toBe('00000')
+    })
+
+    it('gives nothing for a plan whose installation names no commune', () => {
+        expect(getCommuneDeSituationLabel(plan(), getCommuneNom)).toBeNull()
     })
 })

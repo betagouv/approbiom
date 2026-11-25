@@ -20,6 +20,20 @@ describe('createReferentielGeoAdapter', () => {
         })
     })
 
+    describe('getCommuneNom', () => {
+        it('names a commune the dataset knows', () => {
+            expect(createReferentielGeoAdapter().getCommuneNom('64024')).toBe(
+                'Anglet'
+            )
+        })
+
+        it('gives no name for a code no commune carries', () => {
+            expect(
+                createReferentielGeoAdapter().getCommuneNom('00000')
+            ).toBeUndefined()
+        })
+    })
+
     describe('getCountryContour', () => {
         it('gives an outline for a country named in French', () => {
             const contour =

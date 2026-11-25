@@ -1,7 +1,10 @@
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
+import type {
+    DepartementsByRegion,
+    ReferentielGeoPort,
+} from '@shared/core/application/ports/referentiel-geo'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import {
     getAppelsAProjet,
@@ -147,4 +150,20 @@ export function getFournisseurOptions(
     return [...labelBySiret]
         .map(([value, label]) => ({ value, label }))
         .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
+}
+
+/**
+ * The commune a plan sits in, as « Nom (code INSEE) ». A code the référentiel
+ * cannot name is still shown on its own, so the plan keeps its place; a plan
+ * whose installation names no commune reads as `null`.
+ */
+export function getCommuneDeSituationLabel(
+    plan: Pick<PlanDetail, 'communeDeSituation'>,
+    getCommuneNom: ReferentielGeoPort['getCommuneNom']
+): string | null {
+    const code = plan.communeDeSituation
+    if (code === null) return null
+
+    const nom = getCommuneNom(code)
+    return nom === undefined ? code : `${nom} (${code})`
 }

@@ -25,6 +25,7 @@ export type AccueilPorts = PlanDetailPorts &
     ApprovisionnementByRessourceStatsPorts &
     UpdateIsPlanLaureatForProgrammeAidePorts & {
         getCommuneCenterPosition: ReferentielGeoPort['getCommuneCenterPosition']
+        getCommuneNom: ReferentielGeoPort['getCommuneNom']
         getDepartementContour: ReferentielGeoPort['getDepartementContour']
         getCountryContour: ReferentielGeoPort['getCountryContour']
         attachments: Pick<AttachmentPort, 'listByPlan' | 'getFileUrl'>

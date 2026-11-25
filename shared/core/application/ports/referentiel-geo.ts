@@ -16,6 +16,13 @@ export interface ReferentielGeoPort {
               longitude: number
           }
         | undefined
+    /**
+     * The name a commune goes by, or `undefined` when the référentiel does not
+     * hold its code — the code is still worth showing on its own.
+     */
+    getCommuneNom: (
+        codeCommune: Commune['codeInsee']
+    ) => Commune['nom'] | undefined
     /** The outline of a département, or none when its code is not held. */
     getDepartementContour: (codeDepartement: Departement['dep']) => {
         latitude: number

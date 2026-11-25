@@ -19,6 +19,7 @@ export default function DataTable<T>({
     hideCaption = false,
     description,
     showResultCount = false,
+    headerActions,
     expandable,
     rows,
     columns,
@@ -122,6 +123,11 @@ export default function DataTable<T>({
             >
                 <div className="shared-data-table__header-title">
                     <span id={titleId}>{caption}</span>
+                    {headerActions !== undefined && (
+                        <div className="shared-data-table__header-actions">
+                            {headerActions}
+                        </div>
+                    )}
                     {showResultCount && (
                         // Announced on change, not on load: a sighted reader
                         // watches the count move as filters are applied, and

@@ -64,6 +64,31 @@ describe('DataTable', () => {
         expect(caption.closest('.fr-sr-only')).not.toBeNull()
     })
 
+    it('draws the header actions on the title line, keeping the table name', () => {
+        render(
+            <DataTable
+                caption="Plans d’approvisionnement"
+                showResultCount
+                headerActions={<button type="button">Rechercher</button>}
+                rows={plans}
+                columns={columns}
+            />
+        )
+
+        // The actions are not part of the table's name: only the title and
+        // the count are pulled into it.
+        expect(
+            screen.getByRole('table', {
+                name: 'Plans d’approvisionnement 2 résultats',
+            })
+        ).toBeDefined()
+        expect(
+            screen
+                .getByRole('button', { name: 'Rechercher' })
+                .closest('.shared-data-table__header-title')
+        ).not.toBeNull()
+    })
+
     it('renders all column headers', () => {
         render(
             <DataTable

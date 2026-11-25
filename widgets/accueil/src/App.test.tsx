@@ -71,6 +71,7 @@ function fakePorts(overrides: Partial<AccueilPorts> = {}): AccueilPorts {
         entreprises: { list: rows([]), create: () => Promise.resolve() },
         listDepartementsByRegion: rows([]),
         getCommuneCenterPosition: () => ({ latitude: 0, longitude: 0 }),
+        getCommuneNom: () => undefined,
         getDepartementContour: () => [],
         getCountryContour: () => [],
         demandesSubvention: { list: rows([]) },
@@ -347,6 +348,46 @@ describe('App', () => {
         ).toBe(false)
         expect(appelOf('RC Saint Junien')).toBe('BCIAT (2023)')
         expect(appelOf('RC Limoges')).toBe('—')
+    })
+
+    it('shows the commune de situation of each plan, with its code INSEE', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planPort(
+                        rows([
+                            saintJunien,
+                            {
+                                ...saintJunien,
+                                id: 2,
+                                nom: 'RC Limoges',
+                                installation: 2,
+                            },
+                        ])
+                    ),
+                    installations: { list: rows([saintJunienInstallation]) },
+                    getCommuneNom: (code) =>
+                        code === '87154' ? 'Saint-Junien' : undefined,
+                })}
+            />
+        )
+        await screen.findByRole('columnheader', {
+            name: /Commune de situation/,
+        })
+        const communeColumn = screen
+            .getAllByRole('columnheader')
+            .findIndex((header) =>
+                header.textContent?.startsWith('Commune de situation')
+            )
+        const communeOf = (nom: string) => {
+            const row = screen
+                .getAllByRole('row')
+                .find((row) => row.textContent?.includes(nom))
+            return within(row!).getAllByRole('cell')[communeColumn].textContent
+        }
+
+        expect(communeOf('RC Saint Junien')).toBe('Saint-Junien (87154)')
+        expect(communeOf('RC Limoges')).toBe('—')
     })
 
     it('opens the plan on the chronologies of its instructions', async () => {

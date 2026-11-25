@@ -82,6 +82,18 @@
     line-height: 2rem;
 }
 
+/* Pushed against the count, so the title keeps the left of the line and the
+   controls sit with the count that answers them. Back to body text: the title
+   line's heading typography is not theirs. */
+.fr-table .shared-data-table__header-actions {
+    flex: 0 1 28rem;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.5rem;
+    margin-left: auto;
+    min-width: 0;
+}
+
 /* `flex-shrink: 0` keeps "169 résultats" on one line when a long title competes
    for the width. */
 .fr-table .shared-data-table__result-count {

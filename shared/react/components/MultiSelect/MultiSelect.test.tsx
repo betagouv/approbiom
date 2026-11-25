@@ -55,6 +55,21 @@ const getCheckbox = (name: string) =>
 const open = () => fireEvent.click(getTrigger())
 
 describe('MultiSelect', () => {
+    it('invites a selection while nothing is selected', () => {
+        render(<ControlledMultiSelect />)
+
+        expect(getTrigger().textContent).toContain('Sélectionner une option')
+    })
+
+    it('shows the selection in place of the invitation', () => {
+        render(<ControlledMultiSelect initialSelection={['88']} />)
+
+        expect(getTrigger().textContent).toContain('Vosges')
+        expect(getTrigger().textContent).not.toContain(
+            'Sélectionner une option'
+        )
+    })
+
     it('opens the options panel when the trigger is clicked', () => {
         render(<ControlledMultiSelect />)
 

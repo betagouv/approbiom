@@ -43,6 +43,10 @@ export type DataTableProps<T> = {
     // filtered out — not the size of the data it came from. Off by default so
     // it never appears on a table that was not asked to show it.
     showResultCount?: boolean
+    // Controls that act on the rows — a search field, say — drawn on the title
+    // line, between the title and the result count, rather than on a line of
+    // their own above the table. Hidden along with the title by `hideCaption`.
+    headerActions?: ReactNode
     // Opens a detail row under the one that was clicked. Which rows are open is
     // the table's own business — nothing outside it acts on that — so unlike
     // the selection it is not reported back.

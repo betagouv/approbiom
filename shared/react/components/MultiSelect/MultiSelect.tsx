@@ -192,12 +192,12 @@ export default function MultiSelect<T>({
         .filter((option) => selected.has(option.value))
         .map((option) => option.label)
 
-    // What the control says once collapsed: the selection itself. The libellé
-    // sits above it and is pulled into the accessible name, so this only has to
-    // carry the options.
+    // What the control says once collapsed: the selection itself, or an
+    // invitation to make one. The libellé sits above it and is pulled into the
+    // accessible name, so this only has to carry the options.
     const summary =
         selectedLabels.length === 0
-            ? 'Aucune option sélectionnée'
+            ? 'Sélectionner une option'
             : selectedLabels.join(', ')
 
     function renderOption(option: MultiSelectOption<T>, key: string) {

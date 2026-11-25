@@ -41,6 +41,7 @@ export default function App(ports: AccueilPorts) {
                                     }
                                     departementsByRegion={departementsByRegion}
                                     programmesAide={programmesAide}
+                                    getCommuneNom={ports.getCommuneNom}
                                     onOpenPlan={(plan) =>
                                         setSelectedPlanId(plan.id)
                                     }

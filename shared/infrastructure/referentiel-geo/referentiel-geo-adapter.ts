@@ -84,7 +84,10 @@ function toPositions(contour: [Latitude, Longitude][][]) {
  */
 export type ReferentielGeoDatasetPort = Pick<
     ReferentielGeoPort,
-    'getCommuneCenterPosition' | 'getDepartementContour' | 'getCountryContour'
+    | 'getCommuneCenterPosition'
+    | 'getCommuneNom'
+    | 'getDepartementContour'
+    | 'getCountryContour'
 >
 
 export function createReferentielGeoAdapter(): ReferentielGeoDatasetPort {
@@ -95,6 +98,10 @@ export function createReferentielGeoAdapter(): ReferentielGeoDatasetPort {
             return commune === undefined
                 ? undefined
                 : { latitude: commune.latitude, longitude: commune.longitude }
+        },
+
+        getCommuneNom(codeCommune) {
+            return communes[codeCommune]?.nom
         },
 
         getDepartementContour(codeDepartement) {

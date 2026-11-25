@@ -12,7 +12,10 @@ import TagUsage from '../TagUsage'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
-import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
+import type {
+    DepartementsByRegion,
+    ReferentielGeoPort,
+} from '@shared/core/application/ports/referentiel-geo'
 import {
     getAppelsAProjet,
     type PlanDetail,
@@ -20,6 +23,7 @@ import {
 import { useMemo, useState } from 'react'
 import {
     getAppelAProjetOptions,
+    getCommuneDeSituationLabel,
     getDepartementOptions,
     getFilteredRows,
     getFournisseurOptions,
@@ -29,7 +33,8 @@ import {
 } from '../../utils'
 
 function getColumns(
-    onOpenPlan: (plan: PlanDetail) => void
+    onOpenPlan: (plan: PlanDetail) => void,
+    getCommuneNom: ReferentielGeoPort['getCommuneNom']
 ): readonly Column<PlanDetail>[] {
     return [
         {
@@ -77,6 +82,14 @@ function getColumns(
                 return appels.length === 0 ? '—' : appels.join(', ')
             },
         },
+        {
+            id: 'commune-de-situation',
+            header: 'Commune de situation',
+            render: (plan) =>
+                getCommuneDeSituationLabel(plan, getCommuneNom) ?? '—',
+            sortBy: (plan) =>
+                getCommuneDeSituationLabel(plan, getCommuneNom) ?? '',
+        },
     ]
 }
 
@@ -84,6 +97,7 @@ export type PageAccueilProps = {
     plansApprovisionnement: readonly PlanDetail[]
     departementsByRegion: readonly DepartementsByRegion[]
     programmesAide: readonly ProgrammeAide[]
+    getCommuneNom: ReferentielGeoPort['getCommuneNom']
     onOpenPlan: (plan: PlanDetail) => void
 }
 
@@ -91,6 +105,7 @@ export default function PageAccueil({
     plansApprovisionnement,
     departementsByRegion,
     programmesAide,
+    getCommuneNom,
     onOpenPlan,
 }: PageAccueilProps) {
     const [nom, setNom] = useState('')
@@ -102,9 +117,10 @@ export default function PageAccueil({
     >([])
     const [fournisseurs, setFournisseurs] = useState<Entreprise['siret'][]>([])
 
-    const [searchGeneration, setSearchGeneration] = useState(0)
-
-    const columns = useMemo(() => getColumns(onOpenPlan), [onOpenPlan])
+    const columns = useMemo(
+        () => getColumns(onOpenPlan, getCommuneNom),
+        [onOpenPlan, getCommuneNom]
+    )
 
     const statutOptions = getStatutOptions(plansApprovisionnement)
 
@@ -127,41 +143,13 @@ export default function PageAccueil({
         fournisseurs,
     })
 
-    const hasFilters =
-        nom !== '' ||
-        statuts.length > 0 ||
-        usages.length > 0 ||
-        departements.length > 0 ||
-        appelsAProjet.length > 0 ||
-        fournisseurs.length > 0
-
-    function resetFilters() {
-        setNom('')
-        setStatuts([])
-        setUsages([])
-        setDepartements([])
-        setAppelsAProjet([])
-        setFournisseurs([])
-        setSearchGeneration((generation) => generation + 1)
-    }
-
     return (
         <div className="accueil fr-p-2w">
             <h1 className="fr-h3 accueil__title">
                 Suivi des plans d’approvisionnement
             </h1>
 
-            <div className="accueil__search">
-                <SearchBar
-                    key={searchGeneration}
-                    label="Rechercher un plan"
-                    placeholder="Rechercher un plan"
-                    suggestions={planNames}
-                    onSearch={setNom}
-                />
-            </div>
-
-            <div className="accueil__filters fr-mt-2w">
+            <div className="accueil__filters">
                 <div className="accueil__filter">
                     <MultiSelect
                         label="Statut"
@@ -184,7 +172,7 @@ export default function PageAccueil({
 
                 <div className="accueil__filter">
                     <MultiSelect
-                        label="Régions et départements"
+                        label="Département de situation"
                         options={departementOptions}
                         selectedValues={departements}
                         onSelectionChange={setDepartements}
@@ -211,15 +199,6 @@ export default function PageAccueil({
                         showSelectAll
                     />
                 </div>
-
-                <button
-                    type="button"
-                    className="fr-btn fr-btn--tertiary"
-                    onClick={resetFilters}
-                    disabled={!hasFilters}
-                >
-                    Réinitialiser les filtres
-                </button>
             </div>
 
             <div className="accueil__table">
@@ -228,7 +207,16 @@ export default function PageAccueil({
                     rows={displayedRows}
                     columns={columns}
                     showResultCount
+                    headerActions={
+                        <SearchBar
+                            label="Rechercher un plan"
+                            placeholder="Rechercher un plan"
+                            suggestions={planNames}
+                            onSearch={setNom}
+                        />
+                    }
                     bordered
+                    stickyHeader
                 />
             </div>
         </div>

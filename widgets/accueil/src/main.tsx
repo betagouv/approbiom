@@ -38,6 +38,7 @@ createRoot(rootEl).render(
             entreprises={createGristEntreprisePort()}
             listDepartementsByRegion={referentielGeo.listDepartementsByRegion}
             getCommuneCenterPosition={referentielGeo.getCommuneCenterPosition}
+            getCommuneNom={referentielGeo.getCommuneNom}
             getDepartementContour={referentielGeo.getDepartementContour}
             getCountryContour={referentielGeo.getCountryContour}
             demandesSubvention={createGristDemandeSubventionPort()}
