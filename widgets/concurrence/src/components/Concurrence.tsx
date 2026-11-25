@@ -255,7 +255,6 @@ export default function Concurrence({
                         options={planStatutOptions}
                         selectedValues={planStatut}
                         onSelectionChange={setPlanStatut}
-                        showSelectAll
                     />
                 </div>
                 <div className="concurrence__filter">
@@ -264,7 +263,6 @@ export default function Concurrence({
                         options={ressourceOptions}
                         selectedValues={ressource}
                         onSelectionChange={setRessource}
-                        showSelectAll
                     />
                 </div>
                 <div className="concurrence__filter">
@@ -273,7 +271,6 @@ export default function Concurrence({
                         options={provenanceOptions}
                         selectedValues={provenances}
                         onSelectionChange={setProvenances}
-                        showSelectAll
                         searchable
                     />
                 </div>
