@@ -38,6 +38,7 @@ export type DemandeSubventionDetail = {
 }
 
 export type PlanDetail = Plan & {
+    installationNom: Installation['nom'] | null
     communeDeSituation: Commune['codeInsee'] | null
     departementDeSituation: Departement['dep'] | null
     installationRegion: Region['libelle'] | null
@@ -190,8 +191,8 @@ export function composePlanDetails({
     approvisionnementsByFournisseur,
     entreprises,
 }: PlanDetailSources): PlanDetail[] {
-    const communeByInstallation = new Map(
-        installations.map(({ id, commune }) => [id, commune] as const)
+    const installationById = new Map(
+        installations.map((installation) => [installation.id, installation])
     )
 
     const regionByDepartement = new Map<Departement['dep'], Region['libelle']>()
@@ -212,11 +213,15 @@ export function composePlanDetails({
     })
 
     return plans.map((plan) => {
-        const commune = communeByInstallation.get(plan.installation) ?? ''
+        const installation = installationById.get(plan.installation)
+        const commune = installation?.commune ?? ''
         const departementDeSituation = codeDepartementOf(commune) ?? null
 
         return {
             ...plan,
+            // An installation the document leaves unnamed reads as no name, the
+            // same as a plan pointing at none: there is nothing to show.
+            installationNom: installation?.nom || null,
             communeDeSituation: commune === '' ? null : commune,
             departementDeSituation,
             installationRegion:

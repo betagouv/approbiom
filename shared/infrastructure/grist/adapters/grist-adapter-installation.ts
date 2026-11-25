@@ -26,29 +26,55 @@ const asCodeCommune = (value: unknown): Commune['codeInsee'] => {
     return code
 }
 
+/**
+ * The commune each installation sits at, read off the plans that point at it.
+ *
+ * The Installation table only holds a Reference to INSEE_Commune, and reading
+ * that table — every commune of France — to turn the Reference into a code
+ * would cost far more than the plan table, which already carries the code as
+ * a formula and which the plan adapter reads anyway.
+ */
+async function getCommuneByInstallation(): Promise<
+    Map<Installation['id'], Installation['commune']>
+> {
+    const rows = await fetchRowsOnce(TABLE.plan, COLUMNS.plan)
+
+    const communeById = new Map<Installation['id'], Installation['commune']>()
+
+    for (const row of rows) {
+        const id = asNumber(row.Installation) ?? 0
+
+        // A plan naming no installation places none: 0 is Grist's empty
+        // reference, not a row.
+        if (id === 0) continue
+
+        communeById.set(id, asCodeCommune(row.Code_Insee_Installation))
+    }
+
+    return communeById
+}
+
 export function createGristInstallationPort(): InstallationPort {
     return {
         async list() {
             await gristReady()
 
-            const rows = await fetchRowsOnce(TABLE.plan, COLUMNS.plan)
+            const [rows, communeById] = await Promise.all([
+                fetchRowsOnce(TABLE.installation, COLUMNS.installation),
+                getCommuneByInstallation(),
+            ])
 
-            const byId = new Map<Installation['id'], Installation>()
+            // An installation no plan points at is placed nowhere: the plans
+            // are the only place its commune is read from.
+            return rows.map((row): Installation => {
+                const id = asNumber(row.id) ?? 0
 
-            for (const row of rows) {
-                const id = asNumber(row.Installation) ?? 0
-
-                // A plan naming no installation lists none: 0 is Grist's empty
-                // reference, not a row.
-                if (id === 0) continue
-
-                byId.set(id, {
+                return {
                     id,
-                    commune: asCodeCommune(row.Code_Insee_Installation),
-                })
-            }
-
-            return [...byId.values()]
+                    nom: asString(row.Nom),
+                    commune: communeById.get(id) ?? '',
+                }
+            })
         },
     }
 }

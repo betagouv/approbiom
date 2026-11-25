@@ -27,6 +27,7 @@ function plan(overrides: Partial<PlanDetail> = {}): PlanDetail {
         statut: 'projet',
         createdBy: null,
         createdAt: null,
+        installationNom: null,
         communeDeSituation: null,
         departementDeSituation: null,
         installationRegion: null,

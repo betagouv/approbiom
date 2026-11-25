@@ -15,7 +15,11 @@ const PLAN: PlanDApprovisionnement = {
     createdAt: null,
 }
 
-const INSTALLATION: Installation = { id: 10, commune: '69123' }
+const INSTALLATION: Installation = {
+    id: 10,
+    nom: 'Chaufferie du Moulin',
+    commune: '69123',
+}
 
 describe('loadRessource', () => {
     it('reads the plans and the installations the screen is drawn from', async () => {

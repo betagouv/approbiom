@@ -100,7 +100,11 @@ const saintJunien: Plan = {
 
 // 87154 is Saint-Junien's commune code. The « 87 » the header's « Région » is
 // followed from is read out of it, not stored on the plan.
-const saintJunienInstallation: Installation = { id: 1, commune: '87154' }
+const saintJunienInstallation: Installation = {
+    id: 1,
+    nom: 'Chaufferie du Moulin',
+    commune: '87154',
+}
 
 const bciat: ProgrammeAide = {
     id: 1,
@@ -138,8 +142,33 @@ const nouvelleAquitaine: Instruction = {
     phase: 'Avis préfet en attente',
 }
 
+/**
+ * The plans, each at an installation of its own under the given name: the
+ * table shows the installation's name, so that is what a row is found by.
+ */
+function withInstallations(
+    ...entries: [plan: Plan, nom: string, commune?: string][]
+): Pick<AccueilPorts, 'plans' | 'installations'> {
+    return {
+        plans: planPort(
+            rows(entries.map(([plan]) => ({ ...plan, installation: plan.id })))
+        ),
+        installations: {
+            list: rows(
+                entries.map(([plan, nom, commune = '87154']) => ({
+                    id: plan.id,
+                    nom,
+                    commune,
+                }))
+            ),
+        },
+    }
+}
+
 const openPlan = async () =>
-    fireEvent.click(await screen.findByRole('button', { name: 'Voir le plan' }))
+    fireEvent.click(
+        await screen.findByRole('button', { name: /^Voir le plan/ })
+    )
 
 afterEach(() => {
     cleanup()
@@ -262,32 +291,26 @@ describe('App', () => {
 
         expect(search().value).toBe('Saint')
         expect(
-            screen.getAllByRole('button', { name: 'Voir le plan' })
+            screen.getAllByRole('button', { name: /^Voir le plan/ })
         ).toHaveLength(1)
     })
 
     it('sorts the plans by usage principal', async () => {
         render(
             <App
-                {...fakePorts({
-                    plans: planPort(
-                        rows([
-                            { ...saintJunien, id: 1, nom: 'Plan A' },
-                            {
-                                ...saintJunien,
-                                id: 2,
-                                nom: 'Plan B',
-                                usage: 'chimie',
-                            },
-                            {
-                                ...saintJunien,
-                                id: 3,
-                                nom: 'Plan C',
-                                usage: 'matériau',
-                            },
-                        ])
-                    ),
-                })}
+                {...fakePorts(
+                    withInstallations(
+                        [{ ...saintJunien, id: 1 }, 'Chaufferie A'],
+                        [
+                            { ...saintJunien, id: 2, usage: 'chimie' },
+                            'Chaufferie B',
+                        ],
+                        [
+                            { ...saintJunien, id: 3, usage: 'matériau' },
+                            'Chaufferie C',
+                        ]
+                    )
+                )}
             />
         )
         const sortByUsage = within(
@@ -308,13 +331,53 @@ describe('App', () => {
                 )
 
         fireEvent.click(sortByUsage)
-        expect(planNames()).toEqual(['Plan B', 'Plan A', 'Plan C'])
+        expect(planNames()).toEqual([
+            'Chaufferie B',
+            'Chaufferie A',
+            'Chaufferie C',
+        ])
 
         fireEvent.click(sortByUsage)
-        expect(planNames()).toEqual(['Plan C', 'Plan A', 'Plan B'])
+        expect(planNames()).toEqual([
+            'Chaufferie C',
+            'Chaufferie A',
+            'Chaufferie B',
+        ])
     })
 
-    it('lists the appels à projet of each plan, in place of the nature de la donnée', async () => {
+    it('names each plan after its installation, not after itself', async () => {
+        render(
+            <App
+                {...fakePorts(
+                    withInstallations(
+                        [saintJunien, 'Chaufferie du Moulin'],
+                        // The document leaves this installation unnamed.
+                        [{ ...saintJunien, id: 2, nom: 'RC Limoges' }, '']
+                    )
+                )}
+            />
+        )
+        await screen.findByRole('columnheader', {
+            name: /Nom de l’installation/,
+        })
+        const nomColumn = screen
+            .getAllByRole('columnheader')
+            .findIndex((header) =>
+                header.textContent?.startsWith('Nom de l’installation')
+            )
+        const noms = screen
+            .getAllByRole('row')
+            .slice(1)
+            .map(
+                (row) => within(row).getAllByRole('cell')[nomColumn].textContent
+            )
+
+        expect(noms).toEqual(['Chaufferie du Moulin', '—'])
+    })
+
+    // Two plans of one installation read the same on screen; the button is
+    // what tells them apart for a screen reader.
+    it('names each « Voir le plan » button after its plan', async () => {
         render(
             <App
                 {...fakePorts({
@@ -323,6 +386,28 @@ describe('App', () => {
                             saintJunien,
                             { ...saintJunien, id: 2, nom: 'RC Limoges' },
                         ])
+                    ),
+                })}
+            />
+        )
+
+        expect(
+            await screen.findByRole('button', {
+                name: 'Voir le plan RC Saint Junien',
+            })
+        ).toBeDefined()
+        expect(
+            screen.getByRole('button', { name: 'Voir le plan RC Limoges' })
+        ).toBeDefined()
+    })
+
+    it('lists the appels à projet of each plan, in place of the nature de la donnée', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    ...withInstallations(
+                        [saintJunien, 'Chaufferie du Moulin'],
+                        [{ ...saintJunien, id: 2 }, 'Chaufferie des Prés']
                     ),
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: programmeAidePort(rows([bciat])),
@@ -346,26 +431,19 @@ describe('App', () => {
                 header.textContent?.includes('Nature de la donnée')
             )
         ).toBe(false)
-        expect(appelOf('RC Saint Junien')).toBe('BCIAT (2023)')
-        expect(appelOf('RC Limoges')).toBe('—')
+        expect(appelOf('Chaufferie du Moulin')).toBe('BCIAT (2023)')
+        expect(appelOf('Chaufferie des Prés')).toBe('—')
     })
 
     it('shows the commune de situation of each plan, with its code INSEE', async () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planPort(
-                        rows([
-                            saintJunien,
-                            {
-                                ...saintJunien,
-                                id: 2,
-                                nom: 'RC Limoges',
-                                installation: 2,
-                            },
-                        ])
+                    ...withInstallations(
+                        [saintJunien, 'Chaufferie du Moulin'],
+                        // Placed nowhere: the document gives it no commune.
+                        [{ ...saintJunien, id: 2 }, 'Chaufferie des Prés', '']
                     ),
-                    installations: { list: rows([saintJunienInstallation]) },
                     getCommuneNom: (code) =>
                         code === '87154' ? 'Saint-Junien' : undefined,
                 })}
@@ -386,19 +464,17 @@ describe('App', () => {
             return within(row!).getAllByRole('cell')[communeColumn].textContent
         }
 
-        expect(communeOf('RC Saint Junien')).toBe('Saint-Junien (87154)')
-        expect(communeOf('RC Limoges')).toBe('—')
+        expect(communeOf('Chaufferie du Moulin')).toBe('Saint-Junien (87154)')
+        expect(communeOf('Chaufferie des Prés')).toBe('—')
     })
 
     it('narrows the plans to those the picked CRB instructs', async () => {
         render(
             <App
                 {...fakePorts({
-                    plans: planPort(
-                        rows([
-                            saintJunien,
-                            { ...saintJunien, id: 2, nom: 'RC Limoges' },
-                        ])
+                    ...withInstallations(
+                        [saintJunien, 'Chaufferie du Moulin'],
+                        [{ ...saintJunien, id: 2 }, 'Chaufferie des Prés']
                     ),
                     demandesSubvention: { list: rows([demandeBciat]) },
                     programmesAide: programmeAidePort(rows([bciat])),
@@ -416,8 +492,8 @@ describe('App', () => {
         )
 
         expect(screen.getByText('1 résultat')).toBeDefined()
-        expect(screen.getByText('RC Saint Junien')).toBeDefined()
-        expect(screen.queryByText('RC Limoges')).toBeNull()
+        expect(screen.getByText('Chaufferie du Moulin')).toBeDefined()
+        expect(screen.queryByText('Chaufferie des Prés')).toBeNull()
     })
 
     it('opens the plan on the chronologies of its instructions', async () => {

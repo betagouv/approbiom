@@ -150,7 +150,9 @@ describe('composePlanDetails', () => {
     it('places a plan at the commune of its installation', () => {
         const [premier] = composePlanDetails(
             sources({
-                installations: [{ id: 1, commune: '87085' }],
+                installations: [
+                    { id: 1, nom: 'Chaufferie du Moulin', commune: '87085' },
+                ],
                 departementsByRegion: [nouvelleAquitaineInsee],
             })
         )
@@ -162,12 +164,35 @@ describe('composePlanDetails', () => {
         })
     })
 
+    it('names a plan after its installation', () => {
+        const [premier] = composePlanDetails(
+            sources({
+                installations: [
+                    { id: 1, nom: 'Chaufferie du Moulin', commune: '87085' },
+                ],
+            })
+        )
+
+        expect(premier.installationNom).toBe('Chaufferie du Moulin')
+    })
+
+    // Left empty in the document, the name is absent rather than blank, the
+    // same answer as for a plan pointing at no installation.
+    it('gives no installation name when the document leaves it empty', () => {
+        const [premier] = composePlanDetails(
+            sources({ installations: [{ id: 1, nom: '', commune: '87085' }] })
+        )
+
+        expect(premier.installationNom).toBeNull()
+    })
+
     // A plan whose installation the document names nowhere is placed nowhere,
     // rather than at whatever the first installation happens to be.
     it('places a plan nowhere when no installation answers for it', () => {
         const [premier] = composePlanDetails(sources({ installations: [] }))
 
         expect(premier).toMatchObject({
+            installationNom: null,
             communeDeSituation: null,
             departementDeSituation: null,
             installationRegion: null,
@@ -180,7 +205,9 @@ describe('composePlanDetails', () => {
     it('names no région when the référentiel gathers no département', () => {
         const [premier] = composePlanDetails(
             sources({
-                installations: [{ id: 1, commune: '87085' }],
+                installations: [
+                    { id: 1, nom: 'Chaufferie du Moulin', commune: '87085' },
+                ],
                 departementsByRegion: [],
             })
         )

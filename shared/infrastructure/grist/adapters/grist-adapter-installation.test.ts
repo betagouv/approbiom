@@ -2,8 +2,17 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnMajorTable } from '../helpers/grist-helpers'
 import { createGristInstallationPort } from './grist-adapter-installation'
 
-function mockGrist(columns: ColumnMajorTable) {
-    const fetchTable = vi.fn().mockResolvedValue(columns)
+/**
+ * Serves the plan table and the Installation table. Left out, the latter holds
+ * one row per installation the plans point at, every one named « Chaufferie ».
+ */
+function mockGrist(
+    plans: ColumnMajorTable,
+    installations: ColumnMajorTable = installationsOf(plans)
+) {
+    const fetchTable = vi.fn((tableId: string) =>
+        Promise.resolve(tableId === 'Installation' ? installations : plans)
+    )
 
     vi.stubGlobal('grist', {
         docApi: { fetchTable },
@@ -17,6 +26,14 @@ function mockGrist(columns: ColumnMajorTable) {
     })
 
     return { fetchTable }
+}
+
+function installationsOf(plans: ColumnMajorTable): ColumnMajorTable {
+    const ids = [...new Set(plans.Installation as number[])].filter(
+        (id) => id !== 0
+    )
+
+    return { id: ids, Nom: ids.map(() => 'Chaufferie') }
 }
 
 function plansPlacedAt(
@@ -65,7 +82,7 @@ describe('createGristInstallationPort', () => {
         mockGrist(plansPlacedAt(['87085'], [7]))
 
         await expect(createGristInstallationPort().list()).resolves.toEqual([
-            { id: 7, commune: '87085' },
+            { id: 7, nom: 'Chaufferie', commune: '87085' },
         ])
     })
 
@@ -75,7 +92,7 @@ describe('createGristInstallationPort', () => {
         mockGrist(plansPlacedAt(['87085', '87085', '87085'], [7, 7, 7]))
 
         await expect(createGristInstallationPort().list()).resolves.toEqual([
-            { id: 7, commune: '87085' },
+            { id: 7, nom: 'Chaufferie', commune: '87085' },
         ])
     })
 
@@ -85,7 +102,7 @@ describe('createGristInstallationPort', () => {
         mockGrist(plansPlacedAt(['87085', ''], [7, 0]))
 
         await expect(createGristInstallationPort().list()).resolves.toEqual([
-            { id: 7, commune: '87085' },
+            { id: 7, nom: 'Chaufferie', commune: '87085' },
         ])
     })
 
@@ -161,6 +178,42 @@ describe('createGristInstallationPort', () => {
 
         await expect(createGristInstallationPort().list()).rejects.toThrow(
             /not an INSEE commune code/
+        )
+    })
+
+    // The name is the Installation table's own, not the plan's: two plans of
+    // one installation are two names for the plan, one for the installation.
+    it('names an installation as the Installation table does', async () => {
+        mockGrist(plansPlacedAt(['87085', '64024'], [7, 8]), {
+            id: [7, 8],
+            Nom: ['Chaufferie du Moulin', ''],
+        })
+
+        await expect(createGristInstallationPort().list()).resolves.toEqual([
+            { id: 7, nom: 'Chaufferie du Moulin', commune: '87085' },
+            { id: 8, nom: '', commune: '64024' },
+        ])
+    })
+
+    // The commune is read off the plans, so an installation none of them
+    // points at is still listed — named, but placed nowhere.
+    it('places nowhere an installation no plan points at', async () => {
+        mockGrist(plansPlacedAt(['87085'], [7]), {
+            id: [7, 9],
+            Nom: ['Chaufferie du Moulin', 'Chaufferie des Prés'],
+        })
+
+        await expect(createGristInstallationPort().list()).resolves.toEqual([
+            { id: 7, nom: 'Chaufferie du Moulin', commune: '87085' },
+            { id: 9, nom: 'Chaufferie des Prés', commune: '' },
+        ])
+    })
+
+    it('refuses a document whose Installation table has no name', async () => {
+        mockGrist(plansPlacedAt(['87085'], [7]), { id: [7] })
+
+        await expect(createGristInstallationPort().list()).rejects.toThrow(
+            /"Installation".+Nom/
         )
     })
 

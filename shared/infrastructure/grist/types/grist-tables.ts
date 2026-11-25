@@ -24,6 +24,7 @@ const TABLE = {
     totalByProvenance:
         'Approvisionnement_summary_Plan_d_approvisionnement_Provenance_Ressource',
     plan: 'Plan_d_approvisionnement',
+    installation: 'Installation',
     metaRessource: 'Meta_Ressource',
     entreprise: 'Entreprise',
     departement: 'INSEE_Departement',
@@ -75,6 +76,7 @@ export const COLUMNS = {
         'est_Laureat',
         'Code_Insee_Installation',
     ],
+    installation: ['id', 'Nom'],
     metaRessource: [
         'id',
         'Code_ressource_Approbiom',

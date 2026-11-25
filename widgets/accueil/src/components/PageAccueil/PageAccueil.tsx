@@ -43,10 +43,19 @@ function getColumns(
             id: 'action',
             header: 'Action',
 
+            // The row shows the installation, which several plans can share:
+            // without the plan's own name, a screen reader hears the same
+            // button on every one of them. An `aria-label` rather than a
+            // visually hidden span, whose separating space a flex button can
+            // collapse away; it opens with the visible text, so a voice user
+            // saying « Voir le plan » still reaches it (WCAG 2.5.3).
             render: (plan) => (
                 <button
                     type="button"
                     className="fr-btn fr-btn--secondary fr-btn--sm"
+                    aria-label={
+                        plan.nom === '' ? undefined : `Voir le plan ${plan.nom}`
+                    }
                     onClick={() => onOpenPlan(plan)}
                 >
                     Voir le plan
@@ -59,10 +68,10 @@ function getColumns(
             render: (plan) => <TagStatut statut={plan.statut} />,
         },
         {
-            id: 'nom',
-            header: 'Nom',
-            render: (plan) => plan.nom,
-            sortBy: (plan) => plan.nom ?? '',
+            id: 'nom-installation',
+            header: 'Nom de l’installation',
+            render: (plan) => plan.installationNom ?? '—',
+            sortBy: (plan) => plan.installationNom ?? '',
         },
         {
             id: 'type',
@@ -162,7 +171,6 @@ export default function PageAccueil({
                         options={statutOptions}
                         selectedValues={statuts}
                         onSelectionChange={setStatuts}
-                        showSelectAll
                     />
                 </div>
 
@@ -172,7 +180,6 @@ export default function PageAccueil({
                         options={usageOptions}
                         selectedValues={usages}
                         onSelectionChange={setUsages}
-                        showSelectAll
                     />
                 </div>
 
@@ -182,7 +189,6 @@ export default function PageAccueil({
                         options={departementOptions}
                         selectedValues={departements}
                         onSelectionChange={setDepartements}
-                        showSelectAll
                     />
                 </div>
 
@@ -192,7 +198,6 @@ export default function PageAccueil({
                         options={appelAProjetOptions}
                         selectedValues={appelsAProjet}
                         onSelectionChange={setAppelsAProjet}
-                        showSelectAll
                     />
                 </div>
 
@@ -202,7 +207,6 @@ export default function PageAccueil({
                         options={fournisseurOptions}
                         selectedValues={fournisseurs}
                         onSelectionChange={setFournisseurs}
-                        showSelectAll
                     />
                 </div>
 
@@ -212,7 +216,6 @@ export default function PageAccueil({
                         options={crbOptions}
                         selectedValues={crbs}
                         onSelectionChange={setCrbs}
-                        showSelectAll
                     />
                 </div>
             </div>
