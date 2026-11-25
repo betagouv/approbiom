@@ -313,6 +313,42 @@ describe('App', () => {
         expect(planNames()).toEqual(['Plan C', 'Plan A', 'Plan B'])
     })
 
+    it('lists the appels à projet of each plan, in place of the nature de la donnée', async () => {
+        render(
+            <App
+                {...fakePorts({
+                    plans: planPort(
+                        rows([
+                            saintJunien,
+                            { ...saintJunien, id: 2, nom: 'RC Limoges' },
+                        ])
+                    ),
+                    demandesSubvention: { list: rows([demandeBciat]) },
+                    programmesAide: programmeAidePort(rows([bciat])),
+                })}
+            />
+        )
+        await screen.findByRole('columnheader', { name: /Appel à projet/ })
+        const headers = screen.getAllByRole('columnheader')
+        const appelColumn = headers.findIndex((header) =>
+            header.textContent?.startsWith('Appel à projet')
+        )
+        const appelOf = (nom: string) => {
+            const row = screen
+                .getAllByRole('row')
+                .find((row) => row.textContent?.includes(nom))
+            return within(row!).getAllByRole('cell')[appelColumn].textContent
+        }
+
+        expect(
+            headers.some((header) =>
+                header.textContent?.includes('Nature de la donnée')
+            )
+        ).toBe(false)
+        expect(appelOf('RC Saint Junien')).toBe('BCIAT (2023)')
+        expect(appelOf('RC Limoges')).toBe('—')
+    })
+
     it('opens the plan on the chronologies of its instructions', async () => {
         render(
             <App
@@ -374,7 +410,7 @@ describe('App', () => {
 
         await openPlan()
 
-        expect(screen.getAllByText('—')).toHaveLength(1)
+        expect(screen.getAllByText('—', { selector: 'dd' })).toHaveLength(1)
     })
 
     it('leaves the fil d’instruction empty for a plan with no demande', async () => {

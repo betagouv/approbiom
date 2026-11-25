@@ -6,7 +6,6 @@ import './PageAccueil.css'
 import DataTable, { type Column } from '@shared/react/components/DataTable'
 import MultiSelect from '@shared/react/components/MultiSelect'
 import SearchBar from '@shared/react/components/SearchBar'
-import TagNature from '../TagNature'
 import TagStatut from '../TagStatut'
 import TagType from '../TagType'
 import TagUsage from '../TagUsage'
@@ -14,7 +13,10 @@ import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ProgrammeAide } from '@shared/core/domain/entities/programme-aide'
 import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
-import type { PlanDetail } from '@shared/core/application/services/plan-detail'
+import {
+    getAppelsAProjet,
+    type PlanDetail,
+} from '@shared/core/application/services/plan-detail'
 import { useMemo, useState } from 'react'
 import {
     getAppelAProjetOptions,
@@ -68,9 +70,12 @@ function getColumns(
             sortBy: (plan) => plan.usage ?? '',
         },
         {
-            id: 'nature-donnee',
-            header: 'Nature de la donnée',
-            render: (plan) => <TagNature nature={plan.natureDonnee} />,
+            id: 'appel-a-projet',
+            header: 'Appel à projet',
+            render: (plan) => {
+                const appels = getAppelsAProjet(plan)
+                return appels.length === 0 ? '—' : appels.join(', ')
+            },
         },
     ]
 }
