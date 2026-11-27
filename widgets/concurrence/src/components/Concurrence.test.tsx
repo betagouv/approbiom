@@ -216,7 +216,7 @@ describe('Concurrence', () => {
         expect(ressourceCells()).toEqual({
             provenances: 'Retenus : AllemagneNon retenus : 87',
             fournisseurs: 'Retenus : Forst GmbHNon retenus : Scierie Picard',
-            tonnage: '80 retenus / 200',
+            tonnage: '80 retenus /sur 200',
         })
     })
 
@@ -227,7 +227,7 @@ describe('Concurrence', () => {
 
         expect(ressourceCells()).toMatchObject({
             provenances: 'Retenus : 87Non retenus : Allemagne',
-            tonnage: '120 retenus / 200',
+            tonnage: '120 retenus /sur 200',
         })
     })
 

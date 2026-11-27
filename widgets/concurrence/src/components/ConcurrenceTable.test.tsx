@@ -90,7 +90,7 @@ describe('ConcurrenceTable', () => {
         ).toEqual([
             'Retenus : 17, 79Non retenus : 16',
             'Retenus : Scierie Exemple',
-            '6 500 retenus / 12 000',
+            '6 500 retenus /sur 12 000',
         ])
     })
 
@@ -189,7 +189,10 @@ describe('ConcurrenceTable', () => {
         render(<ConcurrenceTable plansConcurrents={[]} />)
 
         expect(
-            screen.getByText('Aucun plan ne correspond aux filtres.')
+            screen.getByRole('table', {
+                name: "Plans d'approvisionnement concernés Aucun plan ne correspond aux filtres",
+            })
         ).toBeDefined()
+        expect(document.querySelector('tbody')).toBeNull()
     })
 })

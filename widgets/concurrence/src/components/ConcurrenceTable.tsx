@@ -164,6 +164,8 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                 retenus » s&apos;ils correspondent aux filtres Provenance et
                 Fournisseur, « non retenus » sinon. Le tonnage donne le tonnage
                 retenu sur le tonnage total, en tonne de matière verte par an.
+                Le nom de chaque plan est un bouton qui replie ou déplie ses
+                ressources.
             </p>
             <div className="fr-table__wrapper">
                 {/* Focusable so keyboard users can scroll the rows between two
@@ -196,21 +198,14 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                     </th>
                                 </tr>
                             </thead>
-                            {count === 0 && (
-                                <tbody>
-                                    <tr>
-                                        <td colSpan={COLUMN_COUNT}>
-                                            Aucun plan ne correspond aux
-                                            filtres.
-                                        </td>
-                                    </tr>
-                                </tbody>
-                            )}
                             {plansConcurrents.map(({ plan, ressources }) => {
                                 const planHeaderId = `${id}-plan-${plan.id}`
                                 const rowId = (index: number) =>
                                     `${planHeaderId}-row-${index}`
                                 const isCollapsed = collapsedPlans.has(plan.id)
+                                const controlledRows = ressources
+                                    .map((_, index) => rowId(index))
+                                    .join(' ')
 
                                 return (
                                     <tbody key={plan.id}>
@@ -226,11 +221,10 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                                         aria-expanded={
                                                             !isCollapsed
                                                         }
-                                                        aria-controls={ressources
-                                                            .map((_, index) =>
-                                                                rowId(index)
-                                                            )
-                                                            .join(' ')}
+                                                        aria-controls={
+                                                            controlledRows ||
+                                                            undefined
+                                                        }
                                                         onClick={() =>
                                                             togglePlan(plan.id)
                                                         }
@@ -340,7 +334,12 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                                         <span className="concurrence-table__mention">
                                                             retenus
                                                         </span>{' '}
-                                                        /{' '}
+                                                        <span aria-hidden="true">
+                                                            /
+                                                        </span>
+                                                        <span className="fr-sr-only">
+                                                            sur
+                                                        </span>{' '}
                                                         {formatNumber(
                                                             ressource.tonnageTotal
                                                         )}
