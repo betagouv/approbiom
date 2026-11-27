@@ -54,12 +54,15 @@ const dAllemagne: Approvisionnement = {
 
 const saintJunien: ConcurrenceRow = {
     plan: {
+        id: 1,
         nom: 'RC Saint Junien',
         departementDeSituation: 'Haute-Vienne',
         installationCommune: '87154',
         statut: 'projet',
     },
     ressource: 'Plaquettes forestières',
+    ressourceCode: '1A-PFA',
+    ressourceFamille: '1 Bois coupé',
     approvisionnements: [deHauteVienne, dAllemagne],
     tonnageTotal: 200,
 }
@@ -229,7 +232,7 @@ describe('Concurrence', () => {
             saintJunien,
             {
                 ...saintJunien,
-                plan: planLike({ nom: 'RCU Clair-Village' }),
+                plan: planLike({ id: 2, nom: 'RCU Clair-Village' }),
                 approvisionnements: [deHauteVienne],
             },
         ])
@@ -249,6 +252,7 @@ describe('Concurrence', () => {
             {
                 ...saintJunien,
                 plan: planLike({
+                    id: 3,
                     nom: 'RCU Limoges',
                     installationCommune: '87085',
                 }),
@@ -264,6 +268,7 @@ describe('Concurrence', () => {
             {
                 ...saintJunien,
                 plan: planLike({
+                    id: 3,
                     nom: 'RCU Limoges',
                     installationCommune: '87085',
                 }),

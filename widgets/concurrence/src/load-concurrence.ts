@@ -33,6 +33,7 @@ export type ConcurrencePorts = {
 }
 
 export type PlanConcurrence = {
+    id: PlanDApprovisionnement['id']
     nom: PlanDApprovisionnement['nom']
     departementDeSituation: Departement['libelle']
     installationCommune: Commune['codeInsee'] | null
@@ -46,6 +47,8 @@ export type PlanConcurrence = {
 export type ConcurrenceRow = {
     plan: PlanConcurrence
     ressource: Ressource['title']
+    ressourceCode: Ressource['code']
+    ressourceFamille: Ressource['famille']
     approvisionnements: readonly Approvisionnement[]
     tonnageTotal: number
 }
@@ -83,7 +86,7 @@ export async function loadConcurrence(
     const communeByInstallation = new Map(
         installations.map(({ id, commune }) => [id, commune] as const)
     )
-    const titleByCode = new Map(ressources.map((r) => [r.code, r.title]))
+    const ressourceByCode = new Map(ressources.map((r) => [r.code, r]))
 
     const libelleByDep = new Map(
         departementsByRegion.flatMap(({ departements }) =>
@@ -92,6 +95,7 @@ export async function loadConcurrence(
     )
 
     const getPlanConcurrence = (
+        id: PlanDApprovisionnement['id'],
         plan: PlanDApprovisionnement | undefined
     ): PlanConcurrence => {
         const commune =
@@ -99,6 +103,7 @@ export async function loadConcurrence(
         const dep = commune === null ? undefined : codeDepartementOf(commune)
 
         return {
+            id,
             nom: plan?.nom ?? '',
             departementDeSituation: dep ? (libelleByDep.get(dep) ?? dep) : '',
             installationCommune: commune,
@@ -119,11 +124,16 @@ export async function loadConcurrence(
 
     return {
         approvisionnementsByPlanAndRessource: totals.map((total) => {
+            const ressource = ressourceByCode.get(total.ressource)
+
             return {
                 plan: getPlanConcurrence(
+                    total.planDApprovisionnement,
                     planById.get(total.planDApprovisionnement)
                 ),
-                ressource: titleByCode.get(total.ressource) ?? total.ressource,
+                ressource: ressource?.title ?? total.ressource,
+                ressourceCode: total.ressource,
+                ressourceFamille: ressource?.famille ?? '',
                 approvisionnements:
                     byPair.get(
                         pairKey(total.planDApprovisionnement, total.ressource)
