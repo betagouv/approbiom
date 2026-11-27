@@ -4,6 +4,6 @@ import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
 export type Referentiels = {
     entreprises: readonly Entreprise[]
-    ressources: readonly Ressource[]
+    ressources: readonly Pick<Ressource, 'code' | 'title'>[]
     departementsByRegion: readonly DepartementsByRegion[]
 }

@@ -1,9 +1,6 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnMajorTable } from '../helpers/grist-helpers'
-import {
-    createGristRessourcePort,
-    createGristRessourcesPort,
-} from './grist-adapter-ressource'
+import { createGristRessourcesPort } from './grist-adapter-ressource'
 
 const SANS_FAMILLE: ColumnMajorTable = {
     id: [1],
@@ -65,22 +62,6 @@ describe('createGristRessourcesPort().list', () => {
 
         expect(await createGristRessourcesPort().list(['famille'])).toEqual([
             { famille: '' },
-        ])
-    })
-})
-
-describe('createGristRessourcePort().list', () => {
-    it('does not need the « Famille ressource » column', async () => {
-        mockMetaRessource(SANS_FAMILLE)
-
-        expect(await createGristRessourcePort().list()).toEqual([
-            {
-                code: '2B-CIB',
-                ademeCode: '2017-2B-CIB',
-                title: 'Connexes de scierie',
-                famille: '',
-                description: 'Produits connexes de scierie hors écorces',
-            },
         ])
     })
 })

@@ -17,6 +17,17 @@ describe('loadApprovisionnementsImportDocument', () => {
         )
     })
 
+    it('reads only the code and title of the ressources', async () => {
+        const list = vi.fn(() => Promise.resolve(FAKE_RESSOURCES))
+
+        await loadApprovisionnementsImportDocument({
+            ...FAKE_PORTS,
+            ressources: { list },
+        })
+
+        expect(list).toHaveBeenCalledWith(['code', 'title'])
+    })
+
     it('hands the attachment reads over to the ports it was loaded with', async () => {
         const getFileUrl = vi.fn(() =>
             Promise.resolve('https://grist.example.fr/fichier/12')

@@ -3,7 +3,7 @@ import type { ApprovisionnementPort } from '@shared/core/application/ports/appro
 import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { EntrepriseSearchPort } from '@shared/core/application/ports/entreprise-search'
-import type { RessourcePort } from '@shared/core/application/ports/ressource'
+import type { RessourcesPort } from '@shared/core/application/ports/ressources'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 
 export type Ports = PlanViewPorts & {
@@ -11,6 +11,6 @@ export type Ports = PlanViewPorts & {
     attachments: Pick<AttachmentPort, 'listByPlan'>
     entreprises: EntreprisePort
     entrepriseSearch: EntrepriseSearchPort
-    ressources: RessourcePort
+    ressources: RessourcesPort
     referentielGeo: Pick<ReferentielGeoPort, 'listDepartementsByRegion'>
 }

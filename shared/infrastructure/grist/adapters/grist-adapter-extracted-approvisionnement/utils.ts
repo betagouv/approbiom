@@ -2,6 +2,7 @@ import type { ExtractedLineChanges } from '@shared/core/application/ports/extrac
 import type {
     ExtractedApprovisionnement,
     ExtractedLine,
+    MatchedRessource,
 } from '@shared/core/domain/entities/extracted-approvisionnement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Ressource } from '@shared/core/domain/value-objects/ressource'
@@ -75,7 +76,7 @@ export function toExtractedApprovisionnement(
     row: ExtractedApprovisionnementColumn,
     document: string,
     fournisseur: Entreprise | undefined,
-    ressource: Ressource | undefined
+    ressource: MatchedRessource | undefined
 ): ExtractedApprovisionnement {
     return {
         id: row.id,
@@ -105,7 +106,7 @@ const fournisseurId = (
 ) => (fournisseur ? (entrepriseIdBySiret.get(fournisseur.siret) ?? 0) : 0)
 
 const ressourceId = (
-    ressource: Ressource | null,
+    ressource: MatchedRessource | null,
     { ressourceIdByCode }: References
 ) => (ressource ? (ressourceIdByCode.get(ressource.code) ?? 0) : 0)
 

@@ -3,9 +3,14 @@ import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ExtractedLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
+export type MatchableRessource = Pick<
+    Ressource,
+    'code' | 'ademeCode' | 'title' | 'description'
+>
+
 export type MatchReferences = {
     entreprises: readonly Entreprise[]
-    ressources: readonly Ressource[]
+    ressources: readonly MatchableRessource[]
 }
 
 export interface DocumentExtractorApprovisionnementPort {

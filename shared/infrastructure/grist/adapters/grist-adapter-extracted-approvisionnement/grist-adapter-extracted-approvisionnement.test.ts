@@ -13,12 +13,11 @@ const TABLES: Record<string, ColumnMajorTable> = {
         Siret: ['00000000000001', '00000000000002'],
         Denomination: ['BOIS FICTIF ENERGIE', 'COOPERATIVE FICTIVE DES FORETS'],
     },
+    // Only the columns the adapter reads.
     [TABLE.metaRessource]: {
         id: [1, 6],
         Code_ressource_Approbiom: ['1A-PFA', '2A-CIB'],
-        ademe_2017: ['2017-1A-PFA', '2017-2A-CIB'],
         Description_courte: ['Plaquettes forestières', 'Ecorces'],
-        Description: ['Plaquettes forestières dont souches', 'Ecorces'],
     },
     [TABLE.extractedApprovisionnement]: {
         id: [5],
@@ -76,10 +75,7 @@ describe('createGristExtractedApprovisionnementAdapter().update', () => {
         await createGristExtractedApprovisionnementAdapter().update(5, {
             matchedRessource: {
                 code: '2A-CIB',
-                ademeCode: '2017-2A-CIB',
-                famille: '2 Coproduits 1ère transfo Bois',
                 title: 'Ecorces',
-                description: 'Ecorces',
             },
         })
 
@@ -321,6 +317,64 @@ describe('createGristExtractedApprovisionnementAdapter().listSummaries', () => {
             extractedAt: null,
             lineCount: 0,
             verifiedCount: 0,
+        })
+    })
+})
+
+describe('createGristExtractedApprovisionnementAdapter().listByDocument', () => {
+    const LINE: Record<string, unknown[]> = {
+        id: [5],
+        Document: [4],
+        Ressource: [6],
+        Fournisseur: [0],
+        Repartition_par_provenance: [
+            JSON.stringify({
+                distribution: [],
+                confidence: 'Non résolu',
+                unrecognized: [],
+            }),
+        ],
+    }
+
+    it('gives the code and title of the ressource each line is matched to', async () => {
+        const tables: Record<string, ColumnMajorTable> = {
+            ...TABLES,
+            [TABLE.attachment]: {
+                id: [4],
+                Plan_d_approvisionnement: [160],
+                piece_jointe: [['L', 20]],
+                type: ['excel ademe'],
+            },
+            [TABLE.extractedApprovisionnement]: Object.fromEntries(
+                COLUMNS.extractedApprovisionnement.map((column) => [
+                    column,
+                    LINE[column] ?? [''],
+                ])
+            ),
+        }
+        vi.stubGlobal('grist', {
+            docApi: {
+                fetchTable: vi.fn((tableId: string) =>
+                    Promise.resolve(tables[tableId])
+                ),
+            },
+            ready: vi.fn(),
+            onOptions: (
+                handler: (
+                    options: unknown,
+                    settings: { accessLevel: string }
+                ) => void
+            ) => handler({}, { accessLevel: 'full' }),
+        })
+
+        const [line] =
+            await createGristExtractedApprovisionnementAdapter().listByDocument(
+                { id: 20, name: 'plan.xlsx' }
+            )
+
+        expect(line.derived.matchedRessource).toEqual({
+            code: '2A-CIB',
+            title: 'Ecorces',
         })
     })
 })

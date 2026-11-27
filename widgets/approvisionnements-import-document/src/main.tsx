@@ -13,7 +13,7 @@ import { importRows } from '@shared/infrastructure/import-bcib-bciat/importRows'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
 import { createGristProgrammeAidePort } from '@shared/infrastructure/grist/adapters/grist-adapter-programme-aide'
 import { createGristReferentielGeoPort } from '@shared/infrastructure/grist/adapters/grist-adapter-referentiel-geo'
-import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
+import { createGristRessourcesPort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
 import { createRechercheEntreprisesPort } from '@shared/infrastructure/referentiel-entreprise/recherche-entreprises-adapter'
 import { FAKE_PORTS } from './fake-data/ports'
 import type { Ports } from './ports'
@@ -25,7 +25,7 @@ const GRIST_PORTS: Ports = {
     approvisionnements: createGristApprovisionnementPort(),
     attachments: createGristAttachmentPort(),
     entreprises: createGristEntreprisePort(),
-    ressources: createGristRessourcePort(),
+    ressources: createGristRessourcesPort(),
     referentielGeo: createGristReferentielGeoPort(),
     entrepriseSearch: createRechercheEntreprisesPort(),
     extractedApprovisionnements: createGristExtractedApprovisionnementAdapter(),

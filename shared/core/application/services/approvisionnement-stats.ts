@@ -10,12 +10,14 @@ import type {
     ReferentielGeoPort,
 } from '@shared/core/application/ports/referentiel-geo'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
-import type { RessourcePort } from '@shared/core/application/ports/ressource'
+import type { RessourcesPort } from '@shared/core/application/ports/ressources'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
 const UNKNOWN = 'Inconnu'
+
+type StatsRessource = Pick<Ressource, 'code' | 'title'>
 
 export type Group = {
     label: string
@@ -29,7 +31,7 @@ export type ProvenanceGroup = Group & {
 }
 
 export type ApprovisionnementStatsByRessource = {
-    ressource: Ressource
+    ressource: StatsRessource
     tonnageTotal: number
     /** Between 0 and 1. */
     repartition: number
@@ -43,7 +45,7 @@ export type ApprovisionnementByRessourceStats =
 
 export type ApprovisionnementByRessourceStatsPorts = {
     approvisionnements: ApprovisionnementPort
-    ressources: RessourcePort
+    ressources: RessourcesPort
     entreprises: EntreprisePort
     listDepartementsByRegion: ReferentielGeoPort['listDepartementsByRegion']
 }
@@ -54,7 +56,7 @@ export type ApprovisionnementByRessourceStatsSources = {
     byRegionOuPays: readonly ApprovisionnementGroupedByPlanRessourceAndRegionOuPays[]
     byProvenance: readonly ApprovisionnementGroupedByPlanRessourceAndProvenance[]
     byFournisseur: readonly ApprovisionnementGroupedByPlanRessourceAndFournisseur[]
-    ressources: readonly Ressource[]
+    ressources: readonly StatsRessource[]
     entreprises: readonly Entreprise[]
     departementsByRegion: readonly DepartementsByRegion[]
 }
@@ -161,13 +163,7 @@ export function composeApprovisionnementStats({
 
     const approvisionnementStatsByRessource = totalsForPlan.map(
         ({ ressource: code, tonnageTotal, repartition }) => ({
-            ressource: ressourceByCode.get(code) ?? {
-                code,
-                ademeCode: '',
-                famille: '',
-                title: code,
-                description: '',
-            },
+            ressource: ressourceByCode.get(code) ?? { code, title: code },
             tonnageTotal,
             repartition,
             byRegionOuPays: regionsOuPays.get(code) ?? [],
@@ -223,7 +219,7 @@ async function loadApprovisionnementStatsSources(
         ports.approvisionnements.listGroupedByPlanRessourceAndRegionOuPays(),
         ports.approvisionnements.listGroupedByPlanRessourceAndProvenance(),
         ports.approvisionnements.listGroupedByPlanRessourceAndFournisseur(),
-        ports.ressources.list(),
+        ports.ressources.list(['code', 'title']),
         ports.entreprises.list(),
         ports.listDepartementsByRegion(),
     ])
