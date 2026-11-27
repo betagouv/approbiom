@@ -1,8 +1,8 @@
 import './EntrepriseSearch.css'
 
 import { useId, useState } from 'react'
-import Alert from '@shared/react/components/Alert'
-import SearchBar from '@shared/react/components/SearchBar'
+import Alert from '@shared/react/ui/components/Alert'
+import SearchBar from '@shared/react/ui/components/SearchBar'
 import { formatNumber } from '@shared/react/format'
 import type {
     EntrepriseSearchResult,

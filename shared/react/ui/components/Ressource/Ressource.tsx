@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import DataTable, { type Column } from '@shared/react/components/DataTable'
+import DataTable, { type Column } from '@shared/react/ui/components/DataTable'
 import './Ressource.css'
 import type {
     Group,

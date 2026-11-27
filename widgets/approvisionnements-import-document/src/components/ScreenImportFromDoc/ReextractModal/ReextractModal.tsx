@@ -3,8 +3,8 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useState } from 'react'
-import Alert from '@shared/react/components/Alert'
-import Modal from '@shared/react/components/Modal'
+import Alert from '@shared/react/ui/components/Alert'
+import Modal from '@shared/react/ui/components/Modal'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 
 export type ReextractModalProps = {

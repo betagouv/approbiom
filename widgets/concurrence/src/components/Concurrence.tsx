@@ -1,11 +1,11 @@
 import './Concurrence.css'
-import DataTable, { type Column } from '@shared/react/components/DataTable'
-import ProvenanceMap from '@shared/react/components/Ressource/ProvenanceMap'
+import DataTable, { type Column } from '@shared/react/ui/components/DataTable'
+import ProvenanceMap from '@shared/react/ui/components/Ressource/ProvenanceMap'
 import MultiSelect, {
     type MultiSelectGroup,
     type MultiSelectOption,
-} from '@shared/react/components/MultiSelect'
-import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
+} from '@shared/react/ui/components/MultiSelect'
+import { getOptions } from '@shared/react/ui/components/MultiSelect/getOptions'
 import type {
     DepartementsByRegion,
     ReferentielGeoPort,

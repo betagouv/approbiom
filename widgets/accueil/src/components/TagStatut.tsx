@@ -1,4 +1,4 @@
-import Tag from '@shared/react/components/Tag'
+import Tag from '@shared/react/ui/components/Tag'
 
 const COLOR: Record<string, string> = {
     projet: 'purple-glycine',

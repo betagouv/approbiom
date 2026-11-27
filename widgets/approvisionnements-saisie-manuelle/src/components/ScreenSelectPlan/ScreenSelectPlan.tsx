@@ -5,8 +5,8 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import { useEffect, useRef } from 'react'
 import Combobox, {
     type ComboboxHandle,
-} from '@shared/react/components/Combobox'
-import type { SelectablePlan } from '@shared/react/components/PlanHeader'
+} from '@shared/react/ui/components/Combobox'
+import type { SelectablePlan } from '@shared/react/ui/components/PlanHeader'
 
 export type { SelectablePlan }
 

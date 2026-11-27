@@ -1,7 +1,7 @@
 import '@gouvfr/dsfr/dist/component/link/link.main.min.css'
 
 import type { ReactNode } from 'react'
-import CopyButton from '@shared/react/components/CopyButton'
+import CopyButton from '@shared/react/ui/components/CopyButton'
 import type { FoundEntreprise } from '@shared/core/application/ports/entreprise-search'
 import { annuaireEntrepriseUrl } from '@shared/infrastructure/referentiel-entreprise/annuaire-entreprises'
 import EtatAdministratifBadge from './EtatAdministratifBadge'

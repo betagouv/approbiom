@@ -2,11 +2,11 @@ import './DocumentPicker.css'
 import '@gouvfr/dsfr/dist/component/form/form.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
-import Alert from '@shared/react/components/Alert'
-import Badge from '@shared/react/components/Badge'
+import Alert from '@shared/react/ui/components/Alert'
+import Badge from '@shared/react/ui/components/Badge'
 import type { ExtractionSummary } from '@shared/core/application/ports/extracted-approvisionnement'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import { documentIconOf } from '@shared/react/components/document-icon'
+import { documentIconOf } from '@shared/react/ui/components/document-icon'
 import { formatNumber, plural } from '@shared/react/format'
 
 const KO = 1024

@@ -1,8 +1,8 @@
 import './TabUpdate.css'
 
-import Select from '@shared/react/components/Select'
+import Select from '@shared/react/ui/components/Select'
 
-import Toggle from '@shared/react/components/Toggle'
+import Toggle from '@shared/react/ui/components/Toggle'
 import type { DemandeSubvention } from '@shared/core/domain/entities/demande-subvention'
 
 import type { InstructionDetail } from '@shared/core/application/services/plan-detail'

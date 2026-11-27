@@ -4,7 +4,7 @@ import '@gouvfr/dsfr/dist/component/input/input.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useId, useState } from 'react'
-import Select, { type SelectItem } from '@shared/react/components/Select'
+import Select, { type SelectItem } from '@shared/react/ui/components/Select'
 import type { DepartementsByRegion } from '@shared/core/application/ports/referentiel-geo'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import {

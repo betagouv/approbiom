@@ -5,9 +5,9 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useId, useState } from 'react'
-import Alert from '@shared/react/components/Alert'
-import Modal from '@shared/react/components/Modal'
-import Select, { type SelectItem } from '@shared/react/components/Select'
+import Alert from '@shared/react/ui/components/Alert'
+import Modal from '@shared/react/ui/components/Modal'
+import Select, { type SelectItem } from '@shared/react/ui/components/Select'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { Pays } from '@shared/core/domain/value-objects/pays'
 import {
@@ -22,7 +22,7 @@ import {
     type EditableFields,
 } from '../../../../approvisionnement-form'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
-import FournisseurField from '@shared/react/components/FournisseurField'
+import FournisseurField from '@shared/react/ui/components/FournisseurField'
 
 export type ApprovisionnementModalProps = Referentiels & {
     pays: readonly Pays[]

@@ -4,7 +4,7 @@ import '@gouvfr/dsfr/dist/component/callout/callout.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
-import CopyButton from '@shared/react/components/CopyButton'
+import CopyButton from '@shared/react/ui/components/CopyButton'
 
 export type ExtractionFailureProps = {
     message: string

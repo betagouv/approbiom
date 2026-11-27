@@ -1,4 +1,4 @@
-import type { MultiSelectOption } from '@shared/react/components/MultiSelect'
+import type { MultiSelectOption } from '@shared/react/ui/components/MultiSelect'
 
 /**
  * Builds deduplicated MultiSelect options from rows, in first-seen order.

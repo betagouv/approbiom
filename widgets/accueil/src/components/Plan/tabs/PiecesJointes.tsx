@@ -3,8 +3,8 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-document/icons-document.main.min.c
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import './PiecesJointes.css'
-import AsyncGate from '@shared/react/components/AsyncGate'
-import DataTable, { type Column } from '@shared/react/components/DataTable'
+import AsyncGate from '@shared/react/ui/components/AsyncGate'
+import DataTable, { type Column } from '@shared/react/ui/components/DataTable'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 

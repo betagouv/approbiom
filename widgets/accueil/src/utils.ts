@@ -14,8 +14,8 @@ import {
 import type {
     MultiSelectGroup,
     MultiSelectOption,
-} from '@shared/react/components/MultiSelect'
-import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
+} from '@shared/react/ui/components/MultiSelect'
+import { getOptions } from '@shared/react/ui/components/MultiSelect/getOptions'
 import { normalizeSearchText } from '@shared/react/search-text'
 
 export const SANS_APPEL_A_PROJET_LABEL =

@@ -5,9 +5,9 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useState } from 'react'
-import Alert from '@shared/react/components/Alert'
-import Combobox from '@shared/react/components/Combobox'
-import Tabs from '@shared/react/components/Tabs'
+import Alert from '@shared/react/ui/components/Alert'
+import Combobox from '@shared/react/ui/components/Combobox'
+import Tabs from '@shared/react/ui/components/Tabs'
 import type {
     ExtractedLineChanges,
     ExtractionSummary,
@@ -25,7 +25,7 @@ import type { ExtractedDocument } from '@shared/core/application/services/extrac
 import type { Referentiels } from '../../referentiels'
 import PlanHeader, {
     type SelectablePlan,
-} from '@shared/react/components/PlanHeader'
+} from '@shared/react/ui/components/PlanHeader'
 import DocumentContext from './DocumentContext'
 import DocumentPicker from './DocumentPicker'
 import Extraction from './Extraction'
