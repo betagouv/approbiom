@@ -5,10 +5,9 @@ import '@gouvfr/dsfr/dist/component/table/table.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-map/icons-map.main.min.css'
 import './ConcurrenceTable.css'
-import Badge from '@shared/react/ui/components/Badge'
+import TagStatut from '@shared/react/ui/components/TagStatut'
 import { getRessourceIcon } from '@shared/react/ui/ressource-icon'
 import { formatNumber } from '@shared/react/format'
-import { PLAN_STATUT_PROJECT } from '@shared/core/domain/value-objects/plan-statut'
 import {
     type CSSProperties,
     useId,
@@ -236,17 +235,9 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                                         {plan.nom}
                                                     </button>
                                                     {plan.statut !== '' && (
-                                                        <Badge
-                                                            size="sm"
-                                                            color={
-                                                                plan.statut ===
-                                                                PLAN_STATUT_PROJECT
-                                                                    ? 'pink-macaron'
-                                                                    : undefined
-                                                            }
-                                                        >
-                                                            {plan.statut}
-                                                        </Badge>
+                                                        <TagStatut
+                                                            statut={plan.statut}
+                                                        />
                                                     )}
                                                     {plan.departementDeSituation !==
                                                         '' && (
