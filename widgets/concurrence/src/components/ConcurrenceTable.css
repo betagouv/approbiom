@@ -43,9 +43,11 @@
 }
 
 .concurrence-table__unit {
+    display: block;
     color: var(--text-mention-grey);
     font-size: 0.875rem;
     font-weight: 400;
+    line-height: 1.25rem;
 }
 
 .concurrence-table .fr-table__content tbody tr.concurrence-table__plan > th {
