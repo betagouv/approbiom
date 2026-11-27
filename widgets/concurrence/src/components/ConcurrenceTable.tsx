@@ -26,6 +26,9 @@ type Props = {
 
 const COLUMN_COUNT = 4
 
+/** Names the toggle of a plan Grist gives no name for. */
+const PLAN_SANS_NOM = 'Plan sans nom'
+
 function RetenusLines({
     retenus,
     nonRetenus,
@@ -232,7 +235,8 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                                             className="fr-icon-arrow-down-s-line concurrence-table__chevron"
                                                             aria-hidden="true"
                                                         />
-                                                        {plan.nom}
+                                                        {plan.nom ||
+                                                            PLAN_SANS_NOM}
                                                     </button>
                                                     {plan.statut !== '' && (
                                                         <TagStatut

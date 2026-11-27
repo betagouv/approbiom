@@ -185,6 +185,21 @@ describe('ConcurrenceTable', () => {
         ).toBe('120px')
     })
 
+    it('names the toggle of a plan without name', () => {
+        const sansNom = plan(1, [plaquettes])
+        render(
+            <ConcurrenceTable
+                plansConcurrents={[
+                    { ...sansNom, plan: { ...sansNom.plan, nom: '' } },
+                ]}
+            />
+        )
+
+        expect(
+            screen.getByRole('button', { name: 'Plan sans nom' })
+        ).toBeDefined()
+    })
+
     it('says so when no plan is left', () => {
         render(<ConcurrenceTable plansConcurrents={[]} />)
 
