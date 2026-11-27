@@ -6,7 +6,7 @@ import type {
     ReferentielGeoPort,
 } from '@shared/core/application/ports/referentiel-geo'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
-import type { RessourcePort } from '@shared/core/application/ports/ressource'
+import type { RessourcesPort } from '@shared/core/application/ports/ressources'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import {
     codeDepartementOf,
@@ -22,7 +22,7 @@ export type ConcurrencePorts = {
     approvisionnements: ApprovisionnementPort
     plans: PlanPort
     installations: InstallationPort
-    ressources: RessourcePort
+    ressources: RessourcesPort
     entreprises: EntreprisePort
     referentielGeo: Pick<
         ReferentielGeoPort,
@@ -80,7 +80,7 @@ export async function loadConcurrence(
         ports.approvisionnements.list(),
         ports.plans.list(),
         ports.installations.list(),
-        ports.ressources.list(),
+        ports.ressources.list(['code', 'title', 'famille']),
         ports.entreprises.list(),
         ports.referentielGeo.listDepartementsByRegion(),
     ])

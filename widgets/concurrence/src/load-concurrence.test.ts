@@ -1,4 +1,4 @@
-import { describe, expect, it } from 'vitest'
+import { describe, expect, it, vi } from 'vitest'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import { DEPARTEMENT_FRANCAIS } from '@shared/core/domain/value-objects/provenance'
@@ -19,6 +19,16 @@ const plan = {
     typeDePlan: 'création',
     statut: 'projet',
 } as PlanDApprovisionnement
+
+const listRessources = vi.fn(() =>
+    Promise.resolve([
+        {
+            code: '2B-CIB',
+            title: 'Connexes de scierie',
+            famille: '2 Coproduits 1ère transfo Bois',
+        },
+    ])
+)
 
 /** Only what loadConcurrence reads; the other port methods are never called. */
 function ports(
@@ -43,18 +53,7 @@ function ports(
                     { id: 3, nom: 'Chaufferie fictive', commune: '17300' },
                 ]),
         },
-        ressources: {
-            list: () =>
-                Promise.resolve([
-                    {
-                        code: '2B-CIB',
-                        ademeCode: '2017-2B-CIB',
-                        title: 'Connexes de scierie',
-                        famille: '2 Coproduits 1ère transfo Bois',
-                        description: '',
-                    },
-                ]),
-        },
+        ressources: { list: listRessources },
         entreprises: { list: () => Promise.resolve([]) },
         referentielGeo: {
             listDepartementsByRegion: () =>
@@ -111,5 +110,15 @@ describe('loadConcurrence', () => {
             ressourceCode: 'XX',
             ressourceFamille: '',
         })
+    })
+
+    it('asks only for the ressource properties it shows', async () => {
+        await loadConcurrence(ports([]))
+
+        expect(listRessources).toHaveBeenCalledWith([
+            'code',
+            'title',
+            'famille',
+        ])
     })
 })

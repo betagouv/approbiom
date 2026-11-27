@@ -77,7 +77,6 @@ export const COLUMNS = {
         'ademe_2017',
         'Description_courte',
         'Description',
-        'Famille_ressource',
     ],
     entreprise: ['id', 'Siret', 'Denomination'],
     departement: ['id', 'DEP', 'LIBELLE', 'REG'],
