@@ -23,10 +23,6 @@ import type { InstructionPort } from '@shared/core/application/ports/instruction
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
 
-/**
- * An instruction, with the CRB it points at named. The instruction itself only
- * holds the rowId, and every screen showing a chronology shows whose it is.
- */
 export type InstructionDetail = Instruction & {
     crbName: Crb['name']
 }
@@ -70,13 +66,10 @@ function getInstructionsBySubvention(
     >()
 
     for (const instruction of instructions) {
-        // An empty Ref reads as 0. Left in, every instruction whose demande
-        // could not be resolved would group under the same key.
+        // An empty Ref reads as 0.
         if (instruction.subvention === 0) continue
 
         const group = instructionsBySubvention.get(instruction.subvention) ?? []
-        // A CRB the document cannot name still instructed the demande, so the
-        // chronology is kept and reads with no name rather than disappearing.
         group.push({
             ...instruction,
             crbName: crbById.get(instruction.crb)?.name ?? '',
@@ -108,9 +101,6 @@ function getDemandesByPlan({
     const demandesByPlan = new Map<Plan['id'], DemandeSubventionDetail[]>()
 
     for (const demande of demandesSubvention) {
-        // A demande is named by its programme, so one pointing at a programme
-        // the document cannot name says nothing about the plan it was filed
-        // for — neither an appel to filter on, nor a chronology to head.
         const programmeAide = programmeById.get(demande.programmeAide)
         if (programmeAide === undefined) continue
 
@@ -145,18 +135,13 @@ function getFournisseursByPlan({
         planDApprovisionnement,
         fournisseur,
     } of approvisionnementsByFournisseur) {
-        // An approvisionnement whose fournisseur the document left empty names
-        // nobody to filter on.
         if (fournisseur === undefined) continue
 
         const fournisseurs =
             fournisseursByPlan.get(planDApprovisionnement) ?? []
-        // The summary carries one row per ressource, so a fournisseur comes
-        // back as many times as it supplies the plan with one.
+        // The summary has one row per ressource, so a fournisseur can repeat.
         if (fournisseurs.some(({ siret }) => siret === fournisseur)) continue
 
-        // A siret the directory does not name is still a fournisseur: it is
-        // read by its siret rather than dropped.
         fournisseurs.push(
             entrepriseBySiret.get(fournisseur) ?? {
                 siret: fournisseur,
@@ -219,8 +204,6 @@ export function composePlanDetails({
 
         return {
             ...plan,
-            // An installation the document leaves unnamed reads as no name, the
-            // same as a plan pointing at none: there is nothing to show.
             installationNom: installation?.nom || null,
             communeDeSituation: commune === '' ? null : commune,
             departementDeSituation,
@@ -234,7 +217,6 @@ export function composePlanDetails({
     })
 }
 
-/** Everything a plan detail is read from. Named so a widget hands over its ports and nothing else. */
 export type PlanDetailPorts = {
     plans: PlanPort
     installations: InstallationPort
@@ -247,13 +229,7 @@ export type PlanDetailPorts = {
     entreprises: EntreprisePort
 }
 
-/**
- * Reads every source a plan detail is built from, then composes them.
- *
- * The reads are fired together rather than in sequence: an adapter is free to
- * serve two callers asking for the same table from one round trip, and can only
- * do so while both are still in flight.
- */
+/** Reads must stay concurrent: adapters share a table fetch only while both are in flight. */
 export async function getPlanDetails(
     ports: PlanDetailPorts
 ): Promise<readonly PlanDetail[]> {

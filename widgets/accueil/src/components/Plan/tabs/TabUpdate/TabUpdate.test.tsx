@@ -121,8 +121,6 @@ describe('TabUpdate', () => {
     it('shows the phase as plain text rather than as a tag', () => {
         renderTab([bciat])
 
-        // The phase names itself, so it is read as a sentence rather than as a
-        // bare status word standing on its own.
         const [phase] = screen.getAllByText(
             /Phase de l'instruction\s*:\s*Avis préfet en attente/
         )
@@ -136,8 +134,7 @@ describe('TabUpdate', () => {
         const [avisCrb] = screen.getAllByRole<HTMLSelectElement>('combobox', {
             name: 'Avis CRB',
         })
-        // The six of AVIS_CRB; the placeholder is `hidden`, so it is out of the
-        // accessibility tree and does not count.
+        // The six of AVIS_CRB; the hidden placeholder is not counted.
         expect(within(avisCrb).getAllByRole('option')).toHaveLength(6)
         expect(
             within(avisCrb).getByRole<HTMLOptionElement>('option', {
@@ -160,9 +157,7 @@ describe('TabUpdate', () => {
         ).toBeNull()
     })
 
-    // The avis a pick shows is the one the document holds: nothing is kept here
-    // until the write comes back, so there is nothing to assert until the tab
-    // shows a change of its own again.
+    // The tab shows the document's avis, not the pick: nothing to assert yet.
     it.todo('keeps the avis the user picks')
 
     it('changes one instruction without touching the other', () => {
@@ -176,8 +171,6 @@ describe('TabUpdate', () => {
         })
         fireEvent.change(premier, { target: { value: reserve.value } })
 
-        // The second instruction of the demande is rowId 2: naming the wrong
-        // one would write the avis over its neighbour's.
         expect(updateInstruction).toHaveBeenCalledTimes(1)
         expect(updateInstruction).toHaveBeenCalledWith(1, {
             avisCRB: 'Avis réservé',
@@ -198,8 +191,6 @@ describe('TabUpdate', () => {
         expect(updateInstruction).toHaveBeenCalledWith(1, {
             avisCRB: 'Avis réservé',
         })
-        // What the document now holds is what the screen shows next, so the
-        // read only follows once the write has been acknowledged.
         expect(refresh).not.toHaveBeenCalled()
         await vi.waitFor(() => expect(refresh).toHaveBeenCalledTimes(1))
     })
@@ -232,10 +223,7 @@ describe('TabUpdate', () => {
             },
         ])
 
-        // Not disabled but absent: there is no avis to record, so the list has
-        // nothing to say.
         expect(screen.queryByRole('combobox', { name: 'Avis CRB' })).toBeNull()
-        // The préfet is asked either way, so its list stays.
         expect(
             screen.getByRole<HTMLSelectElement>('combobox', {
                 name: 'Avis Préfet',
@@ -246,9 +234,7 @@ describe('TabUpdate', () => {
     it('writes the avis CRB requis switch the user moves', () => {
         renderTab([bciat])
 
-        // The instruction requires an avis, so moving the switch takes it back
-        // to `false` — a write that is easily lost by reading a field's
-        // truthiness rather than its presence.
+        // The fixture requires an avis, so the switch writes `false`.
         fireEvent.click(
             screen.getAllByRole('checkbox', { name: 'Avis CRB requis' })[0]
         )
@@ -320,8 +306,7 @@ describe('TabUpdate', () => {
             name: 'Avis CRB requis',
         })[0]
 
-        // Off, then on again: the list is unmounted in between, so the avis
-        // only survives because the draft holds it rather than the `<select>`.
+        // The list is unmounted in between: only the draft keeps the avis.
         fireEvent.click(avisCrbRequis)
         fireEvent.click(avisCrbRequis)
 
@@ -344,8 +329,7 @@ describe('TabUpdate', () => {
             })
         )
 
-        // The plan the tab was opened on, under the programme the switch sits
-        // in — GRANULE (2023), rowId 2, is left as it is.
+        // GRANULE (2023), rowId 2, is left as it is.
         expect(updateIsPlanLaureatForProgrammeAide).toHaveBeenCalledTimes(1)
         expect(updateIsPlanLaureatForProgrammeAide).toHaveBeenCalledWith(
             PLAN_ID,

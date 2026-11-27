@@ -3,9 +3,6 @@ import { normalize } from './transform-provenance/reference-data'
 import type { CellValue } from 'grist/GristData'
 import type { ReadLine } from '@shared/core/domain/entities/extracted-approvisionnement'
 
-// - - - - - Configurations - - - - - - //
-
-// Input - Workbook structure
 const EXPECTED_WORD_CONTAINED_IN_SHEETNAME = 'Fournisseurs'
 
 const EXPECTED_HEADER_COLUMN_FOURNISSEUR =
@@ -24,16 +21,11 @@ const ADDITIONAL_COLUMN_HEADER_PREFIXES = {
     'Taux PEFC': 'taux',
 } as const
 
-// How far down to look for the header row. It sits on row 11, 16 or 18
-// depending on which year's template the plan was written on.
+// The header row sits on row 11, 16 or 18 depending on the template year.
 const MAX_ROW_HEADER_SEARCH = 40
-
-// Output
 
 type ColumnName =
     'Fournisseur' | keyof typeof COLUMN_HEADER_PREFIXES | 'Provenance'
-
-// - - - - - utils - - - - - - //
 
 function toText(value: unknown): string {
     if (value === null || value === undefined) return ''

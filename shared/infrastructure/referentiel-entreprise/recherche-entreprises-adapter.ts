@@ -7,26 +7,23 @@ import type {
 // see https://recherche-entreprises.api.gouv.fr/docs/
 const SEARCH_URL = 'https://recherche-entreprises.api.gouv.fr/search'
 
-// Only the first answers are shown.
 const RESULT_COUNT = 3
 
-// Where the API stops counting: on a query as broad as « sarl » or « bois »,
-// total_results is 10 000 flat, so that many means 10 000 or more.
+// The API caps total_results at 10 000: that value means "10 000 or more".
 const TOTAL_CEILING = 10_000
 
-// The fields read from the answer; the API sends many more.
 type Etablissement = {
     siret: string
     // A: actif, F: fermé.
     etat_administratif: 'A' | 'F'
-    // Always sent, here as on the unité légale: null while still open.
+    // Null while still open.
     date_fermeture: string | null
     adresse: string
 }
 
 type SearchResult = {
     nom_complet: string
-    // That of the unité légale — A: active, C: cessée.
+    // Of the unité légale. A: active, C: cessée.
     etat_administratif: 'A' | 'C'
     date_fermeture: string | null
     siege: Etablissement
@@ -35,8 +32,7 @@ type SearchResult = {
 
 type SearchResponse = {
     results: SearchResult[]
-    // Documented as always sent. Should it ever be missing, the results given
-    // back are all there is to count, rather than a « NaN » shown as the total.
+    // Documented as always sent; guarded so the total is never NaN.
     total_results?: number
 }
 

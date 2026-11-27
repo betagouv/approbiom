@@ -1,5 +1,4 @@
-// Lowercase words without accents, separated by single spaces: punctuation
-// counts as a separator, so « SAS DUPONT & FILS » reads « sas dupont fils ».
+// « SAS DUPONT & FILS » → « sas dupont fils »
 export function normalizeWords(value: string): string {
     return value
         .normalize('NFD')
@@ -13,8 +12,7 @@ function containsWords(text: string, words: string): boolean {
     return words !== '' && ` ${text} `.includes(` ${words} `)
 }
 
-// The item whose label appears as whole words in the text. When several do,
-// the longest label is the most specific one.
+// When several labels match, the longest one wins.
 export function findMostSpecificInText<T>(
     text: string,
     items: readonly T[],

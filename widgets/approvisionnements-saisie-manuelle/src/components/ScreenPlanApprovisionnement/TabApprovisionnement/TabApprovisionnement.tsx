@@ -83,8 +83,7 @@ const DATA_COLUMNS: readonly Column<ApprovisionnementRow>[] = [
     },
 ]
 
-// What a screen reader hears after an action: the buttons of every row read
-// the same otherwise.
+// Announced after an action: otherwise every row's buttons read the same.
 const describe = ({
     fournisseur,
     ressource,

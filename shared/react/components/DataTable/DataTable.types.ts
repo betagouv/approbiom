@@ -4,20 +4,15 @@ export type Column<T> = {
     id: string
     header: ReactNode
     render: (row: T) => ReactNode
-    // Providing this is what puts a sort button in the column's header. It
-    // returns what rows are ordered by, which is not what `render` returns: a
-    // cell may hold a formatted string or an element, and neither sorts.
+    // Makes the column sortable, on this value rather than what `render` shows.
     sortBy?: (row: T) => string | number
 }
 
 export type SortDirection = 'ascending' | 'descending'
 
 export type ExpandableRows<T> = {
-    // Cells of this column become the toggle: they are what the reader clicks,
-    // so it should be the column that names the row.
+    // Cells of this column become the toggle.
     columnId: string
-    // Rendered in a full-width row under the one that was opened. Reached from
-    // the toggle through `aria-controls`, so it stays in the DOM while closed.
     render: (row: T) => ReactNode
 }
 
@@ -35,21 +30,11 @@ export type DataTableProps<T> = {
     onSelectionChange?: (rows: T[]) => void
     selectionLabel?: (row: T) => string
 
-    // Secondary line under the caption, in DSFR's own caption description slot.
-    // It is read out as part of the table's accessible name, like the caption
-    // itself, so one sentence is the right length.
+    // Part of the table's accessible name: keep it to one sentence.
     description?: string
-    // Counts what is on screen — `rows.length`, after whatever the caller
-    // filtered out — not the size of the data it came from. Off by default so
-    // it never appears on a table that was not asked to show it.
+    // Counts `rows.length`, i.e. after the caller's filtering.
     showResultCount?: boolean
-    // Controls that act on the rows — a search field, say — drawn on the title
-    // line, between the title and the result count, rather than on a line of
-    // their own above the table. They stay on screen under `hideCaption`, on a
-    // line of their own: a control that can take the focus is never hidden.
+    // Drawn on the title line; stays visible, on its own line, under `hideCaption`.
     headerActions?: ReactNode
-    // Opens a detail row under the one that was clicked. Which rows are open is
-    // the table's own business — nothing outside it acts on that — so unlike
-    // the selection it is not reported back.
     expandable?: ExpandableRows<T>
 }

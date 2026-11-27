@@ -38,11 +38,9 @@ export type VerificationProps = Referentiels & {
     attachment: Attachment
     lines: readonly ExtractedApprovisionnement[]
     date: Date
-    // True when the user resumes the verification of a document extracted
-    // before (« Reprendre la vérification »): the lines are read back from the
-    // table of extracted lines, with their controle and their corrections, and
-    // `date` is the date of that earlier extraction. False right after a new
-    // extraction (« Extraire les données », « Relancer l'extraction »).
+    // « Reprendre la vérification »: lines are read back with their
+    // corrections and `date` is the earlier extraction's. False right after a
+    // new extraction.
     resumed: boolean
     pays: readonly Pays[]
     getAttachmentUrl: (id: Attachment['id']) => Promise<string>

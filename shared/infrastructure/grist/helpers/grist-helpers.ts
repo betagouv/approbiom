@@ -6,11 +6,7 @@ export type GristCells = Record<string, CellValue>
 
 export type ColumnMajorTable = Record<string, unknown[]>
 
-/**
- * Pivots Grist's column-major table (one array per column) into one plain object
- * per row. Every column present in `columns` lands in every row, so filter the
- * columns upstream (see `fetchRows`) to keep only the ones you want.
- */
+/** Pivots Grist's column-major table (one array per column) into one object per row. */
 export function toRows(columns: ColumnMajorTable): GristRow[] {
     const colIds = Object.keys(columns)
 
@@ -24,21 +20,9 @@ export function toRows(columns: ColumnMajorTable): GristRow[] {
 }
 
 /**
- * Fetches a Grist table and returns it row by row, keeping only the requested
- * columns.
- *
- * @param tableId   ID of the Grist table to fetch.
- * @param columnIds Columns to keep. When omitted, every column is returned and
- *                  nothing is validated.
- * @throws If a requested column is absent from the fetched table.
- *
- * @remark The Grist Plugin API (`grist.docApi.fetchTable`) always returns every
- * column of the table and offers no way to request a subset, so we filter here,
- * before pivoting. This is also the only place we can catch schema drift: the
- * generated types are erased at build time, so if a requested column has been
- * renamed or removed in the document we throw instead of silently returning rows
- * with a missing key. Columns we did not ask for are ignored, whatever happened
- * to them.
+ * `grist.docApi.fetchTable` always returns every column, so we filter here.
+ * Throws if a requested column is missing: the only place schema drift can be caught.
+ * Without `columnIds`, every column is returned unchecked.
  */
 export async function fetchRows(
     tableId: string,
@@ -82,14 +66,7 @@ function selectRows(
 
 const inFlight = new Map<string, Promise<ColumnMajorTable>>()
 
-/**
- * `fetchRows`, minus the reads a single load duplicates.
- *
- * @remark Shared by table, not by columns: Grist sends every column whatever
- * is asked for, so two adapters reading different columns of one table still
- * need one fetch. Each then keeps, and checks, only its own columns — a column
- * one of them needs and the document lacks fails that adapter alone.
- */
+/** `fetchRows` deduplicating concurrent reads of the same table (Grist sends every column anyway). */
 export async function fetchRowsOnce(
     tableId: string,
     columnIds: readonly string[]
@@ -105,10 +82,7 @@ export async function fetchRowsOnce(
     return selectRows(tableId, await reading, columnIds)
 }
 
-/**
- * @remark The Grist Plugin API offers no way to read a single record, so we
- * fetch the table and search it here.
- */
+/** The Grist Plugin API cannot read a single record: fetch the whole table. */
 export async function fetchRow(
     tableId: string,
     rowId: number
@@ -194,11 +168,7 @@ export const asDate = (value: unknown): Date | null =>
 export const asBoolean = (value: unknown): boolean =>
     value === true || value === 1
 
-/**
- * A cell holding several rowIds — a Reference List, an Attachments column —
- * arrives as the list marker followed by the ids. An empty cell is null rather
- * than an empty list, and reads here as no id at all.
- */
+/** Reference List / Attachments cells arrive as ['L', ...ids]; an empty cell is null. */
 export const asIdList = (value: unknown): number[] =>
     Array.isArray(value) && value[0] === 'L'
         ? value.slice(1).filter((id): id is number => typeof id === 'number')
@@ -224,7 +194,6 @@ export function byRowId(rows: readonly GristRow[]): Map<number, GristRow> {
     return indexByKey(rows, (row) => asNumber(row.id) ?? null)
 }
 
-/** Indexes rows by a text column */
 export function byColumn(
     rows: readonly GristRow[],
     column: string

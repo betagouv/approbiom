@@ -1,7 +1,4 @@
-// DSFR's « modale ». The stylesheet is DSFR's; its script is not loaded in a
-// Grist widget, so what it does is done here: focus trapping and restoring,
-// Escape and overlay clicks, and freezing the page behind.
-//
+// DSFR's script is not loaded in a Grist widget, so its modal behaviour is done here.
 // https://www.systeme-de-design.gouv.fr/version-courante/fr/composants/modale
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import '@gouvfr/dsfr/dist/component/modal/modal.main.min.css'
@@ -10,7 +7,6 @@ import './Modal.css'
 import { useEffect, useId, useRef } from 'react'
 import type { ModalProps, ModalSize } from './Modal.types'
 
-// The grid columns DSFR uses for each size.
 const COLUMNS: Record<ModalSize, string> = {
     sm: 'fr-col-12 fr-col-md-6 fr-col-lg-4',
     md: 'fr-col-12 fr-col-md-8 fr-col-lg-6',
@@ -20,8 +16,8 @@ const COLUMNS: Record<ModalSize, string> = {
 const FOCUSABLE =
     'button:not([disabled]), [href], input:not([disabled]), select:not([disabled]), textarea:not([disabled]), [tabindex]:not([tabindex="-1"])'
 
-// Freezes the page behind, the way the DSFR script does: `data-fr-scrolling`
-// fixes the body, which is moved up so the page does not jump to its top.
+// As the DSFR script does: `data-fr-scrolling` fixes the body, moved up so the
+// page does not jump to its top.
 function freezePage(): () => void {
     const root = document.documentElement
     const scrollY = window.scrollY
@@ -60,13 +56,11 @@ export default function Modal({
         const dialog = dialogRef.current
         if (!open || !dialog) return
 
-        // Where the focus goes back to: the button that opened the modal.
         const opener =
             document.activeElement instanceof HTMLElement
                 ? document.activeElement
                 : null
 
-        // `showModal` traps the focus inside the modal.
         if (typeof dialog.showModal === 'function') dialog.showModal()
         else dialog.setAttribute('open', '')
 
@@ -104,8 +98,7 @@ export default function Modal({
                 event.preventDefault()
                 onClose()
             }}
-            // The overlay is the dialog itself: the containers inside let
-            // clicks through, only the body catches them.
+            // The overlay is the dialog itself; only the body inside catches clicks.
             onClick={(event) => {
                 if (event.target === event.currentTarget) onClose()
             }}

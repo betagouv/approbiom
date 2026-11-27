@@ -132,8 +132,6 @@ describe('listPlans', () => {
         expect(plans).toEqual([{ id: 1 }, { id: 2 }])
     })
 
-    // Checked by the compiler: the call below is an error, since the appels
-    // need the demandes and the programmes.
     it('asks for the ports the fields need', async () => {
         const { ports } = fakePorts()
 

@@ -20,8 +20,6 @@ describe('useAsyncState', () => {
     })
 
     it('leaves the data on screen while a refresh is in flight', async () => {
-        // A write is confirmed by the screen showing what was stored, so it
-        // must not empty and load back in between.
         let arrive: (value: string) => void = () => {}
         const load = vi
             .fn()
@@ -48,7 +46,6 @@ describe('useAsyncState', () => {
     })
 
     it('starts over from nothing on a retry', async () => {
-        // A retry follows a failure, so there is nothing worth keeping.
         const load = vi.fn().mockResolvedValue('En attente')
 
         const { result } = renderHook(() => useAsyncState(load))

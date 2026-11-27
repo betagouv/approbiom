@@ -14,8 +14,7 @@ import {
 import type { ProvenanceRepartition } from '@shared/core/domain/value-objects/extracted-approvisionnement-provenance-repartition'
 import { formatNumber } from '@shared/react/format'
 
-// A Select value has to be compared with ===, so a provenance is carried as
-// one string: its source, then its département code or country name.
+// Select values are compared with ===, hence a single string key.
 function keyOf({ source, provenance }: ProvenanceRepartition): string | null {
     return provenance === '' ? null : `${source}|${provenance}`
 }

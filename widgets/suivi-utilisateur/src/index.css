@@ -1,4 +1,3 @@
-/* The figure is what the tile is for: larger than its own title. */
 .indicateur .indicateur__valeur {
     font-size: 2rem;
     font-weight: 700;
@@ -6,11 +5,8 @@
     color: var(--text-title-grey);
 }
 
-/* Same bar as the Synthèse tab of approvisionnements-saisie-manuelle. The
-   tile centres its content in a flex column, where a box with nothing of its
-   own to show shrinks to nothing: the width is set rather than left to it.
-   The tile also places its parts by `order`, the figure being 3: the bar takes
-   the same, so that it follows the figure rather than going first. */
+/* An empty box shrinks to nothing in the tile's centred flex column, hence
+   the width. The tile orders its parts, the figure is 3: same to follow it. */
 .indicateur__barre {
     display: flex;
     order: 3;
@@ -28,8 +24,6 @@
     color: var(--text-mention-grey);
 }
 
-/* One frame, the figure of the week on one side and the weeks on the other:
-   side by side from the DSFR's md breakpoint, one above the other below. */
 .cadre-semaine {
     display: grid;
     grid-template-columns: 1fr;
@@ -69,8 +63,6 @@
     color: var(--text-mention-grey);
 }
 
-/* Weeks pile up as the tracking goes on: past a few months the bars scroll
-   rather than shrink to nothing. */
 .graphique__defilement {
     overflow-x: auto;
 }
@@ -90,8 +82,6 @@
     padding: 0;
 }
 
-/* The column's bottom border is the axis: it runs on unbroken from one week
-   to the next. */
 .graphique__colonne {
     display: flex;
     flex-direction: column;
@@ -102,8 +92,7 @@
     border-bottom: 1px solid var(--border-plain-grey);
 }
 
-/* Its line is set, and left out of the scale below: the tallest bar fills
-   what is left of the column, and the others keep their proportion. */
+/* Fixed line height, left out of the bars' scale. */
 .graphique__valeur {
     font-size: 0.875rem;
     font-weight: 700;

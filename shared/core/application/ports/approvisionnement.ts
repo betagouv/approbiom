@@ -6,7 +6,7 @@ export type ApprovisionnementGroupedByPlanAndRessource = Pick<
     Approvisionnement,
     'planDApprovisionnement' | 'ressource' | 'tonnageTotal'
 > & {
-    /** between 0 and 1. */
+    /** Between 0 and 1. */
     repartition: number
 }
 

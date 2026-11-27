@@ -10,17 +10,15 @@ type GraphiqueSemainesProps = {
 }
 
 /**
- * One bar per week, as tall as the users active in it. The bars are only
- * there to be seen: a table hidden from sight gives the same figures to
- * screen readers.
+ * The bars are decorative: a visually hidden table gives screen readers the
+ * figures.
  */
 export default function GraphiqueSemaines({
     semaines,
 }: GraphiqueSemainesProps) {
     const defilement = useRef<HTMLDivElement>(null)
 
-    // Once the weeks no longer fit, the chart opens on the latest ones: the
-    // week under way, the one the figure beside it speaks of, is in view.
+    // When the weeks overflow, open scrolled to the latest ones.
     useLayoutEffect(() => {
         const element = defilement.current
         if (element) element.scrollLeft = element.scrollWidth
@@ -44,9 +42,8 @@ export default function GraphiqueSemaines({
                     >
                         Nombre d’utilisateurs
                     </p>
-                    {/* Outside the hidden part, so that a keyboard can reach
-                        and scroll it, and that the focus never lands on
-                        something screen readers are told is not there. */}
+                    {/* Outside the aria-hidden part, so the keyboard can scroll
+                        it. */}
                     <div
                         ref={defilement}
                         className="graphique__defilement"
@@ -66,9 +63,8 @@ export default function GraphiqueSemaines({
                                         </span>
                                         <span
                                             className="graphique__barre"
-                                            // The share of the tallest bar;
-                                            // the stylesheet turns it into a
-                                            // height.
+                                            // Share of the tallest bar; CSS
+                                            // turns it into a height.
                                             style={
                                                 {
                                                     '--part':

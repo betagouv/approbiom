@@ -7,7 +7,6 @@ import App from './App'
 
 afterEach(cleanup)
 
-/** The fake ports, but with a plans read that fails with `error`. */
 const portsFailingWith = (error: Error): Ports => ({
     ...FAKE_PORTS,
     plans: { list: () => Promise.reject(error) },

@@ -1,59 +1,26 @@
-/* CSS lives next to its component: DataTable.tsx imports this file directly,
-   so the styles follow the component into whichever widget uses it.
-
-   Only one rule is needed. The sticky selection column is not implemented here:
-   `fr-cell--fixed` is DSFR's own class and already carries `position: sticky`,
-   `left: 0` and a z-index, and DSFR paints every cell opaque
-   (`--background-default-grey` on `td`, `--background-alt-grey` on `thead th`)
-   so scrolled content cannot show through. The blue outline of a selected row
-   comes from DSFR too, keyed on `tr[aria-selected=true]`, borders between
-   adjacent selected rows included. */
-
 .fr-table__content table tbody tr.shared-data-table__row--selected > * {
     --hover: var(--background-contrast-blue-france-hover);
     --active: var(--background-contrast-blue-france-active);
     background-color: var(--background-contrast-blue-france);
 }
 
-/* DSFR's bordered variant draws a bottom + right rule on every cell, so the
-   inner grid and the table's right and bottom edges are there, but its top and
-   left edges are left open. Those cell rules are background-gradients, not real
-   borders, so a real border on the collapsed table closes the frame with nothing
-   to collide with — in the body grid's own colour so all four edges match. */
+/* DSFR's bordered variant leaves the table's top and left edges open (its cell
+   rules are background gradients, so a real border does not collide). */
 .fr-table--bordered .fr-table__content table {
     border-top: 1px solid var(--border-contrast-grey);
     border-left: 1px solid var(--border-contrast-grey);
 }
 
-/* The header row, kept in place while the rows scroll under it. DSFR has no
-   class for this, but it has the vertical half of it: `fr-cell--fixed` sticks a
-   column with `position: sticky; left: 0`. This is the same mechanism turned the
-   other way, and it works here for two reasons that are DSFR's doing —
-   `fr-table__container` is already the scrolling box (`overflow: auto`), and
-   header cells are already painted opaque (`--background-alt-grey`), so rows
-   pass behind them rather than through them.
-
-   The usual trap does not apply either: `position: sticky` on a `<th>` is
-   unreliable under `border-collapse: collapse`, which the table does use — but
-   DSFR draws its rules as `background-image` gradients rather than borders, so
-   there are none to lose.
-
-   This does nothing on a table that is not itself bounded in height: sticky
-   needs something to scroll against. Giving it that is the page's business. */
+/* Only takes effect when the page bounds the table's height. */
 .shared-data-table--sticky-header .fr-table__content thead th {
     position: sticky;
     top: 0;
-    /* Above `fr-cell--fixed`, which DSFR puts at 1: without this, scrolling
-       sideways slides the frozen selection column over the header. */
+    /* Above `fr-cell--fixed` (z-index 1), or the frozen column slides over the header. */
     z-index: 2;
 }
 
-/* WCAG 2.4.11: a stuck header must not end up covering whatever has just taken
-   focus. Tabbing into a row near the bottom scrolls it into view, and without a
-   margin the browser is free to stop with the row tucked under the header.
-
-   The height is a variable because only the caller knows it — headers that wrap
-   onto two lines are taller than the default assumed here. */
+/* WCAG 2.4.11: the stuck header must not cover the focused element. Callers
+   with wrapping headers override the height. */
 .shared-data-table--sticky-header {
     --shared-data-table-header-height: 3.5rem;
 }
@@ -65,9 +32,7 @@
     scroll-margin-top: var(--shared-data-table-header-height);
 }
 
-/* The header block sits outside `fr-table__wrapper`, so it no longer inherits
-   DSFR's `caption` typography — restated here, from the same rules, so moving it
-   out of the table changed where it lives and not how it reads. */
+/* Outside `fr-table__wrapper`, so DSFR's `caption` typography is restated here. */
 .fr-table .shared-data-table__header {
     margin-bottom: 1rem;
 }
@@ -82,9 +47,6 @@
     line-height: 2rem;
 }
 
-/* Pushed against the count, so the title keeps the left of the line and the
-   controls sit with the count that answers them. Back to body text: the title
-   line's heading typography is not theirs. */
 .fr-table .shared-data-table__header-actions {
     flex: 0 1 28rem;
     font-size: 1rem;
@@ -94,17 +56,13 @@
     min-width: 0;
 }
 
-/* With the title hidden the controls stand alone above the table, still at the
-   right-hand end of the line. `flex: none` drops the 28rem basis the title-line
-   rule gives them, which would turn into a height in a column-flex table. */
+/* `flex: none`: the 28rem basis would become a height in the column-flex table. */
 .fr-table > .shared-data-table__header-actions {
     flex: none;
     margin-bottom: 1rem;
     max-width: 28rem;
 }
 
-/* `flex-shrink: 0` keeps "169 résultats" on one line when a long title competes
-   for the width. */
 .fr-table .shared-data-table__result-count {
     color: var(--text-mention-grey);
     flex-shrink: 0;
@@ -121,9 +79,6 @@
     margin: 0.5rem 0 0;
 }
 
-/* The disclosure sits inside a cell and has to keep reading as cell text, so it
-   is a button stripped back to its own content: the semantics are what matter
-   (`aria-expanded`, keyboard operability), not the default button chrome. */
 .shared-data-table__disclosure {
     align-items: center;
     background: none;
@@ -143,14 +98,12 @@
     transition: transform 0.2s;
 }
 
-/* Points down once open, the usual way a disclosure says so without words. */
 .shared-data-table__disclosure[aria-expanded='true']
     .shared-data-table__disclosure-icon {
     transform: rotate(90deg);
 }
 
-/* `[hidden]` alone is only `display: none` at user-agent weight, which any rule
-   setting `display: table-row` would outrank. Stated here so it cannot lose. */
+/* `[hidden]` is only user-agent weight: any `display: table-row` would outrank it. */
 .fr-table__content table tbody tr.shared-data-table__detail[hidden] {
     display: none;
 }

@@ -3,8 +3,6 @@ import type { Ref } from 'react'
 export type ComboboxOption<T> = {
     // Matched by identity against `value`, like `SelectOption`.
     value: T
-    // Visible text of the option, what the search runs on, and what the field
-    // shows once the option is chosen.
     label: string
 }
 
@@ -13,8 +11,8 @@ export type ComboboxMessage = {
     text: string
 }
 
-// A last line under the options, for what the list does not hold yet — « Ajouter
-// un fournisseur ». Both functions get what is typed, trimmed.
+// A last line under the options, e.g. « Ajouter un fournisseur ». Both
+// functions get the typed text, trimmed.
 export type ComboboxAction = {
     label: (query: string) => string
     onActivate: (query: string) => void
@@ -28,20 +26,16 @@ export type ComboboxHandle = {
 
 export type ComboboxProps<T> = {
     label: string
-    // Help under the label, part of the field's accessible name.
     hint?: string
-    // In the order they are listed.
     options: readonly ComboboxOption<T>[]
-    // Controlled, like `Select`: `null` while nothing is chosen.
+    // `null` while nothing is chosen.
     value: T | null
     // Called with the chosen option's value, and with `null` when the choice is
     // undone: typing over it, or clearing the field.
     onChange: (value: T | null) => void
     placeholder?: string
     action?: ComboboxAction
-    // Shown under the field. The component's own message, for a text left in
-    // the field without choosing, comes first.
+    // The component's own message, for a text left without choosing, takes precedence.
     message?: ComboboxMessage
-    // To put the focus back in the field from outside.
     ref?: Ref<ComboboxHandle>
 }

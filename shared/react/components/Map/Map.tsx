@@ -11,32 +11,16 @@ import shadowUrl from 'leaflet/dist/images/marker-shadow.png'
 import './Map.css'
 
 export type MapProps = {
-    /**
-     * position of the center of the map
-     */
     center: LatLngExpression
-    /**
-     * position of markers if provided
-     */
     markers?: LatLngExpression[]
-    /**
-     * polygons' configuration
-     */
     polygons?: {
         latlngs:
             LatLngExpression[] | LatLngExpression[][] | LatLngExpression[][][]
         options?: PolylineOptions
     }[]
-    /**
-     * zoom level, from 0 (the whole world) to 19 (a street). A commune sits at
-     * 13, a département at 9. Ignored when `bounds` is given.
-     */
+    /** 0 (whole world) to 19 (a street): commune 13, département 9. Ignored with `bounds`. */
     zoom?: number
-    /**
-     * the area the view is fitted to, taking `center` and `zoom` over when it
-     * is given: a set of shapes spread over a country has no single zoom that
-     * shows all of them.
-     */
+    /** Takes precedence over `center` and `zoom`. */
     bounds?: LatLngBoundsExpression
 }
 

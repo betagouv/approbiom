@@ -4,8 +4,7 @@ import {
     annuaireSearchUrl,
 } from './annuaire-entreprises'
 
-// Addresses the Annuaire des Entreprises itself redirects to, read from the
-// site for entreprises of the Entreprise table.
+// Expected addresses were read from the Annuaire's own redirects.
 describe('annuaireEntrepriseUrl', () => {
     it.each([
         [

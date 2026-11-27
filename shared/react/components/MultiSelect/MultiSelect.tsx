@@ -1,7 +1,4 @@
-// DSFR 1.14.4 ships no "liste déroulante riche", so the UI is composed out of
-// the primitives it does ship: `fr-label`/`fr-hint-text` for the libellé,
-// `fr-select` for the box that opens the list, `fr-btn` for the select-all,
-// `fr-fieldset` for the legend, `fr-checkbox-group` for the options.
+// DSFR 1.14.4 ships no « liste déroulante riche »: composed from its primitives.
 import '@gouvfr/dsfr/dist/component/form/form.main.min.css'
 import '@gouvfr/dsfr/dist/component/select/select.main.min.css'
 import '@gouvfr/dsfr/dist/component/checkbox/checkbox.main.min.css'
@@ -64,9 +61,7 @@ export default function MultiSelect<T>({
     const [isOpen, setIsOpen] = useState(false)
     const [query, setQuery] = useState('')
 
-    // Wraps the control and the panel both, so "outside" is one containment
-    // test rather than two — and clicking the control itself never reaches the
-    // handler below, leaving its own toggle to do the closing.
+    // Contains the control too, so clicking it is left to its own toggle.
     const rootRef = useRef<HTMLDivElement>(null)
     const triggerRef = useRef<HTMLButtonElement>(null)
     const searchRef = useRef<HTMLInputElement>(null)
@@ -80,21 +75,15 @@ export default function MultiSelect<T>({
         setIsOpen(!isOpen)
     }
 
-    // Escape is the keyboard's half of dismissing the panel: the click-outside
-    // below is mouse and touch only, and without this a keyboard user would be
-    // left with a panel they cannot close over content they cannot see.
     function closeOnEscape(event: React.KeyboardEvent) {
         if (!isOpen || event.key !== 'Escape') return
 
         setIsOpen(false)
-        // Focus is inside the panel that is about to disappear, so it has to be
-        // put back somewhere deliberate — the control the user opened it from.
-        // Dropping it would send the user back to the top of the document.
+        // Focus is inside the panel about to be hidden.
         triggerRef.current?.focus()
     }
 
     useEffect(() => {
-        // Nothing to dismiss, so nothing to listen for.
         if (!isOpen) return
 
         function closeOnClickOutside(event: MouseEvent) {
@@ -102,14 +91,6 @@ export default function MultiSelect<T>({
                 setIsOpen(false)
         }
 
-        // The listener is on the document rather than on a backdrop element:
-        // a backdrop would swallow the click the user actually meant, so
-        // dismissing the panel would cost them an extra click on whatever they
-        // were aiming at.
-        //
-        // `mousedown` rather than `click` — the panel is positioned absolutely,
-        // so closing it reflows nothing and the target cannot move out from
-        // under the cursor between press and release.
         document.addEventListener('mousedown', closeOnClickOutside)
 
         return () => {
@@ -117,22 +98,19 @@ export default function MultiSelect<T>({
         }
     }, [isOpen])
 
-    // Selection is controlled: this is a read of the prop, never state.
     const selected = new Set(selectedValues)
 
     const allOptions = options.flatMap((item) =>
         isGroup(item) ? item.options : [item]
     )
 
-    // What the panel shows. `allOptions` above stays the whole list: it is what
-    // the selection is read from and reported in the order of.
+    // `allOptions` stays the whole list: the selection is read and ordered from it.
     const shownItems = searchable ? searchItems(options, query) : options
     const shownOptions = shownItems.flatMap((item) =>
         isGroup(item) ? item.options : [item]
     )
 
-    // Typing leaves the focus in the field, so the list changing under it is
-    // only heard through this. Empty until something is searched.
+    // Empty until something is searched.
     const searchStatus =
         query.trim() === ''
             ? ''
@@ -154,9 +132,7 @@ export default function MultiSelect<T>({
     }
 
     function reportSelection(next: Set<T>) {
-        // Rebuilt from the list rather than appended to, so the caller always
-        // gets the selection in the list's own order. `selectedValues` itself
-        // is never touched, and the values are passed through by reference.
+        // Rebuilt from the list so the selection comes back in list order.
         onSelectionChange(
             allOptions
                 .filter((option) => next.has(option.value))
@@ -185,16 +161,11 @@ export default function MultiSelect<T>({
         reportSelection(next)
     }
 
-    // Read off the list rather than off `selectedValues`, so a value the caller
-    // kept around for an option that is no longer offered is not announced as
-    // selected. In list order, like everything else the component reports.
+    // Off the list, so a stale value for an option no longer offered is not announced.
     const selectedLabels = allOptions
         .filter((option) => selected.has(option.value))
         .map((option) => option.label)
 
-    // What the control says once collapsed: the selection itself, or an
-    // invitation to make one. The libellé sits above it and is pulled into the
-    // accessible name, so this only has to carry the options.
     const summary =
         selectedLabels.length === 0
             ? 'Sélectionner une option'
@@ -223,9 +194,7 @@ export default function MultiSelect<T>({
 
     function renderGroup(group: MultiSelectGroup<T>) {
         const groupId = `${id}-${group.id}`
-        // A search hands over the group with some of its options only. Their
-        // ids come from their place in the whole group, so an option keeps its
-        // own id — and React its own node — whatever the search leaves.
+        // Ids come from the place in the whole group, so they survive a search.
         const wholeGroup =
             options.find(
                 (item): item is MultiSelectGroup<T> =>
@@ -236,9 +205,7 @@ export default function MultiSelect<T>({
             selected.has(option.value)
         )
 
-        // The group's checkbox has no value of its own: it is a view of its
-        // options, and toggling it toggles them. That is why `selectedValues`
-        // only ever contains option values.
+        // The group checkbox has no value: `selectedValues` only holds option values.
         return (
             <div key={group.id} className="shared-multi-select__group">
                 <div className="fr-checkbox-group fr-checkbox-group--sm">
@@ -246,10 +213,8 @@ export default function MultiSelect<T>({
                         type="checkbox"
                         id={groupId}
                         checked={allSelected}
-                        // Nothing to toggle, so the control has nothing to say.
                         disabled={selectableIn(group.options).length === 0}
-                        // `indeterminate` is a DOM property with no HTML
-                        // attribute, so it can only be set on the node itself.
+                        // `indeterminate` has no HTML attribute.
                         ref={(input) => {
                             if (input)
                                 input.indeterminate =
@@ -268,11 +233,6 @@ export default function MultiSelect<T>({
                         )}
                     </label>
                 </div>
-                {/* Indented by CSS rather than by nesting a list inside the
-                    label's own box: the options are siblings of the group
-                    checkbox in the accessibility tree, which is what a screen
-                    reader should hear — the group checkbox is a shortcut, not
-                    a parent node. */}
                 <div className="shared-multi-select__group-options">
                     {group.options.map((option) =>
                         renderOption(
@@ -288,20 +248,13 @@ export default function MultiSelect<T>({
     const allSelected = isAllSelected(shownOptions)
 
     return (
-        // The handler sits on the wrapper rather than on the document: Escape
-        // should only dismiss the panel when the focus is actually inside this
-        // component, and a keydown reaches here by bubbling from wherever that
-        // focus is — the control or any option.
         <div
             className="fr-select-group shared-multi-select"
             ref={rootRef}
             onKeyDown={closeOnEscape}
         >
-            {/* `htmlFor` on a `<button>` is valid — a button is a labelable
-                element — so clicking the libellé focuses the control. The
-                accessible name is spelled out with `aria-labelledby` all the
-                same: a button takes its name from its own content first, and
-                on its own it would only announce the selection. */}
+            {/* `aria-labelledby`: the button's own content (the selection)
+                would otherwise name it. */}
             <label className="fr-label" htmlFor={triggerId}>
                 <span id={labelId}>{label}</span>
                 {description && (
@@ -317,17 +270,13 @@ export default function MultiSelect<T>({
                 className="fr-select shared-multi-select__trigger"
                 aria-labelledby={`${labelId} ${triggerId}`}
                 aria-describedby={description ? descriptionId : undefined}
-                // The pair a screen reader needs to announce a disclosure: what
-                // it opens, and whether it is open.
                 aria-expanded={isOpen}
                 aria-controls={panelId}
                 onClick={toggleOpen}
             >
                 {summary}
             </button>
-            {/* `hidden` rather than unmounting: it takes the panel out of the
-                tab order and out of the accessibility tree just the same, and
-                it keeps `aria-controls` pointing at an element that exists. */}
+            {/* `hidden` rather than unmounting, so `aria-controls` resolves. */}
             <div
                 className="shared-multi-select__panel"
                 id={panelId}
@@ -335,8 +284,6 @@ export default function MultiSelect<T>({
             >
                 {searchable && (
                     <>
-                        {/* Visually hidden: the placeholder says the same on
-                            screen, but goes away as soon as one types. */}
                         <label
                             className="fr-label fr-sr-only"
                             htmlFor={searchId}
@@ -372,15 +319,9 @@ export default function MultiSelect<T>({
                 )}
                 <fieldset
                     className="fr-fieldset"
-                    // A group of checkboxes needs a name. The legend is it when
-                    // there is one; otherwise the label of the control that
-                    // opened the list already says what is being chosen.
                     aria-label={legend ? undefined : label}
                 >
                     {legend && (
-                        // `fr-sr-only` is DSFR's own visually-hidden utility,
-                        // in `core`: it keeps the legend as the accessible name
-                        // of the group while taking it off the screen.
                         <legend
                             className={`fr-fieldset__legend ${
                                 hideLegend ? 'fr-sr-only' : ''
@@ -398,10 +339,8 @@ export default function MultiSelect<T>({
                                       `option-${options.indexOf(item)}`
                                   )
                         )}
-                        {/* Mounted for as long as the field is, so screen
-                            readers already watch it when its text changes.
-                            Heard only, but for « Aucun résultat », which is
-                            also all the list has left to show. */}
+                        {/* Mounted with the field, so screen readers already
+                            watch it when it changes. */}
                         {searchable && (
                             <p
                                 role="status"

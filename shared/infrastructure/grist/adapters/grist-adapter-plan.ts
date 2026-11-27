@@ -29,8 +29,6 @@ export function createGristPlanPort(): PlanPort {
         async list<F extends keyof Plan = keyof Plan>(fields?: readonly F[]) {
             await gristReady()
 
-            // With none asked for, `F` is every field: the default and the
-            // type say the same.
             const wanted = (fields ?? EVERY_FIELD) as readonly F[]
 
             const rows = await fetchRowsOnce(
@@ -38,8 +36,7 @@ export function createGristPlanPort(): PlanPort {
                 wanted.map((field) => PLAN_COLUMN_BY_FIELD[field])
             )
 
-            // Built field by field, which TypeScript cannot follow back to
-            // the `Pick` it adds up to.
+            // TypeScript cannot follow a field-by-field build back to the `Pick`.
             return rows.map(
                 (row) =>
                     Object.fromEntries(

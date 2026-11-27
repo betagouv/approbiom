@@ -40,9 +40,8 @@ export type PlanConcurrence = {
 }
 
 /**
- * One line of the concurrence table: a (plan, ressource) total with everything
- * it is read by already resolved, and the approvisionnements behind it kept so
- * the screen can narrow on provenance and fournisseur at once.
+ * A (plan, ressource) total, with its approvisionnements kept for filtering by
+ * provenance and fournisseur.
  */
 export type ConcurrenceRow = {
     plan: PlanConcurrence
@@ -57,7 +56,6 @@ export type ConcurrenceScreen = {
     fournisseurs: readonly Entreprise[]
 }
 
-/** The pair every aggregate is keyed by, as a Map key. */
 const pairKey = (plan: number, ressource: string) => `${plan}:${ressource}`
 
 export async function loadConcurrence(
@@ -87,8 +85,6 @@ export async function loadConcurrence(
     )
     const titleByCode = new Map(ressources.map((r) => [r.code, r.title]))
 
-    // The référentiel doubles as the département directory, so a code coming off
-    // a commune can be named without a further read.
     const libelleByDep = new Map(
         departementsByRegion.flatMap(({ departements }) =>
             departements.map((d) => [d.dep, d.libelle] as const)

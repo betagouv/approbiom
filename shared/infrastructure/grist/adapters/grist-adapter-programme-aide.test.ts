@@ -2,8 +2,7 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnMajorTable } from '../helpers/grist-helpers'
 import { createGristProgrammeAidePort } from './grist-adapter-programme-aide'
 
-// `Annee` is a Date column: Grist hands it over as the seconds of the 1st of
-// January of that year, at midnight UTC.
+// `Annee` is a Date column: seconds of 1 January of that year, midnight UTC.
 const PROG_AIDES: ColumnMajorTable = {
     id: [1, 2],
     Annee: [1735689600, null],

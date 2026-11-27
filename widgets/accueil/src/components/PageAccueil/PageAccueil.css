@@ -5,10 +5,8 @@
     gap: 1.5rem;
     padding: 2rem;
 
-    /* Exactly the panel's height, not at least: the table below takes what the
-       title and the filters leave and scrolls inside it, so its sideways
-       scrollbar sits at the bottom of the panel rather than under the last row,
-       out of reach. */
+    /* Not min-height: keeps the table's sideways scrollbar at the bottom of the
+       panel. */
     height: 100vh;
 }
 
@@ -24,18 +22,13 @@
     gap: 1rem;
 }
 
-/* As wide as its libellé or its selection, whichever is longer, and no wider:
-   the filters take the least room they can. The cap keeps a long selection from
-   stretching one filter across the row — past it the text ends in an ellipsis,
-   and the full selection is still there in the panel. */
+/* The cap keeps a long selection from stretching one filter across the row. */
 .accueil__filter {
     flex: 0 0 auto;
     max-width: 17rem;
 }
 
-/* The panel would otherwise be exactly as narrow as its control, wrapping every
-   option of a short-labelled filter. It is let out to fit its options instead,
-   never narrower than the control it opens from. */
+/* Otherwise the panel is as narrow as its control, wrapping every option. */
 .accueil__filter .shared-multi-select__panel {
     right: auto;
     width: max-content;
@@ -47,20 +40,15 @@
     margin-bottom: 0;
 }
 
-/* The table fills the rest of the panel and scrolls inside it, both ways — the
-   same frame as the Concurrence widget. The floor keeps a short panel, or one
-   whose filters wrap onto several lines, from squeezing it down to a strip:
-   past it the page scrolls instead. */
+/* min-height keeps the table from being squeezed to a strip: past it the page
+   scrolls. */
 .accueil__table {
     flex: 1;
     min-height: 20rem;
 }
 
-/* DSFR's own margins are dropped so the flex `gap` above is the only spacing
-   between the filters and the table. Each box down to `fr-table__container` —
-   which DSFR already makes the scrolling box (`overflow: auto`) — is a flex
-   column handing its height on, so the container is bounded and its scrollbars
-   stay in view. */
+/* Each box down to `fr-table__container` (DSFR's scrolling box) hands its
+   height on, so the container is bounded and its scrollbars stay in view. */
 .accueil__table .fr-table {
     display: flex;
     flex-direction: column;

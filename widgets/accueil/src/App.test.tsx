@@ -30,9 +30,7 @@ const rows =
 
 const planPort = (list: PlanPort['list']): PlanPort => ({ list })
 
-// These tests read the accueil; none of them takes a path that writes. A write
-// reaching the port is the test having gone somewhere it did not mean to, so it
-// is refused rather than quietly answered.
+// No test here writes: a write reaching the port fails loudly.
 const instructionPort = (
     list: InstructionPort['list'] = rows([])
 ): InstructionPort => ({
@@ -98,8 +96,8 @@ const saintJunien: Plan = {
     createdAt: null,
 }
 
-// 87154 is Saint-Junien's commune code. The « 87 » the header's « Région » is
-// followed from is read out of it, not stored on the plan.
+// 87154 is Saint-Junien's commune code; the header's département 87 is derived
+// from it.
 const saintJunienInstallation: Installation = {
     id: 1,
     nom: 'Chaufferie du Moulin',
@@ -143,8 +141,7 @@ const nouvelleAquitaine: Instruction = {
 }
 
 /**
- * The plans, each at an installation of its own under the given name: the
- * table shows the installation's name, so that is what a row is found by.
+ * Each plan at its own installation: rows are found by the installation's name.
  */
 function withInstallations(
     ...entries: [plan: Plan, nom: string, commune?: string][]
@@ -375,8 +372,6 @@ describe('App', () => {
         expect(noms).toEqual(['Chaufferie du Moulin', '—'])
     })
 
-    // Two plans of one installation read the same on screen; the button is
-    // what tells them apart for a screen reader.
     it('names each « Voir le plan » button after its plan', async () => {
         render(
             <App
@@ -540,8 +535,7 @@ describe('App', () => {
 
         await openPlan()
 
-        // The « : » after the term is drawn by the stylesheet, so the text
-        // here is the term on its own.
+        // The stylesheet draws the « : » after each term.
         expect(
             screen.getAllByRole('term').map((term) => term.textContent)
         ).toEqual(["Région de l'installation"])
@@ -551,8 +545,7 @@ describe('App', () => {
     })
 
     it('says as much when the région cannot be answered', async () => {
-        // No référentiel names the région of the plan's département. The line
-        // stays, so the header keeps its shape.
+        // No référentiel names the région of the plan's département.
         render(<App {...fakePorts({ plans: planPort(rows([saintJunien])) })} />)
 
         await openPlan()

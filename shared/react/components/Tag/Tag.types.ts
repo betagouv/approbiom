@@ -2,14 +2,9 @@ import type { ReactNode } from 'react'
 
 export type TagProps = {
     children: ReactNode
-    // One of DSFR's illustrative colours, by name — « green-emeraude »,
-    // « pink-tuile »… The component turns it into the class. Left out for the
-    // neutral grey tag, which is DSFR's own default.
-    //
-    // Every colour has to have a rule in Tag.css: one that does not is a tag
-    // that comes out grey without saying why.
+    // A DSFR illustrative colour (« green-emeraude »…); each needs a rule in
+    // Tag.css or it comes out grey.
     color?: string
-    // DSFR ships two sizes and `md` is the one it falls back to, so that is the
-    // default here too.
+    // Defaults to `md`.
     size?: 'sm' | 'md'
 }

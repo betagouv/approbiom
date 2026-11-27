@@ -28,8 +28,7 @@ const ENTREPRISES: FoundEntreprise[] = [
     },
 ]
 
-// A search answering these entreprises, out of `total` in all — by default,
-// just them.
+// `total` defaults to just these entreprises.
 const searchFinding = (
     entreprises: FoundEntreprise[],
     total = { count: entreprises.length, atLeast: false }

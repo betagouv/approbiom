@@ -25,8 +25,7 @@ const SANS_APPEL_A_PROJET_VALUE = ''
 
 export const SANS_CRB_LABEL = "Aucun CRB n'instruit ce plan"
 
-// An empty Ref reads as 0, so no CRB is ever stored under it: free to stand
-// for « none of them ».
+// An empty Grist Ref reads as 0, so no CRB has this id.
 export const SANS_CRB_VALUE: Crb['id'] = 0
 
 export type PlanFilters = {
@@ -144,8 +143,7 @@ export function getAppelAProjetOptions(
         (programme) => programme.appelAProjet
     ).sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 
-    // Last, under the named appels: it is the answer to « none of them », not
-    // one more of them.
+    // « None of them » stays last.
     return [
         ...appels,
         { value: SANS_APPEL_A_PROJET_VALUE, label: SANS_APPEL_A_PROJET_LABEL },
@@ -166,11 +164,6 @@ export function getFournisseurOptions(
         .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 }
 
-/**
- * Every CRB that instructs one of the plan's demandes, once each, in the order
- * they come. An instruction whose CRB Ref is empty names nobody, so it adds
- * none.
- */
 export function getCrbsInstructeurs(
     plan: Pick<PlanDetail, 'demandesSubvention'>
 ): Pick<Crb, 'id' | 'name'>[] {
@@ -188,8 +181,6 @@ export function getCrbOptions(
 ): MultiSelectOption<Crb['id']>[] {
     const labelById = new Map<Crb['id'], string>()
 
-    // A CRB the document cannot name still instructs: it is offered under its
-    // number rather than left out, so its plans can still be found.
     for (const row of rows)
         for (const { id, name } of getCrbsInstructeurs(row))
             labelById.set(id, name || `CRB n°${id}`)
@@ -198,15 +189,11 @@ export function getCrbOptions(
         .map(([value, label]) => ({ value, label }))
         .sort((a, b) => a.label.localeCompare(b.label, 'fr'))
 
-    // Last, under the named CRB: it is the answer to « none of them », not one
-    // more of them.
     return [...crbs, { value: SANS_CRB_VALUE, label: SANS_CRB_LABEL }]
 }
 
 /**
- * The commune a plan sits in, as « Nom (code INSEE) ». A code the référentiel
- * cannot name is still shown on its own, so the plan keeps its place; a plan
- * whose installation names no commune reads as `null`.
+ * « Nom (code INSEE) », or the code alone when the référentiel cannot name it.
  */
 export function getCommuneDeSituationLabel(
     plan: Pick<PlanDetail, 'communeDeSituation'>,

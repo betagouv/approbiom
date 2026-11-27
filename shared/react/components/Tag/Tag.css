@@ -1,20 +1,6 @@
-/* CSS lives next to its component: Tag.tsx imports this file directly, so the
-   styles follow the component into whichever widget uses it.
-
-   All of it answers one thing. DSFR only paints a tag that can be clicked:
-   every `fr-tag--<couleur>` rule it ships is scoped to `a`, `button` and
-   `input[type=…]`, so the read-only `<p>` form of a tag comes out grey
-   whatever colour it is given. The colours are put back here for that form.
-
-   The tokens are the ones DSFR itself uses for coloured labels that cannot be
-   clicked — the badge pair, `--background-contrast-*` / `--text-label-*` —
-   rather than the clickable tag's `--background-action-low-*`, which is tuned
-   to read as an affordance. Tokens rather than colours, so light and dark
-   themes still follow.
-
-   The seventeen illustrative colours DSFR ships all have a rule below, so any
-   of them can be asked for by name. `color` being a plain string, a name that
-   is not one of them is not caught by the compiler — it comes out grey. */
+/* DSFR scopes `fr-tag--<couleur>` to clickable tags, so a `<p>` tag stays
+   grey: colours restored here with the badge tokens. An unknown colour name
+   is not caught by the compiler and stays grey. */
 
 .shared-tag.fr-tag--beige-gris-galet {
     background-color: var(--background-contrast-beige-gris-galet);

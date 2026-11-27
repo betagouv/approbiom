@@ -16,9 +16,6 @@ export function isSourceProvenance(value: unknown): value is SourceProvenance {
     return SOURCES_PROVENANCE.includes(value as SourceProvenance)
 }
 
-/**
- * Where a tonnage is drawn from: a French département, or a foreign country.
- */
 export type Provenance =
     | { source: typeof DEPARTEMENT_FRANCAIS; code: Departement['dep'] }
     | { source: typeof PAYS_ETRANGER; libelle: Pays['libelle'] }

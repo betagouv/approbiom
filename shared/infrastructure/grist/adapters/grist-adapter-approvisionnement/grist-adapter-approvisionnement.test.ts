@@ -34,8 +34,6 @@ const REFERENCED_TABLES: Record<string, ColumnMajorTable> = {
     },
 }
 
-// The adapter reads `grist.docApi.fetchTable` and `grist.ready`, both installed
-// by the Grist plugin script, which does not exist under jsdom.
 function mockGrist(approvisionnements: ColumnMajorTable) {
     const tables: Record<string, ColumnMajorTable> = {
         ...REFERENCED_TABLES,
@@ -139,8 +137,6 @@ describe('createGristApprovisionnementPort', () => {
         ])
     })
 
-    // The text column is what carries a country: nothing else in the document
-    // names it.
     it('reads a provenance outside France off the text column', async () => {
         mockGrist(drawnFrom([[0, 'Allemagne']]))
 
@@ -149,8 +145,6 @@ describe('createGristApprovisionnementPort', () => {
         ])
     })
 
-    // The same plan may draw one ressource from both sides of the border, so
-    // the two live side by side in one read rather than in two.
     it('reads both kinds in a single load', async () => {
         mockGrist(
             drawnFrom([
@@ -167,8 +161,6 @@ describe('createGristApprovisionnementPort', () => {
         ])
     })
 
-    // The Ref is the only thing that tells the two apart, so it is what is
-    // read — not the text, which cannot say which of the two it holds.
     it('takes the département code from the Ref, not from the text', async () => {
         mockGrist(drawnFrom([[1, 'Allemagne']]))
 
@@ -177,9 +169,6 @@ describe('createGristApprovisionnementPort', () => {
         ])
     })
 
-    // A row the document cannot place is a French provenance with no code —
-    // the reading it had before a provenance could be foreign — and not a
-    // country nobody named.
     it('places a row filling neither cell nowhere, inside France', async () => {
         mockGrist(
             drawnFrom([
@@ -194,8 +183,6 @@ describe('createGristApprovisionnementPort', () => {
         ])
     })
 
-    // The column is what the whole notion of provenance now rests on: a rename
-    // must fail loudly rather than place every approvisionnement in France.
     it('refuses a document whose approvisionnements have no provenance column', async () => {
         const columns = drawnFrom([[0, 'Allemagne']])
         delete columns.Provenance
@@ -208,7 +195,6 @@ describe('createGristApprovisionnementPort', () => {
     })
 
     describe('the ventilations of the ressource screen', () => {
-        /** One summary row per group, everything measured held still. */
         const summarised = (
             column: string,
             groups: readonly string[]
@@ -235,7 +221,6 @@ describe('createGristApprovisionnementPort', () => {
             })
         }
 
-        // A région and a country arrive in one column, already as libellés.
         it('reads a région and a pays out of the same column', async () => {
             mockSummary(
                 TABLE.totalByRegionOuPays,
@@ -254,8 +239,6 @@ describe('createGristApprovisionnementPort', () => {
             ])
         })
 
-        // Same reading as `list`: a département by its code, a country by its
-        // name, side by side under one dimension.
         it('reads a département and a pays out of the provenance column', async () => {
             mockSummary(
                 TABLE.totalByProvenance,

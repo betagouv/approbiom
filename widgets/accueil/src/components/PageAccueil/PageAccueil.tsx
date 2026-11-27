@@ -43,12 +43,9 @@ function getColumns(
             id: 'action',
             header: 'Action',
 
-            // The row shows the installation, which several plans can share:
-            // without the plan's own name, a screen reader hears the same
-            // button on every one of them. An `aria-label` rather than a
-            // visually hidden span, whose separating space a flex button can
-            // collapse away; it opens with the visible text, so a voice user
-            // saying « Voir le plan » still reaches it (WCAG 2.5.3).
+            // Several plans share an installation, hence the plan's name in the
+            // label. It opens with the visible text (WCAG 2.5.3); a hidden
+            // span's space would collapse in a flex button.
             render: (plan) => (
                 <button
                     type="button"

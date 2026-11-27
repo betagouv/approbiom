@@ -43,8 +43,7 @@ describe('semaineDe', () => {
         expect(semaineDe(new Date('2026-10-16T13:39:26Z'))).toBe('2026-10-12')
     })
 
-    // 23:30 UTC on Sunday is already 01:30 on Monday in Paris: the week is
-    // the one Grist's own `Cree_la_semaine` column gives it.
+    // 23:30 UTC on Sunday is already 01:30 on Monday in Paris.
     it('takes the day in Paris, not in UTC', () => {
         expect(semaineDe(new Date('2026-10-18T23:30:00Z'))).toBe('2026-10-19')
     })
@@ -61,8 +60,7 @@ describe('semaineDe', () => {
 })
 
 describe('suivreCreations, line by line', () => {
-    // Every plan created before the tracking began has neither a creator nor
-    // a date.
+    // Plans created before the tracking began have neither creator nor date.
     it('leaves untracked plans out of every count', () => {
         const suivi = suivre([
             creation(null, null),
@@ -129,8 +127,6 @@ describe('suivreCreations, week by week', () => {
         ])
     })
 
-    // A chart over time leaves a gap where nothing happened, rather than
-    // jumping from one active week to the next.
     it('keeps the weeks without a creation, at 0', () => {
         const suivi = suivre([
             creation(CAMILLE, '2026-10-06T10:00:00Z'),
@@ -144,8 +140,6 @@ describe('suivreCreations, week by week', () => {
         ])
     })
 
-    // The chart starts in October 2026, with the tracking: a plan dated
-    // before was dated by hand, and counts nowhere.
     it('leaves out a plan dated before the tracking began', () => {
         const suivi = suivre([
             creation(CAMILLE, '2026-06-01T10:00:00Z'),
@@ -161,8 +155,7 @@ describe('suivreCreations, week by week', () => {
         })
     })
 
-    // 22:30 in Paris on Sunday 4 October is still the week of 28 September;
-    // at 00:30 on Monday 5, two hours later, the tracking is open.
+    // 22:30 Paris time on Sunday 4 October is still the week of 28 September.
     it('begins the tracking on Monday 5 October 2026, in Paris time', () => {
         const suivi = suivre([
             creation(CAMILLE, '2026-10-04T20:30:00Z'),
@@ -213,8 +206,7 @@ describe('suivreCreations, week by week', () => {
         expect(suivi.cetteSemaine.semaine).toBe('2026-10-26')
     })
 
-    // Paris leaves summer time on 25 October: a 25-hour day must not knock a
-    // week off its Monday.
+    // Paris leaves summer time on 25 October, a 25-hour day.
     it('steps from one Monday to the next across the change of time', () => {
         const suivi = suivreCreations(
             [creation(CAMILLE, '2026-10-21T10:00:00Z')],
@@ -229,7 +221,6 @@ describe('suivreCreations, week by week', () => {
         ])
     })
 
-    // A plan dated past today, by a clock ahead of the widget's, still shows.
     it('runs on to a creation dated after the week under way', () => {
         const suivi = suivre([creation(CAMILLE, '2026-10-27T10:00:00Z')])
 
@@ -276,8 +267,6 @@ describe('suivreCreations, since the tracking began', () => {
         expect(suivi.premiereCreation).toEqual(new Date('2026-10-16T13:39:26Z'))
     })
 
-    // Dated before October 2026, a plan counts no more in the totals than in
-    // the weeks.
     it('leaves a plan dated before the tracking began out of the totals', () => {
         const suivi = suivre([
             creation(CAMILLE, '2026-06-01T10:00:00Z'),
@@ -305,7 +294,6 @@ describe('partDesCreateurs', () => {
 })
 
 describe('suivreCreations, by the accounts of the Utilisateur table', () => {
-    // The administrators' plans are tests and support, not the use tracked.
     it('counts the plans of the accounts ticked « Utilisateur Approbiom » only', () => {
         const suivi = suivre([
             creation(CAMILLE, '2026-10-16T10:00:00Z'),
@@ -322,8 +310,6 @@ describe('suivreCreations, by the accounts of the Utilisateur table', () => {
         ])
     })
 
-    // Not every creator has a row in the table: a plan made from an account
-    // nobody listed is no user's either.
     it('leaves out the plans of an account missing from the table', () => {
         const suivi = suivre([
             creation('inconnu@example.fr', '2026-10-16T10:00:00Z'),
@@ -332,7 +318,6 @@ describe('suivreCreations, by the accounts of the Utilisateur table', () => {
         expect(suivi.lignes).toEqual([])
     })
 
-    // Nothing says whose they are, so nothing says they are a user's.
     it('leaves out the plans of an unknown creator', () => {
         const suivi = suivre([creation(null, '2026-10-16T10:00:00Z')])
 
@@ -348,7 +333,6 @@ describe('suivreCreations, by the accounts of the Utilisateur table', () => {
             [utilisateur(' CAMILLE.MARTIN@EXAMPLE.FR ')]
         )
 
-        // One address: one user, on one line, active once that week.
         expect(suivi.nombreUtilisateurs).toBe(1)
         expect(suivi.lignes).toEqual([
             { semaine: '2026-10-12', utilisateur: CAMILLE, plans: 2 },
@@ -373,8 +357,6 @@ describe('suivreCreations, by the accounts of the Utilisateur table', () => {
         expect(suivi.nombreUtilisateurs).toBe(2)
     })
 
-    // A ticked row without an email names no one a plan could be traced back
-    // to.
     it('leaves out a ticked account without an email', () => {
         const suivi = suivre(
             [],

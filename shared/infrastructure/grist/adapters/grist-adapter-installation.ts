@@ -26,14 +26,7 @@ const asCodeCommune = (value: unknown): Commune['codeInsee'] => {
     return code
 }
 
-/**
- * The commune each installation sits at, read off the plans that point at it.
- *
- * The Installation table only holds a Reference to INSEE_Commune, and reading
- * that table — every commune of France — to turn the Reference into a code
- * would cost far more than the plan table, which already carries the code as
- * a formula and which the plan adapter reads anyway.
- */
+/** Read off the plan table: resolving Installation's Reference would mean fetching every commune of France. */
 async function getCommuneByInstallation(): Promise<
     Map<Installation['id'], Installation['commune']>
 > {
@@ -44,8 +37,7 @@ async function getCommuneByInstallation(): Promise<
     for (const row of rows) {
         const id = asNumber(row.Installation) ?? 0
 
-        // A plan naming no installation places none: 0 is Grist's empty
-        // reference, not a row.
+        // 0 is Grist's empty reference.
         if (id === 0) continue
 
         communeById.set(id, asCodeCommune(row.Code_Insee_Installation))
@@ -64,8 +56,6 @@ export function createGristInstallationPort(): InstallationPort {
                 getCommuneByInstallation(),
             ])
 
-            // An installation no plan points at is placed nowhere: the plans
-            // are the only place its commune is read from.
             return rows.map((row): Installation => {
                 const id = asNumber(row.id) ?? 0
 

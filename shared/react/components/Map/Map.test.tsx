@@ -22,10 +22,8 @@ describe('Map', () => {
         expect(screen.getAllByAltText('Marker')).toHaveLength(2)
     })
 
-    // Leaflet left to itself guesses its image folder from the stylesheet and
-    // gets it wrong once bundled, pointing every pin at a URL that does not
-    // exist. The guess happens to land on a plausible-looking "marker-icon.png"
-    // in dev, so only the built asset URL tells the two apart.
+    // Leaflet guesses its image folder from the stylesheet, which breaks once
+    // bundled; the guess looks plausible in dev, so only the asset URL tells.
     it('points a pin at the bundled icon rather than a guessed path', () => {
         render(<Map center={[51.505, -0.09]} markers={[[51.5007, -0.1246]]} />)
 
@@ -34,9 +32,6 @@ describe('Map', () => {
         expect(pin.getAttribute('src')).toBe(iconUrl)
     })
 
-    // A polygon's options are what lets a caller tell one shape from another,
-    // so they have to reach Leaflet rather than stop at the component. Leaflet
-    // turns them into the drawn path's attributes, which is where they show.
     it('draws a polygon with the options it is given', () => {
         const { container } = render(
             <Map

@@ -11,8 +11,7 @@ import { COLUMNS, TABLE } from '../types/grist-tables'
 
 export function toEntreprise(row: GristRow): Entreprise {
     return {
-        // Stored numeric, but it identifies an entreprise rather than
-        // measuring anything, so it crosses as the string it is.
+        // Stored in a numeric column.
         siret:
             typeof row.Siret === 'number'
                 ? String(row.Siret)

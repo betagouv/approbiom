@@ -18,8 +18,7 @@ export default function Extraction<T>({
     const [attempt, setAttempt] = useState(0)
     const [failure, setFailure] = useState<string | null>(null)
 
-    // React runs effects twice in development: one attempt must extract once,
-    // or the lines would be written twice.
+    // React runs effects twice in dev: each attempt must extract only once.
     const running = useRef<{ attempt: number; result: Promise<T> } | null>(null)
 
     const runExtract = useEffectEvent(() => {

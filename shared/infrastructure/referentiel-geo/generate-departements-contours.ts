@@ -1,20 +1,11 @@
-// Regenerates departements-contours.json — the local département code → outline
-// lookup used to draw a département on a map without hitting the network.
-//
-//     pnpm generate:referentiels departements
-//
-// geo.api.gouv.fr, which the communes come from, serves geometry for communes
-// only: `contour` on /departements answers nothing. The outlines come from the
-// Géoplateforme instead — IGN's Admin Express COG Carto, the same référentiel,
-// published as a WFS.
+// Regenerates departements-contours.json from IGN's Admin Express COG Carto WFS
+// (geo.api.gouv.fr has no département geometry): `pnpm generate:referentiels departements`
 
 import { writeFile } from 'node:fs/promises'
 
 const SOURCE = 'https://data.geopf.fr/'
 
-// `COG-CARTO` is the edition IGN generalises for map-making, and `COUNT` only
-// has to clear the 101 départements the layer holds — the response is checked
-// against `numberMatched` below rather than paged through.
+// `COUNT` only has to clear the 101 départements; checked against `numberMatched` below.
 const ENDPOINT =
     'https://data.geopf.fr/wfs/ows?SERVICE=WFS&REQUEST=GetFeature&VERSION=2.0.0&TYPENAMES=ADMINEXPRESS-COG-CARTO.LATEST:departement&OUTPUTFORMAT=application/json&SRSNAME=EPSG:4326&COUNT=200'
 
@@ -22,19 +13,15 @@ const OUTPUT_URL = new URL('./departements-contours.json', import.meta.url)
 export const OUTPUT_PATH =
     'shared/infrastructure/referentiel-geo/departements-contours.json'
 
-// In degrees, so about 100 m. IGN draws the coastline to the metre, which is
-// 20 MB of JSON no map at département scale can show — a point that sits this
-// close to the line its neighbours already draw is dropped.
+// Degrees (~100 m); IGN's metre-precise coastline would weigh 20 MB.
 const TOLERANCE = 0.001
 
-// Metres, near enough, once the outline is simplified. Keeping more decimals
-// only stores the noise the simplification just removed.
+// ~1 m.
 const DECIMALS = 5
 
-/** GeoJSON orders a point [longitude, latitude], not the other way round. */
+/** [longitude, latitude]. */
 type GeoJsonPoint = [number, number]
 
-/** One feature of the WFS FeatureCollection. */
 type ApiFeature = {
     properties?: {
         code_insee?: string
@@ -42,13 +29,11 @@ type ApiFeature = {
     }
     geometry?: {
         type?: string
-        // Polygon: rings. MultiPolygon: polygons, each a list of rings. In both
-        // the first ring of a polygon is its outline, the rest are holes.
         coordinates?: GeoJsonPoint[][] | GeoJsonPoint[][][]
     }
 }
 
-/** A ring of the outline, [latitude, longitude] — the order Leaflet reads. */
+/** [latitude, longitude], the order Leaflet reads. */
 type Ring = [number, number][]
 
 type Departement = {
@@ -60,10 +45,9 @@ type ContoursFile = {
     _metadata: {
         source: string
         generatedAt: string
-        /** The tolerance the outlines were simplified with, in degrees. */
+        /** Degrees. */
         simplifiedTo: number
     }
-    /** Keyed by département code. */
     departements: Record<string, Departement>
 }
 
@@ -88,11 +72,6 @@ async function fetchDepartements(): Promise<unknown> {
     }
 }
 
-/**
- * How far a point sits from the segment its neighbours draw, squared — squared
- * because only the comparison matters and a square root per point is a square
- * root 800 000 times.
- */
 function squaredDistanceToSegment(
     point: GeoJsonPoint,
     start: GeoJsonPoint,
@@ -119,14 +98,7 @@ function squaredDistanceToSegment(
     return (point[0] - x) ** 2 + (point[1] - y) ** 2
 }
 
-/**
- * Douglas-Peucker: keep the two ends, keep the point furthest from the line
- * between them if it is further than the tolerance, and ask the same of the
- * two halves it cuts the ring into.
- *
- * Written with an explicit stack rather than recursion because a coastline is
- * tens of thousands of points and the recursion is only shallow on average.
- */
+/** Douglas-Peucker. */
 function simplify(ring: readonly GeoJsonPoint[]): GeoJsonPoint[] {
     if (ring.length < 3) return [...ring]
 
@@ -180,20 +152,11 @@ function round(value: number): number {
     return Math.round(value * factor) / factor
 }
 
-/**
- * The outlines of one geometry, simplified and flipped to [latitude, longitude].
- *
- * Holes are dropped: the fourteen a département has are enclaves of a
- * neighbour, and the map this feeds draws an outline rather than a surface.
- * Rings left with fewer than four points are dropped too — an islet the
- * tolerance has flattened is no longer a shape.
- */
+/** Holes (enclaves of a neighbour) and rings flattened below four points are dropped. */
 function toContour(geometry: ApiFeature['geometry']): Ring[] {
     const { type, coordinates } = geometry ?? {}
     if (!Array.isArray(coordinates)) return []
 
-    // A Polygon is a list of rings, a MultiPolygon a list of those. Reading
-    // both as a list of polygons is what lets one function answer for either.
     const polygons: unknown[] = type === 'Polygon' ? [coordinates] : coordinates
 
     const contour: Ring[] = []
@@ -218,11 +181,6 @@ function toContour(geometry: ApiFeature['geometry']): Ring[] {
     return contour
 }
 
-/**
- * Returns `null` for a feature we cannot use — one without a code or a name, or
- * one whose outline nothing survives of. Those are skipped rather than fatal: a
- * single bad feature upstream should not cost us the other hundred.
- */
 function toDepartement(
     feature: unknown
 ): { code: string; departement: Departement } | null {
@@ -255,8 +213,7 @@ function toContoursFile(payload: unknown): ContoursFile {
         throw new Error(`${ENDPOINT} answered a collection without features`)
     }
 
-    // The WFS pages silently: asking for fewer features than it holds answers
-    // a partial France without saying so.
+    // The WFS pages silently.
     if (
         typeof numberMatched === 'number' &&
         numberMatched > (features as unknown[]).length
@@ -298,7 +255,6 @@ function toContoursFile(payload: unknown): ContoursFile {
     }
 }
 
-/** A short label for a rejected feature, so the warning is actionable. */
 function describe(feature: unknown): string {
     if (typeof feature === 'object' && feature !== null) {
         const { properties } = feature as ApiFeature
@@ -307,16 +263,10 @@ function describe(feature: unknown): string {
     return '(feature without a code)'
 }
 
-/**
- * `JSON.stringify(file, null, 4)` would put each of the hundred thousand
- * coordinates on a line of its own, which is a 20 MB file no one can read a
- * diff of. One département per line keeps the file legible where it matters —
- * you see which of them moved — and small enough to bundle.
- */
+/** One département per line, for readable diffs and a bundle-sized file. */
 function serialise(file: ContoursFile): string {
     const departements = Object.entries(file.departements)
-        // Sorted here rather than on the object: JavaScript hoists integer-like
-        // keys to the front of one, so "01" would follow "95" in the file.
+        // Not on an object: JavaScript hoists integer-like keys, so "01" would follow "95".
         .sort(([a], [b]) => a.localeCompare(b))
         .map(
             ([code, departement]) =>
@@ -334,8 +284,7 @@ function serialise(file: ContoursFile): string {
         '',
     ].join('\n')
 
-    // Assembled by hand, so it is parsed back before it is allowed to replace
-    // the committed file.
+    // Assembled by hand: validate before it replaces the committed file.
     JSON.parse(json)
     return json
 }
@@ -343,8 +292,7 @@ function serialise(file: ContoursFile): string {
 export async function generateDepartementsContours(): Promise<void> {
     const data = toContoursFile(await fetchDepartements())
 
-    // Nothing is written until the whole payload has been validated, so a
-    // failed run always leaves the committed dataset untouched.
+    // Written last: a failed run leaves the committed dataset untouched.
     await writeFile(OUTPUT_URL, serialise(data), 'utf8')
 
     const departements = Object.values(data.departements)

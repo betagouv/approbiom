@@ -137,7 +137,6 @@ describe('getFilteredRows', () => {
     })
 
     it('hands back the very rows it was given, not copies', () => {
-        // The table renders these objects, so identity has to survive filtering.
         expect(getFilteredRows(plans, { nom: 'val' })[0]).toBe(valFleuri)
     })
 
@@ -158,8 +157,6 @@ describe('getFilteredRows', () => {
     })
 
     it('leaves out a plan that sits nowhere, once a département is picked', () => {
-        // Clair-Village has no département to match, so it is out — the same
-        // answer as for a plan sitting somewhere that was not picked.
         expect(getFilteredRows(plans, { departements: ['33'] })).toEqual([
             boisDuNord,
         ])
@@ -192,7 +189,7 @@ describe('getDepartementOptions', () => {
                     ],
                 },
                 {
-                    // Under I, where a reader looks for it — not after Z.
+                    // Sorts under I, not after Z.
                     region: { reg: '11', libelle: 'Île-de-France' },
                     departements: [{ dep: '75', libelle: 'Paris' }],
                 },
@@ -241,7 +238,6 @@ describe('getStatutOptions', () => {
     })
 
     it('drops a statut the document left empty', () => {
-        // An option with no label is a checkbox nobody can read.
         expect(getStatutOptions([plan({ statut: '' })])).toEqual([])
     })
 })

@@ -5,7 +5,6 @@ import type { DemandeSubventionPort } from '@shared/core/application/ports/deman
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
 import type { ProgrammeAidePort } from '@shared/core/application/ports/programme-aide'
 
-// PlanView describes what properties are callable for the object Plan in the frontend.
 export type PlanView = Plan & {
     appelsAProjet: readonly ProgrammeAide['appelAProjet'][]
 }

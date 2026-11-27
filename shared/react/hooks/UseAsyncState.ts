@@ -39,9 +39,7 @@ export function useAsyncState<T>(load: () => Promise<T>): UseAsyncState<T> {
         []
     )
 
-    // `load` is read through a ref rather than from the dependency array: an
-    // inline arrow is a new function on every render and would restart the read
-    // endlessly. `read` is what decides when to read again.
+    // Through a ref: an inline `load` would restart the read on every render.
     const loadRef = useRef(load)
     loadRef.current = load
 

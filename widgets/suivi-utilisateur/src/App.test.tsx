@@ -136,7 +136,6 @@ describe('App, since the tracking began', () => {
         )
 
         expect(barre?.style.width).toBe('50%')
-        // The figure says it in words already.
         expect(barre?.closest('[aria-hidden="true"]')).not.toBeNull()
     })
 
@@ -181,7 +180,6 @@ describe('App, week by week', () => {
         expect(
             section.querySelector('.cadre-semaine__valeur')?.textContent
         ).toBe('0')
-        // The tile above says why: the frame does not say it again.
         expect(section.querySelector('.cadre-semaine__note')).toBeNull()
     })
 
@@ -195,7 +193,6 @@ describe('App, week by week', () => {
             { lundi: '12 oct.', valeur: '1', part: '0.5' },
             { lundi: '19 oct.', valeur: '2', part: '1' },
         ])
-        // The table below says it in words.
         expect(
             section
                 .querySelector('.graphique__barres')
@@ -203,8 +200,6 @@ describe('App, week by week', () => {
         ).not.toBeNull()
     })
 
-    // Once the weeks no longer fit, the bars scroll: a keyboard must reach
-    // them, and the focus must not land inside what screen readers skip.
     it('lets the keyboard scroll the bars, from outside the hidden part', async () => {
         renderApp()
 
@@ -226,7 +221,6 @@ describe('App, week by week', () => {
 
         const [, ...rows] = within(table).getAllByRole('row')
 
-        // Each figure is read out with its week, the row's header.
         expect(
             rows.map((row) => [
                 within(row).getByRole('rowheader').textContent,

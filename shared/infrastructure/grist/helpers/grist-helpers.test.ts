@@ -30,8 +30,6 @@ describe('toRows', () => {
 })
 
 describe('fetchRows', () => {
-    // fetchRows reads `grist.docApi.fetchTable` from the global installed by the
-    // Grist plugin script, which does not exist under jsdom. Stub it per test.
     function mockFetchTable(columns: ColumnMajorTable): void {
         vi.stubGlobal('grist', {
             docApi: { fetchTable: vi.fn().mockResolvedValue(columns) },
@@ -102,8 +100,6 @@ describe('fetchRowsOnce', () => {
         vi.unstubAllGlobals()
     })
 
-    // Grist sends every column whatever is asked for: two reads of one table
-    // for different columns are still one fetch.
     it('fetches a table once for reads of different columns at the same time', async () => {
         const fetchTable = mockFetchTable({
             id: [1],
@@ -195,7 +191,6 @@ describe('asIdList', () => {
     })
 
     it('reads no id at all from an empty cell', () => {
-        // An empty Attachments cell is null, not an empty list.
         expect(asIdList(null)).toEqual([])
         expect(asIdList(undefined)).toEqual([])
     })

@@ -17,21 +17,12 @@ import type { Ressource } from '@shared/core/domain/entities/ressource'
 
 const UNKNOWN = 'Inconnu'
 
-/**
- * One group of a breakdown, ready to be read: the dimension is a label, not a
- * code, so nothing downstream has a directory left to consult.
- */
 export type Group = {
     label: string
     tonnageTotal: number
     repartition: number
 }
 
-/**
- * A provenance group, keeping the code it was read under next to its label: a
- * map draws a département by its code, where the label is only a name — and a
- * provenance the référentiel does not name reads the same in both.
- */
 export type ProvenanceGroup = Group & {
     /** A département code, or a foreign country's libellé. */
     provenance: string
@@ -40,7 +31,7 @@ export type ProvenanceGroup = Group & {
 export type ApprovisionnementStatsByRessource = {
     ressource: Ressource
     tonnageTotal: number
-    /** Share of the plan's total drawn as this ressource, between 0 and 1. */
+    /** Between 0 and 1. */
     repartition: number
     byRegionOuPays: readonly Group[]
     byProvenance: readonly ProvenanceGroup[]
@@ -78,7 +69,6 @@ export type ApprovisionnementByRessourceStatsByPlanSources = Omit<
     'plan'
 >
 
-/** The measures every group carries, whichever dimension names it. */
 function measures(
     row: ApprovisionnementGroupedByPlanAndRessource,
     label: string
@@ -171,8 +161,6 @@ export function composeApprovisionnementStats({
 
     const approvisionnementStatsByRessource = totalsForPlan.map(
         ({ ressource: code, tonnageTotal, repartition }) => ({
-            // A ressource the directory does not name is still drawn on:
-            // it is read by its code rather than left blank.
             ressource: ressourceByCode.get(code) ?? {
                 code,
                 ademeCode: '',
@@ -190,10 +178,7 @@ export function composeApprovisionnementStats({
     return approvisionnementStatsByRessource
 }
 
-/**
- * The same reading as {@link composeApprovisionnementStats}, composed for every
- * plan the totals speak of, in the order they first name them.
- */
+/** Plans come in the order the totals first name them. */
 export function composeApprovisionnementStatsByPlan({
     totals,
     byRegionOuPays,
@@ -201,8 +186,6 @@ export function composeApprovisionnementStatsByPlan({
     byFournisseur,
     ...directories
 }: ApprovisionnementByRessourceStatsByPlanSources): ApprovisionnementByRessourceStatsByPlan {
-    // Each plan is composed from its own rows alone, so the whole reading costs
-    // one pass over the sources rather than one pass per plan.
     const totalsByPlan = rowsByPlan(totals)
     const regionsOuPaysByPlan = rowsByPlan(byRegionOuPays)
     const provenancesByPlan = rowsByPlan(byProvenance)

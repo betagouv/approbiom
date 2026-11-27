@@ -41,7 +41,6 @@ function programmeAide(overrides: Partial<ProgrammeAide> = {}): ProgrammeAide {
     }
 }
 
-/** The CRBs the instructions below point at, by the rowId each one holds. */
 const crbs: readonly Crb[] = [
     { id: 1, name: 'Nouvelle Aquitaine' },
     { id: 2, name: 'Occitanie' },
@@ -145,8 +144,7 @@ const nouvelleAquitaineInsee = {
 }
 
 describe('composePlanDetails', () => {
-    // 87085 is Saint-Junien. Nothing but that code is stored: the département
-    // it opens with, and the région gathering it, are read out of it here.
+    // 87085 is Saint-Junien, Haute-Vienne, Nouvelle-Aquitaine.
     it('places a plan at the commune of its installation', () => {
         const [premier] = composePlanDetails(
             sources({
@@ -176,8 +174,6 @@ describe('composePlanDetails', () => {
         expect(premier.installationNom).toBe('Chaufferie du Moulin')
     })
 
-    // Left empty in the document, the name is absent rather than blank, the
-    // same answer as for a plan pointing at no installation.
     it('gives no installation name when the document leaves it empty', () => {
         const [premier] = composePlanDetails(
             sources({ installations: [{ id: 1, nom: '', commune: '87085' }] })
@@ -186,8 +182,6 @@ describe('composePlanDetails', () => {
         expect(premier.installationNom).toBeNull()
     })
 
-    // A plan whose installation the document names nowhere is placed nowhere,
-    // rather than at whatever the first installation happens to be.
     it('places a plan nowhere when no installation answers for it', () => {
         const [premier] = composePlanDetails(sources({ installations: [] }))
 
@@ -199,9 +193,6 @@ describe('composePlanDetails', () => {
         })
     })
 
-    // The référentiel is read from the document and can be short of a
-    // département. The plan still sits where it sits — only the région is
-    // unanswered.
     it('names no région when the référentiel gathers no département', () => {
         const [premier] = composePlanDetails(
             sources({
@@ -242,8 +233,6 @@ describe('composePlanDetails', () => {
     })
 
     it('reads no name for a CRB the document cannot name', () => {
-        // The instruction still happened, so its chronology is kept — it just
-        // reads with no CRB heading it.
         const inconnu = instruction({ crb: 99 })
 
         const [premiere] = demandesOf(
@@ -272,7 +261,6 @@ describe('composePlanDetails', () => {
     })
 
     it('keeps two demandes filed under the same programme apart', () => {
-        // Each one is instructed on its own, so each one heads a chronology.
         const secondeDemande: DemandeSubvention = { ...demandeBciat, id: 4 }
         const occitanieBis = instruction({ id: 5, crb: 2, subvention: 4 })
 
@@ -302,8 +290,7 @@ describe('composePlanDetails', () => {
     })
 
     it('never hangs instructions on an unresolved demande', () => {
-        // An empty Ref reads as 0 on both sides; matching them would gather
-        // every orphaned instruction under the first such demande.
+        // An empty Ref reads as 0 on both sides.
         const orpheline = instruction({ id: 6, crb: 5, subvention: 0 })
 
         expect(

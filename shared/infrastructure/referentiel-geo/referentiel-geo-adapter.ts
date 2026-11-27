@@ -1,7 +1,5 @@
-// Where a commune sits and what a département looks like, read from datasets
-// bundled with the widget rather than from the network: both are référentiels
-// INSEE/IGN move about once a year, and a map that has to wait on a fetch has
-// nothing to draw. `pnpm generate:referentiels` is what refreshes them.
+// Commune positions and département/country contours, read from datasets bundled
+// with the widget. Refreshed with `pnpm generate:referentiels`.
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
@@ -13,11 +11,7 @@ import countriesDataset from './countries-contours.json'
 type Latitude = number
 type Longitude = number
 
-/**
- * ISO 3166-1 alpha-3 — how geoBoundaries keys a country, and so how the
- * dataset does. It stays inside this file: the port reads a country by the
- * libellé a document names it with, so nothing outside has a code to hold.
- */
+/** ISO 3166-1 alpha-3, how geoBoundaries keys a country. */
 type CodeIso3 = string
 
 type CommunesDataset = {
@@ -70,18 +64,14 @@ const countryByNom = new Map(
     )
 )
 
-/** A stored contour, as the port hands it out. */
 function toPositions(contour: [Latitude, Longitude][][]) {
     return contour.map((ring) =>
         ring.map(([latitude, longitude]) => ({ latitude, longitude }))
     )
 }
 
-/**
- * The half of {@link ReferentielGeoPort} the bundled datasets answer for. What a
- * document holds — which départements a région gathers — comes from the Grist
- * adapter instead, and the two are read as one port.
- */
+/** The part of {@link ReferentielGeoPort} the bundled datasets answer; the
+ *  rest comes from the Grist adapter. */
 export type ReferentielGeoDatasetPort = Pick<
     ReferentielGeoPort,
     | 'getCommuneCenterPosition'

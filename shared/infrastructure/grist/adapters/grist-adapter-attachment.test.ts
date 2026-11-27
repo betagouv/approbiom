@@ -21,8 +21,7 @@ const FILES: Record<number, { fileName: string; fileSize: number }> = {
     344: { fileName: 'plan-exemple-2026.xlsx', fileSize: 4000 },
 }
 
-// The metadata table holds what Grist shows the user: every file for an
-// owner, none for an editor of a document with access rules.
+// The metadata table holds every file for an owner, none for an editor under access rules.
 function mockGrist(visibleFiles: readonly number[]) {
     const tables: Record<string, ColumnMajorTable> = {
         [TABLE.attachment]: PIECES_JOINTES,

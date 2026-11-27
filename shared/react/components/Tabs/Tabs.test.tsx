@@ -63,8 +63,6 @@ describe('Tabs', () => {
         expect(openTab()?.textContent).toBe('Par fournisseur')
     })
 
-    // The whole point of the component: one panel is read at a time, and it is
-    // the one belonging to the open tab.
     it('shows the panel of the open tab, and only that one', () => {
         renderTabs({ defaultId: 'region-ou-pays' })
 
@@ -84,9 +82,6 @@ describe('Tabs', () => {
         )
     })
 
-    // Closed rather than unmounted: `aria-controls` still resolves, and
-    // whatever state the content holds — how a table was sorted — is still
-    // there when the reader comes back to it.
     it('leaves the closed panels in the document', () => {
         const { container } = renderTabs()
 
@@ -97,9 +92,6 @@ describe('Tabs', () => {
         renderTabs()
 
         for (const tab of screen.getAllByRole('tab')) {
-            // `getElementById` rather than a query on the container: the panel
-            // of a closed tab is hidden, so nothing that reads the
-            // accessibility tree will hand it back.
             const panel = document.getElementById(
                 tab.getAttribute('aria-controls') ?? ''
             )
@@ -108,8 +100,6 @@ describe('Tabs', () => {
         }
     })
 
-    // A roving tabindex: one Tab press reaches the tablist and the next leaves
-    // it, rather than stopping on every tab on the way to the panel.
     it('keeps only the open tab in the tab order', () => {
         renderTabs({ defaultId: 'region-ou-pays' })
 
@@ -160,8 +150,6 @@ describe('Tabs', () => {
         expect(openTab()?.textContent).toBe('Par provenance')
     })
 
-    // The arrows are the tablist's, but every other key belongs to the page —
-    // and to the reader, who may be scrolling it.
     it('leaves keys it does not handle alone', () => {
         renderTabs()
 

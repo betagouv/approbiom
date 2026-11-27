@@ -4,8 +4,7 @@ import { createReferentielGeoAdapter } from './referentiel-geo-adapter'
 describe('createReferentielGeoAdapter', () => {
     describe('getCommuneCenterPosition', () => {
         it('gives the centre of a commune the dataset knows', () => {
-            // Anglet. Asserted loosely: regenerating the dataset can nudge a
-            // centre by a few metres, which is not a regression.
+            // Anglet. Loose: regenerating the dataset can shift a centre by a few metres.
             const position =
                 createReferentielGeoAdapter().getCommuneCenterPosition('64024')
 
@@ -43,9 +42,7 @@ describe('createReferentielGeoAdapter', () => {
             const latitudes = points.map(({ latitude }) => latitude)
             const longitudes = points.map(({ longitude }) => longitude)
 
-            // Spain reaches from the Pyrenees down to the Canaries, which is
-            // enough to say the right country came back without pinning the
-            // test to the généralisation. More than one ring, for the islands.
+            // Spain reaches down to the Canaries: more than one ring, latitude below 27.
             expect(contour.length).toBeGreaterThan(1)
             expect(Math.min(...latitudes)).toBeGreaterThan(27)
             expect(Math.max(...latitudes)).toBeLessThan(44)
@@ -79,7 +76,7 @@ describe('createReferentielGeoAdapter', () => {
         })
 
         it('gives an outline the communes of the département fall inside', () => {
-            // Anglet, on the coast, is the western edge of the case.
+            // Anglet (43.49, -1.52), on the coast, is the western edge of the case.
             const [contour] =
                 createReferentielGeoAdapter().getDepartementContour('64')
             const latitudes = contour.map(({ latitude }) => latitude)

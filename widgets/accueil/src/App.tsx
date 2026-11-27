@@ -31,9 +31,8 @@ export default function App(ports: AccueilPorts) {
 
                     return (
                         <>
-                            {/* Hidden rather than unmounted while a plan is open,
-                            so the search and the filters are still there when
-                            the user comes back. */}
+                            {/* Hidden, not unmounted, so the search and filters
+                                survive. */}
                             <div hidden={selectedPlan !== null}>
                                 <PageAccueil
                                     plansApprovisionnement={
@@ -49,8 +48,8 @@ export default function App(ports: AccueilPorts) {
                             </div>
                             {selectedPlan !== null && (
                                 <Plan
-                                    // Keyed by plan: opening another plan mounts
-                                    // another one, which reads its own statistics.
+                                    // Remounts per plan, to read its own
+                                    // statistics.
                                     key={selectedPlan.id}
                                     plan={selectedPlan}
                                     approvisionnementStatsByRessource={

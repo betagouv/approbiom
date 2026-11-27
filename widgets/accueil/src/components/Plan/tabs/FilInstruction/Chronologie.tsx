@@ -13,17 +13,12 @@ const DATE = new Intl.DateTimeFormat('fr-FR', {
     year: 'numeric',
 })
 
-// What each step is called. Wording is read, not reasoned about, so it lives
-// here rather than with the rules that order the steps.
 const LABELS: Record<EtapeId, string> = {
     'saisine-crb': 'Saisine de la CRB',
     'avis-crb': 'Avis CRB remis au préfet',
     'avis-prefet': 'Avis du préfet rendu',
 }
 
-// What is written where the date goes when the step has none. A step that is
-// behind us and dateless is a hole in the data, not a step still to come, so
-// the two do not read the same.
 const SANS_DATE: Record<EtapeState, string> = {
     done: 'Date non renseignée',
     current: 'Date non renseignée',
@@ -54,7 +49,6 @@ export default function Chronologie({ instruction }: ChronologieProps) {
                             : DATE.format(etape.date)}
                     </p>
 
-                    {/* The dot and the line into it: drawn, so nothing to read. */}
                     <div className="chronologie__jalon" aria-hidden="true">
                         <span className="chronologie__marqueur" />
                     </div>

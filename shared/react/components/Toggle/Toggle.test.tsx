@@ -19,8 +19,6 @@ function ControlledToggle({ initial = false }: { initial?: boolean }) {
     )
 }
 
-// A DSFR toggle is a real `<input type="checkbox">` under its paint, so that is
-// the role it is queried by.
 const getToggle = () =>
     screen.getByRole<HTMLInputElement>('checkbox', {
         name: 'Ce plan est lauréat',
@@ -75,8 +73,7 @@ describe('Toggle', () => {
 
         fireEvent.click(screen.getByRole('checkbox'))
 
-        // Controlled: the click is reported, it does not move the switch by
-        // itself. Only the parent can do that.
+        // Controlled: only the parent moves the switch.
         expect(screen.getByRole<HTMLInputElement>('checkbox').checked).toBe(
             false
         )
@@ -102,8 +99,6 @@ describe('Toggle', () => {
     it('leaves the state text off unless it is asked for', () => {
         render(<ControlledToggle />)
 
-        // DSFR only paints « Activé » / « Désactivé » when both attributes are
-        // there, so the bare switch of the model needs neither.
         const label = document.querySelector('.fr-toggle__label')
         expect(label?.hasAttribute('data-fr-checked-label')).toBe(false)
         expect(label?.hasAttribute('data-fr-unchecked-label')).toBe(false)

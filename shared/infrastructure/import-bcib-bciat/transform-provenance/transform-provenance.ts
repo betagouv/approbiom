@@ -15,19 +15,17 @@ import { normalize, type ReferenceData } from './reference-data'
 /** A total written within one point of 100 is taken as meaning 100. */
 const TOLERANCE = 1
 
-// A département-shaped number: 97x, 2a/2b, or exactly two digits — never a
-// slice of a longer number such as 100 or 2021.
+// 97x, 2a/2b or exactly two digits, never a slice of a longer number.
 const CODE = /(?<![0-9])(?:97[0-9]|2[ab]|[0-9]{2})(?![0-9])/g
 const PERCENTAGE = /(\d+(?:\.\d+)?)\s*%/g
 const MEASUREMENT =
     /\d+(?:\.\d+)?\s*(?:km|kwh|mwh|tonnes|tonne|ans|an|t|h)(?![a-z])/g
 const WORD = /[a-z0-9.]+/g
 
-// What can follow a number and prove it is not a département.
 const IS_A_PERCENTAGE = /^\s*%/
 const IS_A_MEASUREMENT = /^\s*(?:km|kwh|mwh|tonnes|tonne|ans|an|t|h)(?![a-z])/
 
-/** Words that carry no place, so their presence is no reason to doubt. */
+/** Words whose presence is no reason to doubt the reading. */
 const NOISE_WORDS = new Set([
     'a',
     'au',
@@ -77,9 +75,7 @@ const NOISE_WORDS = new Set([
     'usine',
 ])
 
-// Régions are recognisable and useless: a plan that says "Grand Est" has not
-// said which département. They are matched only so they can be reported whole
-// rather than word by word.
+// Matched only so a région is reported as unrecognized whole, not word by word.
 const REGION_NAMES = [
     'auvergne rhone alpes',
     'bourgogne franche comte',
@@ -151,7 +147,6 @@ const overlaps = (span: Span, taken: readonly Span[]): boolean =>
 const label = (provenance: Provenance): string =>
     provenance.source === PAYS_ETRANGER ? provenance.libelle : provenance.code
 
-/** Two provenances name the same place when their source and label match. */
 const keyOf = (provenance: Provenance): string =>
     `${provenance.source} ${label(provenance)}`
 
@@ -160,10 +155,6 @@ const spanOf = (match: RegExpExecArray | RegExpMatchArray): Span => ({
     end: (match.index ?? 0) + match[0].length,
 })
 
-/**
- * Every place named in words, longest name first so "haute marne" is not read
- * as "marne".
- */
 function findNamedPlaces(text: string, reference: ReferenceData): Mention[] {
     const mentions: Mention[] = []
     const taken: Span[] = []
@@ -183,7 +174,6 @@ function findNamedPlaces(text: string, reference: ReferenceData): Mention[] {
     return mentions
 }
 
-/** Every place named by its number, skipping numbers that are something else. */
 function findNumberedPlaces(
     text: string,
     reference: ReferenceData,
@@ -198,7 +188,6 @@ function findNumberedPlaces(
         const span = spanOf(match)
         const after = text.slice(span.end)
 
-        // "50 %" is a share and "50 km" a distance; neither is the Manche.
         if (IS_A_PERCENTAGE.test(after) || IS_A_MEASUREMENT.test(after))
             continue
         if (overlaps(span, taken)) continue
@@ -301,11 +290,7 @@ function pairSharesAfter(
 
 type Pairing = { shares: Map<number, number>; unpaired: Percentage[] }
 
-/**
- * One reading order is chosen for the whole cell rather than per place: a plan
- * writes its shares one way throughout. Whichever order explains more of them
- * wins, and a tie goes to "70% Vosges", the common form.
- */
+/** One reading order for the whole cell; a tie goes to "70% Vosges". */
 function pairShares(
     mentions: readonly Mention[],
     percentages: readonly Percentage[]
@@ -355,12 +340,10 @@ function groupByPlace(
     return [...places.values()]
 }
 
-/** Everything the reader looked at and could not place. */
 function findUnreadWords(text: string, covered: readonly Span[]): Span[] {
     const unread: Span[] = []
     const seen = [...covered]
 
-    // Régions first, so a name of several words is reported whole.
     for (const match of text.matchAll(REGIONS)) {
         const span = spanOf(match)
         if (overlaps(span, seen)) continue
@@ -417,7 +400,6 @@ function buildDistribution(
             bare.forEach((place) => (place.share = each))
             confidence = NEEDS_REVIEW
         } else if (bare.length > 0) {
-            // Nothing is left to give them, so they were never really claimed.
             leftOver = [...leftOver, ...bare.flatMap((place) => place.spans)]
             places = written
             confidence = NEEDS_REVIEW
@@ -470,11 +452,7 @@ function buildDistribution(
     }
 }
 
-/**
- * Reads a free-text provenance cell into shares, and says how much of the
- * cell it managed to account for. The shares are kept as written: a part that
- * was not recognised is left missing rather than spread over the others.
- */
+/** Unrecognized parts are left missing rather than spread over the other shares. */
 export function transformProvenance(
     raw: string,
     reference: ReferenceData

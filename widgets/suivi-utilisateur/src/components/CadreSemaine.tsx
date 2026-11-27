@@ -10,7 +10,6 @@ type CadreSemaineProps = {
     >
 }
 
-/** The users active this week, beside their number week after week. */
 export default function CadreSemaine({ suivi }: CadreSemaineProps) {
     const { semaines, cetteSemaine, nombreUtilisateurs } = suivi
 
@@ -26,8 +25,6 @@ export default function CadreSemaine({ suivi }: CadreSemaineProps) {
                 <p className="fr-text--sm fr-mb-1w">
                     Semaine du {lundiLong(cetteSemaine.semaine)}
                 </p>
-                {/* Who the users are, or that no account is ticked, the
-                    tile above says already. */}
                 {nombreUtilisateurs > 0 && (
                     <p className="cadre-semaine__note fr-text--xs fr-mb-0">
                         Sur {plural(nombreUtilisateurs, 'utilisateur')}.

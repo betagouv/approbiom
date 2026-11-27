@@ -8,8 +8,7 @@ import {
     type LigneReferentiel,
 } from './generate-communes.ts'
 
-// Fictitious communes throughout: the codes and names are made up, only the
-// shapes are the ones the COG and geo.api.gouv.fr use.
+// Fictitious communes: codes and names are made up, only the shapes are real.
 
 const HEADER =
     'TYPECOM,COM,REG,DEP,CTCD,ARR,TNCC,NCC,NCCENR,LIBELLE,CAN,COMPARENT'
@@ -266,7 +265,6 @@ describe('buildCommunesFile', () => {
             referentiel,
             centresSource: CENTRES_SOURCE,
         })
-        // First, so it is what anyone opening the file reads.
         expect(Object.keys(file)[0]).toBe('_metadata')
     })
 })

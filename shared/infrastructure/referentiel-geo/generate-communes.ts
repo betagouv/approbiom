@@ -1,24 +1,14 @@
-// Regenerates communes.json — the local INSEE code → geographic centre lookup
-// used to place a commune on a map without hitting the network at runtime.
-//
+// Regenerates communes.json (INSEE code → centre) from the Grist `INSEE_Commune` CSV export;
+// rerun whenever that table changes. Centres come from geo.api.gouv.fr.
 //     pnpm generate:referentiels communes --csv <INSEE_Commune.csv> --source "<where it comes from>"
-//
-// The communes it holds are the ones the Grist document knows: its
-// `INSEE_Commune` table, exported as CSV, is the référentiel. Only the centres
-// come from geo.api.gouv.fr. Keeping the two in step is what lets a commune a
-// document names land on the map, so this is rerun by hand whenever that table
-// is updated, and the result is committed.
 
 import { readFile, writeFile } from 'node:fs/promises'
 import { basename } from 'node:path'
 
 export const CENTRES_SOURCE = 'https://geo.api.gouv.fr/'
 
-// `fields` keeps the payload to what we read; `geometry=centre` makes `centre`
-// the geometry that gets returned, and `format=json` returns a plain array
-// rather than a GeoJSON FeatureCollection. `/communes` answers the communes
-// actuelles only unless `type` asks for the arrondissements as well; the
-// communes déléguées and associées are served by an endpoint of their own.
+// `/communes` omits arrondissements unless `type` asks for them; communes
+// déléguées and associées have an endpoint of their own.
 const ENDPOINTS = [
     'https://geo.api.gouv.fr/communes?fields=code,type,centre&format=json&geometry=centre&type=commune-actuelle,arrondissement-municipal',
     'https://geo.api.gouv.fr/communes_associees_deleguees?fields=code,type,centre&format=json&geometry=centre',
@@ -27,11 +17,9 @@ const ENDPOINTS = [
 const OUTPUT_URL = new URL('./communes.json', import.meta.url)
 export const OUTPUT_PATH = 'shared/infrastructure/referentiel-geo/communes.json'
 
-/** The TYPECOM values of the COG, as the Grist table holds them. */
 const TYPES_COMMUNE = ['COM', 'ARM', 'COMA', 'COMD'] as const
 export type TypeCommune = (typeof TYPES_COMMUNE)[number]
 
-/** How geo.api.gouv.fr spells each TYPECOM in its `type` field. */
 const TYPE_BY_API_TYPE: Record<string, TypeCommune> = {
     'commune-actuelle': 'COM',
     'arrondissement-municipal': 'ARM',
@@ -39,7 +27,6 @@ const TYPE_BY_API_TYPE: Record<string, TypeCommune> = {
     'commune-deleguee': 'COMD',
 }
 
-/** One row of the référentiel that names a commune. */
 export type LigneReferentiel = {
     type: TypeCommune
     code: string
@@ -51,7 +38,7 @@ export type Centre = {
     longitude: number
 }
 
-/** Keyed by {@link centreKey}: a code alone is not enough, see there. */
+/** Keyed by {@link centreKey}. */
 export type Centres = ReadonlyMap<string, Centre>
 
 type Commune = {
@@ -75,26 +62,17 @@ export type CommunesFile = {
 }
 
 export type GenerateCommunesOptions = {
-    /** The CSV export of the Grist `INSEE_Commune` table. */
+    /** CSV export of the Grist `INSEE_Commune` table. */
     csvPath: string
-    /** Free text saying where that CSV comes from, copied into the output. */
     source: string
 }
 
-/**
- * A commune déléguée chef-lieu carries the code of the commune nouvelle it
- * belongs to, so one code can name two places: the centre is looked up by type
- * and code together.
- */
+/** A commune déléguée chef-lieu shares its commune nouvelle's code, hence the type. */
 function centreKey(type: TypeCommune, code: string): string {
     return `${type}:${code}`
 }
 
-/**
- * Splits a CSV the way Grist exports it: comma-separated, a field quoted when
- * it holds a comma, quote or line break, a quote inside one doubled. Line
- * endings may be LF or CRLF, and a leading byte-order mark is dropped.
- */
+/** Grist's CSV export: RFC 4180 quoting, LF or CRLF, optional BOM. */
 export function parseCsv(text: string): string[][] {
     const rows: string[][] = []
     let row: string[] = []
@@ -134,13 +112,10 @@ export function parseCsv(text: string): string[][] {
         }
     }
 
-    // Left open, a quote would have swallowed every row after it into one
-    // field, and those communes would go missing without a word.
     if (quoted) {
         throw new Error('the référentiel CSV has an unterminated quoted field')
     }
 
-    // The last line may or may not end with a line break.
     if (field !== '' || row.length > 0) {
         row.push(field)
         rows.push(row)
@@ -149,11 +124,7 @@ export function parseCsv(text: string): string[][] {
     return rows
 }
 
-/**
- * The communes the référentiel names, and the line numbers (1-based, header
- * included, as an editor shows them) of the rows that name none: a row with
- * no code, no libellé or a TYPECOM the COG does not define.
- */
+/** `ignorees` are 1-based line numbers, header included, as an editor shows them. */
 export function parseReferentiel(text: string): {
     lignes: LigneReferentiel[]
     ignorees: number[]
@@ -180,7 +151,6 @@ export function parseReferentiel(text: string): {
     const ignorees: number[] = []
 
     for (const [index, row] of rows.entries()) {
-        // A blank line, typically the one an editor leaves at the end.
         if (row.every((field) => field.trim() === '')) continue
 
         const type = row[typeColumn]?.trim() ?? ''
@@ -202,11 +172,7 @@ function isTypeCommune(value: string): value is TypeCommune {
     return TYPES_COMMUNE.includes(value as TypeCommune)
 }
 
-/**
- * Indexes what geo.api.gouv.fr answered. An entry with no usable code, type
- * or centre is left out: the commune it stood for then shows up among the ones
- * without a centre, which is where it is actionable.
- */
+/** Unusable entries are dropped: their commune then gets reported as without a centre. */
 export function toCentres(payloads: readonly unknown[]): Centres {
     const centres = new Map<string, Centre>()
 
@@ -251,18 +217,10 @@ export function toCentres(payloads: readonly unknown[]): Centres {
     return centres
 }
 
-/**
- * Where a code is carried by several rows — a commune nouvelle and its commune
- * déléguée chef-lieu — the entry is the commune's own, as a document naming
- * that code means the commune nouvelle. Earlier in this list wins.
- */
+/** When several rows share a code, the earlier type wins (commune nouvelle over its déléguée). */
 const PRIORITY: readonly TypeCommune[] = ['COM', 'ARM', 'COMA', 'COMD']
 
-/**
- * The file to write, and the rows no centre was found for. Every such row is
- * reported, even when another row with the same code gave that code a centre:
- * each is a commune of the référentiel the API does not place.
- */
+/** `sansCentre` lists every unplaced row, even when another row gave its code a centre. */
 export function buildCommunesFile({
     lignes,
     centres,
@@ -297,11 +255,7 @@ export function buildCommunesFile({
     }
 
     const communes: Record<string, Commune> = Object.fromEntries(
-        // Sorted so that regenerating an unchanged référentiel gives a
-        // byte-identical `communes`, whatever order the rows came in. Codes
-        // without a leading zero still land first in the JSON: JavaScript
-        // hoists integer-like keys to the front of an object, and
-        // `JSON.stringify` follows.
+        // Sorted for a byte-identical output; integer-like codes are still hoisted first.
         [...chosen.entries()]
             .sort(([a], [b]) => a.localeCompare(b))
             .map(([code, { ligne, centre }]) => [
@@ -318,8 +272,6 @@ export function buildCommunesFile({
 
     return {
         file: {
-            // JSON has no comments: this is the closest thing, and it is
-            // the first thing anyone opening the file reads.
             _metadata: {
                 _comment:
                     `Généré le ${timestamp} par \`pnpm generate:referentiels communes\` ` +
@@ -382,8 +334,7 @@ export async function generateCommunes({
         throw new Error(`${CENTRES_SOURCE} answered no usable centre`)
     }
 
-    // Only the file name goes into the output: the full path is the local
-    // machine's, and the file is committed.
+    // File name only: the full path is local and the output is committed.
     const fichier = basename(csvPath)
     const { file, sansCentre } = buildCommunesFile({
         lignes,
@@ -401,8 +352,7 @@ export async function generateCommunes({
         }
     }
 
-    // Nothing is written until the whole référentiel has been matched, so a
-    // failed run always leaves the committed dataset untouched.
+    // Written last: a failed run leaves the committed dataset untouched.
     await writeFile(OUTPUT_URL, `${JSON.stringify(file, null, 4)}\n`, 'utf8')
 
     const count = Object.keys(file.communes).length

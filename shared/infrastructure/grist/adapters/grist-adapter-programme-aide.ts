@@ -26,17 +26,12 @@ function mapFromGristToApplication(row: GristRow): ProgrammeAide {
         name: asString(row.Nom_complet),
         shortName: asString(row.Nom_raccourci),
         appelAProjet: asString(row.Appel_a_projet),
-        // `Laureat` is a Ref to the plan the programme named lauréat. An empty
-        // Ref reads as 0, which is no plan at all rather than the plan of
-        // rowId 0.
+        // An empty Ref reads as 0.
         laureat: asNumber(row.Laureat) || null,
     }
 }
 
-/**
- * The cells one update writes. No plan named lauréat empties the Ref, and an
- * empty Ref is written as 0 — Grist has no other way to say « personne ».
- */
+/** Grist writes an empty Ref as 0. */
 function mapFromApplicationToGrist(
     updateData: ProgrammeAideUpdateData
 ): GristCells {

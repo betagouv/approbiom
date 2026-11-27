@@ -16,7 +16,6 @@ function renderModal(props: Partial<ModalProps> = {}) {
     )
 }
 
-// A page with the button that opens the modal, to follow the focus.
 function Page() {
     const [open, setOpen] = useState(false)
 

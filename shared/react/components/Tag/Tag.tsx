@@ -1,10 +1,5 @@
-// A tag that is read, not clicked: a label saying what a piece of content
-// belongs to. DSFR's other two forms — `<a>` and `<button>` — are tags that do
-// something (open a search, drop a filter) and are not what this component is.
-//
-// That distinction is also why the colours are painted in Tag.css: DSFR scopes
-// every `fr-tag--<couleur>` rule to those clickable forms, so a `<p>` given one
-// stays grey. See the stylesheet for how they are put back.
+// Non-interactive DSFR tag. DSFR scopes `fr-tag--<couleur>` to
+// `<a>`/`<button>`, so Tag.css restores the colours.
 import '@gouvfr/dsfr/dist/component/tag/tag.main.min.css'
 import './Tag.css'
 import type { TagProps } from './Tag.types'

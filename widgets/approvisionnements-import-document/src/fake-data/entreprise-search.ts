@@ -7,9 +7,8 @@ const FICTIVE_NAMES = [
     'COOPERATIVE FICTIVE DES CRETES',
 ]
 
-// Stands in for the Recherche d'entreprises API, with the same cases as the
-// mock-up: a SIRET starting with 000 is unknown, 99999999999999 makes the
-// service fail, any other gets a fictive name after a short wait.
+// Fake Recherche d'entreprises API: a SIRET starting with 000 is unknown,
+// 99999999999999 fails, any other gets a fictive name.
 export const FAKE_ENTREPRISE_SEARCH: EntrepriseSearchPort = {
     getEntrepriseFromQuery: (query) =>
         new Promise((resolve, reject) =>

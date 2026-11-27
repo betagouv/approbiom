@@ -2,8 +2,6 @@ import { afterEach, describe, expect, it, vi } from 'vitest'
 import type { ColumnMajorTable } from '../helpers/grist-helpers'
 import { createGristPlanPort } from './grist-adapter-plan'
 
-// The adapter reads `grist.docApi.fetchTable` and `grist.ready`, both installed
-// by the Grist plugin script, which does not exist under jsdom.
 function mockGrist(columns: ColumnMajorTable) {
     const fetchTable = vi.fn().mockResolvedValue(columns)
 
@@ -21,7 +19,6 @@ function mockGrist(columns: ColumnMajorTable) {
     return { fetchTable }
 }
 
-/** One plan, with every cell overridable. */
 function planTable(overrides: Record<string, unknown> = {}): ColumnMajorTable {
     const cells: Record<string, unknown> = {
         id: 1,
@@ -74,32 +71,25 @@ describe('createGristPlanPort', () => {
         expect(plan).toEqual({ nom: 'RCU Val Fleuri', statut: 'projet' })
     })
 
-    // Where the plan sits is the commune of its installation, which the
-    // installation port carries — the plan holds the reference and no more.
     it('carries the installation as a reference', async () => {
         mockGrist(planTable({ Installation: 12 }))
 
         await expect(firstPlan()).resolves.toMatchObject({ installation: 12 })
     })
 
-    // Grist writes an empty reference as 0, which names no installation.
+    // Grist writes an empty reference as 0.
     it('reads no installation when the reference is empty', async () => {
         mockGrist(planTable({ Installation: null }))
 
         await expect(firstPlan()).resolves.toMatchObject({ installation: 0 })
     })
 
-    // A usage the domain does not know is a column that has drifted, and every
-    // screen reading it filters on a value it will never match. Left null, the
-    // plan says « no usage » rather than an invented one.
     it('reads no usage from a value the domain does not know', async () => {
         mockGrist(planTable({ Usage_principal: 'chauffage urbain' }))
 
         await expect(firstPlan()).resolves.toMatchObject({ usage: null })
     })
 
-    // The generated types are erased at build time, so a renamed column has to
-    // fail here rather than fill every plan with blanks.
     it('refuses a document whose plan table is missing a column', async () => {
         const columns = planTable()
         delete columns.Statut
@@ -109,8 +99,7 @@ describe('createGristPlanPort', () => {
         await expect(createGristPlanPort().list()).rejects.toThrow(/Statut/)
     })
 
-    // What Grist sends when an access rule hides a column: only a widget that
-    // reads it stops working.
+    // What Grist sends when an access rule hides a column.
     it('reads the fields asked for from a document that lacks the others', async () => {
         const columns = planTable()
         delete columns.Statut
@@ -126,8 +115,7 @@ describe('createGristPlanPort', () => {
         mockGrist(
             planTable({
                 Cree_par: 'camille.martin',
-                // 16 October 2026, 15:39:26 in Paris: Grist sends seconds,
-                // not milliseconds, and keeps the fraction.
+                // 16 October 2026, 15:39:26 in Paris: Grist sends seconds, with a fraction.
                 Cree_le: 1792157966.94359,
             })
         )
@@ -142,8 +130,7 @@ describe('createGristPlanPort', () => {
         ])
     })
 
-    // Plans created before the tracking began: Grist leaves the Text column
-    // empty and the DateTime one null.
+    // Untracked plans: Grist leaves the Text column empty and the DateTime one null.
     it('reads an untracked plan as created by no one, at no date', async () => {
         mockGrist(planTable({ Cree_par: '', Cree_le: null }))
 

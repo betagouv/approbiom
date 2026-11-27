@@ -7,8 +7,7 @@ import type { ExtractedLine } from '@shared/core/domain/entities/extracted-appro
 const DELAY_MS = 1300
 
 /**
- * Stands in for importRows, to drive the UI. The outcome follows the
- * document's name, one case per error of the mock-up:
+ * Fake importRows: the outcome follows the document's name:
  * - not an .xlsx: unreadable format;
  * - « annexe » or « tableau »: no « Fournisseurs » sheet;
  * - « brive »: no header;

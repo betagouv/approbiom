@@ -1,11 +1,5 @@
-// Projects the place names out of the contour datasets.
-//
-//     pnpm generate:place-names
-//
-// The provenance reader needs 331 names; the contour files that hold them
-// weigh 6.3 MB, so shipping those to a widget is out of the question. This
-// writes the ~15 KB projection instead. Run it after regenerating either
-// contour dataset.
+// Projects the place names out of the 6.3 MB contour datasets into a ~15 KB file.
+// Run after regenerating either contour dataset: `pnpm generate:place-names`
 
 import { readFileSync, writeFileSync } from 'node:fs'
 import { fileURLToPath } from 'node:url'
@@ -13,18 +7,14 @@ import { fileURLToPath } from 'node:url'
 const here = fileURLToPath(new URL('.', import.meta.url))
 
 /**
- * The keys of one section, in the order the file writes them.
- *
- * `JSON.parse` cannot be used for this: JavaScript hoists integer-like keys, so
- * "971" would come out ahead of "01". The order decides which name wins when
- * two are the same length, so it has to survive.
+ * Not `JSON.parse`: it hoists integer-like keys ("971" before "01"), and file
+ * order breaks ties between same-length names.
  */
 function keysInFileOrder(raw: string, section: string): string[] {
     const from = raw.indexOf(`"${section}":`)
     if (from === -1) throw new Error(`no "${section}" section`)
 
-    // Entries are the only keys whose value is an object: `nom` holds a string
-    // and `contour` an array.
+    // Entries are the only keys whose value is an object.
     const entries = raw.slice(from).matchAll(/"([^"]+)":\s*\{/g)
 
     return [...entries].map(([, key]) => key).slice(1)

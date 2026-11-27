@@ -1,18 +1,5 @@
-// Regenerates countries-contours.json — the local ISO 3166-1 alpha-3 → outline
-// lookup used to draw a country on a map without hitting the network.
-//
-//     pnpm generate:referentiels pays
-//
-// geoBoundaries publishes one ADM0 (country) boundary per country under an open
-// licence, indexed by the API below. Each entry points at two GeoJSON files: the
-// full geometry, and a `simplified` one already generalised for the web. The
-// simplified one is what is read here — and then thinned again, because
-// "simplified" upstream still means 13 MB for Canada, which is its eight
-// thousand islands drawn to a precision no world map can show.
-//
-// Countries are keyed by `boundaryISO`, the ISO 3166-1 alpha-3 code, and named
-// in French: the document names a foreign provenance in French, so the screen
-// has to be able to find a country by the name it is written under.
+// Regenerates countries-contours.json (ISO alpha-3 → French name + outline) from geoBoundaries ADM0.
+// Upstream "simplified" files are thinned again (13 MB for Canada): `pnpm generate:referentiels pays`
 
 import { writeFile } from 'node:fs/promises'
 
@@ -25,44 +12,28 @@ const OUTPUT_URL = new URL('./countries-contours.json', import.meta.url)
 export const OUTPUT_PATH =
     'shared/infrastructure/referentiel-geo/countries-contours.json'
 
-// In degrees, so about 5 km. A country is read at world scale, where a degree
-// is a handful of pixels: a point sitting this close to the line its neighbours
-// already draw cannot be told apart from it, and there are millions of them.
+// Degrees (~5 km).
 const TOLERANCE = 0.05
 
-// About 10 m at the equator, which is far finer than the simplification leaves
-// meaningful. Keeping more only stores the noise it just removed.
+// ~10 m at the equator.
 const DECIMALS = 4
 
-// Degrees, so about 1 km. An island whose bounding box is smaller than this is
-// under a pixel at the scale its country is drawn at, so it costs points and
-// draws nothing. Low enough to let a microstate through: Monaco is 2 km across,
-// and a country absent from the map reads as a country with no data.
+// Degrees (~1 km): islands smaller than this are dropped. Must stay below Monaco's 2 km.
 const MINIMUM_EXTENT = 0.01
 
-// A country is never simplified past a twentieth of its own bounding box,
-// whatever TOLERANCE says. Without this the tolerance is measured against a
-// scale the small countries are not drawn at: 5 km of slack flattens Monaco to
-// a straight line, and a shape under four points is dropped as no shape at all.
-//
-// Measured over the whole country rather than over each ring: a map showing
-// Monaco is zoomed to Monaco, but a map showing Canada is not zoomed to each of
-// its eight thousand islands, and giving those the detail their own size asks
-// for is how a country costs a hundred thousand points.
+// Tolerance is capped at 1/20 of the whole country's bounding box (not each ring's),
+// otherwise TOLERANCE flattens small countries such as Monaco.
 const MINIMUM_DETAIL = 20
 
-// geoBoundaries serves each country's geometry as its own file, some of them
-// tens of megabytes. Eight at a time keeps the run to a few minutes without
-// asking GitHub to serve two hundred large files at once.
+// One file per country, some tens of MB, served from GitHub.
 const CONCURRENCY = 8
 
-/** GeoJSON orders a point [longitude, latitude], not the other way round. */
+/** [longitude, latitude]. */
 type GeoJsonPoint = [number, number]
 
-/** A ring of the outline, [latitude, longitude] — the order Leaflet reads. */
+/** [latitude, longitude], the order Leaflet reads. */
 type Ring = [number, number][]
 
-/** One entry of the ADM0 index. Only these four fields are read. */
 type IndexEntry = {
     boundaryISO?: string
     boundaryName?: string
@@ -72,13 +43,10 @@ type IndexEntry = {
 
 type GeoJsonGeometry = {
     type?: string
-    // Polygon: rings. MultiPolygon: polygons, each a list of rings. In both
-    // the first ring of a polygon is its outline, the rest are holes.
     coordinates?: GeoJsonPoint[][] | GeoJsonPoint[][][]
 }
 
 type Country = {
-    /** The country's name in French, the language the document names it in. */
     nom: string
     contour: Ring[]
 }
@@ -87,26 +55,15 @@ type ContoursFile = {
     _metadata: {
         source: string
         generatedAt: string
-        /** The tolerance the outlines were simplified with, in degrees. */
+        /** Degrees. */
         simplifiedTo: number
     }
-    /** Keyed by ISO 3166-1 alpha-3 code. */
+    /** Keyed by ISO 3166-1 alpha-3. */
     countries: Record<string, Country>
 }
 
-// ---------------------------------------------------------------------------
-// Naming
-//
-// `Intl.DisplayNames` names a région from its alpha-2 code, and geoBoundaries
-// identifies a country by its alpha-3 one. Nothing in the platform converts
-// between the two, so the pairing is recovered by matching the English name
-// both sides know the country by. That works for most of them; the rest are
-// the ones geoBoundaries writes under their full UN name ("Russian Federation"
-// where CLDR says "Russia"), and they are listed out below.
-//
-// The run fails if a country is left without a name, so a rename upstream is
-// loud rather than a country quietly missing from the map.
-// ---------------------------------------------------------------------------
+// `Intl.DisplayNames` needs alpha-2; geoBoundaries gives alpha-3. They are paired by English
+// name, except for these, which geoBoundaries writes under their full UN name.
 
 const ALPHA_2_BY_ALPHA_3: Readonly<Record<string, string>> = {
     ATA: 'AQ',
@@ -148,7 +105,6 @@ const ALPHA_2_BY_ALPHA_3: Readonly<Record<string, string>> = {
 
 const ALPHABET = 'ABCDEFGHIJKLMNOPQRSTUVWXYZ'
 
-/** Accents, case and punctuation dropped, so two spellings of a name meet. */
 function normalise(name: string): string {
     return name
         .normalize('NFD')
@@ -157,11 +113,7 @@ function normalise(name: string): string {
         .replace(/[^a-z]/g, '')
 }
 
-/**
- * Every alpha-2 code CLDR names, indexed by its normalised English name. Built
- * by asking for all 676 two-letter combinations: the ones that are not regions
- * answer with the code itself, which is how they are told apart.
- */
+/** Tries all 676 two-letter codes; non-regions answer with the code itself. */
 function alpha2ByEnglishName(): Map<string, string> {
     const english = new Intl.DisplayNames(['en'], { type: 'region' })
     const index = new Map<string, string>()
@@ -215,15 +167,6 @@ function frenchNames(entries: readonly IndexEntry[]): Map<string, string> {
     return names
 }
 
-// ---------------------------------------------------------------------------
-// Geometry
-// ---------------------------------------------------------------------------
-
-/**
- * How far a point sits from the segment its neighbours draw, squared — squared
- * because only the comparison matters and a square root per point is a square
- * root millions of times.
- */
 function squaredDistanceToSegment(
     point: GeoJsonPoint,
     start: GeoJsonPoint,
@@ -250,14 +193,7 @@ function squaredDistanceToSegment(
     return (point[0] - x) ** 2 + (point[1] - y) ** 2
 }
 
-/**
- * Douglas-Peucker: keep the two ends, keep the point furthest from the line
- * between them if it is further than the tolerance, and ask the same of the
- * two halves it cuts the ring into.
- *
- * Written with an explicit stack rather than recursion because a coastline is
- * tens of thousands of points and the recursion is only shallow on average.
- */
+/** Douglas-Peucker. */
 function simplify(
     ring: readonly GeoJsonPoint[],
     tolerance: number
@@ -314,7 +250,7 @@ function round(value: number): number {
     return Math.round(value * factor) / factor
 }
 
-/** The longer side of a ring's bounding box, in degrees. */
+/** Longer side of the bounding box. */
 function extent(ring: readonly GeoJsonPoint[]): number {
     let minimumX = Infinity
     let minimumY = Infinity
@@ -331,7 +267,6 @@ function extent(ring: readonly GeoJsonPoint[]): number {
     return Math.max(maximumX - minimumX, maximumY - minimumY)
 }
 
-/** A simplified outline, rounded and flipped to the order Leaflet reads. */
 function toRing(outline: readonly GeoJsonPoint[]): Ring {
     return outline.map(([longitude, latitude]) => [
         round(latitude),
@@ -339,20 +274,11 @@ function toRing(outline: readonly GeoJsonPoint[]): Ring {
     ])
 }
 
-/**
- * The outlines of one geometry, simplified and flipped to [latitude, longitude].
- *
- * Holes are dropped: a hole in a country is an enclave of a neighbour, and the
- * map this feeds draws an outline rather than a surface. Rings that stay under
- * MINIMUM_EXTENT, or that the tolerance leaves with fewer than four points, are
- * dropped too — an islet flattened to a line is no longer a shape.
- */
+/** Holes (enclaves), rings under MINIMUM_EXTENT and rings flattened below four points are dropped. */
 function toContour(geometry: GeoJsonGeometry | undefined): Ring[] {
     const { type, coordinates } = geometry ?? {}
     if (!Array.isArray(coordinates)) return []
 
-    // A Polygon is a list of rings, a MultiPolygon a list of those. Reading
-    // both as a list of polygons is what lets one function answer for either.
     const polygons: unknown[] = type === 'Polygon' ? [coordinates] : coordinates
 
     const outlines: GeoJsonPoint[][] = []
@@ -375,8 +301,7 @@ function toContour(geometry: GeoJsonGeometry | undefined): Ring[] {
 
     const contour: Ring[] = []
     for (const outline of outlines) {
-        // Measured before simplification: the tolerance pulls a ring's points
-        // together without saying how big the ring was.
+        // Measured before simplification.
         if (extent(outline) < MINIMUM_EXTENT) continue
 
         const simplified = simplify(outline, tolerance)
@@ -385,10 +310,7 @@ function toContour(geometry: GeoJsonGeometry | undefined): Ring[] {
         contour.push(toRing(simplified))
     }
 
-    // An atoll nation is a wide country made only of narrow islands: its span
-    // buys it a coarse tolerance, and every one of its islands then falls under
-    // the minimum. Keeping the largest of them, drawn to its own size, is what
-    // stops the Maldives from having no outline at all.
+    // Atoll nations (Maldives): every island falls under the minimum, keep the largest.
     if (contour.length === 0) {
         const largest = outlines.reduce((biggest, outline) =>
             extent(outline) > extent(biggest) ? outline : biggest
@@ -399,10 +321,6 @@ function toContour(geometry: GeoJsonGeometry | undefined): Ring[] {
 
     return contour
 }
-
-// ---------------------------------------------------------------------------
-// Reading
-// ---------------------------------------------------------------------------
 
 async function fetchJson(url: string): Promise<unknown> {
     let response: Response
@@ -446,11 +364,7 @@ async function fetchIndex(): Promise<readonly IndexEntry[]> {
     return entries
 }
 
-/**
- * The geometry of one country. geoBoundaries wraps it in a FeatureCollection of
- * a single ADM0 feature, but serves a bare Feature for a few of them, so both
- * are read.
- */
+/** Usually a FeatureCollection of one feature, but a few countries are a bare Feature. */
 function toGeometry(payload: unknown): GeoJsonGeometry | undefined {
     if (typeof payload !== 'object' || payload === null) return undefined
 
@@ -469,11 +383,6 @@ function toGeometry(payload: unknown): GeoJsonGeometry | undefined {
     return geometry as GeoJsonGeometry | undefined
 }
 
-/**
- * Returns `null` for a country nothing usable came back for. Those are skipped
- * rather than fatal: one boundary file missing upstream should not cost us the
- * other two hundred.
- */
 async function fetchCountry(
     entry: IndexEntry,
     nom: string
@@ -481,8 +390,7 @@ async function fetchCountry(
     const code = entry.boundaryISO
     if (code === undefined || code === '') return null
 
-    // The simplified geometry is what this is for; the full one is the fallback
-    // for the handful of entries that do not publish a simplified file.
+    // A few entries publish no simplified file.
     const url = entry.simplifiedGeometryGeoJSON ?? entry.gjDownloadURL
     if (url === undefined || url === '') return null
 
@@ -492,7 +400,6 @@ async function fetchCountry(
     return { code, country: { nom, contour } }
 }
 
-/** Runs `work` over `items`, `CONCURRENCY` of them in flight at a time. */
 async function inBatches<T, R>(
     items: readonly T[],
     work: (item: T) => Promise<R>
@@ -507,12 +414,7 @@ async function inBatches<T, R>(
     return results
 }
 
-/**
- * `JSON.stringify(file, null, 4)` would put each of the hundreds of thousands
- * of coordinates on a line of its own, which is a file no one can read a diff
- * of. One country per line keeps it legible where it matters — you see which of
- * them moved — and small enough to bundle.
- */
+/** One country per line, for readable diffs. */
 function serialise(file: ContoursFile): string {
     const countries = Object.entries(file.countries)
         .sort(([a], [b]) => a.localeCompare(b))
@@ -532,8 +434,7 @@ function serialise(file: ContoursFile): string {
         '',
     ].join('\n')
 
-    // Assembled by hand, so it is parsed back before it is allowed to replace
-    // the committed file.
+    // Assembled by hand: validate before it replaces the committed file.
     JSON.parse(json)
     return json
 }
@@ -588,8 +489,7 @@ export async function generateCountriesContours(): Promise<void> {
         countries,
     }
 
-    // Nothing is written until the whole payload has been validated, so a
-    // failed run always leaves the committed dataset untouched.
+    // Written last: a failed run leaves the committed dataset untouched.
     await writeFile(OUTPUT_URL, serialise(data), 'utf8')
 
     const values = Object.values(countries)

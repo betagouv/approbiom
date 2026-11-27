@@ -1,8 +1,7 @@
 .chronologie {
     display: grid;
     grid-auto-flow: column;
-    /* Equal columns that stop shrinking rather than crush their labels; past
-       that the card scrolls sideways inside the Grist iframe. */
+    /* Below 8rem the card scrolls sideways rather than crush the labels. */
     grid-auto-columns: minmax(8rem, 1fr);
     grid-template-rows: repeat(4, auto);
 
@@ -32,15 +31,13 @@
     color: var(--text-mention-grey);
 }
 
-/* A step still to come has nothing to date, so its « En attente » is not
-   given the weight of one. */
 .chronologie__etape--pending .chronologie__date,
 .chronologie__etape--skipped .chronologie__date {
     font-weight: 400;
 }
 
-/* Full column width, so the connector below can be measured against it: the
-   distance between two dots is exactly one column. */
+/* Full column width: the connector below relies on two dots being one column
+   apart. */
 .chronologie__jalon {
     position: relative;
 
@@ -52,8 +49,7 @@
     height: 1rem;
 }
 
-/* The line comes in from the step before, so the first one has none. It stops
-   short of both dots rather than running under them. */
+/* Each step draws the line from the step before it. */
 .chronologie__etape:not(:first-child) .chronologie__jalon::before {
     content: '';
 
@@ -67,8 +63,6 @@
     background-color: var(--border-default-grey);
 }
 
-/* The line is painted by the step it arrives at: it is blue as far as the
-   instruction has got, grey from there on. */
 .chronologie__etape--done .chronologie__jalon::before,
 .chronologie__etape--current .chronologie__jalon::before {
     background-color: var(--background-active-blue-france);
@@ -83,8 +77,6 @@
     border-radius: 50%;
 }
 
-/* Behind us: solid. Where we are: a wider ring, open, so the eye stops on it.
-   Ahead: the grey ring it starts as. */
 .chronologie__etape--done .chronologie__marqueur {
     background-color: var(--background-active-blue-france);
     border-color: var(--background-active-blue-france);

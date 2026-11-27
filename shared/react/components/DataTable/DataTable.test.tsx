@@ -37,9 +37,6 @@ describe('DataTable', () => {
             />
         )
 
-        // Queried by accessible name rather than by text: the caption is what
-        // names the table for a screen reader, and this fails if it stops
-        // being a `<caption>`.
         expect(
             screen.getByRole('table', { name: 'Plans d’approvisionnement' })
         ).toBeDefined()
@@ -75,8 +72,6 @@ describe('DataTable', () => {
             />
         )
 
-        // The actions are not part of the table's name: only the title and
-        // the count are pulled into it.
         expect(
             screen.getByRole('table', {
                 name: 'Plans d’approvisionnement 2 résultats',
@@ -100,8 +95,6 @@ describe('DataTable', () => {
             />
         )
 
-        // A control that takes the focus must not sit inside the visually
-        // hidden title block: it would be tabbed into without being seen.
         expect(
             screen
                 .getByRole('button', { name: 'Rechercher' })
@@ -140,7 +133,6 @@ describe('DataTable', () => {
         )
 
         expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
-        // No extra column either: the table keeps the shape it had.
         expect(screen.getAllByRole('columnheader')).toHaveLength(2)
     })
 
@@ -156,8 +148,6 @@ describe('DataTable', () => {
             />
         )
 
-        // Queried by accessible name: each checkbox has to say which row it
-        // selects, since DSFR hides that text visually in a fixed cell.
         expect(screen.getAllByRole('checkbox')).toHaveLength(plans.length + 1)
         expect(getCheckbox('Tout sélectionner')).toBeDefined()
         expect(getCheckbox('Sélectionner Plan Nord')).toBeDefined()
@@ -165,7 +155,6 @@ describe('DataTable', () => {
     })
 
     it('adds a row to the selection when its checkbox is checked', () => {
-        // Typed so that reading back the reported selection stays type-safe.
         const onSelectionChange = vi.fn<(rows: Plan[]) => void>()
         render(
             <DataTable
@@ -181,7 +170,6 @@ describe('DataTable', () => {
         fireEvent.click(getCheckbox('Sélectionner Plan Nord'))
 
         expect(onSelectionChange).toHaveBeenCalledTimes(1)
-        // The very object from `rows`, not a copy of it.
         expect(onSelectionChange.mock.calls[0][0][0]).toBe(plans[0])
     })
 
@@ -229,8 +217,6 @@ describe('DataTable', () => {
                 caption="Plans d’approvisionnement"
                 rows={plans}
                 columns={columns}
-                // Everything selected, so the header checkbox is checked and
-                // clicking it clears instead of selecting.
                 selectedRows={plans}
                 selectionLabel={selectionLabel}
                 onSelectionChange={onSelectionChange}
@@ -245,10 +231,7 @@ describe('DataTable', () => {
     describe('sorting', () => {
         type Ressource = { nom: string; tonnage: number }
 
-        // Deliberately awkward values. Alphabetically, "Écorces" only lands
-        // between "Broyat" and "Plaquettes" under French collation — by code
-        // point "É" sorts after "P". And 9 / 10 / 100 only come out in that
-        // order numerically; as text they read 10, 100, 9.
+        // By code point "É" sorts after "P", and as text 9 / 10 / 100 read 10, 100, 9.
         const ressources: Ressource[] = [
             { nom: 'Plaquettes', tonnage: 10 },
             { nom: 'Broyat', tonnage: 100 },
@@ -265,8 +248,6 @@ describe('DataTable', () => {
             {
                 id: 'tonnage',
                 header: 'Tonnage',
-                // Rendered as text, sorted on the number behind it — the whole
-                // reason `sortBy` exists separately from `render`.
                 render: (ressource: Ressource) => `${ressource.tonnage} t`,
                 sortBy: (ressource: Ressource) => ressource.tonnage,
             },
@@ -281,9 +262,7 @@ describe('DataTable', () => {
                 />
             )
 
-        // Scoped to its own header rather than picked out of a flat list of
-        // buttons: every sort button is named "Trier", so only the column it
-        // sits in tells them apart.
+        // Every sort button is named "Trier": only its header tells them apart.
         const headerFor = (name: string) =>
             screen.getByRole('columnheader', { name: new RegExp(name) })
 
@@ -307,8 +286,7 @@ describe('DataTable', () => {
             )
 
             expect(screen.queryAllByRole('button')).toHaveLength(0)
-            // Not even `aria-sort="none"`: the column is not sortable at all,
-            // which is a different thing from being sortable and unsorted.
+            // Not even `aria-sort="none"`, which means sortable but unsorted.
             expect(
                 screen.getAllByRole('columnheader')[0].getAttribute('aria-sort')
             ).toBeNull()
@@ -363,7 +341,6 @@ describe('DataTable', () => {
             expect(headerFor('Tonnage').getAttribute('aria-sort')).toBe(
                 'ascending'
             )
-            // The column it left reports itself sortable but unsorted again.
             expect(headerFor('Nom').getAttribute('aria-sort')).toBe('none')
         })
 
@@ -380,8 +357,6 @@ describe('DataTable', () => {
 
             fireEvent.click(sortButtonFor('Tonnage'))
 
-            // Sorting the rendered strings would have given 10, 100, 9; the
-            // rows follow the numbers, so the names line up with them.
             expect(columnValues(0)).toEqual(['Écorces', 'Plaquettes', 'Broyat'])
         })
 

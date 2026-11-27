@@ -18,10 +18,6 @@ const contour = [
     ],
 ]
 
-/**
- * Spies typed from the port, so a call is asserted against the shape the screen
- * really reads through and not against `any`.
- */
 function contours() {
     return {
         getCommuneCenterPosition: vi
@@ -36,28 +32,18 @@ function contours() {
     }
 }
 
-/**
- * Leaflet draws a polygon as an SVG path in the overlay pane. Scoped to that
- * pane rather than the whole container: the attribution control draws paths of
- * its own, and counting those would count the OpenStreetMap flag as a
- * provenance.
- */
+/** Overlay pane only: the attribution control draws SVG paths of its own. */
 function polygons(container: HTMLElement): NodeListOf<SVGPathElement> {
     return container.querySelectorAll('.leaflet-overlay-pane path')
 }
 
-/** Leaflet draws a marker as an image in its own pane. */
 function markers(container: HTMLElement): NodeListOf<HTMLImageElement> {
     return container.querySelectorAll('.leaflet-marker-pane img')
 }
 
 const NOTHING_DRAWN = /Aucun lieu n'a pu être situé/
 
-/**
- * The rows a screen hands the map, written as the places they are drawn from,
- * each drawing the same tonnage as the next — what a test that is not about
- * shading says when it says nothing about tonnage.
- */
+/** Rows with equal tonnage, for tests not about shading. */
 function drawnFrom(
     ...places: string[]
 ): ProvenanceMapProps['approvisionnements'] {
@@ -155,8 +141,6 @@ describe('ProvenanceMap', () => {
         expect(getDepartementContour).toHaveBeenCalledTimes(1)
     })
 
-    // The view is framed on the shapes it drew. A provenance the référentiel
-    // does not hold draws none, and framing on it would be framing on nothing.
     it('draws what it can when a provenance is not held', () => {
         const { getCommuneCenterPosition, getDepartementContour } = contours()
 
@@ -271,8 +255,6 @@ describe('ProvenanceMap', () => {
         expect(polygons(container)).toHaveLength(1)
     })
 
-    // What the concurrence screen asks for: where these plans are, with no
-    // territory drawn under them.
     it('draws a map of markers alone', () => {
         const {
             getCommuneCenterPosition,
@@ -316,7 +298,6 @@ describe('ProvenanceMap', () => {
     })
 
     it('says as much when no provenance can be placed', () => {
-        // A country the référentiel does not hold answers with no outline.
         const { getCommuneCenterPosition, getDepartementContour } = contours()
 
         render(

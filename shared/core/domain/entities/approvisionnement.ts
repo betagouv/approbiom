@@ -12,10 +12,8 @@ export type Approvisionnement = {
     planDApprovisionnement: PlanDApprovisionnement['id']
     ressource: Ressource['code']
     provenance: Provenance
-    // Undefined when the fournisseur is not known — a plan may leave it out.
     fournisseur?: Entreprise['siret']
     tonnageTotal: number
-    // Only set on an approvisionnement imported from a document.
     additionalDataFromDocument?: string
     source?: Attachment['id']
 }

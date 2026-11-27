@@ -6,8 +6,7 @@ import '@gouvfr/dsfr/dist/component/button/button.main.min.css'
 import { Fragment, useId, useMemo, useState } from 'react'
 import type { DataTableProps, SortDirection } from './DataTable.types'
 
-/** Numbers compare as numbers; anything else as French text, so that accents
- *  land where a reader expects and "10" comes after "9" rather than before. */
+/** Numbers compare as numbers, anything else with French collation. */
 function compare(a: string | number, b: string | number): number {
     if (typeof a === 'number' && typeof b === 'number') return a - b
 
@@ -30,15 +29,12 @@ export default function DataTable<T>({
     onSelectionChange,
     selectionLabel,
 }: DataTableProps<T>) {
-    // Ids only have to be unique in the document; `useId` keeps two tables on
-    // the same page from pointing their labels at each other's checkboxes.
     const id = useId()
     const titleId = `${id}-title`
     const countId = `${id}-count`
     const descriptionId = `${id}-description`
 
-    // Keyed by the row object, not its index: filtering and sorting move a row's
-    // position, and an index would leave whichever row landed there open.
+    // Keyed by the row object: filtering and sorting move a row's index.
     const [expandedRows, setExpandedRows] = useState<ReadonlySet<T>>(new Set())
 
     function toggleExpanded(row: T) {
@@ -54,9 +50,7 @@ export default function DataTable<T>({
         direction: SortDirection
     } | null>(null)
 
-    // Ascending on the first click, then flips between the two directions. The
-    // table starts unsorted and stops being so for good: a column taken over by
-    // another one starts from ascending again.
+    // Never goes back to unsorted; a newly sorted column starts ascending.
     function toggleSort(columnId: string) {
         setSort((current) =>
             current?.columnId === columnId && current.direction === 'ascending'
@@ -91,10 +85,8 @@ export default function DataTable<T>({
         if (checked) next.add(row)
         else next.delete(row)
 
-        // Rebuilt from `rows` rather than appended to: the caller always gets
-        // the selection in the table's own order, whatever order it was
-        // clicked in. `selectedRows` itself is never touched, and the row
-        // objects are passed through by reference.
+        // Rebuilt from `sortedRows` so the selection comes back in displayed
+        // order, with the caller's own row objects.
         onSelectionChange?.(
             sortedRows.filter((candidate) => next.has(candidate))
         )
@@ -110,9 +102,7 @@ export default function DataTable<T>({
         .filter(Boolean)
         .join(' ')
 
-    // Controls can take the focus, so they never go where `hideCaption` hides
-    // the title: an invisible field would still be tabbed into. With the title
-    // hidden they get a line of their own instead.
+    // Never inside the title hidden by `hideCaption`: an invisible field would still be tabbable.
     const actions = headerActions !== undefined && (
         <div className="shared-data-table__header-actions">{headerActions}</div>
     )
@@ -120,12 +110,8 @@ export default function DataTable<T>({
     return (
         <div className={rootClassName}>
             {hideCaption && actions}
-            {/* Deliberately outside `fr-table__wrapper`. Its container is the
-                scrolling box, and a `<caption>` — which the HTML parser will
-                only accept inside `<table>` — therefore scrolls away with the
-                rows and puts the scrollbar alongside the title. Named through
-                `aria-labelledby` instead, so the heading is still the table's
-                accessible name without the text existing twice. */}
+            {/* Outside `fr-table__wrapper`, the scrolling box, so the title does not scroll
+                away with the rows; named through `aria-labelledby` instead of a `<caption>`. */}
             <div
                 className={`shared-data-table__header${hideCaption ? ' fr-sr-only' : ''}`}
             >
@@ -133,9 +119,6 @@ export default function DataTable<T>({
                     <span id={titleId}>{caption}</span>
                     {!hideCaption && actions}
                     {showResultCount && (
-                        // Announced on change, not on load: a sighted reader
-                        // watches the count move as filters are applied, and
-                        // this is the only way anyone else hears it.
                         <span
                             id={countId}
                             className="shared-data-table__result-count"
@@ -181,10 +164,7 @@ export default function DataTable<T>({
                                                     id={`${id}-all`}
                                                     checked={allSelected}
                                                     disabled={rows.length === 0}
-                                                    // `indeterminate` is a DOM
-                                                    // property with no HTML
-                                                    // attribute, so it can only
-                                                    // be set on the node itself.
+                                                    // `indeterminate` has no HTML attribute.
                                                     ref={(input) => {
                                                         if (input)
                                                             input.indeterminate =
@@ -215,17 +195,9 @@ export default function DataTable<T>({
                                                 : undefined
 
                                         return (
-                                            // `scope="col"` ties every cell
-                                            // below to this header when a screen
-                                            // reader announces a row.
                                             <th
                                                 key={column.id}
                                                 scope="col"
-                                                // On the `th`, where the
-                                                // columnheader role reads it —
-                                                // the button below carries the
-                                                // matching state as a class,
-                                                // which is what DSFR styles.
                                                 aria-sort={
                                                     column.sortBy
                                                         ? (direction ?? 'none')
@@ -233,13 +205,8 @@ export default function DataTable<T>({
                                                 }
                                             >
                                                 {column.sortBy ? (
-                                                    // Wrapper rather than the
-                                                    // `th` itself: DSFR's class
-                                                    // is `display: flex`, which
-                                                    // on a cell would drop it
-                                                    // out of the table's own
-                                                    // layout and unalign the
-                                                    // column.
+                                                    // Not on the `th`: DSFR's class is
+                                                    // `display: flex`, which breaks table layout.
                                                     <div className="fr-cell--sort">
                                                         <span>
                                                             {column.header}
@@ -265,12 +232,7 @@ export default function DataTable<T>({
                                 </tr>
                             </thead>
                             <tbody>
-                                {/* The row index is a safe React key as long as
-                                    the table only ever displays `rows` in the
-                                    given order. Sorting, filtering or row
-                                    selection would each break that assumption
-                                    and are the point at which callers should
-                                    start supplying a stable key themselves. */}
+                                {/* Index key: rows carry no stable id, so after a sort, state held inside a row (component state, uncontrolled inputs, focus) stays with the position, not the row. */}
                                 {sortedRows.map((row, rowIndex) => {
                                     const isSelected =
                                         isSelectable && selected.has(row)
@@ -280,10 +242,7 @@ export default function DataTable<T>({
                                     return (
                                         <Fragment key={rowIndex}>
                                             <tr
-                                                // DSFR draws the blue outline of a
-                                                // selected row from this attribute;
-                                                // its own table script sets the
-                                                // same one.
+                                                // DSFR draws the selected-row outline from this attribute.
                                                 aria-selected={
                                                     isSelectable
                                                         ? isSelected
@@ -362,10 +321,7 @@ export default function DataTable<T>({
                                                 ))}
                                             </tr>
                                             {expandable && (
-                                                // Rendered whether open or not, so
-                                                // `aria-controls` always resolves to
-                                                // something; `hidden` is what closes
-                                                // it.
+                                                // Always rendered so `aria-controls` resolves.
                                                 <tr
                                                     id={detailId}
                                                     hidden={!isExpanded}

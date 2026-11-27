@@ -1,14 +1,9 @@
-/* One card per demande de subvention, spaced apart so a block reads as one
-   programme rather than as a flat list — the same rhythm FilInstruction gives
-   its programmes. */
 .tab-update {
     display: flex;
     flex-direction: column;
     gap: 1.5rem;
 }
 
-/* The card itself. Both colours are DSFR tokens, so it follows the light and
-   dark themes rather than pinning a grey of its own. */
 .tab-update__demande {
     display: flex;
     flex-direction: column;
@@ -20,9 +15,6 @@
     background-color: var(--background-default-grey);
 }
 
-/* Programme on one side, lauréat on the other, wrapping to two lines when the
-   panel is too narrow for both — a Grist widget is given whatever width the
-   document's layout leaves it. */
 .tab-update__entete {
     display: flex;
     flex-wrap: wrap;
@@ -40,8 +32,6 @@
     gap: 0.25rem;
 }
 
-/* Reads as the label of the name under it, not as a heading — hence the
-   smaller, lighter, spaced-out treatment DSFR gives an overline. */
 .tab-update__surtitre {
     margin: 0;
     font-size: 0.75rem;
@@ -51,7 +41,6 @@
     color: var(--text-mention-grey);
 }
 
-/* The gaps above already space the heading; its own margin would double it. */
 .tab-update__titre {
     margin: 0;
 }
@@ -62,14 +51,11 @@
     gap: 1rem;
 }
 
-/* `fr-toggle` is `width: 100%` by default, which would stretch it across the
-   whole header. Here it only has to be as wide as its own label and switch. */
+/* `fr-toggle` is `width: 100%` by default. */
 .tab-update__laureat .fr-toggle {
     width: auto;
 }
 
-/* The instruction sits on a tint of the card it is in, which is what says it
-   belongs to the programme above rather than standing beside it. */
 .tab-update__instruction {
     display: flex;
     flex-direction: column;
@@ -96,9 +82,7 @@
     color: var(--text-mention-grey);
 }
 
-/* The switch and the two lists side by side, each taking an equal share, and
-   stacking once there is no longer room for three — a select squeezed to a
-   couple of characters shows none of the avis it holds. */
+/* Stack rather than squeeze a select until it shows none of its avis. */
 .tab-update__champs {
     display: grid;
     grid-template-columns: repeat(auto-fit, minmax(14rem, 1fr));
@@ -106,20 +90,14 @@
     gap: 1rem 1.5rem;
 }
 
-/* The lists carry their own libellé above them, so the switch has to sit on
-   the same baseline as the boxes rather than as the labels.
-
-   `justify-self` is what keeps the switch beside its label: `--label-left`
-   spreads the two with `space-between`, so a toggle left to fill its grid
-   column would push the switch all the way to the column's far edge. Sized to
-   its content, the pair reads as one control. */
+/* Aligned with the select boxes, not their libellés. `--label-left` uses
+   `space-between`: a full-width toggle would push the switch away. */
 .tab-update__champs .fr-toggle {
     justify-self: start;
     padding-bottom: 0.5rem;
 }
 
-/* `fr-select-group` carries a bottom margin meant for a stacked form; the grid
-   gap above already spaces the columns. */
+/* Drop DSFR's stacked-form margin: the grid gap spaces the columns. */
 .tab-update__champs .fr-select-group {
     margin-bottom: 0;
 }

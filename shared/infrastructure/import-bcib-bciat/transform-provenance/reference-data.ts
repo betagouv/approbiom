@@ -5,11 +5,7 @@ import {
     type Provenance,
 } from '@shared/core/domain/value-objects/provenance'
 
-/**
- * Places that answer to a French département rather than to a foreign country:
- * the overseas ones are already in the département dataset, and France itself
- * is never a provenance.
- */
+/** France itself and overseas territories already covered by the département dataset. */
 const NOT_A_FOREIGN_COUNTRY = new Set([
     'FRA',
     'GLP',
@@ -27,49 +23,36 @@ const NOT_A_FOREIGN_COUNTRY = new Set([
 ])
 
 export type NamedPlace = {
-    /** The normalized name, which is what the text is searched for. */
+    /** Normalized. */
     name: string
     provenance: Provenance
-    /** Precompiled once: the search runs this over every cell. */
     pattern: RegExp
 }
 
 export type ReferenceData = {
-    /** Code to name, for deciding whether a number is a real département. */
     departements: Map<string, string>
     /**
-     * Every place that can be named in words, longest name first.
-     *
-     * The order is what makes "haute marne" win over "marne": names are claimed
-     * greedily, so a longer one must get its chance first. A département wins a
-     * tie against a country, and anything still tied keeps the dataset's order.
+     * Longest first, so "haute marne" is claimed before "marne"; ties: département
+     * before country, then dataset order.
      */
     names: readonly NamedPlace[]
 }
 
-/**
- * The text as the reader searches it: unaccented, lowercase, and stripped of
- * everything that is not a letter, a digit, a percent sign or a decimal point.
- */
+/** Unaccented, lowercase, keeping only letters, digits, `%` and decimal points. */
 export function normalize(text: string): string {
-    // Decimal percentages first, while the comma is still there to tell them
-    // apart: without this "33,5%" would become "33 5%", which reads as "5%".
+    // Before stripping commas: "33,5%" would otherwise become "33 5%", read as "5%".
     const withDecimals = text.replace(/(\d+)[.,](\d+)(\s*%)/g, '$1.$2$3')
 
     const withoutAccents = withDecimals.normalize('NFD').replace(/\p{M}/gu, '')
 
     const kept = withoutAccents.toLowerCase().replace(/[^a-z0-9%.]/g, ' ')
 
-    // A dot only ever meant something between two digits.
     const withoutStrayDots = kept.replace(/(?<![0-9])\.|\.(?![0-9])/g, ' ')
 
     return withoutStrayDots.split(/\s+/).filter(Boolean).join(' ')
 }
 
-/**
- * A name is only a mention when it stands on its own — letters either side
- * disqualify it, digits do not, so "Vosges88" names the Vosges twice.
- */
+/** Letters either side disqualify a match, digits do not: "Vosges88" matches. */
 function namePattern(name: string): RegExp {
     const escaped = name
         .replace(/[.*+?^${}()|[\]\\]/g, '\\$&')
@@ -78,7 +61,6 @@ function namePattern(name: string): RegExp {
     return new RegExp(`(?<![a-z])${escaped}(?![a-z])`, 'g')
 }
 
-/** A place before the index is ordered; the tier breaks ties. */
 type Candidate = {
     name: string
     provenance: Provenance
@@ -99,8 +81,6 @@ export function buildReferenceData(
         .filter(([iso3]) => !NOT_A_FOREIGN_COUNTRY.has(iso3))
         .map(([, libelle]) => ({
             name: normalize(libelle),
-            // The label keeps its capitals and accents; only the index key is
-            // normalized.
             provenance: { source: PAYS_ETRANGER, libelle },
             fromDepartement: false,
         }))
@@ -122,7 +102,6 @@ export function buildReferenceData(
 
 let cached: ReferenceData | undefined
 
-/** The bundled référentiel, built once. */
 export function loadReferenceData(): ReferenceData {
     cached ??= buildReferenceData(
         placeNames.departements as [string, string][],

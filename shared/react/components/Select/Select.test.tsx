@@ -4,8 +4,6 @@ import { afterEach, describe, expect, it } from 'vitest'
 import Select from './Select'
 import type { SelectItem, SelectMessage } from './Select.types'
 
-// The same shape MultiSelect is tested against, so the two components are shown
-// to take one and the same list of options.
 const items: readonly SelectItem<string>[] = [
     {
         id: 'alsace',
@@ -63,9 +61,7 @@ describe('Select', () => {
     it('renders every option, grouped and ungrouped', () => {
         render(<ControlledSelect />)
 
-        // Four, not five: the placeholder is `hidden`, so it is out of the
-        // accessibility tree and role queries ignore it. That is the point of
-        // it — it is a prompt, and the user is never offered it as a choice.
+        // The hidden placeholder is not counted.
         expect(screen.getAllByRole('option')).toHaveLength(4)
         expect(getOption('Bas-Rhin')).toBeDefined()
         expect(getOption('Vosges')).toBeDefined()
@@ -76,7 +72,6 @@ describe('Select', () => {
 
         const group = getOption('Bas-Rhin').closest('optgroup')
         expect(group?.label).toBe('Alsace')
-        // The ungrouped option stays outside every group.
         expect(getOption('Vosges').closest('optgroup')).toBeNull()
     })
 
@@ -85,13 +80,9 @@ describe('Select', () => {
 
         expect(getSelect().value).toBe('')
 
-        // Queried off the DOM rather than by role: `hidden` keeps it out of the
-        // accessibility tree, which is why `getOption` cannot reach it.
         const placeholder =
             getSelect().querySelector<HTMLOptionElement>('option[value=""]')
         expect(placeholder?.textContent).toBe('Sélectionner une option')
-        // Not pickable, so the user cannot go back to "nothing selected" once
-        // they have chosen — they can only change their choice.
         expect(placeholder?.disabled).toBe(true)
     })
 
@@ -104,8 +95,7 @@ describe('Select', () => {
     it('reports the value of the option the user picks', () => {
         render(<ControlledSelect />)
 
-        // The DOM value is a position rather than the caller's value, so the
-        // option's own `value` attribute is what has to be fired back.
+        // The DOM value is a position, not the caller's value.
         fireEvent.change(getSelect(), {
             target: { value: getOption('Vosges').value },
         })
@@ -149,14 +139,11 @@ describe('Select', () => {
         })
         fireEvent.change(getSelect(), { target: { value: second.value } })
 
-        // Positions, not labels, are what the DOM carries — so the second one
-        // is the one that ends up selected.
+        // The DOM carries positions, so duplicate labels stay distinct.
         expect(second.selected).toBe(true)
     })
 
     it('falls back to the placeholder when the value matches no option', () => {
-        // A value the caller kept around for an option that is no longer
-        // offered must not draw as selected.
         render(<ControlledSelect initialValue="99" />)
 
         expect(getSelect().value).toBe('')
@@ -202,13 +189,8 @@ describe('Select', () => {
     it('carries the description in its accessible name', () => {
         render(<ControlledSelect />)
 
-        // The hint sits inside the `<label>`, so it is read out with the
-        // libellé rather than after it.
-        //
-        // No space between the two here: `fr-hint-text` is `display: block`, so
-        // a browser separates them, but jsdom loads no CSS and reads the span
-        // as inline. The regexp is what keeps the assertion about the hint
-        // being part of the name rather than about jsdom's spacing.
+        // jsdom loads no CSS, so the block-level hint is not separated by a
+        // space.
         expect(getSelect()).toBe(
             screen.getByRole('combobox', {
                 name: /^Département\s*Un seul département$/,
@@ -248,8 +230,6 @@ describe('Select', () => {
     it('keeps the live region on the page while there is nothing to say', () => {
         render(<ControlledSelect />)
 
-        // A messages block that only appears along with its message appears too
-        // late to be announced, so it is rendered empty and stays.
         const messages = document.querySelector('.fr-messages-group')
         expect(messages?.getAttribute('aria-live')).toBe('polite')
         expect(getSelect().getAttribute('aria-describedby')).toBe(messages?.id)

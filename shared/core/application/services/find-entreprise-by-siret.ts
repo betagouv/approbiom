@@ -8,9 +8,7 @@ export type SiretLookup =
 
 const TIMEOUT_MS = 6000
 
-// A search on a SIRET can still answer with other establishments: only one
-// carrying that very SIRET counts. Rejects when the service fails or is too
-// slow, which is not the same as finding nothing.
+// A SIRET search can answer with other establishments. Rejects on failure or timeout.
 export async function findEntrepriseBySiret(
     siret: Siret,
     search: EntrepriseSearchPort['getEntrepriseFromQuery'],

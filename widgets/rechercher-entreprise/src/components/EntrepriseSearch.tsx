@@ -38,9 +38,7 @@ function foundTitle({ count, atLeast }: EntrepriseSearchTotal) {
     return `${atLeast ? 'Au moins ' : ''}${formatNumber(count)} entreprises trouvées`
 }
 
-// Only the first entreprises are listed: say how many others match, so that a
-// search too broad to hold the right one shows as such. Null when every one
-// is listed.
+// How many matches are not listed; null when every one is.
 function notShown(
     { count, atLeast }: EntrepriseSearchTotal,
     shown: number

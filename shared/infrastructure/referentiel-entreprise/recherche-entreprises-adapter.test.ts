@@ -1,8 +1,7 @@
 import { afterEach, describe, expect, it, vi } from 'vitest'
 import { createRechercheEntreprisesPort } from './recherche-entreprises-adapter'
 
-// Fictional entreprises: neither the names, the numbers nor the addresses
-// exist.
+// Fictional entreprises: names, numbers and addresses do not exist.
 const SIEGE = {
     siret: '00000000300010',
     etat_administratif: 'A',
@@ -39,7 +38,6 @@ const result = (n: number) => ({
     },
 })
 
-// An answer of the API: these results, out of `total_results` in all.
 const page = (results: unknown[], total_results = results.length) => ({
     results,
     total_results,

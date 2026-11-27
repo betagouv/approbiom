@@ -60,8 +60,7 @@ const TabUpdate = ({
     ) =>
         void updateInstruction(instructionId, updateData).then(
             refresh,
-            // A refused write leaves the document as it was, so there is
-            // nothing to read back.
+            // A refused write changed nothing: no read back.
             () => {}
         )
 

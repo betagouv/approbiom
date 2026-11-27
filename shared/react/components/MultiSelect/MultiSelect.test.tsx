@@ -73,8 +73,6 @@ describe('MultiSelect', () => {
     it('opens the options panel when the trigger is clicked', () => {
         render(<ControlledMultiSelect />)
 
-        // The panel is `hidden`, so it is out of the accessibility tree and out
-        // of the tab order — role queries ignore it, which is the assertion.
         expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
         expect(getTrigger().getAttribute('aria-expanded')).toBe('false')
 
@@ -88,9 +86,7 @@ describe('MultiSelect', () => {
         render(<ControlledMultiSelect />)
         open()
 
-        // `mousedown` rather than `click`: that is the event the component
-        // dismisses on, and firing `click` alone would pass for the wrong
-        // reason — or rather, would not pass at all.
+        // The component dismisses on `mousedown`, not `click`.
         fireEvent.mouseDown(document.body)
 
         expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
@@ -101,8 +97,6 @@ describe('MultiSelect', () => {
         render(<ControlledMultiSelect />)
         open()
 
-        // Fired from inside the panel, which is where the focus is once the
-        // user has tabbed into the options.
         fireEvent.keyDown(getCheckbox('Bas-Rhin'), { key: 'Escape' })
 
         expect(screen.queryAllByRole('checkbox')).toHaveLength(0)
@@ -115,8 +109,6 @@ describe('MultiSelect', () => {
 
         fireEvent.keyDown(getCheckbox('Bas-Rhin'), { key: 'Escape' })
 
-        // Without this the focus would sit on an element that no longer exists
-        // and the user would be dropped back at the top of the document.
         expect(document.activeElement).toBe(getTrigger())
     })
 
@@ -133,8 +125,6 @@ describe('MultiSelect', () => {
         render(<ControlledMultiSelect />)
         open()
 
-        // Ticking an option is a click inside the panel, and it has to leave
-        // the panel alone — otherwise no one could ever pick two options.
         fireEvent.mouseDown(getCheckbox('Bas-Rhin'))
 
         expect(screen.getAllByRole('checkbox')).toHaveLength(6)
@@ -144,9 +134,7 @@ describe('MultiSelect', () => {
         render(<ControlledMultiSelect />)
         open()
 
-        // The trigger sits inside the component, so the outside-click handler
-        // has to ignore it and leave the closing to its own toggle. Were both
-        // to fire, the panel would close and reopen in the same gesture.
+        // Were the outside-click handler to fire too, the panel would close and reopen.
         fireEvent.mouseDown(getTrigger())
         fireEvent.click(getTrigger())
 

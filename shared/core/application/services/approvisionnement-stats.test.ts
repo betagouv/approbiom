@@ -54,7 +54,6 @@ describe('composeApprovisionnementStats', () => {
             sources({ byProvenance: [provenance({ provenance: '33' })] })
         )
 
-        // The label is what the table shows; the code is what the map draws.
         expect(stats.byProvenance).toEqual([
             {
                 label: 'Gironde',

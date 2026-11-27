@@ -91,8 +91,6 @@ describe('getEtapes', () => {
             const etapes = getEtapes(instruction({ phase }))
             const behind = etapes.filter(({ state }) => state === 'done').length
 
-            // The step just past the ones behind us is the one in progress —
-            // and there is none left to be in once they all are.
             expect(etapes[behind]?.state).toBe(
                 behind === etapes.length ? undefined : 'current'
             )
@@ -137,7 +135,6 @@ describe('getEtapes', () => {
         )
 
         expect(etape(etapes, 'avis-crb').avis).toBe('Avis favorable')
-        // « En attente » is the absence of an avis, not one worth a tag.
         expect(etape(etapes, 'avis-prefet').avis).toBeNull()
         expect(etape(etapes, 'saisine-crb').avis).toBeNull()
     })

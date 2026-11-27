@@ -1,9 +1,8 @@
 import Badge from '@shared/react/components/Badge'
 import type { EtatAdministratif } from '@shared/core/application/ports/entreprise-search'
 
-// SIRENE dates come as YYYY-MM-DD. Rearranged rather than parsed as a Date,
-// they show the same day in every time zone, and one that does not read as a
-// date is left out instead of bringing the widget down.
+// SIRENE dates come as YYYY-MM-DD: rearranged, not parsed, so no time zone
+// shifts the day.
 function since(date: string | null): string {
     const [, year, month, day] = date?.match(/^(\d{4})-(\d{2})-(\d{2})$/) ?? []
 

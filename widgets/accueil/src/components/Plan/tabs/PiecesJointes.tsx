@@ -67,8 +67,8 @@ function getColumns(
 }
 
 export type PiecesJointesProps = {
-    // Read when the tab is opened, for this plan only: an editor does not see
-    // Grist's attachment table, so each file costs one request (ADR 0004).
+    // Called when the tab is opened. Editors cannot see Grist's attachment
+    // table: one request per file (ADR 0004).
     listAttachments: () => Promise<readonly Attachment[]>
     getFileUrl: (id: Attachment['id']) => Promise<string>
 }

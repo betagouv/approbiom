@@ -1,8 +1,4 @@
-// DSFR's interrupteur: a checkbox drawn as a switch. The `<input>` is a real
-// checkbox that DSFR hides and repaints through the label's `::before` and
-// `::after`, so everything about it — the role, the space bar, the focus ring —
-// is the browser's rather than this component's.
-//
+// DSFR's interrupteur: a native checkbox repainted as a switch.
 // https://www.systeme-de-design.gouv.fr/version-courante/fr/composants/interrupteur
 import '@gouvfr/dsfr/dist/component/form/form.main.min.css'
 import '@gouvfr/dsfr/dist/component/toggle/toggle.main.min.css'
@@ -38,9 +34,7 @@ export default function Toggle({
                 aria-describedby={description ? descriptionId : undefined}
                 onChange={(event) => onChange(event.target.checked)}
             />
-            {/* DSFR draws the state text out of these two attributes, and only
-                when both are there — which is why they are set as a pair or not
-                at all. `undefined` leaves the attribute off the element. */}
+            {/* DSFR draws the state text only when both attributes are set. */}
             <label
                 className="fr-toggle__label"
                 htmlFor={inputId}

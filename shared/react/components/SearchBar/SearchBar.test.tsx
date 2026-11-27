@@ -83,8 +83,6 @@ describe('SearchBar', () => {
     it('opens the suggestion panel when the field is reached with the keyboard', () => {
         render(<SearchBar label="Rechercher un plan" suggestions={options} />)
 
-        // Tabbing into the field fires `focus` and no click at all, so the two
-        // handlers are not interchangeable.
         fireEvent.focus(getInput())
 
         expect(screen.getByRole('listbox')).toBeDefined()
@@ -108,7 +106,6 @@ describe('SearchBar', () => {
             name: 'Rechercher un plan',
         })
 
-        // A combobox announces a list to come: without options there is none.
         expect(screen.queryByRole('combobox')).toBeNull()
         expect(field.hasAttribute('aria-expanded')).toBe(false)
         expect(field.hasAttribute('aria-controls')).toBe(false)
@@ -119,8 +116,7 @@ describe('SearchBar', () => {
         render(<SearchBar label="Rechercher un plan" suggestions={options} />)
         fireEvent.click(getInput())
 
-        // `mousedown` rather than `click`: that is the event the component
-        // dismisses on, and firing `click` alone would not pass at all.
+        // The component dismisses on `mousedown`, not `click`.
         fireEvent.mouseDown(document.body)
 
         expect(screen.queryByRole('listbox')).toBeNull()
@@ -176,8 +172,6 @@ describe('SearchBar', () => {
 
         type('chauf')
 
-        // The field is controlled, so its value is only what the component put
-        // back — this fails outright if the change never reaches the state.
         expect(getInput().value).toBe('chauf')
     })
 
@@ -196,9 +190,6 @@ describe('SearchBar', () => {
         render(<SearchBar label="Rechercher un plan" onSearch={onSearch} />)
 
         type('chauf')
-        // Enter in a field submits its form, which is the whole reason the
-        // search bar is a `<form>` — the button and the keyboard land on one
-        // handler rather than two.
         fireEvent.submit(getInput())
 
         expect(onSearch).toHaveBeenCalledWith('chauf')
@@ -210,8 +201,6 @@ describe('SearchBar', () => {
 
         fireEvent.click(getButton())
 
-        // Searching for nothing is a search: it is what clears a filter, and
-        // the caller cannot do that if the submit is swallowed here.
         expect(onSearch).toHaveBeenCalledWith('')
     })
 
@@ -233,7 +222,6 @@ describe('SearchBar', () => {
         ).toBeDefined()
     })
 
-    // `fr-search-bar` hides a label inside it, so a shown one sits outside.
     it('puts the label outside the search form only when it is shown', () => {
         const { rerender } = render(<SearchBar label="Rechercher un plan" />)
         const labelInForm = () =>

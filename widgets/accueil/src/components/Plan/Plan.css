@@ -1,6 +1,5 @@
-/* The same frame as the list it replaces — at least the panel's height, 2rem
-   of padding, and the page itself scrolling — so opening a plan does not shift
-   the page inside the Grist iframe. */
+/* Same frame as the list it replaces, so opening a plan does not shift the page
+   in the Grist iframe. */
 .plan {
     display: flex;
     flex-direction: column;
@@ -21,7 +20,6 @@
     background-color: var(--background-default-grey);
 }
 
-/* The gap above already spaces the title; its own margin would double it. */
 .plan__title {
     margin: 0;
 }
@@ -31,18 +29,12 @@
     flex-direction: column;
 }
 
-/* The title and what identifies the plan under it, stacked: the header itself
-   is a row, and without this the two lines would sit beside the title rather
-   than below it. */
 .plan__heading {
     display: flex;
     flex-direction: column;
     gap: 0.5rem;
 }
 
-/* One row of pairs, wrapping to the next line when the panel is too narrow for
-   both — a Grist widget is given whatever width the document's layout leaves
-   it. The row gap is what separates them once they wrap. */
 .plan__meta {
     display: flex;
     flex-wrap: wrap;
@@ -52,7 +44,6 @@
     font-size: 0.875rem;
 }
 
-/* Term and value on one line, as a sentence rather than a column. */
 .plan__meta-entry {
     display: flex;
 }
@@ -61,15 +52,12 @@
     font-weight: 700;
 }
 
-/* Punctuation, not content: it belongs to the pair, which the `dl` already
-   states, so it is drawn here and left out of the text a screen reader reads.
-   The space before it is the insécable French typography asks for — the colon
-   never begins a line on its own. */
+/* Drawn in CSS to keep it out of the screen reader text; no-break space before
+   the colon. */
 .plan__meta dt::after {
     content: '\00a0:';
 }
 
-/* `dd` carries a browser default indent that would break the pair apart. */
 .plan__meta dd {
     margin: 0;
 }

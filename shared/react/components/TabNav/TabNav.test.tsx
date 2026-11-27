@@ -69,9 +69,6 @@ describe('TabNav', () => {
         expect(onSelect).toHaveBeenCalledWith('documents')
     })
 
-    // Clicking the page one is already on is a no-op as far as the navigation
-    // is concerned, but it is the caller who decides that — closing a menu,
-    // scrolling back to the top — so the click is reported like any other.
     it('reports a click on the current item too', () => {
         const onSelect = vi.fn()
         renderTabNav({ onSelect })
@@ -81,7 +78,6 @@ describe('TabNav', () => {
         expect(onSelect).toHaveBeenCalledWith('ressources')
     })
 
-    // The two forms an item takes, and what tells them apart: somewhere to go.
     it('renders an item with an href as a link, and the others as buttons', () => {
         renderTabNav({
             items: [

@@ -23,8 +23,7 @@ export function fournisseurSiret(
     index: Map<number, GristRow>,
     ref: unknown
 ): string | undefined {
-    // Grist answers 0 for a Ref pointing at nothing: in Approvisionnement,
-    // `Fournisseur: 0` is an approvisionnement without fournisseur.
+    // Grist answers 0 for an empty Ref.
     if (ref === 0) return undefined
 
     const siret = asText(lookup(index, ref)?.Siret)
@@ -127,8 +126,7 @@ export async function readReferencedTables(): Promise<ReferencedTables> {
     }
 }
 
-// A value the document does not hold would be written as an empty Ref, and
-// lost without anyone noticing: it is refused instead.
+// Throws rather than silently writing an empty Ref.
 function refTo<K>(ids: ReadonlyMap<K, number>, key: K, table: string): number {
     const id = ids.get(key)
     if (id === undefined)
@@ -166,8 +164,6 @@ export function toCells(
             TABLE.metaRessource
         )
     if (provenance !== undefined) {
-        // A département left blank is read that way from the table: it is
-        // written back as it was, without a Ref.
         cells.Departement_de_provenance =
             provenance.source === DEPARTEMENT_FRANCAIS && provenance.code !== ''
                 ? refTo(departementIdByDep, provenance.code, TABLE.departement)
@@ -206,8 +202,7 @@ function parseWidgetOptions(value: unknown): Record<string, unknown> {
     }
 }
 
-// The countries are the choices of the Pays_de_provenance column, kept in its
-// widget options.
+// The countries are the choices kept in the column's widget options.
 export async function readPaysDeProvenanceColumn(): Promise<{
     widgetOptions: Record<string, unknown>
     choices: string[]

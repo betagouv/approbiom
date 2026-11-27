@@ -18,9 +18,7 @@ async function getFileUrl(id: number) {
     return `${baseUrl}/attachments/${id}/download?auth=${token}`
 }
 
-// One row carries a whole cell of files, all filed under the same type — the
-// domain holds one file each, so the cell is spread out here rather than by
-// every screen that lists one.
+// One row carries a whole cell of files; the domain holds one file each.
 async function attachmentsOf(rows: readonly GristRow[]): Promise<Attachment[]> {
     const attached = rows.flatMap((row) =>
         asIdList(row.piece_jointe).map((id) => ({

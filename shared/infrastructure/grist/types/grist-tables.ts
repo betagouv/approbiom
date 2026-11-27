@@ -1,8 +1,5 @@
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
 
-/**
- * Every metadata table id and column list the adapters read, in one place.
- */
 export const METADATA_TABLE = {
     gristAttachment: {
         id: '_grist_Attachments',
@@ -10,10 +7,7 @@ export const METADATA_TABLE = {
     },
 }
 
-export /**
- * Every user table id and column list the adapters read, in one place.
- */
-const TABLE = {
+export const TABLE = {
     approvisionnement: 'Approvisionnement',
     totalByPlanAndRessource:
         'Approvisionnement_summary_Plan_d_approvisionnement_Ressource',
@@ -52,8 +46,8 @@ export const COLUMNS = {
         'id',
         'Plan_d_approvisionnement',
         'Ressource',
-        'Departement_de_provenance', // ref, est null si la provenance est un pays
-        'Provenance', // type texte, soit le code du département, soit le libellé du pays
+        'Departement_de_provenance', // Ref, null when the provenance is a country
+        'Provenance', // Text: either the département code or the country libellé
         'Fournisseur',
         'Total_en_tMv_an_',
         'Source',
@@ -172,10 +166,6 @@ export type AImporterApprovisionnementColumn = {
     Niveau_de_confiance: string
 }
 
-/**
- * The column each field of a plan is read from. `PlanPort.list` asks Grist only
- * for the columns of the fields it is given.
- */
 export const PLAN_COLUMN_BY_FIELD = {
     id: 'id',
     nom: 'Nom',

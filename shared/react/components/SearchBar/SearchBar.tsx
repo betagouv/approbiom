@@ -36,9 +36,6 @@ export default function SearchBar({
     const [isRequested, setIsRequested] = useState(false)
     const [query, setQuery] = useState('')
 
-    // Wraps the field and the panel both, so "outside" is one containment test
-    // rather than two — and clicking the field itself never reaches the handler
-    // below, leaving it open.
     const rootRef = useRef<HTMLDivElement>(null)
 
     const visibleSuggestions = suggestions.filter((suggestion) =>
@@ -47,9 +44,6 @@ export default function SearchBar({
 
     const isOpen = isRequested && visibleSuggestions.length > 0
 
-    // Escape is the keyboard's half of dismissing the panel: the click-outside
-    // below is mouse and touch only. Focus is already in the input and stays
-    // there, so nothing has to be put back.
     function closeOnEscape(event: React.KeyboardEvent) {
         if (!isOpen || event.key !== 'Escape') return
 
@@ -57,7 +51,6 @@ export default function SearchBar({
     }
 
     useEffect(() => {
-        // Nothing to dismiss, so nothing to listen for.
         if (!isOpen) return
 
         function closeOnClickOutside(event: MouseEvent) {
@@ -65,14 +58,6 @@ export default function SearchBar({
                 setIsRequested(false)
         }
 
-        // The listener is on the document rather than on a backdrop element: a
-        // backdrop would swallow the click the user actually meant, so
-        // dismissing the panel would cost them an extra click on whatever they
-        // were aiming at.
-        //
-        // `mousedown` rather than `click` — the panel is positioned absolutely,
-        // so closing it reflows nothing and the target cannot move out from
-        // under the cursor between press and release.
         document.addEventListener('mousedown', closeOnClickOutside)
 
         return () => {
@@ -92,50 +77,32 @@ export default function SearchBar({
                 className="fr-search-bar"
                 role="search"
                 onSubmit={(event) => {
-                    // Nothing to post to — the search happens in the page.
                     event.preventDefault()
-                    // Submitting is the user saying they are done choosing, so
-                    // the suggestions have nothing left to offer.
                     setIsRequested(false)
                     onSearch?.(query)
                 }}
             >
-                {/* `fr-search-bar` hides its own label and keeps it as the
-                    accessible name of the input, so this costs nothing on
-                    screen — and without it the field has no name at all, a
-                    placeholder being a hint rather than a name. */}
                 {!showLabel && labelElement}
                 <input
                     className="fr-input"
                     placeholder={displayedPlaceholder}
                     id={inputId}
                     value={query}
-                    // Editing the text is a fresh request for suggestions, so it
-                    // reopens a panel the user had dismissed (Enter, the button,
-                    // Escape, a click away). Without this, removing a letter can't
-                    // re-open a list that a no-match query had emptied.
+                    // Reopens a dismissed panel, e.g. after a no-match query
+                    // emptied it.
                     onChange={(event) => {
                         setQuery(event.target.value)
                         setIsRequested(true)
                     }}
-                    // `type="search"` for the browser's own clear button, which
-                    // DSFR styles.
                     type="search"
-                    // A combobox only when there is a list to open under it:
-                    // without suggestions the field stays a plain search box, and
-                    // a screen reader announces no list that cannot come.
                     {...(suggestions.length > 0 && {
                         role: 'combobox',
                         'aria-autocomplete': 'list',
                         'aria-controls': panelId,
                         'aria-expanded': isOpen,
                     })}
-                    // `focus` rather than `click`: it covers reaching the field
-                    // with the keyboard too, and a click on an unfocused input
-                    // focuses it anyway. Clicking a field that already has
-                    // focus fires no `focus` event, hence the click handler as
-                    // well — that is the case of reopening a panel the user
-                    // just dismissed with Escape.
+                    // Clicking an already focused field fires no `focus` (e.g.
+                    // after Escape).
                     onFocus={() => setIsRequested(true)}
                     onClick={() => setIsRequested(true)}
                 />
@@ -144,9 +111,6 @@ export default function SearchBar({
                 </button>
             </form>
             {isOpen && (
-                // `aria-label` rather than pointing at the field's label: the
-                // label names the field, and the list needs a name of its own
-                // to be announced as anything more than "liste".
                 <ul
                     className="fr-raw-list shared-search-bar__panel"
                     id={panelId}
@@ -158,9 +122,6 @@ export default function SearchBar({
                             key={index}
                             className="shared-search-bar__option"
                             role="option"
-                            // Picking one searches for it, as if it had been
-                            // typed and submitted. With the keyboard, typing
-                            // and Enter do the same.
                             onClick={() => {
                                 setQuery(suggestion)
                                 setIsRequested(false)

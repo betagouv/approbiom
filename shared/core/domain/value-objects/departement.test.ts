@@ -25,14 +25,10 @@ describe('isCodeDepartement', () => {
         expect(isCodeDepartement('976')).toBe(true)
     })
 
-    // The code Corsica gave up. It reads like a département and is not one,
-    // which is exactly the kind of value a formula can produce by accident.
     it('refuses the 20 Corsica left vacant', () => {
         expect(isCodeDepartement('20')).toBe(false)
     })
 
-    // Collectivités, not départements. 975 sits between two codes that are
-    // real, so nothing about its shape gives it away.
     it('refuses a collectivité', () => {
         expect(isCodeDepartement('975')).toBe(false)
         expect(isCodeDepartement('977')).toBe(false)
@@ -46,8 +42,7 @@ describe('isCodeDepartement', () => {
         expect(isCodeDepartement('870')).toBe(false)
     })
 
-    // The unpadded form a numeric column hands back. It is the adapter's job to
-    // widen it first, so the rule itself refuses it.
+    // The unpadded form a numeric column hands back; the adapter widens it.
     it('refuses a code that has not been widened', () => {
         expect(isCodeDepartement('1')).toBe(false)
         expect(isCodeDepartement('9')).toBe(false)

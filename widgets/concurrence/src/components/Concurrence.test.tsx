@@ -69,13 +69,13 @@ const planLike = (
     overrides: Partial<ConcurrenceRow['plan']>
 ): ConcurrenceRow['plan'] => ({ ...saintJunien.plan, ...overrides })
 
-/** Saint-Junien, standing in for whatever the référentiel holds. */
+/** Saint-Junien. */
 const getCommuneCenterPosition = () => ({
     latitude: 45.88,
     longitude: 0.9,
 })
 
-/** A square around Saint-Junien, standing in for a real contour. */
+/** A square around Saint-Junien. */
 const getContour = () => [
     [
         { latitude: 45.8, longitude: 0.8 },
@@ -98,7 +98,6 @@ function renderConcurrence(rows: readonly ConcurrenceRow[] = [saintJunien]) {
     )
 }
 
-/** The one data row on screen, whatever the filters left of it. */
 const planRow = () =>
     within(screen.getByRole('table')).getByRole('row', {
         name: /RC Saint Junien/,
@@ -130,10 +129,7 @@ describe('Concurrence', () => {
         )
     })
 
-    // Départements keep their régions, which is what the référentiel is read
-    // for; the countries hang under one group of their own.
-    // The entreprises come in the order the document stores them, Scierie
-    // Picard before Forst GmbH.
+    // The document stores Scierie Picard before Forst GmbH.
     it('offers the fournisseurs in alphabetical order', () => {
         renderConcurrence()
         fireEvent.click(screen.getByRole('button', { name: /Fournisseur/ }))
@@ -163,8 +159,6 @@ describe('Concurrence', () => {
         expect(screen.getByText('Pays étrangers')).toBeDefined()
     })
 
-    // The référentiel is the list of départements, so one nothing is drawn
-    // from is still somewhere a reader may look.
     it('offers a département no plan draws from', () => {
         renderConcurrence()
         openProvenanceFilter()
@@ -172,8 +166,6 @@ describe('Concurrence', () => {
         expect(screen.getByRole('checkbox', { name: '24' })).toBeDefined()
     })
 
-    // There is no référentiel of countries, so the group is what was drawn on
-    // — and a country drawn on twice is one country.
     it('names a country once, however many draw on it', () => {
         renderConcurrence([
             {
@@ -191,7 +183,6 @@ describe('Concurrence', () => {
         ).toHaveLength(1)
     })
 
-    // Same reading in the column: it lists provenances, not approvisionnements.
     it('names each provenance once in the provenances cell', () => {
         renderConcurrence([
             {
@@ -216,8 +207,7 @@ describe('Concurrence', () => {
 
         const cells = within(planRow()).getAllByRole('cell')
 
-        // Provenances retenues, then tonnage retenu: only what came from
-        // Germany is left, while the plan's own total stays whole.
+        // Provenances retenues, then tonnage retenu.
         expect(cells[4].textContent).toBe('Allemagne')
         expect(cells[5].textContent).toBe('80')
         expect(cells[3].textContent).toBe('200')
@@ -234,7 +224,6 @@ describe('Concurrence', () => {
         expect(cells[5].textContent).toBe('120')
     })
 
-    // A plan drawing on neither is not concurrent with what was asked about.
     it('drops a plan no selected provenance reaches', () => {
         renderConcurrence([
             saintJunien,
@@ -251,9 +240,8 @@ describe('Concurrence', () => {
         expect(screen.queryByText('RCU Clair-Village')).toBeNull()
     })
 
-    // 87085 is Limoges, 87154 Saint-Junien: two plans, two markers. The rows
-    // are per ressource, so one plan can hold several of them and must still
-    // be marked once.
+    // 87085 is Limoges, 87154 Saint-Junien. Rows are per ressource: one plan
+    // can hold several.
     it('marks each commune the retained plans sit at, once', () => {
         const { container } = renderConcurrence([
             saintJunien,
@@ -270,8 +258,6 @@ describe('Concurrence', () => {
         expect(markers(container)).toHaveLength(2)
     })
 
-    // The map sits beside the table and answers for what the table shows, so
-    // a plan the filters dropped is a marker gone with it.
     it('marks only the plans the filters leave', () => {
         const { container } = renderConcurrence([
             saintJunien,
@@ -293,8 +279,6 @@ describe('Concurrence', () => {
         expect(markers(container)).toHaveLength(1)
     })
 
-    // The map still answers « where is this drawn from » for a plan it cannot
-    // answer « where does it go » for.
     it('draws the provenances of a plan it cannot situate', () => {
         const { container } = renderConcurrence([
             { ...saintJunien, plan: planLike({ installationCommune: null }) },
@@ -310,7 +294,6 @@ describe('Concurrence', () => {
         expect(screen.getByText(/Aucun lieu n'a pu être situé/)).toBeDefined()
     })
 
-    // Nothing outside France has been drawn on, so there is no group to open.
     it('offers no pays group when no plan draws from abroad', () => {
         renderConcurrence([
             { ...saintJunien, approvisionnements: [deHauteVienne] },

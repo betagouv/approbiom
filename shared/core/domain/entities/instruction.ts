@@ -18,20 +18,11 @@ export type Instruction = {
     phase: PhaseInstruction
 }
 
-// --- Chronologie -----------------------------------------------------------
-//
-// Where an instruction stands is not stored: it is read off the phase and the
-// dates the instruction already carries. That makes it behaviour of the
-// instruction itself rather than a separate object.
-
 const ETAPES = ['saisine-crb', 'avis-crb', 'avis-prefet'] as const
 
 export type EtapeId = (typeof ETAPES)[number]
 
-/**
- * `skipped` is not `pending` that will never come: it is a step this
- * instruction was never going to take, because no CRB opinion was required.
- */
+/** `skipped`: a CRB step when no CRB opinion was required. */
 export type EtapeState = 'done' | 'current' | 'pending' | 'skipped'
 
 export type Etape = {
@@ -48,7 +39,6 @@ const ETAPE_DATES: Record<EtapeId, (instruction: Instruction) => Date | null> =
         'avis-prefet': (instruction) => instruction.dateAvisPrefet,
     }
 
-/** Where an instruction stands, as the phase itself names it. */
 const ETAPE_BY_PHASE: Record<PhaseInstruction, EtapeId> = {
     'Aucun avis CRB requis': 'saisine-crb',
     "En cours d'instruction": 'saisine-crb',
@@ -65,7 +55,7 @@ function getEtapeCourante(instruction: Instruction): number {
     return fromPhase + 1
 }
 
-/** An avis is only worth showing once it is one — « En attente » is the absence of one. */
+/** « En attente » is the absence of an avis. */
 function getAvis(
     instruction: Instruction,
     id: EtapeId
@@ -93,7 +83,6 @@ function getState(
     return 'pending'
 }
 
-/** The chronology of one instruction: every step, and where it stands. */
 export function getEtapes(instruction: Instruction): readonly Etape[] {
     const courante = getEtapeCourante(instruction)
 

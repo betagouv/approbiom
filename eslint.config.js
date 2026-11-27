@@ -5,9 +5,6 @@ import pluginReact from 'eslint-plugin-react'
 import reactHooks from 'eslint-plugin-react-hooks'
 import markdown from '@eslint/markdown'
 import { defineConfig, globalIgnores } from 'eslint/config'
-// Note the `/flat` suffix here, the difference from default entry is that
-// `/flat` added `name` property to the exported object to improve
-// [config-inspector](https://eslint.org/blog/2024/04/eslint-config-inspector/) experience.
 import eslintConfigPrettier from 'eslint-config-prettier/flat'
 
 const browserFiles = [
@@ -17,8 +14,7 @@ const browserFiles = [
 const reactFiles = ['widgets/**/*.{jsx,tsx}', 'shared/**/*.{jsx,tsx}']
 
 export default defineConfig([
-    // The Grist types are vendored from upstream, so linting them only produces
-    // findings we cannot act on.
+    // Vendored from upstream.
     globalIgnores([
         'dist/',
         'shared/infrastructure/grist/types/grist-plugin-api.d.ts',
@@ -30,12 +26,6 @@ export default defineConfig([
         extends: ['js/recommended'],
     },
 
-    // `recommendedTypeChecked` also pulls in typescript-eslint's
-    // `eslint-recommended`, which switches off the core rules the compiler
-    // already covers (`no-undef`, `no-unused-vars`, …) in favour of its
-    // TS-aware versions. The type-checked rules need real type information,
-    // hence `projectService` — slower than syntax-only linting, but it is what
-    // catches the bugs that matter (floating promises, unsafe `any` flows).
     {
         files: ['**/*.{ts,mts,cts,tsx}'],
         extends: [tseslint.configs.recommendedTypeChecked],
@@ -47,8 +37,6 @@ export default defineConfig([
         },
     },
 
-    // Widget and shared code runs in the browser (inside a Grist iframe);
-    // build scripts and the Vite config run in Node.
     {
         files: browserFiles,
         languageOptions: { globals: globals.browser },
@@ -62,18 +50,12 @@ export default defineConfig([
         files: reactFiles,
         extends: [
             pluginReact.configs.flat.recommended,
-            // Disables `react-in-jsx-scope` and `react/jsx-uses-react`: the
-            // automatic JSX runtime makes importing React unnecessary.
             pluginReact.configs.flat['jsx-runtime'],
             reactHooks.configs.flat.recommended,
         ],
-        // Pinned rather than 'detect': eslint-plugin-react 7.37.5 does not
-        // support ESLint 10 yet, and its version-detection path crashes on the
-        // removed `context.getFilename()` API. Keep in sync with the React
-        // version in dependencies.
+        // Pinned: 'detect' crashes eslint-plugin-react 7.37.5 on ESLint 10. Keep in sync with React.
         settings: { react: { version: '19.2' } },
         rules: {
-            // Props are typed in TS rather than declared with prop-types.
             'react/prop-types': 'off',
         },
     },

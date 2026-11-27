@@ -178,9 +178,6 @@ export function createGristApprovisionnementPort(): ApprovisionnementPort {
                 COLUMNS.totalByProvenance
             )
 
-            // The same text column the entity is built from, so the summary
-            // names a provenance exactly the way `list` does — a département
-            // code, or a country's libellé — and needs no referenced table either.
             return rows.map((row) => ({
                 ...toGroup(row, ressources),
                 provenance: asText(row.Provenance),

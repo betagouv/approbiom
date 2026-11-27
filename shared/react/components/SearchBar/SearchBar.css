@@ -1,10 +1,8 @@
-/* The anchor the panel is positioned against. `fr-search-bar` itself cannot be
-   it: the panel has to sit outside that flex row, not inside it. */
+/* Panel anchor: the panel must sit outside the `fr-search-bar` flex row. */
 .shared-search-bar {
     position: relative;
 }
 
-/* The gap DSFR leaves between a label and its input. */
 .shared-search-bar__label {
     margin-bottom: 0.5rem;
 }

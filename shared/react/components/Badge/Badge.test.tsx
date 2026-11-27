@@ -15,9 +15,6 @@ describe('Badge', () => {
     })
 
     it('is a paragraph, not a control', () => {
-        // DSFR's own markup, and the whole difference from a tag: a badge is
-        // read, never clicked. A `<button>` here would promise something to
-        // happen on click and put the badge in the tab order for nothing.
         expect(render(<Badge>Lauréat</Badge>).container.firstChild).toEqual(
             screen.getByText('Lauréat')
         )
@@ -27,8 +24,7 @@ describe('Badge', () => {
     it('renders the neutral grey badge when nothing narrows it', () => {
         render(<Badge>Brouillon</Badge>)
 
-        // Grey is DSFR's default, painted by `fr-badge` alone. The assertion is
-        // that no modifier is added behind the caller's back.
+        // Grey is DSFR's default, painted by `fr-badge` alone.
         expect(screen.getByText('Brouillon').className).toBe('fr-badge')
     })
 
@@ -73,8 +69,7 @@ describe('Badge', () => {
     it('keeps the status icon unless it is waved off', () => {
         render(<Badge status="error">Refusé</Badge>)
 
-        // The icon comes from the status class itself, through a `::before`
-        // jsdom does not paint. What is testable is that nothing removes it.
+        // The icon comes from the status class through a `::before` jsdom does not paint.
         expect(screen.getByText('Refusé').className).not.toContain(
             'fr-badge--no-icon'
         )
@@ -89,7 +84,6 @@ describe('Badge', () => {
 
         const badge = screen.getByText('Refusé')
         expect(badge.className).toContain('fr-badge--no-icon')
-        // Dropping the icon drops the icon, not the colours that go with it.
         expect(badge.className).toContain('fr-badge--error')
     })
 })

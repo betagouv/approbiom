@@ -1,7 +1,5 @@
-// DSFR ships no combobox: its « liste déroulante riche » is design only. This one
-// is built from DSFR parts (input group, buttons, messages, icons) following the
-// WAI-ARIA « combobox with listbox popup » pattern: the focus stays in the input
-// and `aria-activedescendant` points at the option the arrow keys reached.
+// DSFR ships no combobox (its « liste déroulante riche » is design only): built
+// from DSFR parts following the WAI-ARIA combobox-with-listbox pattern.
 import '@gouvfr/dsfr/dist/component/form/form.main.min.css'
 import '@gouvfr/dsfr/dist/component/input/input.main.min.css'
 import '@gouvfr/dsfr/dist/component/button/button.main.min.css'

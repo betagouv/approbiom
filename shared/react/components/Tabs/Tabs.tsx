@@ -1,13 +1,5 @@
-// DSFR's « onglets »: sections of content sharing one page, one of which is
-// shown at a time. Unlike TabNav — which moves between pages and owns nothing —
-// an onglet owns the panel under it, which is why the content is a prop here
-// and the tablist/tabpanel roles are set.
-//
-// The stylesheet is DSFR's; the behaviour is ours. Their script is not loaded
-// in a Grist widget, so what it does is done here instead: the roving tabindex,
-// the arrow keys, and the panel that is hidden rather than merely invisible.
-// Tabs.css says why that last one cannot be left to the stylesheet.
-//
+// DSFR's « onglets ». The DSFR script is not loaded in a Grist widget, so its
+// behaviour is reimplemented here.
 // https://www.systeme-de-design.gouv.fr/version-courante/fr/composants/onglet
 import '@gouvfr/dsfr/dist/component/tab/tab.main.min.css'
 import './Tabs.css'
@@ -15,8 +7,6 @@ import './Tabs.css'
 import { useId, useRef, useState } from 'react'
 import type { TabsProps } from './Tabs.types'
 
-// The keys a tablist answers to, and where each one lands. Left and right wrap
-// around, as they do in the DSFR script and in the ARIA pattern it follows.
 const MOVES: Record<string, (index: number, count: number) => number> = {
     ArrowRight: (index, count) => (index + 1) % count,
     ArrowLeft: (index, count) => (index - 1 + count) % count,
@@ -31,8 +21,6 @@ export default function Tabs({
     currentId: controlledId,
     onSelect,
 }: TabsProps) {
-    // Ids only have to be unique in the document; `useId` keeps two sets of
-    // onglets on the same page from pointing their tabs at each other's panels.
     const id = useId()
     const tabId = (itemId: string) => `${id}-${itemId}`
     const panelId = (itemId: string) => `${id}-${itemId}-panel`
@@ -47,23 +35,17 @@ export default function Tabs({
         onSelect?.(id)
     }
 
-    // The arrow keys move focus as well as selection, so the tab being moved to
-    // has to be reachable as a node. Keyed by id rather than held in an array:
-    // a list that changes length would leave an index pointing at a tab that is
-    // no longer there.
+    // Keyed by id: indexes would go stale when the list changes length.
     const tabs = useRef(new Map<string, HTMLButtonElement>())
 
     function handleKeyDown(event: React.KeyboardEvent) {
         const move = MOVES[event.key]
         if (!move || items.length === 0) return
 
-        // The list holds nothing focusable but the tabs, and the focused one is
-        // always the selected one — that is what the roving tabindex below
-        // means — so the current index is where the move starts from.
         const index = items.findIndex((item) => item.id === currentId)
 
-        // A disabled tab is stepped over, in the direction of the move. Home
-        // and End land on an end, so from there the search goes inwards.
+        // Skip disabled tabs in the direction of the move; from Home/End,
+        // inwards.
         let nextIndex = move(index === -1 ? 0 : index, items.length)
         const step = event.key === 'ArrowLeft' || event.key === 'End' ? -1 : 1
         for (let tries = 0; items[nextIndex].disabled; tries++) {
@@ -72,21 +54,14 @@ export default function Tabs({
         }
         const next = items[nextIndex]
 
-        // Otherwise the arrow keys scroll the page, and Home and End jump to
-        // its ends, under the reader who was moving between tabs.
         event.preventDefault()
 
-        // Selection follows focus, as in the DSFR script: a panel is one press
-        // away rather than a press and an Enter.
         open(next.id)
         tabs.current.get(next.id)?.focus()
     }
 
     return (
         <div className="fr-tabs shared-tabs">
-            {/* The keys are caught on the list rather than on each tab: they
-                are the tablist's own behaviour, and a tab that is being moved
-                away from should not have to know where the next one is. */}
             <ul
                 className="fr-tabs__list"
                 role="tablist"
@@ -97,9 +72,6 @@ export default function Tabs({
                     const selected = item.id === currentId
 
                     return (
-                        // `role="presentation"` drops the list semantics the
-                        // `<li>` would otherwise add inside a tablist, whose
-                        // children are tabs and nothing else.
                         <li key={item.id} role="presentation">
                             <button
                                 type="button"
@@ -108,10 +80,6 @@ export default function Tabs({
                                 role="tab"
                                 aria-selected={selected}
                                 aria-controls={panelId(item.id)}
-                                // A roving tabindex: one Tab press enters the
-                                // tablist and the next leaves it, instead of
-                                // stopping on every tab on the way to the
-                                // panel. The arrow keys move inside it.
                                 tabIndex={
                                     item.disabled ? -1 : selected ? 0 : -1
                                 }
@@ -137,10 +105,8 @@ export default function Tabs({
                 const selected = item.id === currentId
 
                 return (
-                    // Every panel stays mounted, `hidden` being what closes the
-                    // ones that are not being read: `aria-controls` above then
-                    // always resolves to something, and a table keeps how it
-                    // was sorted while its neighbour is looked at.
+                    // All panels stay mounted so `aria-controls` resolves and
+                    // panel state (e.g. sorting) survives.
                     <div
                         key={item.id}
                         id={panelId(item.id)}
@@ -151,9 +117,7 @@ export default function Tabs({
                         }
                         role="tabpanel"
                         aria-labelledby={tabId(item.id)}
-                        // The panel is what the arrow keys lead to, so it takes
-                        // focus itself — its content may hold nothing that
-                        // does, and a reader would then have nowhere to land.
+                        // Its content may hold nothing focusable.
                         tabIndex={0}
                         hidden={!selected}
                     >
