@@ -13,6 +13,7 @@ export function toRessource(row: GristRow): Ressource {
         code: asString(row.Code_ressource_Approbiom),
         ademeCode: asString(row.ademe_2017),
         title: asString(row.Description_courte),
+        famille: asString(row.Famille_ressource),
         description: asString(row.Description),
     }
 }

@@ -14,6 +14,7 @@ const REFERENCED_TABLES: Record<string, ColumnMajorTable> = {
         ademe_2017: ['2017-1A-PFA'],
         Description_courte: ['Plaquettes forestières'],
         Description: ['Plaquettes forestières dont souches et rémanents'],
+        Famille_ressource: ['1 Bois coupé'],
     },
     [TABLE.entreprise]: {
         id: [1],

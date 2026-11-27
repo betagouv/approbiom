@@ -18,6 +18,7 @@ import type { ExtractedApprovisionnement } from '@shared/core/domain/entities/ex
 const RESSOURCE = {
     code: '1A-PFA',
     ademeCode: '2017-1A-PFA',
+    famille: '1 Bois coupé',
     title: 'Plaquettes forestières',
     description: '',
 }

@@ -43,6 +43,7 @@ const document = (id: number, name: string): Attachment => ({
 const RESSOURCE = {
     code: '1A-PFA',
     ademeCode: '2017-1A-PFA',
+    famille: '1 Bois coupé',
     title: 'Plaquettes forestières',
     description: '',
 }

@@ -19,6 +19,7 @@ const TABLES: Record<string, ColumnMajorTable> = {
         ademe_2017: ['2017-1A-PFA', '2017-2A-CIB'],
         Description_courte: ['Plaquettes forestières', 'Ecorces'],
         Description: ['Plaquettes forestières dont souches', 'Ecorces'],
+        Famille_ressource: ['1 Bois coupé', '2 Coproduits 1ère transfo Bois'],
     },
     [TABLE.extractedApprovisionnement]: {
         id: [5],
@@ -77,6 +78,7 @@ describe('createGristExtractedApprovisionnementAdapter().update', () => {
             matchedRessource: {
                 code: '2A-CIB',
                 ademeCode: '2017-2A-CIB',
+                famille: '2 Coproduits 1ère transfo Bois',
                 title: 'Ecorces',
                 description: 'Ecorces',
             },

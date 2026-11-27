@@ -164,6 +164,7 @@ export function composeApprovisionnementStats({
             ressource: ressourceByCode.get(code) ?? {
                 code,
                 ademeCode: '',
+                famille: '',
                 title: code,
                 description: '',
             },

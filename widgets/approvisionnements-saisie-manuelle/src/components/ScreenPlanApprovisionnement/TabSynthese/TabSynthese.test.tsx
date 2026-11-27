@@ -18,12 +18,14 @@ const REFERENTIELS = {
         {
             code: '1A-PFA',
             ademeCode: '2017-1A-PFA',
+            famille: '1 Bois coupé',
             title: 'Plaquettes forestières',
             description: 'Plaquettes forestières dont souches et rémanents',
         },
         {
             code: '2B-CIB',
             ademeCode: '2017-2B-CIB',
+            famille: '2 Coproduits 1ère transfo Bois',
             title: 'Connexes de scierie',
             description: 'Produits connexes de scierie hors écorces',
         },

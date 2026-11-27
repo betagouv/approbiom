@@ -602,6 +602,7 @@ describe('App', () => {
                             {
                                 code: 'PF',
                                 ademeCode: '',
+                                famille: '',
                                 title: 'Plaquettes forestières',
                                 description: '',
                             },
