@@ -220,9 +220,12 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                 return (
                                     <tbody key={plan.id}>
                                         <tr className="concurrence-table__plan">
+                                            {/* DSFR: the toggle's click area
+                                                spreads over the whole cell. */}
                                             <th
                                                 id={planHeaderId}
                                                 colSpan={COLUMN_COUNT}
+                                                className="fr-enlarge-button"
                                             >
                                                 <div className="concurrence-table__plan-header">
                                                     <button
@@ -245,18 +248,43 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                                         />
                                                         {plan.installationNom ||
                                                             INSTALLATION_SANS_NOM}
+                                                        {/* Tells apart the toggles of
+                                                            an installation's plans. */}
+                                                        {plan.typeDePlan !==
+                                                            '' && (
+                                                            <>
+                                                                {' '}
+                                                                <span className="fr-sr-only">
+                                                                    (
+                                                                    {
+                                                                        plan.typeDePlan
+                                                                    }
+                                                                    )
+                                                                </span>
+                                                            </>
+                                                        )}
                                                     </button>
+                                                    {/* Hidden: the toggle names it. */}
                                                     {plan.typeDePlan !== '' && (
-                                                        <TagTypeDePlan
-                                                            typeDePlan={
-                                                                plan.typeDePlan
-                                                            }
-                                                        />
+                                                        <div aria-hidden="true">
+                                                            <TagTypeDePlan
+                                                                typeDePlan={
+                                                                    plan.typeDePlan
+                                                                }
+                                                            />
+                                                        </div>
                                                     )}
                                                     {plan.statut !== '' && (
-                                                        <TagStatut
-                                                            statut={plan.statut}
-                                                        />
+                                                        <div>
+                                                            <span className="fr-sr-only">
+                                                                Statut :{' '}
+                                                            </span>
+                                                            <TagStatut
+                                                                statut={
+                                                                    plan.statut
+                                                                }
+                                                            />
+                                                        </div>
                                                     )}
                                                     {plan.departementDeSituation !==
                                                         '' && (

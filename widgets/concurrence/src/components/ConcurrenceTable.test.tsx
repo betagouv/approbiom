@@ -86,12 +86,13 @@ describe('ConcurrenceTable', () => {
         render(<ConcurrenceTable plansConcurrents={[plan(1, [plaquettes])]} />)
 
         const header = screen
-            .getByRole('button', { name: 'Chaufferie fictive 1' })
+            .getByRole('button', { name: 'Chaufferie fictive 1 (création)' })
             .closest('th')
 
         expect(header?.colSpan).toBe(4)
+        expect(header?.className).toContain('fr-enlarge-button')
         expect(header?.textContent).toContain('création')
-        expect(header?.textContent).toContain('projet')
+        expect(header?.textContent).toContain('Statut : projet')
         expect(header?.textContent).toContain('Charente-Maritime')
     })
 
@@ -146,7 +147,7 @@ describe('ConcurrenceTable', () => {
         render(<ConcurrenceTable plansConcurrents={[plan(1, [plaquettes])]} />)
 
         const toggle = screen.getByRole('button', {
-            name: 'Chaufferie fictive 1',
+            name: 'Chaufferie fictive 1 (création)',
         })
         const row = screen.getByText('Plaquettes forestières').closest('tr')!
 
@@ -200,6 +201,40 @@ describe('ConcurrenceTable', () => {
                 .querySelector<HTMLElement>('.concurrence-table')
                 ?.style.getPropertyValue('--concurrence-table-header-height')
         ).toBe('120px')
+    })
+
+    it('tells apart the toggles of two plans of one installation', () => {
+        const creation = plan(1, [plaquettes])
+        const modification = plan(2, [plaquettes])
+        render(
+            <ConcurrenceTable
+                plansConcurrents={[
+                    creation,
+                    {
+                        ...modification,
+                        plan: {
+                            ...modification.plan,
+                            installationNom: 'Chaufferie fictive 1',
+                            typeDePlan: 'modification',
+                        },
+                    },
+                ]}
+            />
+        )
+
+        expect(
+            screen
+                .getAllByRole('button')
+                .map((button) => button.textContent?.trim())
+        ).toEqual([
+            'Chaufferie fictive 1 (création)',
+            'Chaufferie fictive 1 (modification)',
+        ])
+        expect(
+            screen.getByRole('button', {
+                name: 'Chaufferie fictive 1 (modification)',
+            })
+        ).toBeDefined()
     })
 
     it('names the toggle of a plan whose installation and type are unknown', () => {
