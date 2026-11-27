@@ -43,7 +43,8 @@ function row(
     return {
         plan: {
             id: planId,
-            nom: `Plan fictif ${planId}`,
+            installationNom: `Installation fictive ${planId}`,
+            typeDePlan: 'création',
             departementDeSituation: 'Charente-Maritime',
             installationCommune: null,
             statut: 'projet',
@@ -231,6 +232,41 @@ describe('buildPlansConcurrents', () => {
             '9',
             '79',
             'Espagne',
+        ])
+    })
+
+    it('sorts the plans by installation, then by type, unnamed last', () => {
+        const plan = (
+            planId: number,
+            installationNom: string,
+            typeDePlan: string
+        ) =>
+            row(planId, [approvisionnement({})], {
+                plan: { ...row(planId, []).plan, installationNom, typeDePlan },
+            })
+
+        const plans = buildPlansConcurrents(
+            [
+                plan(1, '', 'création'),
+                plan(2, 'Réseau fictif', 'modification'),
+                plan(3, 'chaufferie fictive 10', 'création'),
+                plan(4, 'Réseau fictif', 'création'),
+                plan(5, 'Chaufferie fictive 9', 'création'),
+            ],
+            tousRetenus,
+            denominationBySiret
+        )
+
+        expect(
+            plans.map(
+                ({ plan }) => `${plan.installationNom} ${plan.typeDePlan}`
+            )
+        ).toEqual([
+            'Chaufferie fictive 9 création',
+            'chaufferie fictive 10 création',
+            'Réseau fictif création',
+            'Réseau fictif modification',
+            ' création',
         ])
     })
 })

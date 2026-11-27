@@ -36,7 +36,8 @@ const plan = (id: number, ressources: RessourceConcurrente[]) =>
     ({
         plan: {
             id,
-            nom: `Chaufferie fictive ${id}`,
+            installationNom: `Chaufferie fictive ${id}`,
+            typeDePlan: 'création',
             departementDeSituation: 'Charente-Maritime',
             installationCommune: null,
             statut: 'projet',
@@ -66,7 +67,22 @@ describe('ConcurrenceTable', () => {
         expect(screen.queryByText(/Total/)).toBeNull()
     })
 
-    it('reads each plan as a group header, with its statut and département', () => {
+    it('explains « retenus » under the title, outside the table name', () => {
+        render(<ConcurrenceTable plansConcurrents={[plan(1, [plaquettes])]} />)
+
+        expect(
+            screen.getByText(
+                '« Retenus » : qui correspondent aux filtres Provenance et Fournisseur'
+            )
+        ).toBeDefined()
+        expect(
+            screen.getByRole('table', {
+                name: "Plans d'approvisionnement concernés 1 plan correspond aux filtres",
+            })
+        ).toBeDefined()
+    })
+
+    it('reads each plan as a group header, with its type, statut and département', () => {
         render(<ConcurrenceTable plansConcurrents={[plan(1, [plaquettes])]} />)
 
         const header = screen
@@ -74,6 +90,7 @@ describe('ConcurrenceTable', () => {
             .closest('th')
 
         expect(header?.colSpan).toBe(4)
+        expect(header?.textContent).toContain('création')
         expect(header?.textContent).toContain('projet')
         expect(header?.textContent).toContain('Charente-Maritime')
     })
@@ -185,18 +202,25 @@ describe('ConcurrenceTable', () => {
         ).toBe('120px')
     })
 
-    it('names the toggle of a plan without name', () => {
+    it('names the toggle of a plan whose installation and type are unknown', () => {
         const sansNom = plan(1, [plaquettes])
         render(
             <ConcurrenceTable
                 plansConcurrents={[
-                    { ...sansNom, plan: { ...sansNom.plan, nom: '' } },
+                    {
+                        ...sansNom,
+                        plan: {
+                            ...sansNom.plan,
+                            installationNom: '',
+                            typeDePlan: '',
+                        },
+                    },
                 ]}
             />
         )
 
         expect(
-            screen.getByRole('button', { name: 'Plan sans nom' })
+            screen.getByRole('button', { name: 'Installation sans nom' })
         ).toBeDefined()
     })
 

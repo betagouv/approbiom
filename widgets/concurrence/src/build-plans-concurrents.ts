@@ -29,6 +29,15 @@ export type PlanConcurrent = {
 const byProvenance = (a: string, b: string) =>
     a.localeCompare(b, 'fr', { numeric: true })
 
+const compareNoms = (a: string, b: string) =>
+    Number(a === '') - Number(b === '') ||
+    a.localeCompare(b, 'fr', { numeric: true })
+
+/** By installation, then type de plan; what has no name comes last. */
+const byInstallation = (a: PlanConcurrent, b: PlanConcurrent) =>
+    compareNoms(a.plan.installationNom, b.plan.installationNom) ||
+    compareNoms(a.plan.typeDePlan, b.plan.typeDePlan)
+
 const byFournisseur = (a: string, b: string) =>
     Number(a === FOURNISSEUR_NON_RENSEIGNE) -
         Number(b === FOURNISSEUR_NON_RENSEIGNE) || a.localeCompare(b, 'fr')
@@ -55,7 +64,8 @@ function splitRetenus(
 
 /**
  * Groups the (plan, ressource) rows by plan, keeping only the plans with at
- * least one approvisionnement retenu, and all of their ressources.
+ * least one approvisionnement retenu, and all of their ressources. Plans are
+ * sorted by installation name.
  */
 export function buildPlansConcurrents(
     approvisionnementsByPlanAndRessource: readonly ConcurrenceRow[],
@@ -114,4 +124,5 @@ export function buildPlansConcurrents(
                 }
             }),
         }))
+        .toSorted(byInstallation)
 }

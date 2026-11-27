@@ -14,6 +14,7 @@ import {
 } from '@shared/core/domain/value-objects/commune'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Installation } from '@shared/core/domain/entities/installation'
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
@@ -34,7 +35,9 @@ export type ConcurrencePorts = {
 
 export type PlanConcurrence = {
     id: PlanDApprovisionnement['id']
-    nom: PlanDApprovisionnement['nom']
+    /** The plan's own name repeats its installation, type and statut. */
+    installationNom: Installation['nom']
+    typeDePlan: PlanDApprovisionnement['typeDePlan']
     departementDeSituation: Departement['libelle']
     installationCommune: Commune['codeInsee'] | null
     statut: PlanDApprovisionnement['statut']
@@ -83,8 +86,8 @@ export async function loadConcurrence(
     ])
 
     const planById = new Map(plans.map((plan) => [plan.id, plan]))
-    const communeByInstallation = new Map(
-        installations.map(({ id, commune }) => [id, commune] as const)
+    const installationById = new Map(
+        installations.map((installation) => [installation.id, installation])
     )
     const ressourceByCode = new Map(ressources.map((r) => [r.code, r]))
 
@@ -98,13 +101,14 @@ export async function loadConcurrence(
         id: PlanDApprovisionnement['id'],
         plan: PlanDApprovisionnement | undefined
     ): PlanConcurrence => {
-        const commune =
-            (plan && communeByInstallation.get(plan.installation)) || null
+        const installation = plan && installationById.get(plan.installation)
+        const commune = installation?.commune || null
         const dep = commune === null ? undefined : codeDepartementOf(commune)
 
         return {
             id,
-            nom: plan?.nom ?? '',
+            installationNom: installation?.nom ?? '',
+            typeDePlan: plan?.typeDePlan ?? '',
             departementDeSituation: dep ? (libelleByDep.get(dep) ?? dep) : '',
             installationCommune: commune,
             statut: plan?.statut ?? '',

@@ -55,7 +55,8 @@ const dAllemagne: Approvisionnement = {
 const saintJunien: ConcurrenceRow = {
     plan: {
         id: 1,
-        nom: 'RC Saint Junien',
+        installationNom: 'RC Saint Junien',
+        typeDePlan: 'création',
         departementDeSituation: 'Haute-Vienne',
         installationCommune: '87154',
         statut: 'projet',
@@ -236,7 +237,7 @@ describe('Concurrence', () => {
             saintJunien,
             {
                 ...saintJunien,
-                plan: planLike({ id: 2, nom: 'RCU Clair-Village' }),
+                plan: planLike({ id: 2, installationNom: 'RCU Clair-Village' }),
                 approvisionnements: [deHauteVienne],
             },
         ])
@@ -257,7 +258,7 @@ describe('Concurrence', () => {
                 ...saintJunien,
                 plan: planLike({
                     id: 3,
-                    nom: 'RCU Limoges',
+                    installationNom: 'RCU Limoges',
                     installationCommune: '87085',
                 }),
             },
@@ -273,7 +274,7 @@ describe('Concurrence', () => {
                 ...saintJunien,
                 plan: planLike({
                     id: 3,
-                    nom: 'RCU Limoges',
+                    installationNom: 'RCU Limoges',
                     installationCommune: '87085',
                 }),
                 approvisionnements: [deHauteVienne],

@@ -14,8 +14,9 @@ const approvisionnement: Approvisionnement = {
 
 const plan = {
     id: 7,
-    nom: 'Chaufferie fictive',
+    nom: 'Chaufferie fictive - création - projet',
     installation: 3,
+    typeDePlan: 'création',
     statut: 'projet',
 } as PlanDApprovisionnement
 
@@ -39,7 +40,7 @@ function ports(
         installations: {
             list: () =>
                 Promise.resolve([
-                    { id: 3, nom: 'Chaufferie', commune: '17300' },
+                    { id: 3, nom: 'Chaufferie fictive', commune: '17300' },
                 ]),
         },
         ressources: {
@@ -73,7 +74,7 @@ function ports(
 }
 
 describe('loadConcurrence', () => {
-    it('keys each row by its plan id, with its ressource code and famille', async () => {
+    it('keys each row by its plan id, with its installation, type, ressource code and famille', async () => {
         const { approvisionnementsByPlanAndRessource } = await loadConcurrence(
             ports([{ planDApprovisionnement: 7, ressource: '2B-CIB' }])
         )
@@ -82,7 +83,8 @@ describe('loadConcurrence', () => {
             {
                 plan: {
                     id: 7,
-                    nom: 'Chaufferie fictive',
+                    installationNom: 'Chaufferie fictive',
+                    typeDePlan: 'création',
                     departementDeSituation: 'Charente-Maritime',
                     installationCommune: '17300',
                     statut: 'projet',
@@ -104,7 +106,7 @@ describe('loadConcurrence', () => {
         ).approvisionnementsByPlanAndRessource
 
         expect(row).toMatchObject({
-            plan: { id: 99, nom: '' },
+            plan: { id: 99, installationNom: '', typeDePlan: '' },
             ressource: 'XX',
             ressourceCode: 'XX',
             ressourceFamille: '',

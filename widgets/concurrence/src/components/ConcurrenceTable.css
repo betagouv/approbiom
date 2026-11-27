@@ -1,9 +1,4 @@
 .concurrence-table__header {
-    display: flex;
-    flex-wrap: wrap;
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.25rem 1rem;
     margin-bottom: 1rem;
 }
 
@@ -13,9 +8,10 @@
     line-height: 2rem;
 }
 
-.concurrence-table__count {
+.concurrence-table__subtitle {
     margin: 0;
     color: var(--text-mention-grey);
+    font-size: 0.875rem;
 }
 
 /* DSFR's bordered variant leaves the table's top and left edges open. */
@@ -24,7 +20,8 @@
     border-left: 1px solid var(--border-contrast-grey);
 }
 
-/* Type scale: table title 1.25rem > column headers 1.125rem > plan titles 1rem. */
+/* Type scale: table title 1.25rem > column headers 1.125rem > plan header
+   rows 1rem > ressource rows at the cells' 0.875rem. */
 .concurrence-table .fr-table__content thead th {
     position: sticky;
     top: 0;
@@ -52,6 +49,8 @@
 
 .concurrence-table .fr-table__content tbody tr.concurrence-table__plan > th {
     background-color: var(--background-alt-grey);
+    font-size: 1rem;
+    line-height: 1.5rem;
 }
 
 .concurrence-table__plan-header {
@@ -70,7 +69,6 @@
     background: none;
     color: inherit;
     font: inherit;
-    font-size: 1rem;
     font-weight: 700;
     text-align: left;
     cursor: pointer;
@@ -95,7 +93,6 @@
     align-items: center;
     gap: 0.25rem;
     color: var(--text-mention-grey);
-    font-size: 0.875rem;
     font-weight: 400;
 }
 
@@ -117,6 +114,8 @@
 
 .concurrence-table__line {
     margin: 0;
+    font-size: inherit;
+    line-height: inherit;
 }
 
 .concurrence-table__line + .concurrence-table__line {

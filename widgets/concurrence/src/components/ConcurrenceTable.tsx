@@ -6,6 +6,7 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-arrows/icons-arrows.main.min.css'
 import '@gouvfr/dsfr/dist/utility/icons/icons-map/icons-map.main.min.css'
 import './ConcurrenceTable.css'
 import TagStatut from '@shared/react/ui/components/TagStatut'
+import TagTypeDePlan from '@shared/react/ui/components/TagTypeDePlan'
 import { getRessourceIcon } from '@shared/react/ui/ressource-icon'
 import { formatNumber } from '@shared/react/format'
 import {
@@ -26,8 +27,11 @@ type Props = {
 
 const COLUMN_COUNT = 4
 
-/** Names the toggle of a plan Grist gives no name for. */
-const PLAN_SANS_NOM = 'Plan sans nom'
+/** Names the toggle of a plan whose installation Grist gives no name for. */
+const INSTALLATION_SANS_NOM = 'Installation sans nom'
+
+const RETENUS_LEGEND =
+    '« Retenus » : qui correspondent aux filtres Provenance et Fournisseur'
 
 function RetenusLines({
     retenus,
@@ -146,16 +150,17 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                 <h2 id={titleId} className="concurrence-table__title">
                     Plans d&apos;approvisionnement concernés
                 </h2>
-                <p
-                    id={countId}
-                    className="concurrence-table__count"
-                    aria-live="polite"
-                >
-                    {count === 0
-                        ? 'Aucun plan ne correspond aux filtres'
-                        : count === 1
-                          ? '1 plan correspond aux filtres'
-                          : `${count} plans correspondent aux filtres`}
+                <p className="concurrence-table__subtitle">
+                    <span id={countId} aria-live="polite">
+                        {count === 0
+                            ? 'Aucun plan ne correspond aux filtres'
+                            : count === 1
+                              ? '1 plan correspond aux filtres'
+                              : `${count} plans correspondent aux filtres`}
+                    </span>
+                    <span aria-hidden="true"> · </span>
+                    <span className="fr-sr-only">. </span>
+                    <span>{RETENUS_LEGEND}</span>
                 </p>
             </div>
             <p id={summaryId} className="fr-sr-only">
@@ -166,8 +171,8 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                 retenus » s&apos;ils correspondent aux filtres Provenance et
                 Fournisseur, « non retenus » sinon. Le tonnage donne le tonnage
                 retenu sur le tonnage total, en tonne de matière verte par an.
-                Le nom de chaque plan est un bouton qui replie ou déplie ses
-                ressources.
+                Le nom de l&apos;installation de chaque plan est un bouton qui
+                replie ou déplie ses ressources.
             </p>
             <div className="fr-table__wrapper">
                 {/* Focusable so keyboard users can scroll the rows between two
@@ -192,7 +197,10 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                     <th id={columnIds.fournisseurs}>
                                         Fournisseurs
                                     </th>
-                                    <th id={columnIds.tonnage}>
+                                    <th
+                                        id={columnIds.tonnage}
+                                        className="fr-col--md"
+                                    >
                                         Tonnage{' '}
                                         <span className="concurrence-table__unit">
                                             (en tonne de matière verte par an)
@@ -235,9 +243,16 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                                                             className="fr-icon-arrow-down-s-line concurrence-table__chevron"
                                                             aria-hidden="true"
                                                         />
-                                                        {plan.nom ||
-                                                            PLAN_SANS_NOM}
+                                                        {plan.installationNom ||
+                                                            INSTALLATION_SANS_NOM}
                                                     </button>
+                                                    {plan.typeDePlan !== '' && (
+                                                        <TagTypeDePlan
+                                                            typeDePlan={
+                                                                plan.typeDePlan
+                                                            }
+                                                        />
+                                                    )}
                                                     {plan.statut !== '' && (
                                                         <TagStatut
                                                             statut={plan.statut}
