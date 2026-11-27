@@ -7,7 +7,7 @@ describe('getRessourceIcon', () => {
             getRessourceIcon('2B-CIB', '2 Coproduits 1ère transfo Bois')
         ).toEqual({
             iconClassName: 'fr-icon-hammer-fill',
-            colorToken: '--text-label-yellow-moutarde',
+            colorToken: '--text-label-yellow-tournesol',
             familleLabel: 'Coproduits 1ère transfo Bois',
         })
     })

@@ -38,43 +38,47 @@ export const ICON_BY_FAMILLE: Readonly<Record<string, string>> = {
 
 const DEFAULT_ICON = 'fr-icon-leaf-fill'
 
-/** Never twice the same colour within a famille: the icon tells famille apart. */
+/**
+ * The `--text-label-*` tokens keep their contrast in both themes but are
+ * muted: only eight of them read as distinct hues (green, olive, teal, blue,
+ * navy, plum, red, rust). Within a famille, a ressource never shares its hue.
+ */
 export const COLOR_BY_RESSOURCE_CODE: Readonly<
     Record<Ressource['code'], DsfrIllustrativeColor>
 > = {
     '1A-PFA': 'green-bourgeon',
-    '1A-PFA-1': 'green-emeraude',
-    '1A-PFA-2': 'green-menthe',
-    '1B-PFA': 'green-tilleul-verveine',
-    '1C-PFA': 'green-archipel',
-    '1D-BR': 'brown-caramel',
-    '1D-BR-1': 'brown-cafe-creme',
-    '1D-BR-2': 'brown-opera',
-    '2B-CIB': 'yellow-moutarde',
-    '2A-CIB': 'brown-caramel',
-    '2C-LN': 'purple-glycine',
-    '2D-TO': 'yellow-tournesol',
-    '2E-LB': 'blue-cumulus',
-    '3A-BFVBD': 'pink-tuile',
-    '3BR1-BFVBD': 'orange-terre-battue',
-    '3BR2-BFVBD': 'pink-macaron',
-    '3C-BFVBD': 'purple-glycine',
-    '4A-GR': 'brown-cafe-creme',
-    '4B-GR': 'green-tilleul-verveine',
-    '4C-GR': 'orange-terre-battue',
+    '1A-PFA-1': 'yellow-tournesol',
+    '1A-PFA-2': 'green-archipel',
+    '1B-PFA': 'blue-cumulus',
+    '1C-PFA': 'blue-ecume',
+    '1D-BR': 'pink-macaron',
+    '1D-BR-1': 'pink-tuile',
+    '1D-BR-2': 'purple-glycine',
+    '2A-CIB': 'pink-macaron',
+    '2B-CIB': 'yellow-tournesol',
+    '2C-LN': 'blue-ecume',
+    '2D-TO': 'pink-tuile',
+    '2E-LB': 'green-archipel',
+    '3A-BFVBD': 'green-bourgeon',
+    '3BR1-BFVBD': 'blue-cumulus',
+    '3BR2-BFVBD': 'purple-glycine',
+    '3C-BFVBD': 'pink-tuile',
+    '4A-GR': 'pink-macaron',
+    '4B-GR': 'green-bourgeon',
+    '4C-GR': 'pink-tuile',
     '5A-CVE': 'green-bourgeon',
-    '5A-CVE-1': 'green-menthe',
-    '5A-CVE-2': 'green-emeraude',
-    '5B-CIVE': 'yellow-tournesol',
-    '5C-CA': 'yellow-moutarde',
+    '5A-CVE-1': 'green-archipel',
+    '5A-CVE-2': 'yellow-tournesol',
+    '5B-CIVE': 'blue-cumulus',
+    '5C-CA': 'pink-macaron',
     Autre: 'beige-gris-galet',
-    '6A-STEPI': 'blue-ecume',
+    '6A-STEPI': 'purple-glycine',
     '6B-STEPU': 'blue-cumulus',
     '6C-PAPET': 'green-archipel',
-    '6D-REFUS': 'purple-glycine',
-    '7A-FUEL': 'brown-opera',
+    '6D-REFUS': 'yellow-tournesol',
+    '7A-FUEL': 'blue-ecume',
     '7B-CHAR': 'beige-gris-galet',
-    '8A-PLA': 'brown-caramel',
+    '8A-PLA': 'pink-macaron',
 }
 
 const DEFAULT_COLOR_TOKEN = '--text-mention-grey'
