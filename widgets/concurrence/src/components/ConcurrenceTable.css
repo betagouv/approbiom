@@ -24,11 +24,14 @@
     border-left: 1px solid var(--border-contrast-grey);
 }
 
+/* Type scale: table title 1.25rem > column headers 1.125rem > plan titles 1rem. */
 .concurrence-table .fr-table__content thead th {
     position: sticky;
     top: 0;
     z-index: 2;
     vertical-align: top;
+    font-size: 1.125rem;
+    line-height: 1.75rem;
 }
 
 /* WCAG 2.4.11: the stuck header must not cover the focused toggle. The
@@ -65,7 +68,7 @@
     background: none;
     color: inherit;
     font: inherit;
-    font-size: 1.125rem;
+    font-size: 1rem;
     font-weight: 700;
     text-align: left;
     cursor: pointer;
