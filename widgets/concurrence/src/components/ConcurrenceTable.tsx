@@ -31,7 +31,7 @@ const COLUMN_COUNT = 4
 const INSTALLATION_SANS_NOM = 'Installation sans nom'
 
 const RETENUS_LEGEND =
-    '« Retenus » : qui correspondent aux filtres Provenance et Fournisseur'
+    'Retenus : approvisionnements dont la provenance et le fournisseur figurent dans votre sélection'
 
 function RetenusLines({
     retenus,
@@ -153,10 +153,10 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                 <p className="concurrence-table__subtitle">
                     <span id={countId} aria-live="polite">
                         {count === 0
-                            ? 'Aucun plan ne correspond aux filtres'
+                            ? 'Aucun plan ne correspond à votre recherche'
                             : count === 1
-                              ? '1 plan correspond aux filtres'
-                              : `${count} plans correspondent aux filtres`}
+                              ? '1 plan correspond à votre recherche'
+                              : `${count} plans correspondent à votre recherche`}
                     </span>
                     <span aria-hidden="true"> · </span>
                     <span className="fr-sr-only">. </span>
@@ -166,13 +166,15 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
             <p id={summaryId} className="fr-sr-only">
                 Le tableau regroupe les ressources par plan
                 d&apos;approvisionnement. Chaque plan est une ligne
-                d&apos;en-tête, suivie d&apos;une ligne par ressource. Pour
-                chaque ressource, les provenances et les fournisseurs sont «
-                retenus » s&apos;ils correspondent aux filtres Provenance et
-                Fournisseur, « non retenus » sinon. Le tonnage donne le tonnage
-                retenu sur le tonnage total, en tonne de matière verte par an.
-                Le nom de l&apos;installation de chaque plan est un bouton qui
-                replie ou déplie ses ressources.
+                d&apos;en-tête, suivie d&apos;une ligne par ressource. Les
+                approvisionnements retenus sont ceux dont la provenance et le
+                fournisseur figurent dans votre sélection. Pour chaque
+                ressource, les provenances et les fournisseurs sont « retenus »
+                s&apos;ils figurent sur au moins un approvisionnement retenu, «
+                non retenus » sinon. Le tonnage donne le tonnage retenu sur le
+                tonnage total, en tonne de matière verte par an. Le nom de
+                l&apos;installation de chaque plan est un bouton qui replie ou
+                déplie ses ressources.
             </p>
             <div className="fr-table__wrapper">
                 {/* Focusable so keyboard users can scroll the rows between two

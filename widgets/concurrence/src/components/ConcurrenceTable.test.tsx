@@ -61,7 +61,7 @@ describe('ConcurrenceTable', () => {
 
         expect(
             screen.getByRole('table', {
-                name: "Plans d'approvisionnement concernés 2 plans correspondent aux filtres",
+                name: "Plans d'approvisionnement concernés 2 plans correspondent à votre recherche",
             })
         ).toBeDefined()
         expect(screen.queryByText(/Total/)).toBeNull()
@@ -72,12 +72,12 @@ describe('ConcurrenceTable', () => {
 
         expect(
             screen.getByText(
-                '« Retenus » : qui correspondent aux filtres Provenance et Fournisseur'
+                'Retenus : approvisionnements dont la provenance et le fournisseur figurent dans votre sélection'
             )
         ).toBeDefined()
         expect(
             screen.getByRole('table', {
-                name: "Plans d'approvisionnement concernés 1 plan correspond aux filtres",
+                name: "Plans d'approvisionnement concernés 1 plan correspond à votre recherche",
             })
         ).toBeDefined()
     })
@@ -264,7 +264,7 @@ describe('ConcurrenceTable', () => {
 
         expect(
             screen.getByRole('table', {
-                name: "Plans d'approvisionnement concernés Aucun plan ne correspond aux filtres",
+                name: "Plans d'approvisionnement concernés Aucun plan ne correspond à votre recherche",
             })
         ).toBeDefined()
         expect(document.querySelector('tbody')).toBeNull()
