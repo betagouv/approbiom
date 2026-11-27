@@ -69,10 +69,9 @@ export function buildPlansConcurrents(
 
     const rowsByPlan = new Map<PlanConcurrence['id'], ConcurrenceRow[]>()
     for (const row of approvisionnementsByPlanAndRessource) {
-        rowsByPlan.set(row.plan.id, [
-            ...(rowsByPlan.get(row.plan.id) ?? []),
-            row,
-        ])
+        const rows = rowsByPlan.get(row.plan.id) ?? []
+        rows.push(row)
+        rowsByPlan.set(row.plan.id, rows)
     }
 
     return [...rowsByPlan.values()]
