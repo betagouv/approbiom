@@ -8,7 +8,7 @@ import { createGristEntreprisePort } from '@shared/infrastructure/grist/adapters
 import { createGristInstallationPort } from '@shared/infrastructure/grist/adapters/grist-adapter-installation'
 import { createGristReferentielGeoPort } from '@shared/infrastructure/grist/adapters/grist-adapter-referentiel-geo'
 import { createGristPlanPort } from '@shared/infrastructure/grist/adapters/grist-adapter-plan'
-import { createGristRessourcePort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
+import { createGristRessourcesPort } from '@shared/infrastructure/grist/adapters/grist-adapter-ressource'
 import { createReferentielGeoAdapter } from '@shared/infrastructure/referentiel-geo/referentiel-geo-adapter'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 
@@ -26,7 +26,7 @@ createRoot(rootEl).render(
             approvisionnements={createGristApprovisionnementPort()}
             plans={createGristPlanPort()}
             installations={createGristInstallationPort()}
-            ressources={createGristRessourcePort()}
+            ressources={createGristRessourcesPort()}
             entreprises={createGristEntreprisePort()}
             referentielGeo={referentielGeo}
         />

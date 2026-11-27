@@ -1,7 +1,7 @@
 import './RechercheDePlan.css'
-import Combobox from '@shared/react/components/Combobox'
-import Ressource from '@shared/react/components/Ressource'
-import AsyncGate from '@shared/react/components/AsyncGate'
+import Combobox from '@shared/react/ui/components/Combobox'
+import Ressource from '@shared/react/ui/components/Ressource'
+import AsyncGate from '@shared/react/ui/components/AsyncGate'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import {
     getApprovisionnementByRessourceStats,

@@ -1,4 +1,4 @@
-import AsyncGate from '@shared/react/components/AsyncGate'
+import AsyncGate from '@shared/react/ui/components/AsyncGate'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import type { PlanDetail } from '@shared/core/application/services/plan-detail'
 import { useState } from 'react'

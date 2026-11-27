@@ -1,4 +1,4 @@
-import Badge from '@shared/react/components/Badge'
+import Badge from '@shared/react/ui/components/Badge'
 import type { EtatAdministratif } from '@shared/core/application/ports/entreprise-search'
 
 // SIRENE dates come as YYYY-MM-DD: rearranged, not parsed, so no time zone

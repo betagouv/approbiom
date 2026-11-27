@@ -13,7 +13,7 @@ import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { PlanDApprovisionnement as Plan } from '@shared/core/domain/entities/plan-d-approvisionnement'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
 const UNKNOWN = 'Inconnu'
 
@@ -164,6 +164,7 @@ export function composeApprovisionnementStats({
             ressource: ressourceByCode.get(code) ?? {
                 code,
                 ademeCode: '',
+                famille: '',
                 title: code,
                 description: '',
             },

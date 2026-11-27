@@ -1,16 +1,15 @@
 import './Concurrence.css'
-import DataTable, { type Column } from '@shared/react/components/DataTable'
-import ProvenanceMap from '@shared/react/components/Ressource/ProvenanceMap'
+import ProvenanceMap from '@shared/react/ui/components/Ressource/ProvenanceMap'
+import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
 import MultiSelect, {
     type MultiSelectGroup,
     type MultiSelectOption,
-} from '@shared/react/components/MultiSelect'
-import { getOptions } from '@shared/react/components/MultiSelect/getOptions'
+} from '@shared/react/ui/components/MultiSelect'
+import { getOptions } from '@shared/react/ui/components/MultiSelect/getOptions'
 import type {
     DepartementsByRegion,
     ReferentielGeoPort,
 } from '@shared/core/application/ports/referentiel-geo'
-import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import {
     getProvenanceLabel,
     PAYS_ETRANGER,
@@ -19,6 +18,11 @@ import {
 import { useCallback, useMemo, useState } from 'react'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { ConcurrenceRow } from '../load-concurrence'
+import {
+    buildPlansConcurrents,
+    type GetIsApprovisionnementRetenu,
+} from '../build-plans-concurrents'
+import ConcurrenceTable from './ConcurrenceTable'
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
 import { PLAN_STATUT_PROJECT } from '@shared/core/domain/value-objects/plan-statut'
 
@@ -113,17 +117,18 @@ export default function Concurrence({
         (item) => item.plan.statut
     )
 
-    const isSelected = useCallback(
-        (approvisionnement: Approvisionnement) =>
-            (provenances.length === 0 ||
-                provenances.includes(
-                    getProvenanceLabel(approvisionnement.provenance)
-                )) &&
-            (fournisseurs.length === 0 ||
-                (approvisionnement.fournisseur !== undefined &&
-                    fournisseurs.includes(approvisionnement.fournisseur))),
-        [provenances, fournisseurs]
-    )
+    const getIsApprovisionnementRetenu: GetIsApprovisionnementRetenu =
+        useCallback(
+            (approvisionnement) =>
+                (provenances.length === 0 ||
+                    provenances.includes(
+                        getProvenanceLabel(approvisionnement.provenance)
+                    )) &&
+                (fournisseurs.length === 0 ||
+                    (approvisionnement.fournisseur !== undefined &&
+                        fournisseurs.includes(approvisionnement.fournisseur))),
+            [provenances, fournisseurs]
+        )
 
     const filteredRows = useMemo(
         () =>
@@ -131,116 +136,36 @@ export default function Concurrence({
                 (item) =>
                     (ressource.length === 0 ||
                         ressource.includes(item.ressource)) &&
-                    ((provenances.length === 0 && fournisseurs.length === 0) ||
-                        item.approvisionnements.some(isSelected)) &&
                     (planStatut.length === 0 ||
                         planStatut.includes(item.plan.statut))
             ),
-        [
-            approvisionnementsByPlanAndRessource,
-            ressource,
-            provenances.length,
-            fournisseurs.length,
-            isSelected,
-            planStatut,
-        ]
+        [approvisionnementsByPlanAndRessource, ressource, planStatut]
+    )
+
+    const plansConcurrents = useMemo(
+        () =>
+            buildPlansConcurrents(
+                filteredRows,
+                getIsApprovisionnementRetenu,
+                denominationBySiret
+            ),
+        [filteredRows, getIsApprovisionnementRetenu, denominationBySiret]
     )
 
     const communes = useMemo(
         () =>
-            filteredRows
+            plansConcurrents
                 .map(({ plan }) => plan.installationCommune)
                 .filter((commune) => commune !== null),
-        [filteredRows]
+        [plansConcurrents]
     )
 
     const approvisionnementsRetenus = useMemo(
         () =>
             filteredRows.flatMap((item) =>
-                item.approvisionnements.filter(isSelected)
+                item.approvisionnements.filter(getIsApprovisionnementRetenu)
             ),
-        [filteredRows, isSelected]
-    )
-
-    const getSelectedApprovisionnements = useCallback(
-        (item: ConcurrenceRow) => {
-            const selectedApprovisionnements =
-                item.approvisionnements.filter(isSelected)
-
-            return {
-                provenances: [
-                    ...new Set(
-                        selectedApprovisionnements.map((approvisionnement) =>
-                            getProvenanceLabel(approvisionnement.provenance)
-                        )
-                    ),
-                ].join(', '),
-                fournisseurs: [
-                    ...new Set(
-                        selectedApprovisionnements.map(({ fournisseur }) =>
-                            fournisseur === undefined
-                                ? 'Non renseigné'
-                                : denominationBySiret.get(fournisseur) ||
-                                  fournisseur
-                        )
-                    ),
-                ]
-                    .toSorted(byLabel)
-                    .join(', '),
-                sumTonnageRetenu: selectedApprovisionnements.reduce(
-                    (sum, approvisionnement) =>
-                        sum + (approvisionnement.tonnageTotal ?? 0),
-                    0
-                ),
-            }
-        },
-        [isSelected, denominationBySiret]
-    )
-
-    const columns: readonly Column<ConcurrenceRow>[] = useMemo(
-        () => [
-            {
-                header: 'Plan d’approvisionnement',
-                id: 'plan_d_approvisionnement',
-                render: (item) => item.plan.nom,
-                sortBy: (item) => item.plan.nom,
-            },
-            {
-                header: 'Département de situation',
-                id: 'departement_de_situation',
-                render: (item) => item.plan.departementDeSituation,
-            },
-            {
-                header: 'Provenances',
-                id: 'provenances',
-                render: (item) =>
-                    [
-                        ...new Set(
-                            item.approvisionnements.map((approvisionnement) =>
-                                getProvenanceLabel(approvisionnement.provenance)
-                            )
-                        ),
-                    ].join(', '),
-            },
-            {
-                header: 'Tonnage total (en tonne de matière verte par an)',
-                id: 'tonnage_total',
-                render: (item) => item.tonnageTotal,
-            },
-            {
-                header: 'Provenances retenues',
-                id: 'provenances_retenues',
-                render: (item) =>
-                    getSelectedApprovisionnements(item).provenances,
-            },
-            {
-                header: 'Tonnage retenu (en tonne de matière verte par an)',
-                id: 'tonnage_retenu',
-                render: (item) =>
-                    getSelectedApprovisionnements(item).sumTonnageRetenu,
-            },
-        ],
-        [getSelectedApprovisionnements]
+        [filteredRows, getIsApprovisionnementRetenu]
     )
 
     return (
@@ -286,33 +211,7 @@ export default function Concurrence({
             </div>
             <div className="concurrence__results">
                 <div className="concurrence__table">
-                    <DataTable
-                        caption={'Plans concernés'}
-                        showResultCount
-                        stickyHeader
-                        expandable={{
-                            columnId: 'plan_d_approvisionnement',
-                            render: (item) => (
-                                <dl className="concurrence__detail">
-                                    <div>
-                                        <dt>Ressource</dt>
-                                        <dd>{item.ressource}</dd>
-                                    </div>
-                                    <div>
-                                        <dt>Fournisseurs retenus</dt>
-                                        <dd>
-                                            {getSelectedApprovisionnements(item)
-                                                .fournisseurs || 'Inconnu'}
-                                        </dd>
-                                    </div>
-                                </dl>
-                            ),
-                        }}
-                        rows={filteredRows}
-                        columns={columns}
-                        bordered
-                        multiLine
-                    />
+                    <ConcurrenceTable plansConcurrents={plansConcurrents} />
                 </div>
 
                 <div className="concurrence__map">
@@ -323,6 +222,16 @@ export default function Concurrence({
                         getDepartementContour={getDepartementContour}
                         getCountryContour={getCountryContour}
                     />
+                    {communes.length > 0 && (
+                        <p className="concurrence__map-legend">
+                            <img
+                                className="concurrence__map-legend-pin"
+                                src={markerIconUrl}
+                                alt=""
+                            />
+                            Commune de l&apos;installation
+                        </p>
+                    )}
                 </div>
             </div>
         </div>

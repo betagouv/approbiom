@@ -2,7 +2,7 @@ import { useRef, useState } from 'react'
 import Combobox, {
     type ComboboxHandle,
     type ComboboxMessage,
-} from '@shared/react/components/Combobox'
+} from '@shared/react/ui/components/Combobox'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { SiretLookup } from '@shared/core/application/services/find-entreprise-by-siret'
 import { digitsOf, formatSiret } from '@shared/core/domain/value-objects/siret'

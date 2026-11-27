@@ -1,16 +1,18 @@
 import { describe, expect, it } from 'vitest'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 import { matchRessource } from './match-ressource'
 
 const plaquettes: Ressource = {
     code: '1A-PFA',
     ademeCode: '2017-1A-PFA',
+    famille: '1 Bois coupé',
     title: 'Plaquettes forestières',
     description: 'Plaquettes forestières dont souches et rémanents',
 }
 const connexes: Ressource = {
     code: '2B-CIB',
     ademeCode: '2017-2B-CIB',
+    famille: '2 Coproduits 1ère transfo Bois',
     title: 'Produits connexes de scierie',
     description: 'Produits connexes de scierie hors écorces',
 }
@@ -76,6 +78,7 @@ describe('matchRessource', () => {
         const bois: Ressource = {
             code: 'X',
             ademeCode: '',
+            famille: '',
             title: 'Bois',
             description: 'Bois',
         }
@@ -87,6 +90,7 @@ describe('matchRessource', () => {
         const plaquettesSeches: Ressource = {
             code: '1A-PFS',
             ademeCode: '',
+            famille: '1 Bois coupé',
             title: 'Plaquettes forestières sèches',
             description:
                 'Plaquettes forestières dont souches et rémanents sèches',
@@ -108,7 +112,13 @@ describe('matchRessource', () => {
         expect(
             matchRessource('', [
                 ...ressources,
-                { code: '', ademeCode: '', title: '', description: '' },
+                {
+                    code: '',
+                    ademeCode: '',
+                    title: '',
+                    famille: '',
+                    description: '',
+                },
             ])
         ).toBeNull()
     })

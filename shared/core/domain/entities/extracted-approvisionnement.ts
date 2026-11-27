@@ -1,7 +1,7 @@
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 import {
     VERIFIEE,
     type Controle,

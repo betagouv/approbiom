@@ -77,6 +77,7 @@ describe('createGristExtractedApprovisionnementAdapter().update', () => {
             matchedRessource: {
                 code: '2A-CIB',
                 ademeCode: '2017-2A-CIB',
+                famille: '2 Coproduits 1ère transfo Bois',
                 title: 'Ecorces',
                 description: 'Ecorces',
             },

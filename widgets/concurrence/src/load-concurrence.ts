@@ -6,7 +6,7 @@ import type {
     ReferentielGeoPort,
 } from '@shared/core/application/ports/referentiel-geo'
 import type { PlanPort } from '@shared/core/application/ports/plan-d-approvisionnement'
-import type { RessourcePort } from '@shared/core/application/ports/ressource'
+import type { RessourcesPort } from '@shared/core/application/ports/ressources'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
 import {
     codeDepartementOf,
@@ -14,14 +14,15 @@ import {
 } from '@shared/core/domain/value-objects/commune'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
+import type { Installation } from '@shared/core/domain/entities/installation'
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
 export type ConcurrencePorts = {
     approvisionnements: ApprovisionnementPort
     plans: PlanPort
     installations: InstallationPort
-    ressources: RessourcePort
+    ressources: RessourcesPort
     entreprises: EntreprisePort
     referentielGeo: Pick<
         ReferentielGeoPort,
@@ -33,7 +34,10 @@ export type ConcurrencePorts = {
 }
 
 export type PlanConcurrence = {
-    nom: PlanDApprovisionnement['nom']
+    id: PlanDApprovisionnement['id']
+    /** The plan's own name repeats its installation, type and statut. */
+    installationNom: Installation['nom']
+    typeDePlan: PlanDApprovisionnement['typeDePlan']
     departementDeSituation: Departement['libelle']
     installationCommune: Commune['codeInsee'] | null
     statut: PlanDApprovisionnement['statut']
@@ -46,6 +50,8 @@ export type PlanConcurrence = {
 export type ConcurrenceRow = {
     plan: PlanConcurrence
     ressource: Ressource['title']
+    ressourceCode: Ressource['code']
+    ressourceFamille: Ressource['famille']
     approvisionnements: readonly Approvisionnement[]
     tonnageTotal: number
 }
@@ -74,16 +80,16 @@ export async function loadConcurrence(
         ports.approvisionnements.list(),
         ports.plans.list(),
         ports.installations.list(),
-        ports.ressources.list(),
+        ports.ressources.list(['code', 'title', 'famille']),
         ports.entreprises.list(),
         ports.referentielGeo.listDepartementsByRegion(),
     ])
 
     const planById = new Map(plans.map((plan) => [plan.id, plan]))
-    const communeByInstallation = new Map(
-        installations.map(({ id, commune }) => [id, commune] as const)
+    const installationById = new Map(
+        installations.map((installation) => [installation.id, installation])
     )
-    const titleByCode = new Map(ressources.map((r) => [r.code, r.title]))
+    const ressourceByCode = new Map(ressources.map((r) => [r.code, r]))
 
     const libelleByDep = new Map(
         departementsByRegion.flatMap(({ departements }) =>
@@ -92,14 +98,17 @@ export async function loadConcurrence(
     )
 
     const getPlanConcurrence = (
+        id: PlanDApprovisionnement['id'],
         plan: PlanDApprovisionnement | undefined
     ): PlanConcurrence => {
-        const commune =
-            (plan && communeByInstallation.get(plan.installation)) || null
+        const installation = plan && installationById.get(plan.installation)
+        const commune = installation?.commune || null
         const dep = commune === null ? undefined : codeDepartementOf(commune)
 
         return {
-            nom: plan?.nom ?? '',
+            id,
+            installationNom: installation?.nom ?? '',
+            typeDePlan: plan?.typeDePlan ?? '',
             departementDeSituation: dep ? (libelleByDep.get(dep) ?? dep) : '',
             installationCommune: commune,
             statut: plan?.statut ?? '',
@@ -119,11 +128,16 @@ export async function loadConcurrence(
 
     return {
         approvisionnementsByPlanAndRessource: totals.map((total) => {
+            const ressource = ressourceByCode.get(total.ressource)
+
             return {
                 plan: getPlanConcurrence(
+                    total.planDApprovisionnement,
                     planById.get(total.planDApprovisionnement)
                 ),
-                ressource: titleByCode.get(total.ressource) ?? total.ressource,
+                ressource: ressource?.title ?? total.ressource,
+                ressourceCode: total.ressource,
+                ressourceFamille: ressource?.famille ?? '',
                 approvisionnements:
                     byPair.get(
                         pairKey(total.planDApprovisionnement, total.ressource)

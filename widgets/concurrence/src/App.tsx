@@ -1,4 +1,4 @@
-import AsyncGate from '@shared/react/components/AsyncGate'
+import AsyncGate from '@shared/react/ui/components/AsyncGate'
 
 import Concurrence from './components/Concurrence'
 import { loadConcurrence, type ConcurrencePorts } from './load-concurrence'

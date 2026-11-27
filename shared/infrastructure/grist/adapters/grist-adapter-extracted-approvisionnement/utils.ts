@@ -4,7 +4,7 @@ import type {
     ExtractedLine,
 } from '@shared/core/domain/entities/extracted-approvisionnement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 import {
     CONTROLES,
     NON_VERIFIEE,

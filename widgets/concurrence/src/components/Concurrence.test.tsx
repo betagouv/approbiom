@@ -54,12 +54,16 @@ const dAllemagne: Approvisionnement = {
 
 const saintJunien: ConcurrenceRow = {
     plan: {
-        nom: 'RC Saint Junien',
+        id: 1,
+        installationNom: 'RC Saint Junien',
+        typeDePlan: 'création',
         departementDeSituation: 'Haute-Vienne',
         installationCommune: '87154',
         statut: 'projet',
     },
     ressource: 'Plaquettes forestières',
+    ressourceCode: '1A-PFA',
+    ressourceFamille: '1 Bois coupé',
     approvisionnements: [deHauteVienne, dAllemagne],
     tonnageTotal: 200,
 }
@@ -98,10 +102,19 @@ function renderConcurrence(rows: readonly ConcurrenceRow[] = [saintJunien]) {
     )
 }
 
-const planRow = () =>
-    within(screen.getByRole('table')).getByRole('row', {
-        name: /RC Saint Junien/,
-    })
+/** Provenances, fournisseurs and tonnage of the one ressource row on screen. */
+const ressourceCells = () => {
+    const row = within(screen.getByRole('table'))
+        .getByText('Plaquettes forestières')
+        .closest('tr')
+    if (row === null) throw new Error('No ressource row')
+
+    const [provenances, fournisseurs, tonnage] = within(row)
+        .getAllByRole('cell')
+        .map((cell) => cell.textContent)
+
+    return { provenances, fournisseurs, tonnage }
+}
 
 /** Leaflet draws a marker as an image in its own pane, a polygon as a path. */
 const markers = (container: HTMLElement) =>
@@ -124,9 +137,7 @@ describe('Concurrence', () => {
     it('shows both kinds of provenance in the same cell', () => {
         renderConcurrence()
 
-        expect(within(planRow()).getAllByRole('cell')[2].textContent).toBe(
-            '87, Allemagne'
-        )
+        expect(ressourceCells().provenances).toBe('Retenus : 87, Allemagne')
     })
 
     // The document stores Scierie Picard before Forst GmbH.
@@ -195,9 +206,7 @@ describe('Concurrence', () => {
             },
         ])
 
-        expect(within(planRow()).getAllByRole('cell')[2].textContent).toBe(
-            '87, Allemagne'
-        )
+        expect(ressourceCells().provenances).toBe('Retenus : 87, Allemagne')
     })
 
     it('narrows the retained tonnage to a foreign provenance', () => {
@@ -205,12 +214,11 @@ describe('Concurrence', () => {
         openProvenanceFilter()
         check('Allemagne')
 
-        const cells = within(planRow()).getAllByRole('cell')
-
-        // Provenances retenues, then tonnage retenu.
-        expect(cells[4].textContent).toBe('Allemagne')
-        expect(cells[5].textContent).toBe('80')
-        expect(cells[3].textContent).toBe('200')
+        expect(ressourceCells()).toEqual({
+            provenances: 'Retenus : AllemagneNon retenus : 87',
+            fournisseurs: 'Retenus : Forst GmbHNon retenus : Scierie Picard',
+            tonnage: '80 retenus /sur 200',
+        })
     })
 
     it('narrows the retained tonnage to a French provenance', () => {
@@ -218,10 +226,10 @@ describe('Concurrence', () => {
         openProvenanceFilter()
         check('87')
 
-        const cells = within(planRow()).getAllByRole('cell')
-
-        expect(cells[4].textContent).toBe('87')
-        expect(cells[5].textContent).toBe('120')
+        expect(ressourceCells()).toMatchObject({
+            provenances: 'Retenus : 87Non retenus : Allemagne',
+            tonnage: '120 retenus /sur 200',
+        })
     })
 
     it('drops a plan no selected provenance reaches', () => {
@@ -229,7 +237,7 @@ describe('Concurrence', () => {
             saintJunien,
             {
                 ...saintJunien,
-                plan: planLike({ nom: 'RCU Clair-Village' }),
+                plan: planLike({ id: 2, installationNom: 'RCU Clair-Village' }),
                 approvisionnements: [deHauteVienne],
             },
         ])
@@ -249,7 +257,8 @@ describe('Concurrence', () => {
             {
                 ...saintJunien,
                 plan: planLike({
-                    nom: 'RCU Limoges',
+                    id: 3,
+                    installationNom: 'RCU Limoges',
                     installationCommune: '87085',
                 }),
             },
@@ -264,7 +273,8 @@ describe('Concurrence', () => {
             {
                 ...saintJunien,
                 plan: planLike({
-                    nom: 'RCU Limoges',
+                    id: 3,
+                    installationNom: 'RCU Limoges',
                     installationCommune: '87085',
                 }),
                 approvisionnements: [deHauteVienne],
@@ -279,6 +289,12 @@ describe('Concurrence', () => {
         expect(markers(container)).toHaveLength(1)
     })
 
+    it('says the pins are the installations of the plans', () => {
+        renderConcurrence([saintJunien])
+
+        expect(screen.getByText("Commune de l'installation")).toBeDefined()
+    })
+
     it('draws the provenances of a plan it cannot situate', () => {
         const { container } = renderConcurrence([
             { ...saintJunien, plan: planLike({ installationCommune: null }) },
@@ -286,6 +302,7 @@ describe('Concurrence', () => {
 
         expect(markers(container)).toHaveLength(0)
         expect(polygons(container)).toHaveLength(2)
+        expect(screen.queryByText("Commune de l'installation")).toBeNull()
     })
 
     it('says as much when the filters leave nothing to place', () => {

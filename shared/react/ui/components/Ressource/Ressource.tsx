@@ -1,5 +1,5 @@
 import { useState } from 'react'
-import DataTable, { type Column } from '@shared/react/components/DataTable'
+import DataTable, { type Column } from '@shared/react/ui/components/DataTable'
 import './Ressource.css'
 import type {
     Group,
@@ -8,7 +8,7 @@ import type {
 } from '@shared/core/application/services/approvisionnement-stats'
 import type { ReferentielGeoPort } from '@shared/core/application/ports/referentiel-geo'
 import type { Commune } from '@shared/core/domain/value-objects/commune'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 import { toProvenance } from '@shared/core/domain/value-objects/provenance'
 import Alert from '../Alert'
 import Tabs from '../Tabs'

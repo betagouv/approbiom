@@ -32,7 +32,7 @@
 .concurrence__results {
     display: grid;
     flex: 1;
-    grid-template-columns: minmax(35rem, 50%) 1fr;
+    grid-template-columns: minmax(35rem, 62%) 1fr;
     grid-template-rows: minmax(0, 1fr);
     min-height: 0;
 }
@@ -67,8 +67,34 @@
 }
 
 .concurrence__map {
+    position: relative;
     min-width: 0;
     isolation: isolate;
+}
+
+/* Bottom left: Leaflet keeps its zoom top left and its attribution bottom
+   right. Above its panes and controls (z-index up to 1000). */
+.concurrence__map-legend {
+    position: absolute;
+    bottom: 0.75rem;
+    left: 0.75rem;
+    z-index: 1000;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+    max-width: calc(100% - 1.5rem);
+    margin: 0;
+    padding: 0.25rem 0.5rem;
+    background-color: var(--background-default-grey);
+    box-shadow: 0 1px 4px rgba(0, 0, 0, 0.3);
+    font-size: 0.875rem;
+    line-height: 1.25rem;
+    pointer-events: none;
+}
+
+.concurrence__map-legend-pin {
+    flex-shrink: 0;
+    height: 1.25rem;
 }
 
 .concurrence__map .ressource__map,
@@ -76,19 +102,32 @@
     height: 100%;
 }
 
-.concurrence__detail {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 3rem;
-    margin: 0;
-    padding: 0.5rem 0;
-}
+/* RGAA 10.11 (reflow): below 48em, two columns would overflow sideways, so
+   the table and the map stack and the page scrolls instead. */
+@media (max-width: 47.99em) {
+    .concurrence {
+        height: auto;
+    }
 
-.concurrence__detail dt {
-    color: var(--text-mention-grey);
-    font-size: 0.875rem;
-}
+    .concurrence__filters {
+        flex-wrap: wrap;
+    }
 
-.concurrence__detail dd {
-    margin: 0;
+    .concurrence__filter {
+        flex: 1 1 12rem;
+    }
+
+    .concurrence__results {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto 24rem;
+    }
+
+    .concurrence__table {
+        border-right: 0;
+        border-bottom: 1px solid var(--border-default-grey);
+    }
+
+    .concurrence__table .fr-table {
+        height: auto;
+    }
 }

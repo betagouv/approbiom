@@ -1,5 +1,5 @@
-import Alert from '@shared/react/components/Alert'
-import DataTable, { type Column } from '@shared/react/components/DataTable'
+import Alert from '@shared/react/ui/components/Alert'
+import DataTable, { type Column } from '@shared/react/ui/components/DataTable'
 import { formatNumber, plural } from '@shared/react/format'
 import { lundiNumerique } from '../format-semaine'
 import {

@@ -1,4 +1,4 @@
-import AsyncGate from '@shared/react/components/AsyncGate'
+import AsyncGate from '@shared/react/ui/components/AsyncGate'
 import { useAsyncState } from '@shared/react/hooks/UseAsyncState'
 import TableauDeBord from './components/TableauDeBord'
 import { lundiLong } from './format-semaine'

@@ -42,6 +42,7 @@ const line: ExtractedApprovisionnement = {
         matchedRessource: {
             code: '1A-PFA',
             ademeCode: '2017-1A-PFA',
+            famille: '1 Bois coupé',
             title: 'Plaquettes forestières',
             description: '',
         },

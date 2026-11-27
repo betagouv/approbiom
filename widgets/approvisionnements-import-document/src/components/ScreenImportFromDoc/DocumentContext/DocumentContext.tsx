@@ -4,7 +4,7 @@ import '@gouvfr/dsfr/dist/utility/icons/icons-system/icons-system.main.min.css'
 
 import { useState, type ReactNode } from 'react'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import { documentIconOf } from '@shared/react/components/document-icon'
+import { documentIconOf } from '@shared/react/ui/document-icon'
 
 export type DocumentContextProps = {
     attachment: Attachment
