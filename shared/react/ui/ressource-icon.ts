@@ -26,17 +26,17 @@ export type DsfrIllustrativeColor =
 
 /** Keyed by the number the « Famille ressource » label starts with. */
 export const ICON_BY_FAMILLE: Readonly<Record<string, string>> = {
-    '1': 'fr-icon-plant-line',
-    '2': 'fr-icon-hammer-line',
-    '3': 'fr-icon-recycle-line',
-    '4': 'fr-icon-bubble-chart-line',
-    '5': 'fr-icon-seedling-line',
-    '6': 'fr-icon-drop-line',
-    '7': 'fr-icon-gas-station-line',
-    '8': 'fr-icon-stack-line',
+    '1': 'fr-icon-plant-fill',
+    '2': 'fr-icon-hammer-fill',
+    '3': 'fr-icon-recycle-fill',
+    '4': 'fr-icon-bubble-chart-fill',
+    '5': 'fr-icon-seedling-fill',
+    '6': 'fr-icon-drop-fill',
+    '7': 'fr-icon-gas-station-fill',
+    '8': 'fr-icon-stack-fill',
 }
 
-const DEFAULT_ICON = 'fr-icon-leaf-line'
+const DEFAULT_ICON = 'fr-icon-leaf-fill'
 
 /** Never twice the same colour within a famille: the icon tells famille apart. */
 export const COLOR_BY_RESSOURCE_CODE: Readonly<

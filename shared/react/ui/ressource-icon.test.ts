@@ -10,7 +10,7 @@ describe('getRessourceIcon', () => {
         expect(
             getRessourceIcon('2B-CIB', '2 Coproduits 1ère transfo Bois')
         ).toEqual({
-            iconClassName: 'fr-icon-hammer-line',
+            iconClassName: 'fr-icon-hammer-fill',
             colorToken: '--text-label-yellow-moutarde',
             familleLabel: 'Coproduits 1ère transfo Bois',
         })
@@ -18,7 +18,7 @@ describe('getRessourceIcon', () => {
 
     it('falls back on a leaf in grey for an unknown famille and code', () => {
         expect(getRessourceIcon('XX', '9 Inconnue')).toEqual({
-            iconClassName: 'fr-icon-leaf-line',
+            iconClassName: 'fr-icon-leaf-fill',
             colorToken: '--text-mention-grey',
             familleLabel: 'Inconnue',
         })
@@ -26,7 +26,7 @@ describe('getRessourceIcon', () => {
 
     it('keeps a famille without number as its own label', () => {
         expect(getRessourceIcon('1A-PFA', 'Bois coupé')).toMatchObject({
-            iconClassName: 'fr-icon-leaf-line',
+            iconClassName: 'fr-icon-leaf-fill',
             familleLabel: 'Bois coupé',
         })
     })
