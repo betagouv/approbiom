@@ -1,5 +1,6 @@
 import './Concurrence.css'
 import ProvenanceMap from '@shared/react/ui/components/Ressource/ProvenanceMap'
+import markerIconUrl from 'leaflet/dist/images/marker-icon.png'
 import MultiSelect, {
     type MultiSelectGroup,
     type MultiSelectOption,
@@ -221,6 +222,17 @@ export default function Concurrence({
                         getDepartementContour={getDepartementContour}
                         getCountryContour={getCountryContour}
                     />
+                    {communes.length > 0 && (
+                        <p className="concurrence__map-legend">
+                            <img
+                                className="concurrence__map-legend-pin"
+                                src={markerIconUrl}
+                                alt=""
+                            />
+                            Installations des plans affichés, au centre de leur
+                            commune
+                        </p>
+                    )}
                 </div>
             </div>
         </div>
