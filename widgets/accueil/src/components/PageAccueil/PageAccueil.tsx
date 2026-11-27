@@ -7,7 +7,7 @@ import DataTable, { type Column } from '@shared/react/ui/components/DataTable'
 import MultiSelect from '@shared/react/ui/components/MultiSelect'
 import SearchBar from '@shared/react/ui/components/SearchBar'
 import TagStatut from '@shared/react/ui/components/TagStatut'
-import TagType from '../TagType'
+import TagTypeDePlan from '@shared/react/ui/components/TagTypeDePlan'
 import TagUsage from '../TagUsage'
 import type { Crb } from '@shared/core/domain/entities/crb'
 import type { Departement } from '@shared/core/domain/value-objects/departement'
@@ -73,7 +73,7 @@ function getColumns(
         {
             id: 'type',
             header: 'Type de plan',
-            render: (plan) => <TagType type={plan.typeDePlan} />,
+            render: (plan) => <TagTypeDePlan typeDePlan={plan.typeDePlan} />,
         },
         {
             id: 'usage',
