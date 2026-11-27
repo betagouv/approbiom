@@ -75,3 +75,33 @@
 .concurrence__map .map {
     height: 100%;
 }
+
+/* RGAA 10.11 (reflow): below 48em, two columns would overflow sideways, so
+   the table and the map stack and the page scrolls instead. */
+@media (max-width: 47.99em) {
+    .concurrence {
+        height: auto;
+    }
+
+    .concurrence__filters {
+        flex-wrap: wrap;
+    }
+
+    .concurrence__filter {
+        flex: 1 1 12rem;
+    }
+
+    .concurrence__results {
+        grid-template-columns: minmax(0, 1fr);
+        grid-template-rows: auto 24rem;
+    }
+
+    .concurrence__table {
+        border-right: 0;
+        border-bottom: 1px solid var(--border-default-grey);
+    }
+
+    .concurrence__table .fr-table {
+        height: auto;
+    }
+}
