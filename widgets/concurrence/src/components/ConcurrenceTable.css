@@ -127,6 +127,13 @@
     color: var(--text-mention-grey);
 }
 
+/* Containing block of the cells' `fr-sr-only` texts, which are absolutely
+   positioned: anchored on `.fr-table`, outside the scrolling box, they escaped
+   its clipping and stretched the whole page to the table's full height. */
+.concurrence-table__scroller {
+    position: relative;
+}
+
 .concurrence-table__scroller:focus-visible {
     outline: 2px solid var(--border-active-blue-france);
     outline-offset: -2px;
