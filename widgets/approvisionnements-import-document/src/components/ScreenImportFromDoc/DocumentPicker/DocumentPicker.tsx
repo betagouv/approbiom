@@ -6,7 +6,7 @@ import Alert from '@shared/react/ui/components/Alert'
 import Badge from '@shared/react/ui/components/Badge'
 import type { ExtractionSummary } from '@shared/core/application/ports/extracted-approvisionnement'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
-import { documentIconOf } from '@shared/react/ui/components/document-icon'
+import { documentIconOf } from '@shared/react/ui/document-icon'
 import { formatNumber, plural } from '@shared/react/format'
 
 const KO = 1024
