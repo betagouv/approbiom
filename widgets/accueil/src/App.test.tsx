@@ -183,6 +183,15 @@ describe('App', () => {
         ).toBeDefined()
     })
 
+    it('reads only the code and title of the ressources', async () => {
+        const list = vi.fn(rows([]))
+        render(<App {...fakePorts({ ressources: { list } })} />)
+
+        await screen.findByRole('heading', { level: 1 })
+
+        expect(list).toHaveBeenCalledWith(['code', 'title'])
+    })
+
     it('says so when the page is not running inside Grist', async () => {
         render(
             <App

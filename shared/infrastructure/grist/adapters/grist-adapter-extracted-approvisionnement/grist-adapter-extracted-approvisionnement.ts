@@ -22,7 +22,7 @@ import {
 } from '../../helpers/grist-helpers'
 import { COLUMNS, TABLE } from '../../types/grist-tables'
 import { toEntreprise } from '../grist-adapter-entreprise'
-import { toRessource } from '../grist-adapter-ressource'
+import { ressourceColumns, toRessource } from '../grist-adapter-ressource'
 import {
     toChangedFields,
     toControle,
@@ -31,6 +31,8 @@ import {
     toFields,
     type References,
 } from './utils'
+
+const MATCHED_RESSOURCE = ['code', 'title'] as const
 
 // The table points at the Piece_jointe row, not at the attachment itself.
 async function findAttachmentRow(
@@ -52,7 +54,10 @@ const fetchExtractedApprovisionnementRows = async () =>
 async function fetchReferences(): Promise<References> {
     const [entrepriseRows, ressourceRows] = await Promise.all([
         fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise),
-        fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
+        fetchRowsOnce(TABLE.metaRessource, [
+            'id',
+            ...ressourceColumns(['code']),
+        ]),
     ])
 
     return {
@@ -64,7 +69,7 @@ async function fetchReferences(): Promise<References> {
         ),
         ressourceIdByCode: new Map(
             ressourceRows.map((row) => [
-                toRessource(row).code,
+                toRessource(row, ['code']).code,
                 asNumber(row.id) ?? 0,
             ])
         ),
@@ -83,7 +88,10 @@ export function createGristExtractedApprovisionnementAdapter(): ExtractedApprovi
                     findAttachmentRow(attachment.id),
                     fetchExtractedApprovisionnementRows(),
                     fetchRowsOnce(TABLE.entreprise, COLUMNS.entreprise),
-                    fetchRowsOnce(TABLE.metaRessource, COLUMNS.metaRessource),
+                    fetchRowsOnce(TABLE.metaRessource, [
+                        'id',
+                        ...ressourceColumns(MATCHED_RESSOURCE),
+                    ]),
                 ])
             if (!attachmentRow) return []
 
@@ -100,7 +108,7 @@ export function createGristExtractedApprovisionnementAdapter(): ExtractedApprovi
                         row,
                         attachment.name,
                         entreprise && toEntreprise(entreprise),
-                        ressource && toRessource(ressource)
+                        ressource && toRessource(ressource, MATCHED_RESSOURCE)
                     )
                 })
                 .sort((a, b) => a.read.excelRow - b.read.excelRow)

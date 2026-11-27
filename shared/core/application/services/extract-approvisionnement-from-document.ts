@@ -2,7 +2,7 @@ import type { AttachmentPort } from '@shared/core/application/ports/attachment'
 import type { DocumentExtractorApprovisionnementPort } from '@shared/core/application/ports/document-extractor-approvisionnement'
 import type { EntreprisePort } from '@shared/core/application/ports/entreprise'
 import type { ExtractedApprovisionnementPort } from '@shared/core/application/ports/extracted-approvisionnement'
-import type { RessourcePort } from '@shared/core/application/ports/ressource'
+import type { RessourcesPort } from '@shared/core/application/ports/ressources'
 import type { Attachment } from '@shared/core/domain/entities/attachment'
 import type {
     ExtractedApprovisionnement,
@@ -18,7 +18,7 @@ export type ExtractApprovisionnementFromDocumentPorts = {
     extractedApprovisionnements: ExtractedApprovisionnementPort
     attachments: Pick<AttachmentPort, 'download'>
     entreprises: Pick<EntreprisePort, 'list'>
-    ressources: Pick<RessourcePort, 'list'>
+    ressources: RessourcesPort
     documentExtractorApprovisionnement: DocumentExtractorApprovisionnementPort
 }
 
@@ -57,7 +57,7 @@ async function downloadAndExtract(
     const [file, entrepriseList, ressourceList] = await Promise.all([
         attachments.download(attachment.id),
         entreprises.list(),
-        ressources.list(),
+        ressources.list(['code', 'ademeCode', 'title', 'description']),
     ])
 
     try {

@@ -26,12 +26,14 @@ export type ReadLine = {
     additionalData: string
 }
 
+export type MatchedRessource = Pick<Ressource, 'code' | 'title'>
+
 export type ExtractedLine = {
     read: ReadLine
     derived: {
         parsedProvenance: ProvenanceParseResults
         matchedFournisseur: Entreprise | null
-        matchedRessource: Ressource | null
+        matchedRessource: MatchedRessource | null
     }
 }
 

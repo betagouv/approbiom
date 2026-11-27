@@ -62,7 +62,7 @@ function ports(
         extractedApprovisionnements,
         attachments: { download: vi.fn(() => Promise.resolve(new Blob())) },
         entreprises: { list: () => Promise.resolve([]) },
-        ressources: { list: () => Promise.resolve([]) },
+        ressources: { list: vi.fn(() => Promise.resolve([])) },
         documentExtractorApprovisionnement: {
             extract: vi.fn(() => Promise.resolve([line])),
         },
@@ -84,6 +84,19 @@ describe('extractApprovisionnementFromDocument', () => {
         ).toHaveBeenCalledOnce()
         expect(lines).toMatchObject([
             { controle: NON_VERIFIEE, read: line.read },
+        ])
+    })
+
+    it('reads only what matching a ressource needs', async () => {
+        const dependencies = ports()
+
+        await extractApprovisionnementFromDocument(attachment, dependencies)
+
+        expect(dependencies.ressources.list).toHaveBeenCalledWith([
+            'code',
+            'ademeCode',
+            'title',
+            'description',
         ])
     })
 

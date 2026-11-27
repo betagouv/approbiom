@@ -19,6 +19,17 @@ describe('loadApprovisionnementsSaisieManuelle', () => {
         )
     })
 
+    it('reads only the code and title of the ressources', async () => {
+        const list = vi.fn(() => Promise.resolve(FAKE_RESSOURCES))
+
+        await loadApprovisionnementsSaisieManuelle({
+            ...FAKE_PORTS,
+            ressources: { list },
+        })
+
+        expect(list).toHaveBeenCalledWith(['code', 'title'])
+    })
+
     it('hands the writes over to the ports it was loaded with', async () => {
         const remove = vi.fn(() => Promise.resolve())
         const listByPlan = vi.fn(() => Promise.resolve([]))

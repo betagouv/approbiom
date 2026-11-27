@@ -11,9 +11,6 @@ const REFERENCED_TABLES: Record<string, ColumnMajorTable> = {
     [TABLE.metaRessource]: {
         id: [1],
         Code_ressource_Approbiom: ['PF'],
-        ademe_2017: ['2017-1A-PFA'],
-        Description_courte: ['Plaquettes forestières'],
-        Description: ['Plaquettes forestières dont souches et rémanents'],
     },
     [TABLE.entreprise]: {
         id: [1],

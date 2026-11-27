@@ -20,7 +20,7 @@ export async function loadApprovisionnementsSaisieManuelle(ports: Ports) {
         ),
         ports.approvisionnements.list(),
         ports.entreprises.list(),
-        ports.ressources.list(),
+        ports.ressources.list(['code', 'title']),
         ports.referentielGeo.listDepartementsByRegion(),
         ports.approvisionnements.listPaysDeProvenance(),
     ])
