@@ -32,7 +32,7 @@
 .concurrence__results {
     display: grid;
     flex: 1;
-    grid-template-columns: minmax(35rem, 50%) 1fr;
+    grid-template-columns: minmax(35rem, 62%) 1fr;
     grid-template-rows: minmax(0, 1fr);
     min-height: 0;
 }
