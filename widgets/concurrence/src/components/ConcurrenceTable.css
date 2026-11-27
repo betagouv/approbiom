@@ -31,9 +31,12 @@
     vertical-align: top;
 }
 
-/* WCAG 2.4.11: the stuck header must not cover the focused toggle. */
+/* WCAG 2.4.11: the stuck header must not cover the focused toggle. The
+   height is measured by the component; 4.5rem until then. */
 .concurrence-table .concurrence-table__toggle {
-    scroll-margin-top: 4.5rem;
+    scroll-margin-top: calc(
+        var(--concurrence-table-header-height, 4.5rem) + 0.5rem
+    );
 }
 
 .concurrence-table__unit {

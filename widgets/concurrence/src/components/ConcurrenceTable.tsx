@@ -9,7 +9,13 @@ import Badge from '@shared/react/ui/components/Badge'
 import { getRessourceIcon } from '@shared/react/ui/ressource-icon'
 import { formatNumber } from '@shared/react/format'
 import { PLAN_STATUT_PROJECT } from '@shared/core/domain/value-objects/plan-statut'
-import { useId, useState } from 'react'
+import {
+    type CSSProperties,
+    useId,
+    useLayoutEffect,
+    useRef,
+    useState,
+} from 'react'
 import type {
     PlanConcurrent,
     RessourceConcurrente,
@@ -103,10 +109,34 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
         })
     }
 
+    // WCAG 2.4.11: the stuck header wraps when the column narrows, so the room
+    // a focused toggle keeps below it follows its actual height.
+    const theadRef = useRef<HTMLTableSectionElement>(null)
+    const [headerHeight, setHeaderHeight] = useState<number | null>(null)
+    useLayoutEffect(() => {
+        const thead = theadRef.current
+        if (thead === null || typeof ResizeObserver === 'undefined') return
+
+        const observer = new ResizeObserver(() =>
+            setHeaderHeight(thead.getBoundingClientRect().height)
+        )
+        observer.observe(thead)
+        return () => observer.disconnect()
+    }, [])
+
     const count = plansConcurrents.length
 
     return (
-        <div className="fr-table fr-table--bordered fr-table--multiline concurrence-table">
+        <div
+            className="fr-table fr-table--bordered fr-table--multiline concurrence-table"
+            style={
+                headerHeight === null
+                    ? undefined
+                    : ({
+                          '--concurrence-table-header-height': `${headerHeight}px`,
+                      } as CSSProperties)
+            }
+        >
             {/* Outside `fr-table__wrapper`, the scrolling box, so the title does
                 not scroll away with the rows. */}
             <div className="concurrence-table__header">
@@ -148,7 +178,7 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                             aria-labelledby={`${titleId} ${countId}`}
                             aria-describedby={summaryId}
                         >
-                            <thead>
+                            <thead ref={theadRef}>
                                 <tr>
                                     <th id={columnIds.ressource}>Ressource</th>
                                     <th id={columnIds.provenances}>

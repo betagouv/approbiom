@@ -5,7 +5,7 @@ import {
     screen,
     within,
 } from '@testing-library/react'
-import { afterEach, describe, expect, it } from 'vitest'
+import { afterEach, describe, expect, it, vi } from 'vitest'
 import type {
     PlanConcurrent,
     RessourceConcurrente,
@@ -46,6 +46,8 @@ const plan = (id: number, ressources: RessourceConcurrente[]) =>
 
 afterEach(() => {
     cleanup()
+    vi.unstubAllGlobals()
+    vi.restoreAllMocks()
 })
 
 describe('ConcurrenceTable', () => {
@@ -155,6 +157,33 @@ describe('ConcurrenceTable', () => {
 
         expect(region.tabIndex).toBe(0)
         expect(within(region).getByRole('table')).toBeDefined()
+    })
+
+    it('keeps the focused toggle below the sticky header, however tall', () => {
+        vi.stubGlobal(
+            'ResizeObserver',
+            class {
+                constructor(private readonly callback: () => void) {}
+                observe() {
+                    this.callback()
+                }
+                disconnect() {}
+            }
+        )
+        vi.spyOn(
+            HTMLTableSectionElement.prototype,
+            'getBoundingClientRect'
+        ).mockReturnValue({ height: 120 } as DOMRect)
+
+        const { container } = render(
+            <ConcurrenceTable plansConcurrents={[plan(1, [plaquettes])]} />
+        )
+
+        expect(
+            container
+                .querySelector<HTMLElement>('.concurrence-table')
+                ?.style.getPropertyValue('--concurrence-table-header-height')
+        ).toBe('120px')
     })
 
     it('says so when no plan is left', () => {
