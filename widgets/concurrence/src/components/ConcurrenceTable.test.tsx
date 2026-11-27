@@ -146,6 +146,17 @@ describe('ConcurrenceTable', () => {
         expect(row.hidden).toBe(false)
     })
 
+    it('lets keyboard users reach the scrolling area', () => {
+        render(<ConcurrenceTable plansConcurrents={[plan(1, [plaquettes])]} />)
+
+        const region = screen.getByRole('region', {
+            name: "Plans d'approvisionnement concernés",
+        })
+
+        expect(region.tabIndex).toBe(0)
+        expect(within(region).getByRole('table')).toBeDefined()
+    })
+
     it('says so when no plan is left', () => {
         render(<ConcurrenceTable plansConcurrents={[]} />)
 

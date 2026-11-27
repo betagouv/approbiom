@@ -135,7 +135,14 @@ export default function ConcurrenceTable({ plansConcurrents }: Props) {
                 retenu sur le tonnage total, en tonne de matière verte par an.
             </p>
             <div className="fr-table__wrapper">
-                <div className="fr-table__container">
+                {/* Focusable so keyboard users can scroll the rows between two
+                    plan toggles. */}
+                <div
+                    className="fr-table__container concurrence-table__scroller"
+                    tabIndex={0}
+                    role="region"
+                    aria-labelledby={titleId}
+                >
                     <div className="fr-table__content">
                         <table
                             aria-labelledby={`${titleId} ${countId}`}

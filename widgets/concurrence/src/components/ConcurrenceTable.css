@@ -118,3 +118,8 @@
 .concurrence-table__mention {
     color: var(--text-mention-grey);
 }
+
+.concurrence-table__scroller:focus-visible {
+    outline: 2px solid var(--border-active-blue-france);
+    outline-offset: -2px;
+}
