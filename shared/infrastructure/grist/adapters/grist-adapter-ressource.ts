@@ -1,6 +1,6 @@
 import type { RessourcePort } from '@shared/core/application/ports/ressource'
 import { gristReady } from '../helpers/grist-ready'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 import {
     asString,
     fetchRowsOnce,

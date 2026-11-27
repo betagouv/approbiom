@@ -1,4 +1,4 @@
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
 export const FAKE_RESSOURCES: readonly Ressource[] = [
     {

@@ -1,5 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 import { matchRessource } from './match-ressource'
 
 const plaquettes: Ressource = {

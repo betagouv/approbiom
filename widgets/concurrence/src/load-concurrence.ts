@@ -15,7 +15,7 @@ import {
 import type { Departement } from '@shared/core/domain/value-objects/departement'
 import type { Entreprise } from '@shared/core/domain/entities/entreprise'
 import type { PlanDApprovisionnement } from '@shared/core/domain/entities/plan-d-approvisionnement'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
 export type ConcurrencePorts = {
     approvisionnements: ApprovisionnementPort

@@ -2,7 +2,7 @@ import './TabSynthese.css'
 
 import { useId, useState } from 'react'
 import type { Approvisionnement } from '@shared/core/domain/entities/approvisionnement'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 import { toApprovisionnementRows } from '../../../approvisionnement-rows'
 import type { Referentiels } from '../../../referentiels'
 import { toSynthese, type Share } from './synthese'

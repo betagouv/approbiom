@@ -7,7 +7,7 @@ import { useId } from 'react'
 import DismissibleTag from '@shared/react/components/DismissibleTag'
 import MultiSelect from '@shared/react/components/MultiSelect'
 import SelectableTag from '@shared/react/components/SelectableTag'
-import type { Ressource } from '@shared/core/domain/entities/ressource'
+import type { Ressource } from '@shared/core/domain/value-objects/ressource'
 
 const MAX_SELECTABLE_TAGS = 6
 
