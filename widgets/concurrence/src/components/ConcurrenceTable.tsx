@@ -65,22 +65,23 @@ function RessourceName({ ressource }: { ressource: RessourceConcurrente }) {
 
     return (
         <span className="concurrence-table__ressource">
-            {familleLabel === '' ? (
-                <span
-                    className={`${iconClassName} fr-icon--sm`}
-                    style={style}
-                    aria-hidden="true"
-                />
-            ) : (
-                <span
-                    className={`${iconClassName} fr-icon--sm`}
-                    style={style}
-                    role="img"
-                    aria-label={`Famille : ${familleLabel}`}
-                    title={`Famille : ${familleLabel}`}
-                />
-            )}
-            {ressource.nom}
+            {/* Hidden: its name would come before the ressource in the row
+                header read out for every cell. */}
+            <span
+                className={`${iconClassName} fr-icon--sm`}
+                style={style}
+                aria-hidden="true"
+                title={familleLabel === '' ? undefined : familleLabel}
+            />
+            <span>
+                {ressource.nom}
+                {familleLabel !== '' && (
+                    <span className="fr-sr-only">
+                        {' '}
+                        (famille : {familleLabel})
+                    </span>
+                )}
+            </span>
         </span>
     )
 }

@@ -94,14 +94,13 @@ describe('ConcurrenceTable', () => {
         ])
     })
 
-    it('names the famille of each ressource on its icon', () => {
+    it('names the famille of each ressource after its name', () => {
         render(<ConcurrenceTable plansConcurrents={[plan(1, [connexes])]} />)
 
         expect(
-            screen.getByRole('img', {
-                name: 'Famille : Coproduits 1ère transfo Bois',
-            })
-        ).toBeDefined()
+            screen.getByText('Connexes de scierie').closest('th')?.textContent
+        ).toBe('Connexes de scierie (famille : Coproduits 1ère transfo Bois)')
+        expect(screen.queryByRole('img')).toBeNull()
     })
 
     it('ties every cell to headers that exist', () => {
