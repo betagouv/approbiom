@@ -229,8 +229,7 @@ export default function Concurrence({
                                 src={markerIconUrl}
                                 alt=""
                             />
-                            Installations des plans affichés, au centre de leur
-                            commune
+                            Commune de l&apos;installation
                         </p>
                     )}
                 </div>

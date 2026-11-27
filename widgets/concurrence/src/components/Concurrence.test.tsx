@@ -292,11 +292,7 @@ describe('Concurrence', () => {
     it('says the pins are the installations of the plans', () => {
         renderConcurrence([saintJunien])
 
-        expect(
-            screen.getByText(
-                'Installations des plans affichés, au centre de leur commune'
-            )
-        ).toBeDefined()
+        expect(screen.getByText("Commune de l'installation")).toBeDefined()
     })
 
     it('draws the provenances of a plan it cannot situate', () => {
@@ -306,7 +302,7 @@ describe('Concurrence', () => {
 
         expect(markers(container)).toHaveLength(0)
         expect(polygons(container)).toHaveLength(2)
-        expect(screen.queryByText(/^Installations des plans/)).toBeNull()
+        expect(screen.queryByText("Commune de l'installation")).toBeNull()
     })
 
     it('says as much when the filters leave nothing to place', () => {
