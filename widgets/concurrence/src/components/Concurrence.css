@@ -75,20 +75,3 @@
 .concurrence__map .map {
     height: 100%;
 }
-
-.concurrence__detail {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 0.5rem 3rem;
-    margin: 0;
-    padding: 0.5rem 0;
-}
-
-.concurrence__detail dt {
-    color: var(--text-mention-grey);
-    font-size: 0.875rem;
-}
-
-.concurrence__detail dd {
-    margin: 0;
-}

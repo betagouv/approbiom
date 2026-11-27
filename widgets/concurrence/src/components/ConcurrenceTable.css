@@ -1,0 +1,120 @@
+.concurrence-table__header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.25rem 1rem;
+    margin-bottom: 1rem;
+}
+
+.concurrence-table__title {
+    margin: 0;
+    font-size: 1.25rem;
+    line-height: 2rem;
+}
+
+.concurrence-table__count {
+    margin: 0;
+    color: var(--text-mention-grey);
+}
+
+/* DSFR's bordered variant leaves the table's top and left edges open. */
+.concurrence-table .fr-table__content table {
+    border-top: 1px solid var(--border-contrast-grey);
+    border-left: 1px solid var(--border-contrast-grey);
+}
+
+.concurrence-table .fr-table__content thead th {
+    position: sticky;
+    top: 0;
+    z-index: 2;
+    vertical-align: top;
+}
+
+/* WCAG 2.4.11: the stuck header must not cover the focused toggle. */
+.concurrence-table .concurrence-table__toggle {
+    scroll-margin-top: 4.5rem;
+}
+
+.concurrence-table__unit {
+    color: var(--text-mention-grey);
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+.concurrence-table .fr-table__content tbody tr.concurrence-table__plan > th {
+    background-color: var(--background-alt-grey);
+}
+
+.concurrence-table__plan-header {
+    display: flex;
+    flex-wrap: wrap;
+    align-items: center;
+    gap: 0.5rem 1rem;
+}
+
+.concurrence-table__toggle {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+    padding: 0;
+    border: 0;
+    background: none;
+    color: inherit;
+    font: inherit;
+    font-size: 1.125rem;
+    font-weight: 700;
+    text-align: left;
+    cursor: pointer;
+}
+
+.concurrence-table__chevron {
+    flex-shrink: 0;
+    color: var(--text-action-high-blue-france);
+    transition: transform 0.2s;
+}
+
+.concurrence-table__toggle[aria-expanded='false'] .concurrence-table__chevron {
+    transform: rotate(-90deg);
+}
+
+.concurrence-table__plan-header .fr-badge {
+    margin: 0;
+}
+
+.concurrence-table__departement {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.25rem;
+    color: var(--text-mention-grey);
+    font-size: 0.875rem;
+    font-weight: 400;
+}
+
+/* `[hidden]` is only user-agent weight: any `display: table-row` would outrank it. */
+.concurrence-table .fr-table__content tbody tr.concurrence-table__row[hidden] {
+    display: none;
+}
+
+.concurrence-table .fr-table__content tbody tr.concurrence-table__row > * {
+    vertical-align: top;
+}
+
+.concurrence-table__ressource {
+    display: inline-flex;
+    align-items: baseline;
+    gap: 0.5rem;
+    font-weight: 700;
+}
+
+.concurrence-table__line {
+    margin: 0;
+}
+
+.concurrence-table__line + .concurrence-table__line {
+    margin-top: 0.5rem;
+}
+
+.concurrence-table__mention {
+    color: var(--text-mention-grey);
+}
