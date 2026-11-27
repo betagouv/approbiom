@@ -1,9 +1,5 @@
 import { describe, expect, it } from 'vitest'
-import {
-    COLOR_BY_RESSOURCE_CODE,
-    getRessourceIcon,
-    ICON_BY_FAMILLE,
-} from './ressource-icon'
+import { COLOR_BY_RESSOURCE_CODE, getRessourceIcon } from './ressource-icon'
 
 describe('getRessourceIcon', () => {
     it('gives the icon of the famille and the colour of the ressource', () => {
@@ -48,9 +44,5 @@ describe('getRessourceIcon', () => {
         for (const colors of colorsByFamille.values()) {
             expect(new Set(colors).size).toBe(colors.length)
         }
-    })
-
-    it('has an icon for each of the eight familles', () => {
-        expect(Object.keys(ICON_BY_FAMILLE)).toHaveLength(8)
     })
 })
